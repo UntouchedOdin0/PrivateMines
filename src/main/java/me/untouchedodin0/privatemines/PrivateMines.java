@@ -23,7 +23,7 @@ public class PrivateMines extends JavaPlugin {
         setupSchematicUtils();
         getLogger().info("Schematic Storage: " + getSchematicStorage());
         getLogger().info("Schematic Iterator: " + getSchematicIterator());
-        getLogger().info("Mid Version: " + VersionUtils.getMidVersion());
+        getLogger().info("Mid Version: " + VersionUtils.MID_VERSION);
     }
 
     private void registerCommands() {
