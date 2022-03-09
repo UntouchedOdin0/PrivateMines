@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+}
+
+group 'me.untouchedodin0'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://papermc.io/repo/repository/maven-public/' }
+    maven { url = 'https://maven.enginehub.org/repo/' }
+    maven { url = 'https://repo.aikar.co/content/groups/aikar/' }
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    compileOnly 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT'
+    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.9-SNAPSHOT'
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+
+    implementation "co.aikar:acf-paper:0.5.1-SNAPSHOT"
+}
+
+shadowJar {
+    relocate 'org.codemc.worldguardwrapper', 'me.untouchedodin0.privatemines.worldguardwrapper'
+    relocate 'de.jeff_media.updatechecker', 'me.untouchedodin0.privatemines.updatechecker'
+}
+
+task copyTo_DevServer(type: Copy) {
+    from shadowJar
+    into "E:/Coding/Spigot Test Servers/1.18.2 Privates Mines (Paper)/plugins"
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,21 @@
+/.gradle/
+/.idea/
+/build/
+/build/classes/
+/build/generated/
+/build/libs/
+/build/resources/
+/build/tmp/
+/server/
+/gradle/
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+/gradle.properties
+
+# We no share the jar files for the libs we use.
+/plugin/libs/
