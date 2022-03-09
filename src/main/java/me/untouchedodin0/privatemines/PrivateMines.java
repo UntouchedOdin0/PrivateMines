@@ -4,6 +4,7 @@ import co.aikar.commands.PaperCommandManager;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
+import me.untouchedodin0.privatemines.utils.version.VersionUtils;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PrivateMines extends JavaPlugin {
@@ -22,6 +23,7 @@ public class PrivateMines extends JavaPlugin {
         setupSchematicUtils();
         getLogger().info("Schematic Storage: " + getSchematicStorage());
         getLogger().info("Schematic Iterator: " + getSchematicIterator());
+        getLogger().info("Mid Version: " + VersionUtils.getMidVersion());
     }
 
     private void registerCommands() {

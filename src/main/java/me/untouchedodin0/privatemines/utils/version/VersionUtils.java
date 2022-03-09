@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class VersionUtils {
 
-    private static int getMidVersion() {
+    public static int getMidVersion() {
         // Credits to Redempt for this
         Pattern pattern = Pattern.compile("1\\\\.([0-9]+)");
         Matcher matcher = pattern.matcher(Bukkit.getBukkitVersion());
