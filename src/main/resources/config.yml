@@ -1,1 +1,8 @@
-name: "uwu"
+mineTypes:
+  Test:
+    file: "debugschem.schem"
+    resetTime: 5
+    resetPercentage: 50.0
+    materials:
+      STONE: 0.9
+      COBBLESTONE: 0.1

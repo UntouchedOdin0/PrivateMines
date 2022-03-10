@@ -8,5 +8,6 @@ import java.util.Map;
 
 @ConfigMappable
 public class MineConfig {
+
     public static Map<String, MineType> mineTypes = new HashMap<>();
 }
