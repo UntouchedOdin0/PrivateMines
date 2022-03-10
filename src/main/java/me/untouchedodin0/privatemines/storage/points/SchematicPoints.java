@@ -8,7 +8,8 @@ public class SchematicPoints {
 
     private BlockVector3 spawn;
     private BlockVector3 npc;
-    private List<BlockVector3> corners;
+    private BlockVector3 corner1;
+    private BlockVector3 corner2;
 
     public BlockVector3 getSpawn() {
         return spawn;
@@ -26,11 +27,19 @@ public class SchematicPoints {
         this.npc = npc;
     }
 
-    public List<BlockVector3> getCorners() {
-        return corners;
+    public BlockVector3 getCorner1() {
+        return corner1;
     }
 
-    public void setCorners(List<BlockVector3> corners) {
-        this.corners = corners;
+    public void setCorner1(BlockVector3 corner1) {
+        this.corner1 = corner1;
+    }
+
+    public BlockVector3 getCorner2() {
+        return corner1;
+    }
+
+    public void setCorner2(BlockVector3 corner2) {
+        this.corner2 = corner2;
     }
 }

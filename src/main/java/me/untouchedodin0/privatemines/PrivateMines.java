@@ -22,12 +22,39 @@ import java.time.Instant;
 public class PrivateMines extends JavaPlugin {
 
     private static PaperCommandManager paperCommandManager;
-    private SchematicStorage schematicStorage;
-    private SchematicIterator schematicIterator;
     private static PrivateMines privateMines;
-
     private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
     private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
+    private SchematicStorage schematicStorage;
+    private SchematicIterator schematicIterator;
+
+    public static PrivateMines getPrivateMines() {
+        return privateMines;
+    }
+
+    public static PaperCommandManager getPaperCommandManager() {
+        return paperCommandManager;
+    }
+
+    /**
+     * Gets the plugin that called the calling method of this method
+     * <p>
+     * Credits to Redempt
+     *
+     * @return The plugin which called the method
+     */
+
+    public static Plugin getCallingPlugin() {
+        Exception ex = new Exception();
+        try {
+            Class<?> clazz = Class.forName(ex.getStackTrace()[2].getClassName());
+            Plugin plugin = JavaPlugin.getProvidingPlugin(clazz);
+            return plugin.isEnabled() ? plugin : Bukkit.getPluginManager().getPlugin(plugin.getName());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     @Override
     public void onEnable() {
@@ -85,38 +112,11 @@ public class PrivateMines extends JavaPlugin {
         this.schematicIterator = new SchematicIterator(getSchematicStorage());
     }
 
-    public static PrivateMines getPrivateMines() {
-        return privateMines;
-    }
-
-    public static PaperCommandManager getPaperCommandManager() {
-        return paperCommandManager;
-    }
-
     public SchematicStorage getSchematicStorage() {
         return schematicStorage;
     }
 
     public SchematicIterator getSchematicIterator() {
         return schematicIterator;
-    }
-
-    /**
-     * Gets the plugin that called the calling method of this method
-     *
-     * Credits to Redempt
-     * @return The plugin which called the method
-     */
-
-    public static Plugin getCallingPlugin() {
-        Exception ex = new Exception();
-        try {
-            Class<?> clazz = Class.forName(ex.getStackTrace()[2].getClassName());
-            Plugin plugin = JavaPlugin.getProvidingPlugin(clazz);
-            return plugin.isEnabled() ? plugin : Bukkit.getPluginManager().getPlugin(plugin.getName());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 }
