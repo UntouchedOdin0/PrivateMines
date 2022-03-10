@@ -1,8 +1,7 @@
 package me.untouchedodin0.privatemines.storage.points;
 
 import com.sk89q.worldedit.math.BlockVector3;
-
-import java.util.List;
+import org.bukkit.Bukkit;
 
 public class SchematicPoints {
 
@@ -32,14 +31,16 @@ public class SchematicPoints {
     }
 
     public void setCorner1(BlockVector3 corner1) {
+        Bukkit.getLogger().info("Corner1 set to " + corner1 + "!");
         this.corner1 = corner1;
     }
 
     public BlockVector3 getCorner2() {
-        return corner1;
+        return corner2;
     }
 
     public void setCorner2(BlockVector3 corner2) {
+        Bukkit.getLogger().info("Corner2 set to " + corner2 + "!");
         this.corner2 = corner2;
     }
 }
