@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 
 public class PrivateMines extends JavaPlugin {
 
@@ -94,7 +95,7 @@ public class PrivateMines extends JavaPlugin {
             getLogger().info("Schematic iterator: " + schematicIterator);
 
             SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
-            Bukkit.getLogger().info("corners: " + mineBlocks.getCorners()[0]);
+            Bukkit.getLogger().info("corners: " + Arrays.toString(mineBlocks.getCorners()));
         });
 
         Instant end = Instant.now();

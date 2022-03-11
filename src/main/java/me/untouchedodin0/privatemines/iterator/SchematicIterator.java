@@ -67,6 +67,8 @@ public class SchematicIterator {
 
                 Bukkit.getLogger().info("corner1: " + corner1);
                 Bukkit.getLogger().info("corner2: " + corner2);
+                mineBlocks.corners[0] = corner1;
+                mineBlocks.corners[1] = corner2;
             } catch (IOException e) {
                 e.printStackTrace();
             }
