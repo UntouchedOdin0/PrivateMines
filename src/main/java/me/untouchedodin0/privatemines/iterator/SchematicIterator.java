@@ -53,10 +53,7 @@ public class SchematicIterator {
                     Material spawnMaterial = Material.SPONGE;
                     Material cornerMaterial = Material.POWERED_RAIL;
 
-                    Material bukkitMaterial = BukkitAdapter.adapt(clipboard.getBlock(blockVector3)).getMaterial();
-
                     BlockType blockType = clipboard.getBlock(blockVector3).getBlockType();
-
                     if (blockType.equals(BlockTypes.POWERED_RAIL)) {
                         if (corner1 == null) {
                             Bukkit.getLogger().info("powered rail " + blockVector3.toParserString());
