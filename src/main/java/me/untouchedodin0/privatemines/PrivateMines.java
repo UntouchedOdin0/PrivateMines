@@ -93,7 +93,8 @@ public class PrivateMines extends JavaPlugin {
             getLogger().info("MineType reset percentage: " + mineType.getResetPercentage());
             getLogger().info("Schematic iterator: " + schematicIterator);
 
-            schematicIterator.findRelativePoints(schematicFile);
+            SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
+            Bukkit.getLogger().info("corners: " + mineBlocks.getCorners()[0]);
         });
 
         Instant end = Instant.now();

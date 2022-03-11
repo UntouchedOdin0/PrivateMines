@@ -27,7 +27,7 @@ public class SchematicPoints {
     }
 
     public BlockVector3 getCorner1() {
-        return corner1;
+        return this.corner1;
     }
 
     public void setCorner1(BlockVector3 corner1) {
@@ -36,7 +36,7 @@ public class SchematicPoints {
     }
 
     public BlockVector3 getCorner2() {
-        return corner2;
+        return this.corner2;
     }
 
     public void setCorner2(BlockVector3 corner2) {
