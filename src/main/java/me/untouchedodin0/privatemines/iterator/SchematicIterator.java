@@ -1,7 +1,5 @@
 package me.untouchedodin0.privatemines.iterator;
 
-import com.google.common.collect.ImmutableList;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
@@ -10,16 +8,12 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
-import me.untouchedodin0.privatemines.storage.points.SchematicPoints;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class SchematicIterator {
 
@@ -27,10 +21,6 @@ public class SchematicIterator {
     BlockVector3 spawn;
     BlockVector3 corner1;
     BlockVector3 corner2;
-    List<BlockVector3> corners = new ArrayList<>();
-    List<BlockVector3> test = new ArrayList<>();
-    BlockVector3 fix;
-    BlockVector3 fix2 = null;
 
     public SchematicIterator(SchematicStorage storage) {
         this.schematicStorage = storage;
