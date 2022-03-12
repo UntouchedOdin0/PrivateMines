@@ -90,5 +90,13 @@ public class SchematicIterator {
         public BlockVector3[] getCorners() {
             return corners;
         }
+
+        public BlockVector3 getCorner1() {
+            return corners[0];
+        }
+
+        public BlockVector3 getCorner2() {
+            return corners[1];
+        }
     }
 }
