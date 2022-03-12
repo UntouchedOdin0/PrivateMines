@@ -1,5 +1,6 @@
 package me.untouchedodin0.privatemines.iterator;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
@@ -38,13 +39,19 @@ public class SchematicIterator {
                 clipboard = clipboardReader.read();
                 Bukkit.getLogger().info("Clipboard: " + clipboard);
                 Bukkit.getLogger().info("Clipboard Region: " + clipboard.getRegion());
-//
-                clipboard.getRegion().forEach(blockVector3 -> {
-                    Material spawnMaterial = Material.SPONGE;
-                    Material cornerMaterial = Material.POWERED_RAIL;
 
+                Material cornerMaterial = Material.POWERED_RAIL;
+                Material spawnMaterial = Material.SPONGE;
+                BlockType cornerType = BlockType.REGISTRY.get(cornerMaterial.getKey().getKey());
+                BlockType spawnType = BlockType.REGISTRY.get(spawnMaterial.getKey().getKey());
+
+                Bukkit.getLogger().info("spawn type: " + spawnType);
+                Bukkit.getLogger().info("corner type: " + cornerType);
+
+                clipboard.getRegion().forEach(blockVector3 -> {
                     BlockType blockType = clipboard.getBlock(blockVector3).getBlockType();
-                    if (blockType.equals(BlockTypes.POWERED_RAIL)) {
+
+                    if (blockType.equals(cornerType)) {
                         if (corner1 == null) {
                             Bukkit.getLogger().info("powered rail " + blockVector3.toParserString());
                             corner1 = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
@@ -52,7 +59,7 @@ public class SchematicIterator {
                             Bukkit.getLogger().info("powered rail " + blockVector3.toParserString());
                             corner2 = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
                         }
-                    } else if (blockType.equals(BlockTypes.SPONGE)) {
+                    } else if (blockType.equals(spawnType)) {
                         if (spawn == null) {
                             Bukkit.getLogger().info("Sponge: " + blockVector3.toParserString());
                             spawn = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
@@ -73,6 +80,7 @@ public class SchematicIterator {
         }
         return mineBlocks;
     }
+
     public static class MineBlocks {
         BlockVector3 spawnLocation;
         BlockVector3[] corners;
