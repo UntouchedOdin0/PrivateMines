@@ -52,11 +52,19 @@ public class SchematicIterator {
                             Bukkit.getLogger().info("powered rail " + blockVector3.toParserString());
                             corner2 = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
                         }
+                    } else if (blockType.equals(BlockTypes.SPONGE)) {
+                        if (spawn == null) {
+                            Bukkit.getLogger().info("Sponge: " + blockVector3.toParserString());
+                            spawn = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
+                        }
                     }
                 });
 
                 Bukkit.getLogger().info("corner1: " + corner1);
                 Bukkit.getLogger().info("corner2: " + corner2);
+                Bukkit.getLogger().info("spawn: " + spawn);
+
+                mineBlocks.spawnLocation = spawn;
                 mineBlocks.corners[0] = corner1;
                 mineBlocks.corners[1] = corner2;
             } catch (IOException e) {
@@ -65,7 +73,6 @@ public class SchematicIterator {
         }
         return mineBlocks;
     }
-
     public static class MineBlocks {
         BlockVector3 spawnLocation;
         BlockVector3[] corners;

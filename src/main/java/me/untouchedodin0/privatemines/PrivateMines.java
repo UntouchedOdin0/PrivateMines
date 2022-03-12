@@ -95,7 +95,9 @@ public class PrivateMines extends JavaPlugin {
             getLogger().info("Schematic iterator: " + schematicIterator);
 
             SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
-            Bukkit.getLogger().info("corners: " + Arrays.toString(mineBlocks.getCorners()));
+
+            getLogger().info("spawn: " + mineBlocks.getSpawnLocation());
+            getLogger().info("corners: " + Arrays.toString(mineBlocks.getCorners()));
         });
 
         Instant end = Instant.now();
