@@ -1,6 +1,8 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.configmanager.ConfigManager;
@@ -105,8 +107,6 @@ public class PrivateMines extends JavaPlugin {
             getLogger().info("corners: " + Arrays.toString(mineBlocks.getCorners()));
             schematicStorage.addSchematic(schematicFile, mineBlocks);
         });
-
-        getLogger().info("getMineBlocksMap: " + schematicStorage.getMineBlocksMap());
 
         Instant end = Instant.now();
         getLogger().info("mineConfig: " + mineConfig);
