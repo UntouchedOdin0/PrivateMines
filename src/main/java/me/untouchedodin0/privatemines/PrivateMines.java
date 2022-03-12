@@ -98,7 +98,10 @@ public class PrivateMines extends JavaPlugin {
 
             getLogger().info("spawn: " + mineBlocks.getSpawnLocation());
             getLogger().info("corners: " + Arrays.toString(mineBlocks.getCorners()));
+            schematicStorage.addSchematic(schematicFile, mineBlocks);
         });
+
+        getLogger().info("getMineBlocksMap: " + schematicStorage.getMineBlocksMap());
 
         Instant end = Instant.now();
         getLogger().info("mineConfig: " + mineConfig);
