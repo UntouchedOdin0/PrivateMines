@@ -4,6 +4,7 @@ import co.aikar.commands.PaperCommandManager;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.configmanager.ConfigManager;
+import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.version.VersionUtils;
@@ -28,6 +29,7 @@ public class PrivateMines extends JavaPlugin {
     private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
     private SchematicStorage schematicStorage;
     private SchematicIterator schematicIterator;
+    private MineFactory mineFactory;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -65,6 +67,9 @@ public class PrivateMines extends JavaPlugin {
         saveDefaultConfig();
         registerCommands();
         setupSchematicUtils();
+
+        mineFactory = new MineFactory();
+
         try {
             Files.createDirectories(minesDirectory);
             Files.createDirectories(schematicsDirectory);
@@ -125,5 +130,9 @@ public class PrivateMines extends JavaPlugin {
 
     public SchematicIterator getSchematicIterator() {
         return schematicIterator;
+    }
+
+    public MineFactory getMineFactory() {
+        return mineFactory;
     }
 }
