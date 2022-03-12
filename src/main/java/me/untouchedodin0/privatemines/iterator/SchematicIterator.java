@@ -1,13 +1,11 @@
 package me.untouchedodin0.privatemines.iterator;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
