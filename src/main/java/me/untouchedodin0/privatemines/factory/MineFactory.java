@@ -11,12 +11,14 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.type.MineType;
+import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.task.Task;
 import org.bukkit.Location;
 
@@ -46,15 +48,17 @@ public class MineFactory {
 
         Task task = Task.asyncDelayed(() -> {
             Clipboard clipboard;
+            Region region;
             BlockVector3 clipboardOffset;
             BlockVector3 realTo;
-
             if (clipboardFormat != null) {
                 try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(schematicFile))) {
                     World world = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()));
                     EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
 
                     clipboard = clipboardReader.read();
+                    region = clipboard.getRegion();
+
                     clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
                     realTo = blockVector3.toVector3().add(clipboard.getOrigin().getX(), clipboard.getOrigin().getY(), clipboard.getOrigin().getZ()).toBlockPoint();
                     spawn = blockVector3.toVector3().subtract(clipboard.getOrigin().getX(), clipboard.getOrigin().getY(), clipboard.getOrigin().getZ()).toBlockPoint();
@@ -78,7 +82,12 @@ public class MineFactory {
                             .ignoreAirBlocks(true)
                             .build();
 
-                    Location spawnLocation = BukkitAdapter.adapt(location.getWorld(), blockVector3.subtract(spawn));
+
+
+                    Location spawnLocation = Utils.getRelative(region,
+                                                               mineBlocks.getSpawnLocation().getX(),
+                                                               mineBlocks.getSpawnLocation().getY(),
+                                                               mineBlocks.getSpawnLocation().getZ());
 //                    Location corner1Location = BukkitAdapter.adapt(location.getWorld(), blockVector3.subtract(corner1));
 //                    Location corner2Location = BukkitAdapter.adapt(location.getWorld(), blockVector3.subtract(corner2));
 

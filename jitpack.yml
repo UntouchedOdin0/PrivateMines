@@ -2,4 +2,4 @@
 # https://github.com/Redempt/RedLib/blob/master/jitpack.yml
 
 install:
-  - ./gradlew publishToMavenLocal
+  - ./gradlew shadowJar
