@@ -1,8 +1,5 @@
 # Thanks Redempt for this example config
 # https://github.com/Redempt/RedLib/blob/master/jitpack.yml
 
-before_install:
-  - sdk install java 16.0.1.j9-adpt
-  - sdk use java 16.0.1.j9-adpt
 install:
   - ./gradlew publishToMavenLocal
