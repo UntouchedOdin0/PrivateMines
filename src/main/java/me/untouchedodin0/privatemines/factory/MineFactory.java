@@ -1,7 +1,6 @@
 package me.untouchedodin0.privatemines.factory;
 
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -11,11 +10,9 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
@@ -49,24 +46,29 @@ public class MineFactory {
 
         Task task = Task.asyncDelayed(() -> {
             Clipboard clipboard;
+            BlockVector3 clipboardOffset;
+            BlockVector3 realTo;
+
             if (clipboardFormat != null) {
                 try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(schematicFile))) {
-                    clipboard = clipboardReader.read();
-
                     World world = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()));
                     EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
+
+                    clipboard = clipboardReader.read();
+                    clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+                    realTo = blockVector3.toVector3().add(clipboard.getOrigin().getX(), clipboard.getOrigin().getY(), clipboard.getOrigin().getZ()).toBlockPoint();
+                    spawn = blockVector3.toVector3().subtract(clipboard.getOrigin().getX(), clipboard.getOrigin().getY(), clipboard.getOrigin().getZ()).toBlockPoint();
+
                     privateMines.getLogger().info("clipboard: " + clipboard);
                     privateMines.getLogger().info("edit session: " + editSession);
                     privateMines.getLogger().info("blockVector3: " + blockVector3);
                     privateMines.getLogger().info("The spawn vector for " + schematicFile.getName() + " is " + mineBlocks.getSpawnLocation());
                     privateMines.getLogger().info("The corner 1 vector for " + schematicFile.getName() + " is " + mineBlocks.getCorner1());
                     privateMines.getLogger().info("The corner 2 vector for " + schematicFile.getName() + " is " + mineBlocks.getCorner2());
-                    this.spawn = mineBlocks.getSpawnLocation();
-                    this.corner1 = mineBlocks.getCorner1();
-                    this.corner2 = mineBlocks.getCorner2();
+                    privateMines.getLogger().info("" + world.getBlock(blockVector3.add(mineBlocks.getCorner1())));
 
-                    Location location1 = BukkitAdapter.adapt(location.getWorld(), corner1);
-                    Location location2 = BukkitAdapter.adapt(location.getWorld(), corner2);
+//                    Location location1 = BukkitAdapter.adapt(location.getWorld(), corner1);
+//                    Location location2 = BukkitAdapter.adapt(location.getWorld(), corner2);
 
                     Instant start = Instant.now();
 
@@ -76,15 +78,11 @@ public class MineFactory {
                             .ignoreAirBlocks(true)
                             .build();
 
-                    try {
-                        editSession.setBlock(spawn, (Pattern) BlockTypes.BARREL);
-                    } catch (MaxChangedBlocksException e) {
-                        e.printStackTrace();
-                    }
                     Location spawnLocation = BukkitAdapter.adapt(location.getWorld(), blockVector3.subtract(spawn));
-                    Location corner1Location = BukkitAdapter.adapt(location.getWorld(), blockVector3.subtract(corner1));
-                    Location corner2Location = BukkitAdapter.adapt(location.getWorld(), blockVector3.subtract(corner2));
+//                    Location corner1Location = BukkitAdapter.adapt(location.getWorld(), blockVector3.subtract(corner1));
+//                    Location corner2Location = BukkitAdapter.adapt(location.getWorld(), blockVector3.subtract(corner2));
 
+                    privateMines.getLogger().info("spawn: " + spawn);
                     try {
                         Operations.complete(operation);
                         editSession.close();
@@ -96,8 +94,8 @@ public class MineFactory {
                     Duration timeElapsedStream = Duration.between(start, end);
                     privateMines.getLogger().info("Time elapsed: " + timeElapsedStream.toMillis() + "ms");
                     privateMines.getLogger().info("spawnLocation: " + spawnLocation);
-                    privateMines.getLogger().info("corner1Location: " + corner1Location);
-                    privateMines.getLogger().info("corner2Location: " + corner2Location);
+//                    privateMines.getLogger().info("corner1Location: " + corner1Location);
+//                    privateMines.getLogger().info("corner2Location: " + corner2Location);
 
                 } catch (IOException e) {
                     e.printStackTrace();
