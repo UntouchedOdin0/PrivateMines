@@ -23,7 +23,7 @@ public class PrivateMinesCommand extends BaseCommand {
         MineFactory mineFactory = new MineFactory();
         MineType mineType = MineConfig.mineTypes.get("Test");
         player.sendMessage("mine factory: " + mineFactory);
-        mineFactory.create(player.getLocation(), mineType);
+        mineFactory.create(player, player.getLocation(), mineType);
     }
 
     @Subcommand("delete")
