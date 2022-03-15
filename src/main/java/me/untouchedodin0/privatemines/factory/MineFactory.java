@@ -18,7 +18,6 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.type.MineType;
-import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.task.Task;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -43,6 +42,10 @@ public class MineFactory {
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
         BlockVector3 blockVector3 = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
+        // /pmine teleport
+        // /pmine teleport <name>
+        // /pmine give <name>
 
         schematicStorage = privateMines.getSchematicStorage();
         SchematicIterator.MineBlocks mineBlocks = schematicStorage.getMineBlocksMap().get(schematicFile);
