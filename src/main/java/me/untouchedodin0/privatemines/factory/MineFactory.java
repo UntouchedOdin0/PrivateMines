@@ -57,6 +57,9 @@ public class MineFactory {
         int corner2Y = mineBlocks.getCorner2().getY();
         int corner2Z = mineBlocks.getCorner2().getZ();
 
+        // Pastes schematic into world -> Loops every single block in region to find certain block type -> sets the location in the minedata -> stores the minedata file as a json
+
+
         Task task = Task.asyncDelayed(() -> {
             Clipboard clipboard;
             Region region;
@@ -79,8 +82,16 @@ public class MineFactory {
                     clipboard.setOrigin(blockVector3);
                     privateMines.getLogger().info("clipboard origin: " + clipboard.getOrigin());
 
-                    Location location1 = new Location(location.getWorld(), location.getBlockX() + corner1X, location.getBlockY() + corner1Y, location.getBlockZ() + corner1Z);
-                    Location location2 = new Location(location.getWorld(), location.getBlockX() + corner2X, location.getBlockY() + corner2Y, location.getBlockZ() + corner2Z);
+                    //Corner1
+                    Location location1 = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
+
+
+
+
+                    //Corner2
+                    Location location2 = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
                     privateMines.getLogger().info(" " + location1);
                     privateMines.getLogger().info(" " + location2);
 
