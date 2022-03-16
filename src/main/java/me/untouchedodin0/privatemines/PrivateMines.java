@@ -1,6 +1,7 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
+import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
@@ -112,6 +113,9 @@ public class PrivateMines extends JavaPlugin {
         getLogger().info("mineConfig: " + mineConfig);
         Duration loadTime = Duration.between(start, end);
         getLogger().info("time to load: " + loadTime.toMillis() + "ms");
+
+        if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager"))
+        setupSlimeWorld();
     }
 
     private void registerCommands() {
@@ -134,5 +138,12 @@ public class PrivateMines extends JavaPlugin {
 
     public MineFactory getMineFactory() {
         return mineFactory;
+    }
+
+    public void setupSlimeWorld() {
+        privateMines.getLogger().info("Setting up the slime world...");
+        // Create a new empty property map
+        SlimePropertyMap slimePropertyMap = new SlimePropertyMap();
+        privateMines.getLogger().info("slimePropertyMap: " + slimePropertyMap);
     }
 }
