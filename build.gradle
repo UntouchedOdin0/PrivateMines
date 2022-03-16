@@ -12,6 +12,7 @@ repositories {
     maven { url = 'https://papermc.io/repo/repository/maven-public/' }
     maven { url = 'https://maven.enginehub.org/repo/' }
     maven { url = 'https://repo.aikar.co/content/groups/aikar/' }
+    maven { url = 'https://repo.glaremasters.me/repository/concuncan/' }
 }
 
 dependencies {
@@ -20,6 +21,7 @@ dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT'
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.9-SNAPSHOT'
     compileOnly 'org.projectlombok:lombok:1.18.22'
+    compileOnly 'com.grinderwolf:slimeworldmanager-api:2.7.0'
 
     implementation "co.aikar:acf-paper:0.5.1-SNAPSHOT"
 }

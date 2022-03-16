@@ -32,6 +32,8 @@ public class SchematicIterator {
         Clipboard clipboard;
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(file);
 
+        BlockVector3 zero = BlockVector3.ZERO;
+
         if (clipboardFormat != null) {
             try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(file))) {
                 clipboard = clipboardReader.read();
@@ -52,15 +54,15 @@ public class SchematicIterator {
                     if (blockType.equals(cornerType)) {
                         if (corner1 == null) {
                             Bukkit.getLogger().info("powered rail " + blockVector3.toParserString());
-                            corner1 = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
+                            corner1 = zero.add(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ()); //BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
                         } else if (corner2 == null) {
                             Bukkit.getLogger().info("powered rail " + blockVector3.toParserString());
-                            corner2 = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
+                            corner2 = zero.add(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ()); //BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
                         }
                     } else if (blockType.equals(spawnType)) {
                         if (spawn == null) {
                             Bukkit.getLogger().info("Sponge: " + blockVector3.toParserString());
-                            spawn = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
+                            spawn = zero.add(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ()); //spawn = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
                         }
                     }
                 });

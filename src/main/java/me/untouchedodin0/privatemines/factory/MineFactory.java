@@ -57,12 +57,17 @@ public class MineFactory {
         int corner2Y = mineBlocks.getCorner2().getY();
         int corner2Z = mineBlocks.getCorner2().getZ();
 
-        // Pastes schematic into world -> Loops every single block in region to find certain block type -> sets the location in the minedata -> stores the minedata file as a json
+        int spawnX = mineBlocks.getSpawnLocation().getX();
+        int spawnY = mineBlocks.getSpawnLocation().getY();
+        int spawnZ = mineBlocks.getSpawnLocation().getZ();
 
+
+        // Pastes schematic into world -> Loops every single block in region to find certain block type -> sets the location in the minedata -> stores the minedata file as a json
 
         Task task = Task.asyncDelayed(() -> {
             Clipboard clipboard;
             Region region;
+            BlockVector3 origin;
 
             if (clipboardFormat != null) {
                 try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(schematicFile))) {
@@ -80,20 +85,27 @@ public class MineFactory {
                             .ignoreAirBlocks(true)
                             .build();
                     clipboard.setOrigin(blockVector3);
-                    privateMines.getLogger().info("clipboard origin: " + clipboard.getOrigin());
+                    origin = BlockVector3.at(blockVector3.getBlockX(), blockVector3.getBlockY(), blockVector3.getBlockZ());
+
+                    privateMines.getLogger().info("origin " + origin);
+
+                    BlockVector3 spawnVector3 = clipboard.getMinimumPoint().add(mineBlocks.getSpawnLocation());
+
+                    privateMines.getLogger().info("spawnVector3: " + spawnVector3);
+
+                    //Spawn Location
+                    Location spawn = new Location(location.getWorld(), blockVector3.getBlockX(), blockVector3.getBlockY(), blockVector3.getBlockZ());
+                    spawn.add(spawnX, spawnY, spawnZ);
 
                     //Corner1
                     Location location1 = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
-
-
-
-
                     //Corner2
                     Location location2 = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
-                    privateMines.getLogger().info(" " + location1);
-                    privateMines.getLogger().info(" " + location2);
+                    privateMines.getLogger().info("spawn " + spawn);
+                    privateMines.getLogger().info("loc1 " + location1);
+                    privateMines.getLogger().info("loc2 " + location2);
 
 //                    privateMines.getLogger().info("clipboard: " + clipboard);
 //                    privateMines.getLogger().info("edit session: " + editSession);
