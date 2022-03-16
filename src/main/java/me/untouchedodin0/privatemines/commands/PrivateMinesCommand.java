@@ -33,6 +33,4 @@ public class PrivateMinesCommand extends BaseCommand {
             player.sendMessage("Deleting " + target.getName() + "'s private mine!");
         }
     }
-
-
 }
