@@ -8,15 +8,19 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.type.MineType;
 import me.untouchedodin0.privatemines.utils.task.Task;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -32,6 +36,7 @@ public class MineFactory {
 
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         player.sendMessage(schematicFile.getName());
+        player.sendMessage(location.toString());
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
@@ -41,9 +46,18 @@ public class MineFactory {
 
         BlockVector3 spawnOffset = mineBlocks.getSpawnLocation(), cornerOneOffset = mineBlocks.getCorner1(), cornerTwoOffset = mineBlocks.getCorner2();
 
-        Location spawn = location.clone().add(spawnOffset.getX(), spawnOffset.getY(), spawnOffset.getZ());
-        Location cornerOne = location.clone().add(cornerOneOffset.getX(), cornerOneOffset.getY(), cornerOneOffset.getZ());
-        Location cornerTwo = location.clone().add(cornerTwoOffset.getX(), cornerTwoOffset.getY(), cornerTwoOffset.getZ());
+
+        Location spawn = location.subtract(mineBlocks.getSpawnLocation().getX(), mineBlocks.getSpawnLocation().getY(), mineBlocks.getSpawnLocation().getZ());
+        Location cornerOne = location.subtract(cornerOneOffset.getX(), cornerOneOffset.getY(), cornerOneOffset.getZ());
+        Location cornerTwo = location.subtract(cornerTwoOffset.getX(), cornerTwoOffset.getY(), cornerTwoOffset.getZ());
+
+        spawn.getBlock().setType(Material.GOLD_BLOCK);
+        cornerOne.getBlock().setType(Material.IRON_BLOCK);
+        cornerTwo.getBlock().setType(Material.EMERALD_BLOCK);
+
+        privateMines.getLogger().info("spawn" + spawn);
+        privateMines.getLogger().info("cornerOne" + cornerOne.getBlockX() + " " + cornerOne.getBlockY() + " " + cornerOne.getBlockZ());
+        privateMines.getLogger().info("cornerTwo" + cornerTwo.getBlockX() + " " + cornerTwo.getBlockY() + " " + cornerTwo.getBlockZ());
 
         /*
          *   1. Pastes schematic into world
@@ -69,8 +83,12 @@ public class MineFactory {
                             .ignoreAirBlocks(true)
                             .build();
 
+                    BlockVector3 spawnTest = vector.subtract(mineBlocks.getSpawnLocation());
+                    privateMines.getLogger().info("spawnTest clipboard: " + spawnTest);
+
                     try {
                         Operations.complete(operation);
+                        editSession.setBlock(vector, (Pattern) BlockTypes.DIAMOND_BLOCK);
                         editSession.close();
                     } catch (WorldEditException worldEditException) {
                         worldEditException.printStackTrace();

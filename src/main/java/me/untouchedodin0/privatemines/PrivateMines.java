@@ -2,8 +2,6 @@ package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEdit;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.configmanager.ConfigManager;
