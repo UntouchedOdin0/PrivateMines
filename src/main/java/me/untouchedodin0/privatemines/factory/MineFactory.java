@@ -33,7 +33,6 @@ public class MineFactory {
     PrivateMines privateMines = PrivateMines.getPrivateMines();
 
     public void create(Player player, Location location, MineType mineType) {
-
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         player.sendMessage(schematicFile.getName());
 
@@ -70,6 +69,42 @@ public class MineFactory {
                     Clipboard clipboard = clipboardReader.read();
                     ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
                     Region region = clipboard.getRegion();
+
+                    System.out.println("mb0|" + mineBlocks.getSpawnLocation().toParserString());
+                    System.out.println("mb1|" + mineBlocks.getCorner1().toParserString());
+                    System.out.println("mb2|" + mineBlocks.getCorner2().toParserString());
+
+                    System.out.println("cbo|" + clipboard.getOrigin().toParserString());
+
+                    System.out.println("min|" + minimumPoint.toParserString());
+
+                    System.out.println("loc|" + location);
+
+//                    mb0|0,50,-150
+//                    mb1|13,48,-144
+//                    mb2|-12,20,-116
+//                    cbo|0,50,-151
+//                    min|-30000000,-64,-30000000
+//                    loc|763.6692645437984,140.45037494032877,728.8705431310638
+//
+//                    763,140,729 Sponge
+//                    751,110,763 Lower Rails Sponge - mb0 + mb2 -> 763 - 0 +-12 = 751
+//                    776,138,735 Upper Rails Sponge - mb0 + mb1 -> 763 - 0 + 13 = 776
+
+//                    Location sponge = vector;
+//                    Location lrails = sponge - mineBlocks.getSpawnLocation() + mineBlocks.getCorner2();
+//                    Location urails = sponge - mineBlocks.getSpawnLocation() + mineBlocks.getCorner1();
+
+                    BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2()); // BlockVector3.at(sponge.getBlockX(), sponge.getBlockY(), sponge.getBlockZ()).subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2());
+                    BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1()); // BlockVector3.at(sponge.getBlockX(), sponge.getBlockY(), sponge.getBlockZ()).subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1());
+
+                    Location spongeL = new Location(location.getWorld(), vector.getBlockX(),  vector.getBlockY(),  vector.getBlockZ() + 1);
+                    Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ() + 1);
+                    Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ() + 1);
+
+                    System.out.println("S|" + spongeL); // spawn
+                    System.out.println("L|" + lrailsL); // lower corner
+                    System.out.println("U|" + urailsL); // upper corner
 
                     localSession.setClipboard(clipboardHolder);
 

@@ -80,9 +80,9 @@ public class SchematicIterator {
         return mineBlocks;
     }
 
-    public static class MineBlocks {
-        BlockVector3 spawnLocation;
-        BlockVector3[] corners;
+    public class MineBlocks {
+        public BlockVector3 spawnLocation;
+        public BlockVector3[] corners;
 
         public BlockVector3 getSpawnLocation() {
             return spawnLocation;
