@@ -9,6 +9,10 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -37,6 +41,9 @@ public class MineFactory {
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
         SchematicStorage storage = privateMines.getSchematicStorage();
+        privateMines.getLogger().info("storage: " + storage);
+        privateMines.getLogger().info("mineBlocks: " + storage.getMineBlocksMap().get(schematicFile));
+
         SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
 
         BlockVector3 spawnOffset = mineBlocks.getSpawnLocation(), cornerOneOffset = mineBlocks.getCorner1(), cornerTwoOffset = mineBlocks.getCorner2();
@@ -58,9 +65,16 @@ public class MineFactory {
                     World world = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()));
                     EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
                     LocalSession localSession = new LocalSession();
+                    BlockVector3 minimumPoint = editSession.getMinimumPoint();
+
+                    privateMines.getLogger().info("minimumPoint: " + minimumPoint);
+                    privateMines.getLogger().info("minimumPoint + vector: " + minimumPoint.add(vector));
+                    privateMines.getLogger().info("minimumPoint + vector + spawn: " + minimumPoint.add(vector).add(spawnOffset));
 
                     Clipboard clipboard = clipboardReader.read();
                     ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
+                    Region region = clipboard.getRegion();
+
                     localSession.setClipboard(clipboardHolder);
 
                     Operation operation = clipboardHolder
@@ -68,13 +82,25 @@ public class MineFactory {
                             .to(vector)
                             .ignoreAirBlocks(true)
                             .build();
-
                     try {
                         Operations.complete(operation);
                         editSession.close();
                     } catch (WorldEditException worldEditException) {
                         worldEditException.printStackTrace();
                     }
+
+                    BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+                    Vector3 realTo = vector.toVector3().add(clipboardHolder.getTransform().apply(clipboardOffset.toVector3()));
+                    Vector3 min = realTo.subtract(clipboardHolder.getTransform().apply(region.getMinimumPoint().add(region.getMaximumPoint()).toVector3()));
+                    Vector3 max = realTo.add(clipboardHolder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
+                    RegionSelector selector = new CuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
+                    selector.learnChanges();
+
+                    privateMines.getLogger().info("clipboardOffset: " + clipboardOffset);
+                    privateMines.getLogger().info("realTo: " + realTo);
+                    privateMines.getLogger().info("min: " + min);
+                    privateMines.getLogger().info("max: " + max);
+                    privateMines.getLogger().info("selector: " + selector);
 
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
