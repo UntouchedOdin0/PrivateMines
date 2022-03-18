@@ -48,10 +48,6 @@ public class MineFactory {
 
         BlockVector3 spawnOffset = mineBlocks.getSpawnLocation(), cornerOneOffset = mineBlocks.getCorner1(), cornerTwoOffset = mineBlocks.getCorner2();
 
-        Location spawn = location.clone().add(spawnOffset.getX(), spawnOffset.getY(), spawnOffset.getZ());
-        Location cornerOne = location.clone().add(cornerOneOffset.getX(), cornerOneOffset.getY(), cornerOneOffset.getZ());
-        Location cornerTwo = location.clone().add(cornerTwoOffset.getX(), cornerTwoOffset.getY(), cornerTwoOffset.getZ());
-
         /*
          *   1. Pastes schematic into world
          *   2. Loops every single block in region to find certain block type
@@ -93,16 +89,24 @@ public class MineFactory {
                     Vector3 realTo = vector.toVector3().add(clipboardHolder.getTransform().apply(clipboardOffset.toVector3()));
                     Vector3 min = realTo.subtract(clipboardHolder.getTransform().apply(region.getMinimumPoint().add(region.getMaximumPoint()).toVector3()));
                     Vector3 max = realTo.add(clipboardHolder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
-                    RegionSelector selector = new CuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
+                    RegionSelector selector = new CuboidRegionSelector(world, min.toBlockPoint(), max.toBlockPoint());
                     selector.learnChanges();
+
+                    Vector3 corner1Vector = Vector3.at(cornerOneOffset.getX(), cornerOneOffset.getY(), cornerOneOffset.getZ());
+
+                    BlockVector3 corner1Test = realTo.add(corner1Vector).toBlockPoint();
 
                     privateMines.getLogger().info("clipboardOffset: " + clipboardOffset);
                     privateMines.getLogger().info("realTo: " + realTo);
                     privateMines.getLogger().info("min: " + min);
                     privateMines.getLogger().info("max: " + max);
                     privateMines.getLogger().info("selector: " + selector);
+                    privateMines.getLogger().info("corner1Test: " + corner1Test);
 
-                } catch (IOException ioException) {
+                    privateMines.getLogger().info("selector min: " + selector.getRegion().getMinimumPoint());
+                    privateMines.getLogger().info("selector max: " + selector.getRegion().getMaximumPoint());
+
+                } catch (IOException | IncompleteRegionException ioException) {
                     ioException.printStackTrace();
                 }
             }
