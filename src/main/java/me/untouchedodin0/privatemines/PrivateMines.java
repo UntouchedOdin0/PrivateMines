@@ -47,7 +47,6 @@ public class PrivateMines extends JavaPlugin {
      *
      * @return The plugin which called the method
      */
-
     public static Plugin getCallingPlugin() {
         Exception ex = new Exception();
         try {

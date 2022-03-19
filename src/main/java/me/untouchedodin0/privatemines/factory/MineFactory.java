@@ -32,6 +32,12 @@ public class MineFactory {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
 
+    /**
+     * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
+     * @param player the player the mine should be created for
+     * @param location the location of the mine
+     * @param mineType the type of mine to paste
+     */
     public void create(Player player, Location location, MineType mineType) {
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         player.sendMessage(schematicFile.getName());
@@ -44,15 +50,7 @@ public class MineFactory {
         privateMines.getLogger().info("mineBlocks: " + storage.getMineBlocksMap().get(schematicFile));
 
         SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
-
         BlockVector3 spawnOffset = mineBlocks.getSpawnLocation(), cornerOneOffset = mineBlocks.getCorner1(), cornerTwoOffset = mineBlocks.getCorner2();
-
-        /*
-         *   1. Pastes schematic into world
-         *   2. Loops every single block in region to find certain block type
-         *   3. Sets the location in the MineData
-         *   4. Stores the MineData as a JSON
-         */
 
         Task.asyncDelayed(() -> {
             if (clipboardFormat != null) {

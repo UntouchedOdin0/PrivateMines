@@ -56,7 +56,6 @@ public class Utils {
      * @see org.bukkit.Location
      * @see java.io.File
      */
-
     public void paste(Location location, File file) {
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(file);
