@@ -118,6 +118,10 @@ public class MineFactory {
                     BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1());
 
                     Location spongeL = new Location(location.getWorld(), vector.getBlockX(),  vector.getBlockY(),  vector.getBlockZ() + 1);
+
+                    Location min = new Location(location.getWorld(), fullRegionOne.getBlockX(), fullRegionOne.getBlockY(), fullRegionOne.getBlockZ() + 1);
+                    Location max = new Location(location.getWorld(), fullRegionTwo.getBlockX(), fullRegionTwo.getBlockY(), fullRegionTwo.getBlockZ() + 1);
+
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ() + 1);
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ() + 1);
 
@@ -128,8 +132,11 @@ public class MineFactory {
                     System.out.println("U|" + urailsL); // upper corner
 
                     System.out.println("cuboidRegion: " + cuboidRegion);
-                    System.out.println("fullRegionOne: " + fullRegionOne);
-                    System.out.println("fullRegionTwo: " + fullRegionTwo);
+                    System.out.println("fullRegionOne: " + fullRegionOne); // this
+                    System.out.println("fullRegionTwo: " + fullRegionTwo); // and this
+
+                    System.out.println("min: " + min); // min of the whole area in a bukkit location
+                    System.out.println("max: " + max); // max of the whole area in a bukkit location
 
                     Instant endOfIterator = Instant.now();
 

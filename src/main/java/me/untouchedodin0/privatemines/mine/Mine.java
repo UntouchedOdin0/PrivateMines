@@ -135,4 +135,9 @@ public class Mine {
     public void teleport(Player player) {
         player.teleport(getSpawnLocation());
     }
+
+    public void delete() {
+        Region fullRegion = getMineData().getFullRegion();
+        privateMines.getLogger().info(fullRegion.toString());
+    }
 }
