@@ -61,10 +61,4 @@ public class Utils {
             throw new RuntimeException("Could not save mine data", e);
         }
     }
-
-    public CuboidRegion toWorldEditCuboid(me.untouchedodin0.privatemines.utils.regions.CuboidRegion cuboidRegion) {
-        BlockVector3 min = BlockVector3.at(cuboidRegion.getMinimumPoint().getBlockX(), cuboidRegion.getMinimumPoint().getBlockY(), cuboidRegion.getMinimumPoint().getBlockZ());
-        BlockVector3 max = BlockVector3.at(cuboidRegion.getMaximumPoint().getBlockX(), cuboidRegion.getMaximumPoint().getBlockY(), cuboidRegion.getMaximumPoint().getBlockZ());
-        return new CuboidRegion(min, max);
-    }
 }

@@ -15,6 +15,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
+import me.untouchedodin0.kotlin.WorldEditUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
@@ -44,6 +45,7 @@ public class MineFactory {
         Mine mine = new Mine(privateMines);
         MineData mineData = new MineData();
         MineStorage mineStorage = privateMines.getMineStorage();
+        WorldEditUtils worldEditUtils = new WorldEditUtils();
 
         UUID owner = player.getUniqueId();
 
@@ -170,6 +172,7 @@ public class MineFactory {
 
                     privateMines.getLogger().info("region: " + mineData.getFullRegion());
                     privateMines.getLogger().info("mining region: " + mineData.getMiningRegion());
+                    privateMines.getLogger().info("worldedit region: " + worldEditUtils.toWorldEditCuboid(miningRegion));
 
                     mine.setMineOwner(owner);
                     mine.setMineType(mineType);

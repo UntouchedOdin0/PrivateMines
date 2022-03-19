@@ -1,6 +1,5 @@
 package me.untouchedodin0.privatemines.mine.data;
 
-import com.sk89q.worldedit.regions.Region;
 import me.untouchedodin0.privatemines.utils.regions.CuboidRegion;
 import org.bukkit.Location;
 import org.bukkit.Material;
