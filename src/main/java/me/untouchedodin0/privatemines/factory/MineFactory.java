@@ -126,6 +126,9 @@ public class MineFactory {
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ() + 1);
 
                     CuboidRegion miningRegion = new me.untouchedodin0.privatemines.utils.regions.CuboidRegion(lrailsL, urailsL);
+                    CuboidRegion fullRegion = new me.untouchedodin0.privatemines.utils.regions.CuboidRegion(min, max);
+
+                    //com.sk89q.worldedit.regions.CuboidRegion fullRegion = new com.sk89q.worldedit.regions.CuboidRegion(fullRegionOne, fullRegionTwo);
 
 //                    CuboidRegion miningRegion = new CuboidRegion(lrailsV, urailsV); // Cuboid region of the mining area
 //                    CuboidRegion fullRegion = new CuboidRegion(fullRegionOne, fullRegionTwo); // Cuboid region of the full area
@@ -161,9 +164,11 @@ public class MineFactory {
                     Duration durationPasted = Duration.between(start, pasted);
 
                     mineData.setMiningRegion(miningRegion);
+                    mineData.setFullRegion(fullRegion);
+
 //                    mineData.setFullRegion(fullRegion);
 
-                    privateMines.getLogger().info("region: " + region);
+                    privateMines.getLogger().info("region: " + mineData.getFullRegion());
                     privateMines.getLogger().info("mining region: " + mineData.getMiningRegion());
 
                     mine.setMineOwner(owner);

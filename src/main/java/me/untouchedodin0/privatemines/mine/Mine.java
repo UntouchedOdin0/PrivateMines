@@ -137,7 +137,11 @@ public class Mine {
     }
 
     public void delete() {
-        Region fullRegion = getMineData().getFullRegion();
+        me.untouchedodin0.privatemines.utils.regions.CuboidRegion fullRegion = getMineData().getFullRegion();
+        if (fullRegion == null) {
+            privateMines.getLogger().warning("Region was null!");
+            return;
+        }
         privateMines.getLogger().info(fullRegion.toString());
     }
 }

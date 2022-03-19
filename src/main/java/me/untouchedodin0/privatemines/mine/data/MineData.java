@@ -13,11 +13,9 @@ public class MineData {
     UUID coOwner;
     Location spawnLocation;
     Location npcLocation;
-    Location corner1;
-    Location corner2;
 
     CuboidRegion miningRegion;
-    Region fullRegion;
+    CuboidRegion fullRegion;
 
     String worldName;
     String mineType;
@@ -53,11 +51,11 @@ public class MineData {
         this.miningRegion = cuboidRegion;
     }
 
-    public Region getFullRegion() {
+    public CuboidRegion getFullRegion() {
         return fullRegion;
     }
 
-    public void setFullRegion(Region region) {
+    public void setFullRegion(CuboidRegion region) {
         this.fullRegion = region;
     }
 
