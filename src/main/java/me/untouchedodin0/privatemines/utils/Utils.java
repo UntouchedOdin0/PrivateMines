@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -59,5 +60,11 @@ public class Utils {
         } catch (IOException e) {
             throw new RuntimeException("Could not save mine data", e);
         }
+    }
+
+    public CuboidRegion toWorldEditCuboid(me.untouchedodin0.privatemines.utils.regions.CuboidRegion cuboidRegion) {
+        BlockVector3 min = BlockVector3.at(cuboidRegion.getMinimumPoint().getBlockX(), cuboidRegion.getMinimumPoint().getBlockY(), cuboidRegion.getMinimumPoint().getBlockZ());
+        BlockVector3 max = BlockVector3.at(cuboidRegion.getMaximumPoint().getBlockX(), cuboidRegion.getMaximumPoint().getBlockY(), cuboidRegion.getMaximumPoint().getBlockZ());
+        return new CuboidRegion(min, max);
     }
 }
