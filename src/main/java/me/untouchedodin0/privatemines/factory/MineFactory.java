@@ -1,6 +1,9 @@
 package me.untouchedodin0.privatemines.factory;
 
-import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
@@ -9,10 +12,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.RegionSelector;
-import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -26,6 +26,8 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Objects;
 
 public class MineFactory {
@@ -57,6 +59,9 @@ public class MineFactory {
         Task.asyncDelayed(() -> {
             if (clipboardFormat != null) {
                 try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(schematicFile))) {
+
+                    Instant start = Instant.now();
+
                     World world = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()));
                     EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
                     LocalSession localSession = new LocalSession();
@@ -95,8 +100,8 @@ public class MineFactory {
 //                    Location lrails = sponge - mineBlocks.getSpawnLocation() + mineBlocks.getCorner2();
 //                    Location urails = sponge - mineBlocks.getSpawnLocation() + mineBlocks.getCorner1();
 
-                    BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2()); // BlockVector3.at(sponge.getBlockX(), sponge.getBlockY(), sponge.getBlockZ()).subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2());
-                    BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1()); // BlockVector3.at(sponge.getBlockX(), sponge.getBlockY(), sponge.getBlockZ()).subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1());
+                    BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2());
+                    BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1());
 
                     Location spongeL = new Location(location.getWorld(), vector.getBlockX(),  vector.getBlockY(),  vector.getBlockZ() + 1);
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ() + 1);
@@ -106,6 +111,8 @@ public class MineFactory {
                     System.out.println("L|" + lrailsL); // lower corner
                     System.out.println("U|" + urailsL); // upper corner
 
+                    Instant endOfIterator = Instant.now();
+
                     localSession.setClipboard(clipboardHolder);
 
                     Operation operation = clipboardHolder
@@ -114,34 +121,19 @@ public class MineFactory {
                             .ignoreAirBlocks(true)
                             .build();
                     try {
-                        Operations.complete(operation);
+                        Operations.completeLegacy(operation);
                         editSession.close();
                     } catch (WorldEditException worldEditException) {
                         worldEditException.printStackTrace();
                     }
+                    Instant pasted = Instant.now();
+                    Duration durationIterator = Duration.between(start, endOfIterator);
+                    Duration durationPasted = Duration.between(start, pasted);
 
-                    BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-                    Vector3 realTo = vector.toVector3().add(clipboardHolder.getTransform().apply(clipboardOffset.toVector3()));
-                    Vector3 min = realTo.subtract(clipboardHolder.getTransform().apply(region.getMinimumPoint().add(region.getMaximumPoint()).toVector3()));
-                    Vector3 max = realTo.add(clipboardHolder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
-                    RegionSelector selector = new CuboidRegionSelector(world, min.toBlockPoint(), max.toBlockPoint());
-                    selector.learnChanges();
+                    privateMines.getLogger().info("Iterator time: " + durationIterator.toMillis() + "ms");
+                    privateMines.getLogger().info("Pasted time: " + durationPasted.toMillis() + "ms");
 
-                    Vector3 corner1Vector = Vector3.at(cornerOneOffset.getX(), cornerOneOffset.getY(), cornerOneOffset.getZ());
-
-                    BlockVector3 corner1Test = realTo.add(corner1Vector).toBlockPoint();
-
-                    privateMines.getLogger().info("clipboardOffset: " + clipboardOffset);
-                    privateMines.getLogger().info("realTo: " + realTo);
-                    privateMines.getLogger().info("min: " + min);
-                    privateMines.getLogger().info("max: " + max);
-                    privateMines.getLogger().info("selector: " + selector);
-                    privateMines.getLogger().info("corner1Test: " + corner1Test);
-
-                    privateMines.getLogger().info("selector min: " + selector.getRegion().getMinimumPoint());
-                    privateMines.getLogger().info("selector max: " + selector.getRegion().getMaximumPoint());
-
-                } catch (IOException | IncompleteRegionException ioException) {
+                } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
             }
