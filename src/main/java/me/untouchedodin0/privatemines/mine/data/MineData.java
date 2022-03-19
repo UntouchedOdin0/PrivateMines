@@ -1,10 +1,7 @@
 package me.untouchedodin0.privatemines.mine.data;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.world.World;
-import me.untouchedodin0.privatemines.PrivateMines;
 import org.bukkit.Material;
 
 import java.util.*;

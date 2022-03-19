@@ -145,6 +145,10 @@ public class PrivateMines extends JavaPlugin {
         return mineWorldManager;
     }
 
+    public Path getMinesDirectory() {
+        return minesDirectory;
+    }
+
     public void setupSlimeWorld() {
         privateMines.getLogger().info("Setting up the slime world...");
         // Create a new empty property map
