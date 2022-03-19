@@ -47,8 +47,6 @@ public class MineFactory {
 
         UUID owner = player.getUniqueId();
 
-        player.sendMessage(schematicFile.getName());
-
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
