@@ -17,8 +17,12 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
+import me.untouchedodin0.privatemines.mine.Mine;
+import me.untouchedodin0.privatemines.mine.data.MineData;
+import me.untouchedodin0.privatemines.storage.MineStorage;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.type.MineType;
+import me.untouchedodin0.privatemines.utils.regions.CuboidRegion;
 import me.untouchedodin0.privatemines.utils.task.Task;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -29,6 +33,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 public class MineFactory {
 
@@ -36,6 +41,12 @@ public class MineFactory {
 
     public void create(Player player, Location location, MineType mineType) {
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
+        Mine mine = new Mine(privateMines);
+        MineData mineData = new MineData();
+        MineStorage mineStorage = privateMines.getMineStorage();
+
+        UUID owner = player.getUniqueId();
+
         player.sendMessage(schematicFile.getName());
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
@@ -66,6 +77,7 @@ public class MineFactory {
                     EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
                     LocalSession localSession = new LocalSession();
                     BlockVector3 minimumPoint = editSession.getMinimumPoint();
+                    BlockVector3 maximumPoint = editSession.getMaximumPoint();
 
                     privateMines.getLogger().info("minimumPoint: " + minimumPoint);
                     privateMines.getLogger().info("minimumPoint + vector: " + minimumPoint.add(vector));
@@ -82,6 +94,7 @@ public class MineFactory {
                     System.out.println("cbo|" + clipboard.getOrigin().toParserString());
 
                     System.out.println("min|" + minimumPoint.toParserString());
+                    System.out.println("max|" + maximumPoint.toParserString());
 
                     System.out.println("loc|" + location);
 
@@ -100,6 +113,9 @@ public class MineFactory {
 //                    Location lrails = sponge - mineBlocks.getSpawnLocation() + mineBlocks.getCorner2();
 //                    Location urails = sponge - mineBlocks.getSpawnLocation() + mineBlocks.getCorner1();
 
+                    BlockVector3 fullRegionOne = vector.subtract(mineBlocks.getSpawnLocation()).add(region.getMinimumPoint());
+                    BlockVector3 fullRegionTwo = vector.subtract(mineBlocks.getSpawnLocation()).add(region.getMaximumPoint());
+
                     BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2());
                     BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1());
 
@@ -107,9 +123,15 @@ public class MineFactory {
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ() + 1);
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ() + 1);
 
+                    CuboidRegion cuboidRegion = new CuboidRegion(lrailsL, urailsL);
+
                     System.out.println("S|" + spongeL); // spawn
                     System.out.println("L|" + lrailsL); // lower corner
                     System.out.println("U|" + urailsL); // upper corner
+
+                    System.out.println("cuboidRegion: " + cuboidRegion);
+                    System.out.println("fullRegionOne: " + fullRegionOne);
+                    System.out.println("fullRegionTwo: " + fullRegionTwo);
 
                     Instant endOfIterator = Instant.now();
 
@@ -129,6 +151,21 @@ public class MineFactory {
                     Instant pasted = Instant.now();
                     Duration durationIterator = Duration.between(start, endOfIterator);
                     Duration durationPasted = Duration.between(start, pasted);
+
+                    mineData.setMiningRegion(cuboidRegion);
+                    mineData.setFullRegion(region);
+
+                    privateMines.getLogger().info("region: " + region);
+                    privateMines.getLogger().info("mining region: " + mineData.getMiningRegion());
+
+                    mine.setMineOwner(owner);
+                    mine.setMineType(mineType);
+                    mine.setSpawnLocation(spongeL);
+                    mine.setMineData(mineData);
+
+                    privateMines.getLogger().info("mineStorage mines: " + mineStorage.getMines());
+                    mineStorage.addMine(owner, mine);
+                    privateMines.getLogger().info("mineStorage mines: " + mineStorage.getMines());
 
                     privateMines.getLogger().info("Iterator time: " + durationIterator.toMillis() + "ms");
                     privateMines.getLogger().info("Pasted time: " + durationPasted.toMillis() + "ms");

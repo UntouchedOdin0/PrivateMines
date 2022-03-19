@@ -7,6 +7,7 @@ import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.configmanager.ConfigManager;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
+import me.untouchedodin0.privatemines.storage.MineStorage;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.version.VersionUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -32,6 +33,7 @@ public class PrivateMines extends JavaPlugin {
     private SchematicStorage schematicStorage;
     private SchematicIterator schematicIterator;
     private MineFactory mineFactory;
+    private MineStorage mineStorage;
     private MineWorldManager mineWorldManager;
 
     public static PrivateMines getPrivateMines() {
@@ -72,6 +74,7 @@ public class PrivateMines extends JavaPlugin {
         setupSchematicUtils();
 
         mineFactory = new MineFactory();
+        mineStorage = new MineStorage();
         mineWorldManager = new MineWorldManager();
 
         try {
@@ -139,6 +142,10 @@ public class PrivateMines extends JavaPlugin {
 
     public MineFactory getMineFactory() {
         return mineFactory;
+    }
+
+    public MineStorage getMineStorage() {
+        return mineStorage;
     }
 
     public MineWorldManager getMineWorldManager() {
