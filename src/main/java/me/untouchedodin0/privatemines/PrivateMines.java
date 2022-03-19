@@ -9,6 +9,7 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.version.VersionUtils;
+import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
@@ -31,6 +32,7 @@ public class PrivateMines extends JavaPlugin {
     private SchematicStorage schematicStorage;
     private SchematicIterator schematicIterator;
     private MineFactory mineFactory;
+    private MineWorldManager mineWorldManager;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -70,6 +72,7 @@ public class PrivateMines extends JavaPlugin {
         setupSchematicUtils();
 
         mineFactory = new MineFactory();
+        mineWorldManager = new MineWorldManager();
 
         try {
             Files.createDirectories(minesDirectory);
@@ -136,6 +139,10 @@ public class PrivateMines extends JavaPlugin {
 
     public MineFactory getMineFactory() {
         return mineFactory;
+    }
+
+    public MineWorldManager getMineWorldManager() {
+        return mineWorldManager;
     }
 
     public void setupSlimeWorld() {
