@@ -125,13 +125,16 @@ public class MineFactory {
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ() + 1);
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ() + 1);
 
-                    CuboidRegion cuboidRegion = new CuboidRegion(lrailsL, urailsL);
+                    CuboidRegion miningRegion = new me.untouchedodin0.privatemines.utils.regions.CuboidRegion(lrailsL, urailsL);
+
+//                    CuboidRegion miningRegion = new CuboidRegion(lrailsV, urailsV); // Cuboid region of the mining area
+//                    CuboidRegion fullRegion = new CuboidRegion(fullRegionOne, fullRegionTwo); // Cuboid region of the full area
 
                     System.out.println("S|" + spongeL); // spawn
                     System.out.println("L|" + lrailsL); // lower corner
                     System.out.println("U|" + urailsL); // upper corner
 
-                    System.out.println("cuboidRegion: " + cuboidRegion);
+                    System.out.println("cuboidRegion: " + miningRegion); // mining area
                     System.out.println("fullRegionOne: " + fullRegionOne); // this
                     System.out.println("fullRegionTwo: " + fullRegionTwo); // and this
 
@@ -157,8 +160,8 @@ public class MineFactory {
                     Duration durationIterator = Duration.between(start, endOfIterator);
                     Duration durationPasted = Duration.between(start, pasted);
 
-                    mineData.setMiningRegion(cuboidRegion);
-                    mineData.setFullRegion(region);
+                    mineData.setMiningRegion(miningRegion);
+//                    mineData.setFullRegion(fullRegion);
 
                     privateMines.getLogger().info("region: " + region);
                     privateMines.getLogger().info("mining region: " + mineData.getMiningRegion());
