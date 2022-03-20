@@ -4,7 +4,13 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.Subcommand;
-import me.untouchedodin0.privatemines.PrivateMines;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.session.SessionManager;
+import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
@@ -14,9 +20,6 @@ import org.bukkit.entity.Player;
 
 @CommandAlias("privatemines|pmines|pmine")
 public class PrivateMinesCommand extends BaseCommand {
-
-    PrivateMines privateMines = PrivateMines.getPrivateMines();
-    MineStorage mineStorage; // = privateMines.getMineStorage();
 
     @Subcommand("give")
     @CommandCompletion("@players")
@@ -44,15 +47,20 @@ public class PrivateMinesCommand extends BaseCommand {
         }
     }
 
-    @Subcommand("teleport")
-    public void teleport(Player player) {
-        this.mineStorage = privateMines.getMineStorage();
+    @Subcommand("create")
+    public void create(Player player, String fileName) { // TODO: fileName is currently unused
+        SessionManager manager = WorldEdit.getInstance().getSessionManager();
+        LocalSession localSession = manager.get(BukkitAdapter.adapt(player));
+        World world = localSession.getSelectionWorld();
 
-        if (!mineStorage.hasMine(player.getUniqueId())) {
-            player.sendMessage("you got no mine, fam!");
-        } else {
-            Mine mine = mineStorage.get(player.getUniqueId());
-            mine.teleport(player);
+        try {
+            if (world == null) throw new IncompleteRegionException();
+            Region region = localSession.getSelection(world);
+            player.sendMessage("region: " + region);
+            player.sendMessage("min: " + region.getMinimumPoint());
+            player.sendMessage("max: " + region.getMaximumPoint());
+        } catch (IncompleteRegionException e) {
+            e.printStackTrace();
         }
     }
 }

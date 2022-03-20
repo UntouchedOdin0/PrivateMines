@@ -52,13 +52,53 @@ public class Utils {
         return new Location(world, vector3.getX(), vector3.getY(), vector3.getZ());
     }
 
-    public void saveMineData(UUID uuid, MineData mineData) {
-        Path minesDirectory = privateMines.getMinesDirectory();
-        Path playerDataFile = minesDirectory.resolve(uuid + ".json");
-        try {
-            Files.write(playerDataFile, gson.toJson(mineData).getBytes());
-        } catch (IOException e) {
-            throw new RuntimeException("Could not save mine data", e);
+    /**
+     * @param location - The location where you want the schematic to be pasted at
+     * @param file     - The file of the schematic you want to paste into the world
+     * @see org.bukkit.Location
+     * @see java.io.File
+     */
+    public void paste(Location location, File file) {
+
+        ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(file);
+        Clipboard clipboard;
+
+        // Create a block vector 3 at the location you want the schematic to be pasted at
+        BlockVector3 blockVector3 = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
+        // If the clipboard format isn't null meaning it found the file load it in and read the data
+        if (clipboardFormat != null) {
+            try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(file))) {
+
+                // Get the world from the location
+                World world = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()));
+
+                // Make a new Edit Session by building one.
+                EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
+
+                // Read the clipboard reader and set the clipboard data.
+                clipboard = clipboardReader.read();
+
+                // Create an operation and paste the schematic
+
+                Operation operation = new ClipboardHolder(clipboard) // Create a new operation instance using the clipboard
+                        .createPaste(editSession) // Create a builder using the edit session
+                        .to(blockVector3) // Set where you want the paste to go
+                        .ignoreAirBlocks(true) // Tell world edit not to paste air blocks (true/false)
+                        .build(); // Build the operation
+
+                // Now we try to complete the operation and catch any exceptions
+
+                try {
+                    Operations.complete(operation);
+                    editSession.close(); // We now close it to flush the buffers and run the cleanup tasks.
+                } catch (WorldEditException worldEditException) {
+                    worldEditException.printStackTrace();
+                }
+            } catch (IOException e) {
+                // Print any stack traces of which may occur.
+                e.printStackTrace();
+            }
         }
     }
 }
