@@ -1,16 +1,14 @@
 package me.untouchedodin0.privatemines.mine;
 
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Region;
 import me.untouchedodin0.kotlin.WorldEditUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.type.MineType;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.task.Task;
-import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.codemc.worldguardwrapper.region.IWrappedRegion;
 
@@ -24,9 +22,7 @@ public class Mine {
 
     private UUID mineOwner;
     private MineType mineType;
-    private Region fullRegion;
-    private CuboidRegion miningRegion;
-    private BlockVector3 location, miningRegionMinX, miningRegionMinY, miningRegionZ;
+    private BlockVector3 location;
     private IWrappedRegion iWrappedMiningRegion;
     private IWrappedRegion iWrappedFullRegion;
     private Location spawnLocation;
@@ -61,38 +57,6 @@ public class Mine {
 
     public void setLocation(BlockVector3 location) {
         this.location = location;
-    }
-
-    public BlockVector3 getMiningRegionMinX() {
-        return miningRegionMinX;
-    }
-
-    public void setMiningRegionMinX(BlockVector3 miningRegionMinX) {
-        this.miningRegionMinX = miningRegionMinX;
-    }
-
-    public BlockVector3 getMiningRegionMinY() {
-        return miningRegionMinY;
-    }
-
-    public void setMiningRegionMinY(BlockVector3 miningRegionMinY) {
-        this.miningRegionMinY = miningRegionMinY;
-    }
-
-    public BlockVector3 getMiningRegionZ() {
-        return miningRegionZ;
-    }
-
-    public void setMiningRegionZ(BlockVector3 miningRegionZ) {
-        this.miningRegionZ = miningRegionZ;
-    }
-
-    public CuboidRegion getMiningRegion() {
-        return miningRegion;
-    }
-
-    public void setMiningRegion(CuboidRegion cuboidRegion) {
-        this.miningRegion = cuboidRegion;
     }
 
     public IWrappedRegion getiWrappedMiningRegion() {
@@ -149,18 +113,20 @@ public class Mine {
 
     public void delete() {
         me.untouchedodin0.privatemines.utils.regions.CuboidRegion fullRegion = getMineData().getFullRegion();
-        if (fullRegion == null) {
-            privateMines.getLogger().warning("Region was null!");
-            return;
-        }
-        privateMines.getLogger().info(fullRegion.toString());
+//        if (fullRegion == null) {
+//            privateMines.getLogger().warning("Region was null!");
+//            return;
+//        }
+        privateMines.getLogger().info("fullRegion: " + fullRegion);
+        privateMines.getMineStorage().removeMine(getMineOwner());
     }
 
     public void reset() {
-        MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
-        org.bukkit.World privateMinesWorld = mineWorldManager.getMinesWorld();
         MineData mineData = getMineData();
-
-        privateMines.getLogger().info("mining region: " + mineData.getMiningRegion());
+        me.untouchedodin0.privatemines.utils.regions.CuboidRegion miningRegion = mineData.getMiningRegion();
+        Task task = Task.syncDelayed(() -> {
+                miningRegion.getMinimumPoint().getBlock().setType(Material.EMERALD_BLOCK);
+                miningRegion.getMaximumPoint().getBlock().setType(Material.DIAMOND_BLOCK);
+        });
     }
 }

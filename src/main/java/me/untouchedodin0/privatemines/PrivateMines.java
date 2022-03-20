@@ -67,15 +67,14 @@ public class PrivateMines extends JavaPlugin {
     public void onEnable() {
         Instant start = Instant.now();
         getLogger().info("Loading Private Mines v" + getDescription().getVersion());
-        privateMines = this;
         saveDefaultConfig();
-        registerCommands();
-        setupSchematicUtils();
-
+        privateMines = this;
         mineFactory = new MineFactory();
         mineStorage = new MineStorage();
         mineWorldManager = new MineWorldManager();
 
+        registerCommands();
+        setupSchematicUtils();
         try {
             Files.createDirectories(minesDirectory);
             Files.createDirectories(schematicsDirectory);
@@ -123,7 +122,7 @@ public class PrivateMines extends JavaPlugin {
 
     private void registerCommands() {
         paperCommandManager = new PaperCommandManager(this);
-        paperCommandManager.registerCommand(new PrivateMinesCommand());
+        paperCommandManager.registerCommand(new PrivateMinesCommand(mineStorage));
     }
 
     public void setupSchematicUtils() {

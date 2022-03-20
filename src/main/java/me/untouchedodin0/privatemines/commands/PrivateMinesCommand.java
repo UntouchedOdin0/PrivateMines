@@ -22,8 +22,11 @@ import org.bukkit.entity.Player;
 @CommandAlias("privatemines|pmines|pmine")
 public class PrivateMinesCommand extends BaseCommand {
 
-    PrivateMines privateMines = PrivateMines.getPrivateMines();
     MineStorage mineStorage;
+
+    public PrivateMinesCommand(MineStorage mineStorage) {
+        this.mineStorage = mineStorage;
+    }
 
     @Subcommand("give")
     @CommandCompletion("@players")
@@ -38,7 +41,6 @@ public class PrivateMinesCommand extends BaseCommand {
     @Subcommand("delete")
     @CommandCompletion("@players")
     public void delete(Player player, Player target) {
-        this.mineStorage = privateMines.getMineStorage();
 
         if (target != null) {
             if (!mineStorage.hasMine(player.getUniqueId())) {
@@ -70,7 +72,6 @@ public class PrivateMinesCommand extends BaseCommand {
 
     @Subcommand("reset")
     public void reset(Player player) {
-        this.mineStorage = privateMines.getMineStorage();
         if (!mineStorage.hasMine(player.getUniqueId())) {
             player.sendMessage("Player doesn't own a mine!");
         } else {

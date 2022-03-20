@@ -43,7 +43,8 @@ public class MineFactory {
 
     /**
      * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
-     * @param player the player the mine should be created for
+     *
+     * @param player   the player the mine should be created for
      * @param location the location of the mine
      * @param mineType the type of mine to paste
      */
@@ -119,7 +120,7 @@ public class MineFactory {
                     BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2());
                     BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1());
 
-                    Location spongeL = new Location(location.getWorld(), vector.getBlockX(),  vector.getBlockY(),  vector.getBlockZ() + 1);
+                    Location spongeL = new Location(location.getWorld(), vector.getBlockX(), vector.getBlockY(), vector.getBlockZ() + 1);
 
                     Location min = new Location(location.getWorld(), fullRegionOne.getBlockX(), fullRegionOne.getBlockY(), fullRegionOne.getBlockZ() + 1);
                     Location max = new Location(location.getWorld(), fullRegionTwo.getBlockX(), fullRegionTwo.getBlockY(), fullRegionTwo.getBlockZ() + 1);
@@ -127,12 +128,8 @@ public class MineFactory {
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ() + 1);
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ() + 1);
 
-                                        /*
-                        BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2());
-                        BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1());
-                     */
                     CuboidRegion miningRegion = new me.untouchedodin0.privatemines.utils.regions.CuboidRegion(lrailsL.clone(), urailsL.clone());
-                    CuboidRegion fullRegion = new me.untouchedodin0.privatemines.utils.regions.CuboidRegion(min, max);
+                    CuboidRegion fullRegion = new me.untouchedodin0.privatemines.utils.regions.CuboidRegion(min.clone(), max.clone());
 
                     //com.sk89q.worldedit.regions.CuboidRegion fullRegion = new com.sk89q.worldedit.regions.CuboidRegion(fullRegionOne, fullRegionTwo);
 
