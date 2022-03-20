@@ -23,10 +23,10 @@ import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.MineStorage;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.type.MineType;
-import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.regions.CuboidRegion;
 import me.untouchedodin0.privatemines.utils.task.Task;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -127,19 +127,20 @@ public class MineFactory {
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ() + 1);
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ() + 1);
 
-                    CuboidRegion miningRegion = new me.untouchedodin0.privatemines.utils.regions.CuboidRegion(lrailsL, urailsL);
+                                        /*
+                        BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2());
+                        BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1());
+                     */
+                    CuboidRegion miningRegion = new me.untouchedodin0.privatemines.utils.regions.CuboidRegion(lrailsL.clone(), urailsL.clone());
                     CuboidRegion fullRegion = new me.untouchedodin0.privatemines.utils.regions.CuboidRegion(min, max);
 
                     //com.sk89q.worldedit.regions.CuboidRegion fullRegion = new com.sk89q.worldedit.regions.CuboidRegion(fullRegionOne, fullRegionTwo);
-
-//                    CuboidRegion miningRegion = new CuboidRegion(lrailsV, urailsV); // Cuboid region of the mining area
-//                    CuboidRegion fullRegion = new CuboidRegion(fullRegionOne, fullRegionTwo); // Cuboid region of the full area
 
                     System.out.println("S|" + spongeL); // spawn
                     System.out.println("L|" + lrailsL); // lower corner
                     System.out.println("U|" + urailsL); // upper corner
 
-                    System.out.println("cuboidRegion: " + miningRegion); // mining area
+                    System.out.println("miningRegion: " + miningRegion); // mining area
                     System.out.println("fullRegionOne: " + fullRegionOne); // this
                     System.out.println("fullRegionTwo: " + fullRegionTwo); // and this
 
@@ -165,22 +166,26 @@ public class MineFactory {
                     Duration durationIterator = Duration.between(start, endOfIterator);
                     Duration durationPasted = Duration.between(start, pasted);
 
+                    Task task = Task.syncDelayed(() -> {
+                        spongeL.getBlock().setType(Material.AIR, false);
+                    }, 1L);
+
                     mineData.setMiningRegion(miningRegion);
                     mineData.setFullRegion(fullRegion);
 
 //                    mineData.setFullRegion(fullRegion);
 
                     privateMines.getLogger().info("region: " + mineData.getFullRegion());
-                    privateMines.getLogger().info("mining region: " + miningRegion);
-                    privateMines.getLogger().info("worldedit mining region: " + Utils.toWorldEditCuboid(miningRegion));
+                    privateMines.getLogger().info("mining region: " + mineData.getMiningRegion()); // this is correct
 
                     mine.setMineOwner(owner);
                     mine.setMineType(mineType);
+                    mine.setLocation(vector);
                     mine.setSpawnLocation(spongeL);
                     mine.setMineData(mineData);
 
                     privateMines.getLogger().info("mineStorage mines: " + mineStorage.getMines());
-                    mineStorage.addMine(owner, mine);
+                    privateMines.getMineStorage().addMine(owner, mine);
                     privateMines.getLogger().info("mineStorage mines: " + mineStorage.getMines());
 
                     privateMines.getLogger().info("Iterator time: " + durationIterator.toMillis() + "ms");

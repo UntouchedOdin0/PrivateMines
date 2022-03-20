@@ -31,7 +31,7 @@ public class Mine {
     private MineType mineType;
     private Region fullRegion;
     private CuboidRegion miningRegion;
-    private BlockVector3 miningRegionMinX, miningRegionMinY, miningRegionZ;
+    private BlockVector3 location, miningRegionMinX, miningRegionMinY, miningRegionZ;
     private IWrappedRegion iWrappedMiningRegion;
     private IWrappedRegion iWrappedFullRegion;
     private Location spawnLocation;
@@ -58,6 +58,14 @@ public class Mine {
 
     public void setMineType(MineType mineType) {
         this.mineType = mineType;
+    }
+
+    public BlockVector3 getLocation() {
+        return location;
+    }
+
+    public void setLocation(BlockVector3 location) {
+        this.location = location;
     }
 
     public BlockVector3 getMiningRegionMinX() {
@@ -171,6 +179,8 @@ public class Mine {
         BlockVector3 maxV3 = BlockVector3.at(max.getBlockX(), max.getBlockY(), max.getBlockZ());
         CuboidRegion test = new CuboidRegion(world, minV3, maxV3);
 
-        privateMines.getLogger().info("test: " + test);
+        privateMines.getLogger().info("test: " + mineData.getMiningRegion());
+        privateMines.getLogger().info("minV3: " + minV3);
+        privateMines.getLogger().info("maxV3: " + maxV3);
     }
 }
