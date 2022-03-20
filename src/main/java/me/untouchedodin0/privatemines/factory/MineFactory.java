@@ -46,6 +46,7 @@ public class MineFactory {
      * @param location the location of the mine
      * @param mineType the type of mine to paste
      */
+
     public void create(Player player, Location location, MineType mineType) {
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         Mine mine = new Mine(privateMines);
