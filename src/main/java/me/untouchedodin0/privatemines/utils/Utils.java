@@ -13,6 +13,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
@@ -108,5 +109,22 @@ public class Utils {
                 e.printStackTrace();
             }
         }
+    }
+
+
+    public static CuboidRegion toWorldEditCuboid(me.untouchedodin0.privatemines.utils.regions.CuboidRegion cuboidRegion) {
+        var min = BlockVector3.at(
+                cuboidRegion.getMinimumPoint().getBlockX(),
+                cuboidRegion.getMinimumPoint().getBlockY(),
+                cuboidRegion.getMinimumPoint().getBlockZ()
+        );
+
+        var max = BlockVector3.at(
+                cuboidRegion.getMaximumPoint().getBlockX(),
+                cuboidRegion.getMaximumPoint().getBlockY(),
+                cuboidRegion.getMaximumPoint().getBlockZ()
+        );
+
+        return new CuboidRegion(min, max);
     }
 }

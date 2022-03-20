@@ -23,6 +23,7 @@ import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.MineStorage;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.type.MineType;
+import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.regions.CuboidRegion;
 import me.untouchedodin0.privatemines.utils.task.Task;
 import org.bukkit.Location;
@@ -170,8 +171,8 @@ public class MineFactory {
 //                    mineData.setFullRegion(fullRegion);
 
                     privateMines.getLogger().info("region: " + mineData.getFullRegion());
-                    privateMines.getLogger().info("mining region: " + mineData.getMiningRegion());
-                    privateMines.getLogger().info("worldedit mining region: " + worldEditUtils.toWorldEditCuboid(miningRegion));
+                    privateMines.getLogger().info("mining region: " + miningRegion);
+                    privateMines.getLogger().info("worldedit mining region: " + Utils.toWorldEditCuboid(miningRegion));
 
                     mine.setMineOwner(owner);
                     mine.setMineType(mineType);

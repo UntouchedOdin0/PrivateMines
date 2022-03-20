@@ -67,4 +67,15 @@ public class PrivateMinesCommand extends BaseCommand {
             e.printStackTrace();
         }
     }
+
+    @Subcommand("reset")
+    public void reset(Player player) {
+        this.mineStorage = privateMines.getMineStorage();
+        if (!mineStorage.hasMine(player.getUniqueId())) {
+            player.sendMessage("Player doesn't own a mine!");
+        } else {
+            Mine mine = mineStorage.get(player.getUniqueId());
+            mine.reset();
+        }
+    }
 }
