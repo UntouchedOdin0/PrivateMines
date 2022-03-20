@@ -9,7 +9,9 @@ group 'me.untouchedodin0'
 version '1.0-SNAPSHOT'
 
 repositories {
+    mavenLocal()
     mavenCentral()
+
     maven { url = 'https://papermc.io/repo/repository/maven-public/' }
     maven { url = 'https://maven.enginehub.org/repo/' }
     maven { url = 'https://repo.aikar.co/content/groups/aikar/' }
@@ -26,9 +28,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.22'
     compileOnly 'com.grinderwolf:slimeworldmanager-api:2.7.0-20220302.215927-13'
 
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation 'org.codemc.worldguardwrapper:worldguardwrapper:1.2.0-SNAPSHOT'
     implementation "co.aikar:acf-paper:0.5.1-SNAPSHOT"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 shadowJar {
@@ -44,11 +46,8 @@ task copyTo_DevServer(type: Copy) {
 
 publishing {
     publications {
-
-    }
-    repositories {
-        maven {
-            url = "maven-repo-url"
+        mavenJava(MavenPublication) {
+            from components.java
         }
     }
 }
