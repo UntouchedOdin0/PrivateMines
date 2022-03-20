@@ -1,7 +1,6 @@
 package me.untouchedodin0.privatemines.mine;
 
 import com.sk89q.worldedit.math.BlockVector3;
-import me.untouchedodin0.kotlin.WorldEditUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.type.MineType;
@@ -19,7 +18,6 @@ public class Mine {
 
     private final PrivateMines privateMines;
     private final Utils utils;
-    private final WorldEditUtils worldEditUtils = new WorldEditUtils();
 
     private UUID mineOwner;
     private MineType mineType;
