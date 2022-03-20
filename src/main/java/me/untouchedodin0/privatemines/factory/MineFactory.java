@@ -190,7 +190,6 @@ public class MineFactory {
 
                     privateMines.getLogger().info("Iterator time: " + durationIterator.toMillis() + "ms");
                     privateMines.getLogger().info("Pasted time: " + durationPasted.toMillis() + "ms");
-
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }

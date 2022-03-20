@@ -1,8 +1,17 @@
 package me.untouchedodin0.privatemines.mine;
 
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.function.block.BlockReplace;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.pattern.RandomPattern;
+import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -15,6 +24,7 @@ import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.task.Task;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.codemc.worldguardwrapper.region.IWrappedRegion;
 
@@ -165,22 +175,29 @@ public class Mine {
         MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
         org.bukkit.World privateMinesWorld = mineWorldManager.getMinesWorld();
         MineData mineData = getMineData();
-        me.untouchedodin0.privatemines.utils.regions.CuboidRegion cuboidRegion = mineData.getMiningRegion();
-        CuboidRegion worldEditCuboidRegion = worldEditUtils.toWorldEditCuboid(cuboidRegion);
+        me.untouchedodin0.privatemines.utils.regions.CuboidRegion cube = mineData.getMiningRegion();
 
         World world = BukkitAdapter.adapt(Objects.requireNonNull(privateMinesWorld));
         EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
+        final RandomPattern randomPattern = new RandomPattern();
+        Pattern pattern = BukkitAdapter.adapt(Material.STONE.createBlockData()).toBaseBlock();
 
-        privateMines.getLogger().info("1) " + cuboidRegion);
-        Location min = cuboidRegion.getMinimumPoint();
-        Location max = cuboidRegion.getMaximumPoint();
+        // Correct.
+        Location min = cube.getMinimumPoint();
+        Location max = cube.getMaximumPoint();
 
         BlockVector3 minV3 = BlockVector3.at(min.getBlockX(), min.getBlockY(), min.getBlockZ());
         BlockVector3 maxV3 = BlockVector3.at(max.getBlockX(), max.getBlockY(), max.getBlockZ());
-        CuboidRegion test = new CuboidRegion(world, minV3, maxV3);
+        CuboidRegion cuboidRegion = new CuboidRegion(world, minV3, maxV3);
 
         privateMines.getLogger().info("test: " + mineData.getMiningRegion());
         privateMines.getLogger().info("minV3: " + minV3);
         privateMines.getLogger().info("maxV3: " + maxV3);
+
+        try {
+            editSession.setBlocks(cuboidRegion, pattern);
+        } catch (MaxChangedBlocksException e) {
+            e.printStackTrace();
+        }
     }
 }
