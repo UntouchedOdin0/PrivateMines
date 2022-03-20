@@ -171,7 +171,7 @@ public class MineFactory {
 
                     privateMines.getLogger().info("region: " + mineData.getFullRegion());
                     privateMines.getLogger().info("mining region: " + mineData.getMiningRegion());
-                    privateMines.getLogger().info("worldedit region: " + worldEditUtils.toWorldEditCuboid(miningRegion));
+                    privateMines.getLogger().info("worldedit mining region: " + worldEditUtils.toWorldEditCuboid(miningRegion));
 
                     mine.setMineOwner(owner);
                     mine.setMineType(mineType);

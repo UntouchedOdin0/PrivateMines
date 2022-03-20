@@ -11,6 +11,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.SessionManager;
 import com.sk89q.worldedit.world.World;
+import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
@@ -20,6 +21,9 @@ import org.bukkit.entity.Player;
 
 @CommandAlias("privatemines|pmines|pmine")
 public class PrivateMinesCommand extends BaseCommand {
+
+    PrivateMines privateMines = PrivateMines.getPrivateMines();
+    MineStorage mineStorage;
 
     @Subcommand("give")
     @CommandCompletion("@players")
