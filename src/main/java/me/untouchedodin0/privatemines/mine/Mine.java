@@ -127,6 +127,14 @@ public class Mine {
         privateMines.getLogger().info("miningRegion min: " + miningRegion.getMinimumPoint());
         privateMines.getLogger().info("miningRegion max: " + miningRegion.getMaximumPoint());
 
+        Location minimumPoint = miningRegion.getMinimumPoint();
+        Location maximumPoint = miningRegion.getMaximumPoint();
+        World world = miningRegion.getWorld();
+
+        miningRegion.stream().forEach(block -> {
+            block.setType(Material.DIRT);
+        });
+
 //        for(int x = maximumPoint.getBlockX(); x < minimumPoint.getBlockX(); x++){
 //            for(int y = maximumPoint.getBlockY(); y < minimumPoint.getBlockY(); y++){
 //                for(int z = maximumPoint.getBlockZ(); z < minimumPoint.getBlockZ(); z++){

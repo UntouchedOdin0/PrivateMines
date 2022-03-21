@@ -1,21 +1,20 @@
 package me.untouchedodin0.kotlin
 
-import com.sk89q.worldedit.math.BlockVector3
-import me.untouchedodin0.privatemines.utils.regions.CuboidRegion
+import com.sk89q.worldedit.WorldEdit
+import com.sk89q.worldedit.bukkit.BukkitAdapter
+import com.sk89q.worldedit.function.pattern.RandomPattern
+import com.sk89q.worldedit.regions.CuboidRegion
+import com.sk89q.worldedit.world.World
+import org.bukkit.Material
+
 
 class WorldEditUtils {
 
-    fun toWorldEditCuboid(cuboidRegion: CuboidRegion): com.sk89q.worldedit.regions.CuboidRegion {
-        val min = BlockVector3.at(
-            cuboidRegion.minimumPoint.blockX,
-            cuboidRegion.minimumPoint.blockY,
-            cuboidRegion.minimumPoint.blockZ
-        )
-        val max = BlockVector3.at(
-            cuboidRegion.maximumPoint.blockX,
-            cuboidRegion.maximumPoint.blockY,
-            cuboidRegion.maximumPoint.blockZ
-        )
-        return com.sk89q.worldedit.regions.CuboidRegion(min, max)
+    fun fillRegion(cuboidRegion: CuboidRegion, world: World) {
+        val editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build()
+        val pattern = RandomPattern() // Create the random pattern
+        val stone: com.sk89q.worldedit.world.block.BlockState? = BukkitAdapter.adapt(Material.STONE.createBlockData())
+        pattern.add(stone, 1.0)
+        editSession.setBlocks(cuboidRegion, pattern)
     }
 }
