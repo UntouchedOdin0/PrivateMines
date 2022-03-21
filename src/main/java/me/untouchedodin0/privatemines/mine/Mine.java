@@ -123,17 +123,18 @@ public class Mine {
     public void reset() {
         MineData mineData = getMineData();
         me.untouchedodin0.privatemines.utils.regions.CuboidRegion miningRegion = mineData.getMiningRegion();
-        Location minimumPoint = miningRegion.getMinimumPoint();
-        Location maximumPoint = miningRegion.getMaximumPoint();
-        World world = miningRegion.getWorld();
+        privateMines.getLogger().info("miningRegion: " + miningRegion);
+        privateMines.getLogger().info("miningRegion min: " + miningRegion.getMinimumPoint());
+        privateMines.getLogger().info("miningRegion max: " + miningRegion.getMaximumPoint());
 
-        for(int x = minimumPoint.getBlockX(); x < maximumPoint.getBlockX(); x++){
-            for(int y = minimumPoint.getBlockY(); y < maximumPoint.getBlockY(); y++){
-                for(int z = minimumPoint.getBlockZ(); z < maximumPoint.getBlockZ(); z++){
-                    privateMines.getLogger().info(String.format("%d %d %d", x, y, z));
-                }
-            }
-        }
+//        for(int x = maximumPoint.getBlockX(); x < minimumPoint.getBlockX(); x++){
+//            for(int y = maximumPoint.getBlockY(); y < minimumPoint.getBlockY(); y++){
+//                for(int z = maximumPoint.getBlockZ(); z < minimumPoint.getBlockZ(); z++){
+////                    privateMines.getLogger().info(String.format("%d %d %d", x, y, z));
+//                    world.getBlockAt(x, y, z).setType(Material.DIAMOND_BLOCK);
+//                }
+//            }
+//        }
 
         miningRegion.getMinimumPoint().getBlock().setType(Material.EMERALD_BLOCK);
         miningRegion.getMaximumPoint().getBlock().setType(Material.DIAMOND_BLOCK);

@@ -128,8 +128,8 @@ public class MineFactory {
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ() + 1);
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ() + 1);
 
-                    CuboidRegion miningRegion = new me.untouchedodin0.privatemines.utils.regions.CuboidRegion(lrailsL.clone(), urailsL.clone());
-                    CuboidRegion fullRegion = new me.untouchedodin0.privatemines.utils.regions.CuboidRegion(min.clone(), max.clone());
+                    CuboidRegion miningRegion = new CuboidRegion(lrailsL.clone(), urailsL.clone());
+                    CuboidRegion fullRegion = new CuboidRegion(min.clone(), max.clone());
 
                     //com.sk89q.worldedit.regions.CuboidRegion fullRegion = new com.sk89q.worldedit.regions.CuboidRegion(fullRegionOne, fullRegionTwo);
 
