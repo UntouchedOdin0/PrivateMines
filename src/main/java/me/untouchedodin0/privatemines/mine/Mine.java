@@ -5,13 +5,13 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.type.MineType;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.regions.CuboidRegion;
 import me.untouchedodin0.privatemines.utils.task.Task;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.codemc.worldguardwrapper.region.IWrappedRegion;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Mine {
@@ -111,7 +111,7 @@ public class Mine {
     }
 
     public void delete() {
-        me.untouchedodin0.privatemines.utils.regions.CuboidRegion fullRegion = getMineData().getFullRegion();
+        CuboidRegion fullRegion = getMineData().getFullRegion();
 //        if (fullRegion == null) {
 //            privateMines.getLogger().warning("Region was null!");
 //            return;
@@ -122,29 +122,29 @@ public class Mine {
 
     public void reset() {
         MineData mineData = getMineData();
-        me.untouchedodin0.privatemines.utils.regions.CuboidRegion miningRegion = mineData.getMiningRegion();
+        CuboidRegion miningRegion = mineData.getMiningRegion();
+
+        if (miningRegion == null) {
+            privateMines.getLogger().info("Mining region was null!");
+        }
+
         privateMines.getLogger().info("miningRegion: " + miningRegion);
-        privateMines.getLogger().info("miningRegion min: " + miningRegion.getMinimumPoint());
+        privateMines.getLogger().info("miningRegion min: " + Objects.requireNonNull(miningRegion).getMinimumPoint());
         privateMines.getLogger().info("miningRegion max: " + miningRegion.getMaximumPoint());
 
-        Location minimumPoint = miningRegion.getMinimumPoint();
-        Location maximumPoint = miningRegion.getMaximumPoint();
-        World world = miningRegion.getWorld();
 
-        miningRegion.stream().forEach(block -> {
-            block.setType(Material.DIRT);
-        });
+        BlockVector3 minimumVector = BlockVector3.at(miningRegion.getMinimumPoint().getBlockX(),
+                                                     miningRegion.getMinimumPoint().getBlockY(),
+                                                     miningRegion.getMinimumPoint().getBlockZ());
+        BlockVector3 maximumVector = BlockVector3.at(miningRegion.getMaximumPoint().getBlockX(),
+                                                     miningRegion.getMaximumPoint().getBlockY(),
+                                                     miningRegion.getMaximumPoint().getBlockZ());
 
-//        for(int x = maximumPoint.getBlockX(); x < minimumPoint.getBlockX(); x++){
-//            for(int y = maximumPoint.getBlockY(); y < minimumPoint.getBlockY(); y++){
-//                for(int z = maximumPoint.getBlockZ(); z < minimumPoint.getBlockZ(); z++){
-////                    privateMines.getLogger().info(String.format("%d %d %d", x, y, z));
-//                    world.getBlockAt(x, y, z).setType(Material.DIAMOND_BLOCK);
-//                }
-//            }
-//        }
+        com.sk89q.worldedit.regions.CuboidRegion cuboidRegion = new com.sk89q.worldedit.regions.CuboidRegion(minimumVector, maximumVector);
 
-        miningRegion.getMinimumPoint().getBlock().setType(Material.EMERALD_BLOCK);
-        miningRegion.getMaximumPoint().getBlock().setType(Material.DIAMOND_BLOCK);
+        privateMines.getLogger().info("minimum vector: " + minimumVector);
+        privateMines.getLogger().info("maximum vector: " + maximumVector);
+
+        privateMines.getLogger().info("cuboid region: " + cuboidRegion);
     }
 }

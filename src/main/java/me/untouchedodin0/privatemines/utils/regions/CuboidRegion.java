@@ -55,6 +55,24 @@ public class CuboidRegion extends Region {
         return maximumPoint;
     }
 
+    /**
+     * Expands the region, or retracts where negative values are passed
+     * @param posX The amount to expand the region in the positive X direction
+     * @param negX The amount to expand the region in the negative X direction
+     * @param posY The amount to expand the region in the positive Y direction
+     * @param negY The amount to expand the region in the negative Y direction
+     * @param posZ The amount to expand the region in the positive Z direction
+     * @param negZ The amount to expand the region in the negative Z direction
+     * @return Itself
+     */
+    public CuboidRegion expand(double posX, double negX, double posY, double negY, double posZ, double negZ) {
+        minimumPoint = minimumPoint.subtract(negX, negY, negZ);
+        maximumPoint = minimumPoint.add(posX, posY, posZ);
+        setLocations(minimumPoint, maximumPoint);
+        return this;
+    }
+
+
     public int getBlockVolume() {
         int[] dim = getBlockDimensions();
         return dim[0] * dim[1] * dim[2];

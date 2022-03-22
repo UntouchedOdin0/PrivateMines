@@ -53,20 +53,13 @@ public class PrivateMinesCommand extends BaseCommand {
         }
     }
 
-    @Subcommand("create")
-    public void create(Player player, String fileName) { // TODO: fileName is currently unused
-        SessionManager manager = WorldEdit.getInstance().getSessionManager();
-        LocalSession localSession = manager.get(BukkitAdapter.adapt(player));
-        World world = localSession.getSelectionWorld();
-
-        try {
-            if (world == null) throw new IncompleteRegionException();
-            Region region = localSession.getSelection(world);
-            player.sendMessage("region: " + region);
-            player.sendMessage("min: " + region.getMinimumPoint());
-            player.sendMessage("max: " + region.getMaximumPoint());
-        } catch (IncompleteRegionException e) {
-            e.printStackTrace();
+    @Subcommand("teleport")
+    public void teleport(Player player) {
+        if (!mineStorage.hasMine(player.getUniqueId())) {
+            player.sendMessage("Player doesn't own a mine!");
+        } else {
+            Mine mine = mineStorage.get(player.getUniqueId());
+            mine.teleport(player);
         }
     }
 
