@@ -1,6 +1,17 @@
 package me.untouchedodin0.privatemines.mine;
 
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.function.block.BlockReplace;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.RandomPattern;
+import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockState;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.type.MineType;
@@ -8,6 +19,7 @@ import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.regions.CuboidRegion;
 import me.untouchedodin0.privatemines.utils.task.Task;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.codemc.worldguardwrapper.region.IWrappedRegion;
 
@@ -123,6 +135,8 @@ public class Mine {
     public void reset() {
         MineData mineData = getMineData();
         CuboidRegion miningRegion = mineData.getMiningRegion();
+        World world = BukkitAdapter.adapt(privateMines.getMineWorldManager().getMinesWorld());
+        EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
 
         if (miningRegion == null) {
             privateMines.getLogger().info("Mining region was null!");
@@ -146,5 +160,16 @@ public class Mine {
         privateMines.getLogger().info("maximum vector: " + maximumVector);
 
         privateMines.getLogger().info("cuboid region: " + cuboidRegion);
+        RandomPattern randomPattern = new RandomPattern(); // Create the random pattern
+        BlockState stone = BukkitAdapter.adapt(Material.STONE.createBlockData());
+        randomPattern.add(stone, 1.0);
+
+        RegionFunction set = new BlockReplace(editSession, randomPattern);
+        RegionVisitor regionVisitor = new RegionVisitor(cuboidRegion, set);
+        try {
+            Operations.completeLegacy(regionVisitor);
+        } catch (MaxChangedBlocksException e) {
+            e.printStackTrace();
+        }
     }
 }
