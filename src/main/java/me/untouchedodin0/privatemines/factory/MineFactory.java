@@ -43,7 +43,7 @@ public class MineFactory {
 
 
     /**
-     * Creates a mine for the {@link Player} at {@link Location} with {@link MineTypeOld}
+     * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
      *
      * @param player   the player the mine should be created for
      * @param location the location of the mine
