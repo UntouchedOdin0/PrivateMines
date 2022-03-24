@@ -165,14 +165,6 @@ public class MineFactory {
                     mineData.setMinimumMining(lrailsL.subtract(0, 0, 1));
                     mineData.setMaximumMining(urailsL.subtract(0, 0 , 1));
 
-//                    mineData.setMiningRegion(miningRegion);
-//                    mineData.setFullRegion(fullRegion);
-
-//                    mineData.setFullRegion(fullRegion);
-
-//                    privateMines.getLogger().info("region: " + mineData.getFullRegion());
-//                    privateMines.getLogger().info("mining region: " + mineData.getMiningRegion()); // this is correct
-
                     mine.setMineOwner(owner);
                     mine.setMineType(mineType);
                     mine.setLocation(vector);
