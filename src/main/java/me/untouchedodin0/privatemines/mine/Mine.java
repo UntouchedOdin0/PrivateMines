@@ -126,6 +126,7 @@ public class Mine {
 //        privateMines.getLogger().info("fullRegion: " + fullRegion);
         com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(privateMines.getMineWorldManager().getMinesWorld());
         MineData mineData = getMineData();
+
         EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
         try {
             editSession.setBlocks(mineData.getFullRegion(), BukkitAdapter.adapt(Material.AIR.createBlockData()));

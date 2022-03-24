@@ -125,6 +125,7 @@ public class MineFactory {
                         mineData.setMaximumMining(urailsL.subtract(0, 0 , 1));
                         mineData.setSpawnLocation(spongeL);
                         mineData.setFullRegion(newRegion);
+
                         privateMines.getLogger().info("newRegion: " + newRegion);
                     } catch (IncompleteRegionException e) {
                         e.printStackTrace();

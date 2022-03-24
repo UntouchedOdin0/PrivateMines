@@ -15,6 +15,8 @@ public class MineData {
     Location npcLocation;
     Location minimumMining;
     Location maximumMining;
+    Location minimumFullRegion;
+    Location maximumFullRegion;
 
     CuboidRegion miningRegion;
     Region fullRegion;
@@ -67,6 +69,22 @@ public class MineData {
 
     public void setMaximumMining(Location maximumMining) {
         this.maximumMining = maximumMining;
+    }
+
+    public Location getMinimumFullRegion() {
+        return minimumFullRegion;
+    }
+
+    public void setMinimumFullRegion(Location minimumFullRegion) {
+        this.minimumFullRegion = minimumFullRegion;
+    }
+
+    public Location getMaximumFullRegion() {
+        return maximumFullRegion;
+    }
+
+    public void setMaximumFullRegion(Location maximumFullRegion) {
+        this.maximumFullRegion = maximumFullRegion;
     }
 
     public Region getFullRegion() {
