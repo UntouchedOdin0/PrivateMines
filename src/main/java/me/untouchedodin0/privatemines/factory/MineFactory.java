@@ -15,12 +15,13 @@ import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
+import me.untouchedodin0.kotlin.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
-import me.untouchedodin0.privatemines.type.MineType;
+import me.untouchedodin0.privatemines.type.MineTypeOld;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -43,7 +44,7 @@ public class MineFactory {
 
 
     /**
-     * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
+     * Creates a mine for the {@link Player} at {@link Location} with {@link MineTypeOld}
      *
      * @param player   the player the mine should be created for
      * @param location the location of the mine

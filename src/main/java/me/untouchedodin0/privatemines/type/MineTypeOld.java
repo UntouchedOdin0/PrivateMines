@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import java.util.Map;
 
 @ConfigMappable
-public class MineType {
+public class MineTypeOld {
 
     @ConfigPath
     private String name;
