@@ -14,6 +14,7 @@ import org.codemc.worldguardwrapper.region.IWrappedRegion;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 
 public class Mine {
@@ -123,6 +124,8 @@ public class Mine {
 
     public void reset() {
         MineData mineData = getMineData();
+        Map<Material, Double> materials = mineData.getMaterials();
+
         Location cornerA = mineData.getMinimumMining();
         Location cornerB = mineData.getMaximumMining();
         World world = cornerA.getWorld();

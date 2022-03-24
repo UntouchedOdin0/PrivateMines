@@ -21,6 +21,7 @@ import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.type.MineType;
 import me.untouchedodin0.privatemines.utils.task.Task;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
@@ -123,7 +124,7 @@ public class MineFactory {
                         spongeL.getBlock().setType(Material.AIR);
                     });
                     privateMines.getMineStorage().addMine(owner, mine);
-                    TextComponent teleportMessage = new TextComponent("Click me to teleport to your mine!" );
+                    TextComponent teleportMessage = new TextComponent(ChatColor.GREEN + "Click me to teleport to your mine!" );
                     teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));
                     player.spigot().sendMessage(teleportMessage);
 
