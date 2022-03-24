@@ -12,6 +12,8 @@ public class MineData {
     UUID coOwner;
     Location spawnLocation;
     Location npcLocation;
+    Location minimumMining;
+    Location maximumMining;
 
     CuboidRegion miningRegion;
     CuboidRegion fullRegion;
@@ -40,6 +42,22 @@ public class MineData {
 
     public void setCoOwner(UUID coOwner) {
         this.coOwner = coOwner;
+    }
+
+    public Location getMinimumMining() {
+        return minimumMining;
+    }
+
+    public void setMinimumMining(Location minimumMining) {
+        this.minimumMining = minimumMining;
+    }
+
+    public Location getMaximumMining() {
+        return maximumMining;
+    }
+
+    public void setMaximumMining(Location maximumMining) {
+        this.maximumMining = maximumMining;
     }
 
     public CuboidRegion getMiningRegion() {

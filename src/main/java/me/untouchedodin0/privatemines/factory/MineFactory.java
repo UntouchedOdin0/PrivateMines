@@ -12,6 +12,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
@@ -23,7 +24,6 @@ import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.MineStorage;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.type.MineType;
-import me.untouchedodin0.privatemines.utils.regions.CuboidRegion;
 import me.untouchedodin0.privatemines.utils.task.Task;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -117,32 +117,27 @@ public class MineFactory {
                     BlockVector3 fullRegionOne = vector.subtract(mineBlocks.getSpawnLocation()).add(region.getMinimumPoint());
                     BlockVector3 fullRegionTwo = vector.subtract(mineBlocks.getSpawnLocation()).add(region.getMaximumPoint());
 
-                    BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2());
-                    BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1());
+                    BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2().add(0, 0, 1));
+                    BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1().add(0, 0, 1));
 
                     Location spongeL = new Location(location.getWorld(), vector.getBlockX(), vector.getBlockY(), vector.getBlockZ() + 1);
 
-                    Location min = new Location(location.getWorld(), fullRegionOne.getBlockX(), fullRegionOne.getBlockY(), fullRegionOne.getBlockZ() + 1);
-                    Location max = new Location(location.getWorld(), fullRegionTwo.getBlockX(), fullRegionTwo.getBlockY(), fullRegionTwo.getBlockZ() + 1);
-
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ() + 1);
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ() + 1);
-
-                    CuboidRegion miningRegion = new CuboidRegion(lrailsL.clone(), urailsL.clone());
-                    CuboidRegion fullRegion = new CuboidRegion(min.clone(), max.clone());
 
                     //com.sk89q.worldedit.regions.CuboidRegion fullRegion = new com.sk89q.worldedit.regions.CuboidRegion(fullRegionOne, fullRegionTwo);
 
                     System.out.println("S|" + spongeL); // spawn
                     System.out.println("L|" + lrailsL); // lower corner
                     System.out.println("U|" + urailsL); // upper corner
+                    System.out.println("lrailsV " + lrailsV);
+                    System.out.println("urailsV " + urailsV);
 
-                    System.out.println("miningRegion: " + miningRegion); // mining area
-                    System.out.println("fullRegionOne: " + fullRegionOne); // this
-                    System.out.println("fullRegionTwo: " + fullRegionTwo); // and this
+                    CuboidRegion cuboidRegion = new CuboidRegion(world, lrailsV, urailsV);
+                    CuboidRegion test = new CuboidRegion(lrailsV, urailsV);
 
-                    System.out.println("min: " + min); // min of the whole area in a bukkit location
-                    System.out.println("max: " + max); // max of the whole area in a bukkit location
+                    System.out.println("cuboid region w/e: " + cuboidRegion);
+                    System.out.println("cuboid region w/e (test): " + test);
 
                     Instant endOfIterator = Instant.now();
 
@@ -167,19 +162,25 @@ public class MineFactory {
                         spongeL.getBlock().setType(Material.AIR, false);
                     }, 1L);
 
-                    mineData.setMiningRegion(miningRegion);
-                    mineData.setFullRegion(fullRegion);
+                    mineData.setMinimumMining(lrailsL.subtract(0, 0, 1));
+                    mineData.setMaximumMining(urailsL.subtract(0, 0 , 1));
+
+//                    mineData.setMiningRegion(miningRegion);
+//                    mineData.setFullRegion(fullRegion);
 
 //                    mineData.setFullRegion(fullRegion);
 
-                    privateMines.getLogger().info("region: " + mineData.getFullRegion());
-                    privateMines.getLogger().info("mining region: " + mineData.getMiningRegion()); // this is correct
+//                    privateMines.getLogger().info("region: " + mineData.getFullRegion());
+//                    privateMines.getLogger().info("mining region: " + mineData.getMiningRegion()); // this is correct
 
                     mine.setMineOwner(owner);
                     mine.setMineType(mineType);
                     mine.setLocation(vector);
                     mine.setSpawnLocation(spongeL);
                     mine.setMineData(mineData);
+
+                    privateMines.getLogger().info("min mining mineData: " + mineData.getMinimumMining());
+                    privateMines.getLogger().info("max mining mineData: " + mineData.getMaximumMining());
 
                     privateMines.getLogger().info("mineStorage mines: " + mineStorage.getMines());
                     privateMines.getMineStorage().addMine(owner, mine);
