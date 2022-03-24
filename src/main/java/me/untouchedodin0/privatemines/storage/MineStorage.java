@@ -23,6 +23,8 @@ public class MineStorage {
     public void removeMine(UUID uuid) {
         if (!mines.containsKey(uuid)) {
             privateMines.getLogger().warning(String.format("Player %s doesn't a mine!!", uuid.toString()));
+        } else {
+            mines.remove(uuid);
         }
     }
 

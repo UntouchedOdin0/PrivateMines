@@ -1,22 +1,19 @@
 package me.untouchedodin0.privatemines.mine;
 
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.type.MineType;
 import me.untouchedodin0.privatemines.utils.Utils;
-import me.untouchedodin0.privatemines.utils.regions.CuboidRegion;
 import me.untouchedodin0.privatemines.utils.task.Task;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.codemc.worldguardwrapper.region.IWrappedRegion;
 
-import java.util.Objects;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.UUID;
 
 public class Mine {
@@ -121,7 +118,7 @@ public class Mine {
 //            return;
 //        }
 //        privateMines.getLogger().info("fullRegion: " + fullRegion);
-        privateMines.getMineStorage().removeMine(getMineOwner());
+        MineData mineData = getMineData();
     }
 
     public void reset() {
@@ -136,6 +133,8 @@ public class Mine {
         privateMines.getLogger().info("cornerA: " + cornerA);
         privateMines.getLogger().info("cornerB: " + cornerB);
 
+        int blocks = 0;
+
         int xMax = Integer.max(cornerA.getBlockX(), cornerB.getBlockX());
         int xMin = Integer.min(cornerA.getBlockX(), cornerB.getBlockX());
         int yMax = Integer.max(cornerA.getBlockY(), cornerB.getBlockY());
@@ -143,13 +142,21 @@ public class Mine {
         int zMax = Integer.max(cornerA.getBlockZ(), cornerB.getBlockZ());
         int zMin = Integer.min(cornerA.getBlockZ(), cornerB.getBlockZ());
 
+        Instant start = Instant.now();
+
         for (int x = xMin; x <= xMax; x++) {
             for (int y = yMin; y <= yMax; y++) {
                 for (int z = zMin; z <= zMax; z++) {
                     world.getBlockAt(x, y, z).setType(Material.STONE);
+                    blocks++;
                 }
             }
         }
+
+        Instant filled = Instant.now();
+        Duration durationToFill = Duration.between(start, filled);
+        privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
+//        privateMines.getLogger().info("Time took to fill %d blocks %fms " + durationToFill.toMillis() + "ms");
 
 //        World world = BukkitAdapter.adapt(privateMines.getMineWorldManager().getMinesWorld());
 //        EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();

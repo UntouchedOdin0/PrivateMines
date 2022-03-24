@@ -122,7 +122,7 @@ public class PrivateMines extends JavaPlugin {
 
     private void registerCommands() {
         paperCommandManager = new PaperCommandManager(this);
-        paperCommandManager.registerCommand(new PrivateMinesCommand(mineStorage));
+        paperCommandManager.registerCommand(new PrivateMinesCommand(this));
     }
 
     public void setupSchematicUtils() {
