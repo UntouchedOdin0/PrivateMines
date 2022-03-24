@@ -12,16 +12,12 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
-import me.untouchedodin0.kotlin.WorldEditUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.data.MineData;
-import me.untouchedodin0.privatemines.storage.MineStorage;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.type.MineType;
 import me.untouchedodin0.privatemines.utils.task.Task;
@@ -117,6 +113,8 @@ public class MineFactory {
                     mine.setLocation(vector);
                     mine.setSpawnLocation(spongeL);
                     mine.setMineData(mineData);
+
+                    //noinspection unused
 
                     Task teleport = Task.syncDelayed(() -> {
                         spongeL.getBlock().setType(Material.AIR);
