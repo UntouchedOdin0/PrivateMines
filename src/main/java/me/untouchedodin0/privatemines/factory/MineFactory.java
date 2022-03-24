@@ -21,6 +21,8 @@ import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.type.MineType;
 import me.untouchedodin0.privatemines.utils.task.Task;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -36,6 +38,7 @@ import java.util.UUID;
 public class MineFactory {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
+
 
     /**
      * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
@@ -118,9 +121,12 @@ public class MineFactory {
 
                     Task teleport = Task.syncDelayed(() -> {
                         spongeL.getBlock().setType(Material.AIR);
-                        mine.teleport(player);
                     });
                     privateMines.getMineStorage().addMine(owner, mine);
+                    TextComponent teleportMessage = new TextComponent("Click me to teleport to your mine!" );
+                    teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));
+                    player.spigot().sendMessage(teleportMessage);
+
                     privateMines.getLogger().info("Mine creation time: " + durationPasted.toMillis() + "ms");
                 } catch (IOException ioException) {
                     ioException.printStackTrace();

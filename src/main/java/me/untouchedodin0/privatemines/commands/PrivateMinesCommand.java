@@ -10,8 +10,10 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.storage.MineStorage;
 import me.untouchedodin0.privatemines.type.MineType;
+import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 @CommandAlias("privatemines|pmines|pmine")
@@ -30,8 +32,10 @@ public class PrivateMinesCommand extends BaseCommand {
     public void give(Player player, Player target) {
         player.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a private mine!");
         MineFactory mineFactory = new MineFactory();
+        MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
+        Location location = mineWorldManager.getNextFreeLocation();
         MineType mineType = MineConfig.mineTypes.get("Test");
-        mineFactory.create(player, player.getLocation(), mineType);
+        mineFactory.create(player, location, mineType);
     }
 
     @Subcommand("delete")
