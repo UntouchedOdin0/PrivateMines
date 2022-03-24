@@ -110,10 +110,6 @@ public class MineFactory {
 //                    751,110,763 Lower Rails Sponge - mb0 + mb2 -> 763 - 0 +-12 = 751
 //                    776,138,735 Upper Rails Sponge - mb0 + mb1 -> 763 - 0 + 13 = 776
 
-//                    Location sponge = vector;
-//                    Location lrails = sponge - mineBlocks.getSpawnLocation() + mineBlocks.getCorner2();
-//                    Location urails = sponge - mineBlocks.getSpawnLocation() + mineBlocks.getCorner1();
-
                     BlockVector3 fullRegionOne = vector.subtract(mineBlocks.getSpawnLocation()).add(region.getMinimumPoint());
                     BlockVector3 fullRegionTwo = vector.subtract(mineBlocks.getSpawnLocation()).add(region.getMaximumPoint());
 
@@ -158,12 +154,11 @@ public class MineFactory {
                     Duration durationIterator = Duration.between(start, endOfIterator);
                     Duration durationPasted = Duration.between(start, pasted);
 
-                    Task task = Task.syncDelayed(() -> {
-                        spongeL.getBlock().setType(Material.AIR, false);
-                    }, 1L);
+                    Task task = Task.syncDelayed(() -> spongeL.getBlock().setType(Material.AIR, false), 1L);
 
                     mineData.setMinimumMining(lrailsL.subtract(0, 0, 1));
                     mineData.setMaximumMining(urailsL.subtract(0, 0 , 1));
+                    mineData.setSpawnLocation(spongeL);
 
                     mine.setMineOwner(owner);
                     mine.setMineType(mineType);

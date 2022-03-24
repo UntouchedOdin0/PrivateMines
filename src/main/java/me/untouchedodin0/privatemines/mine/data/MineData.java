@@ -44,6 +44,14 @@ public class MineData {
         this.coOwner = coOwner;
     }
 
+    public Location getSpawnLocation() {
+        return spawnLocation;
+    }
+
+    public void setSpawnLocation(Location spawnLocation) {
+        this.spawnLocation = spawnLocation;
+    }
+
     public Location getMinimumMining() {
         return minimumMining;
     }
@@ -58,14 +66,6 @@ public class MineData {
 
     public void setMaximumMining(Location maximumMining) {
         this.maximumMining = maximumMining;
-    }
-
-    public CuboidRegion getMiningRegion() {
-        return miningRegion;
-    }
-
-    public void setMiningRegion(CuboidRegion cuboidRegion) {
-        this.miningRegion = cuboidRegion;
     }
 
     public CuboidRegion getFullRegion() {
