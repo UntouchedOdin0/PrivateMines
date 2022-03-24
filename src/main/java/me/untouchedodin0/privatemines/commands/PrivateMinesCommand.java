@@ -57,6 +57,7 @@ public class PrivateMinesCommand extends BaseCommand {
             player.sendMessage("Player doesn't own a mine!");
         } else {
             Mine mine = mineStorage.get(player.getUniqueId());
+            mine.reset();
             mine.teleport(player);
         }
     }

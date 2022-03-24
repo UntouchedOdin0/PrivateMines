@@ -60,13 +60,8 @@ public class MineFactory {
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-
         SchematicStorage storage = privateMines.getSchematicStorage();
-        privateMines.getLogger().info("storage: " + storage);
-        privateMines.getLogger().info("mineBlocks: " + storage.getMineBlocksMap().get(schematicFile));
-
         SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
-        BlockVector3 spawnOffset = mineBlocks.getSpawnLocation(), cornerOneOffset = mineBlocks.getCorner1(), cornerTwoOffset = mineBlocks.getCorner2();
 
         Task.asyncDelayed(() -> {
             if (clipboardFormat != null) {
@@ -77,27 +72,9 @@ public class MineFactory {
                     World world = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()));
                     EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
                     LocalSession localSession = new LocalSession();
-                    BlockVector3 minimumPoint = editSession.getMinimumPoint();
-                    BlockVector3 maximumPoint = editSession.getMaximumPoint();
-
-                    privateMines.getLogger().info("minimumPoint: " + minimumPoint);
-                    privateMines.getLogger().info("minimumPoint + vector: " + minimumPoint.add(vector));
-                    privateMines.getLogger().info("minimumPoint + vector + spawn: " + minimumPoint.add(vector).add(spawnOffset));
 
                     Clipboard clipboard = clipboardReader.read();
                     ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
-                    Region region = clipboard.getRegion();
-
-                    System.out.println("mb0|" + mineBlocks.getSpawnLocation().toParserString());
-                    System.out.println("mb1|" + mineBlocks.getCorner1().toParserString());
-                    System.out.println("mb2|" + mineBlocks.getCorner2().toParserString());
-
-                    System.out.println("cbo|" + clipboard.getOrigin().toParserString());
-
-                    System.out.println("min|" + minimumPoint.toParserString());
-                    System.out.println("max|" + maximumPoint.toParserString());
-
-                    System.out.println("loc|" + location);
 
 //                    mb0|0,50,-150
 //                    mb1|13,48,-144
@@ -110,9 +87,6 @@ public class MineFactory {
 //                    751,110,763 Lower Rails Sponge - mb0 + mb2 -> 763 - 0 +-12 = 751
 //                    776,138,735 Upper Rails Sponge - mb0 + mb1 -> 763 - 0 + 13 = 776
 
-                    BlockVector3 fullRegionOne = vector.subtract(mineBlocks.getSpawnLocation()).add(region.getMinimumPoint());
-                    BlockVector3 fullRegionTwo = vector.subtract(mineBlocks.getSpawnLocation()).add(region.getMaximumPoint());
-
                     BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2().add(0, 0, 1));
                     BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1().add(0, 0, 1));
 
@@ -120,22 +94,6 @@ public class MineFactory {
 
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ() + 1);
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ() + 1);
-
-                    //com.sk89q.worldedit.regions.CuboidRegion fullRegion = new com.sk89q.worldedit.regions.CuboidRegion(fullRegionOne, fullRegionTwo);
-
-                    System.out.println("S|" + spongeL); // spawn
-                    System.out.println("L|" + lrailsL); // lower corner
-                    System.out.println("U|" + urailsL); // upper corner
-                    System.out.println("lrailsV " + lrailsV);
-                    System.out.println("urailsV " + urailsV);
-
-                    CuboidRegion cuboidRegion = new CuboidRegion(world, lrailsV, urailsV);
-                    CuboidRegion test = new CuboidRegion(lrailsV, urailsV);
-
-                    System.out.println("cuboid region w/e: " + cuboidRegion);
-                    System.out.println("cuboid region w/e (test): " + test);
-
-                    Instant endOfIterator = Instant.now();
 
                     localSession.setClipboard(clipboardHolder);
 
@@ -151,10 +109,7 @@ public class MineFactory {
                         worldEditException.printStackTrace();
                     }
                     Instant pasted = Instant.now();
-                    Duration durationIterator = Duration.between(start, endOfIterator);
                     Duration durationPasted = Duration.between(start, pasted);
-
-                    Task task = Task.syncDelayed(() -> spongeL.getBlock().setType(Material.AIR, false), 1L);
 
                     mineData.setMinimumMining(lrailsL.subtract(0, 0, 1));
                     mineData.setMaximumMining(urailsL.subtract(0, 0 , 1));
@@ -166,15 +121,12 @@ public class MineFactory {
                     mine.setSpawnLocation(spongeL);
                     mine.setMineData(mineData);
 
-                    privateMines.getLogger().info("min mining mineData: " + mineData.getMinimumMining());
-                    privateMines.getLogger().info("max mining mineData: " + mineData.getMaximumMining());
-
-                    privateMines.getLogger().info("mineStorage mines: " + mineStorage.getMines());
+                    Task teleport = Task.syncDelayed(() -> {
+                        spongeL.getBlock().setType(Material.AIR);
+                        mine.teleport(player);
+                    });
                     privateMines.getMineStorage().addMine(owner, mine);
-                    privateMines.getLogger().info("mineStorage mines: " + mineStorage.getMines());
-
-                    privateMines.getLogger().info("Iterator time: " + durationIterator.toMillis() + "ms");
-                    privateMines.getLogger().info("Pasted time: " + durationPasted.toMillis() + "ms");
+                    privateMines.getLogger().info("Mine creation time: " + durationPasted.toMillis() + "ms");
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }

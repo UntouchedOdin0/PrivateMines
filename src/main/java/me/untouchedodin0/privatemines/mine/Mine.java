@@ -127,12 +127,6 @@ public class Mine {
         Location cornerB = mineData.getMaximumMining();
         World world = cornerA.getWorld();
 
-        privateMines.getLogger().info("min " + mineData.getMinimumMining());
-        privateMines.getLogger().info("max " + mineData.getMaximumMining());
-
-        privateMines.getLogger().info("cornerA: " + cornerA);
-        privateMines.getLogger().info("cornerB: " + cornerB);
-
         int blocks = 0;
 
         int xMax = Integer.max(cornerA.getBlockX(), cornerB.getBlockX());
@@ -147,7 +141,9 @@ public class Mine {
         for (int x = xMin; x <= xMax; x++) {
             for (int y = yMin; y <= yMax; y++) {
                 for (int z = zMin; z <= zMax; z++) {
-                    world.getBlockAt(x, y, z).setType(Material.STONE);
+                    if (world != null) {
+                        world.getBlockAt(x, y, z).setType(Material.STONE);
+                    }
                     blocks++;
                 }
             }
@@ -156,32 +152,5 @@ public class Mine {
         Instant filled = Instant.now();
         Duration durationToFill = Duration.between(start, filled);
         privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
-//        privateMines.getLogger().info("Time took to fill %d blocks %fms " + durationToFill.toMillis() + "ms");
-
-//        World world = BukkitAdapter.adapt(privateMines.getMineWorldManager().getMinesWorld());
-//        EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
-//
-//        if (miningRegion == null) {
-//            privateMines.getLogger().info("Mining region was null!");
-//        }
-//
-//        privateMines.getLogger().info("miningRegion: " + miningRegion);
-//        privateMines.getLogger().info("miningRegion min: " + Objects.requireNonNull(miningRegion).getMinimumPoint());
-//        privateMines.getLogger().info("miningRegion max: " + miningRegion.getMaximumPoint());
-//
-//
-//        privateMines.getLogger().info("cuboid region: " + miningRegion.getMinimumPoint() + " " + miningRegion.getMaximumPoint());
-//        RandomPattern randomPattern = new RandomPattern(); // Create the random pattern
-//        BlockState stone = BukkitAdapter.adapt(Material.STONE.createBlockData());
-//        randomPattern.add(stone, 1.0);
-//
-//        RegionFunction set = new BlockReplace(editSession, randomPattern);
-//        RegionVisitor regionVisitor = new RegionVisitor(miningRegion, set);
-//        try {
-//            Operations.completeLegacy(regionVisitor);
-//        } catch (MaxChangedBlocksException e) {
-//            e.printStackTrace();
-//        }
-//    }
     }
 }
