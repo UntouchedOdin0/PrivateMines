@@ -1,5 +1,9 @@
 package me.untouchedodin0.privatemines.mine;
 
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.data.MineData;
@@ -120,7 +124,17 @@ public class Mine {
 //            return;
 //        }
 //        privateMines.getLogger().info("fullRegion: " + fullRegion);
+        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(privateMines.getMineWorldManager().getMinesWorld());
         MineData mineData = getMineData();
+        EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
+        try {
+            editSession.setBlocks(mineData.getFullRegion(), BukkitAdapter.adapt(Material.AIR.createBlockData()));
+        } catch (MaxChangedBlocksException e) {
+            e.printStackTrace();
+        }
+
+        privateMines.getLogger().info("full region min: " + mineData.getFullRegion().getMinimumPoint());
+        privateMines.getLogger().info("full region max: " + mineData.getFullRegion().getMaximumPoint());
     }
 
     public void reset() {

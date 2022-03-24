@@ -41,7 +41,6 @@ public class PrivateMinesCommand extends BaseCommand {
     @Subcommand("delete")
     @CommandCompletion("@players")
     public void delete(Player player, Player target) {
-
         if (target != null) {
             if (!privateMines.getMineStorage().hasMine(target.getUniqueId())) {
                 player.sendMessage("Player doesn't own a mine!");

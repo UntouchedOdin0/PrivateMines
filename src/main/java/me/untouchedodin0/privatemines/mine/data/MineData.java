@@ -1,5 +1,6 @@
 package me.untouchedodin0.privatemines.mine.data;
 
+import com.sk89q.worldedit.regions.Region;
 import me.untouchedodin0.privatemines.utils.regions.CuboidRegion;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,7 +17,7 @@ public class MineData {
     Location maximumMining;
 
     CuboidRegion miningRegion;
-    CuboidRegion fullRegion;
+    Region fullRegion;
 
     String worldName;
     String mineType;
@@ -68,11 +69,11 @@ public class MineData {
         this.maximumMining = maximumMining;
     }
 
-    public CuboidRegion getFullRegion() {
+    public Region getFullRegion() {
         return fullRegion;
     }
 
-    public void setFullRegion(CuboidRegion region) {
+    public void setFullRegion(Region region) {
         this.fullRegion = region;
     }
 

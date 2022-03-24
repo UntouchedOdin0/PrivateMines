@@ -1,9 +1,6 @@
 package me.untouchedodin0.privatemines.factory;
 
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
@@ -12,6 +9,10 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -108,9 +109,26 @@ public class MineFactory {
                     Instant pasted = Instant.now();
                     Duration durationPasted = Duration.between(start, pasted);
 
-                    mineData.setMinimumMining(lrailsL.subtract(0, 0, 1));
-                    mineData.setMaximumMining(urailsL.subtract(0, 0 , 1));
-                    mineData.setSpawnLocation(spongeL);
+                    Region region = clipboard.getRegion();
+                    Region newRegion;
+
+                    BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+                    Vector3 realTo = vector.toVector3().add(clipboardHolder.getTransform().apply(clipboardOffset.toVector3()));
+                    Vector3 max = realTo.add(clipboardHolder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
+                    RegionSelector regionSelector = new CuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
+                    localSession.setRegionSelector(world, regionSelector);
+                    regionSelector.learnChanges();
+
+                    try {
+                        newRegion = regionSelector.getRegion();
+                        mineData.setMinimumMining(lrailsL.subtract(0, 0, 1));
+                        mineData.setMaximumMining(urailsL.subtract(0, 0 , 1));
+                        mineData.setSpawnLocation(spongeL);
+                        mineData.setFullRegion(newRegion);
+                        privateMines.getLogger().info("newRegion: " + newRegion);
+                    } catch (IncompleteRegionException e) {
+                        e.printStackTrace();
+                    }
 
                     mine.setMineOwner(owner);
                     mine.setMineType(mineType);
@@ -118,6 +136,7 @@ public class MineFactory {
                     mine.setSpawnLocation(spongeL);
                     mine.setMineData(mineData);
 
+                    privateMines.getLogger().info("full region: " + mineData.getFullRegion());
                     //noinspection unused
 
                     Task teleport = Task.syncDelayed(() -> {
