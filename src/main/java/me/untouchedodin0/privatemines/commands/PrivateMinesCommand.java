@@ -11,6 +11,7 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.storage.MineStorage;
 import me.untouchedodin0.privatemines.type.MineType;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 @CommandAlias("privatemines|pmines|pmine")
@@ -27,10 +28,9 @@ public class PrivateMinesCommand extends BaseCommand {
     @Subcommand("give")
     @CommandCompletion("@players")
     public void give(Player player, Player target) {
-        player.sendMessage("Giving " + target.getName() + " a private mine!");
+        player.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a private mine!");
         MineFactory mineFactory = new MineFactory();
         MineType mineType = MineConfig.mineTypes.get("Test");
-        player.sendMessage("mine factory: " + mineFactory);
         mineFactory.create(player, player.getLocation(), mineType);
     }
 

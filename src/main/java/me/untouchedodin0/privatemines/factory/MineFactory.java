@@ -53,9 +53,6 @@ public class MineFactory {
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         Mine mine = new Mine(privateMines);
         MineData mineData = new MineData();
-        MineStorage mineStorage = privateMines.getMineStorage();
-        WorldEditUtils worldEditUtils = new WorldEditUtils();
-
         UUID owner = player.getUniqueId();
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
