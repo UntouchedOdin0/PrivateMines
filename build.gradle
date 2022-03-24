@@ -18,6 +18,7 @@ repositories {
     maven { url = 'https://repo.rapture.pw/repository/maven-releases/' }
     maven { url = 'https://repo.rapture.pw/repository/maven-snapshots/' }
     maven { url = 'https://repo.codemc.org/repository/maven-public/' }
+    maven { url = 'https://redempt.dev' }
 }
 
 dependencies {
@@ -31,9 +32,11 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation 'org.codemc.worldguardwrapper:worldguardwrapper:1.2.0-SNAPSHOT'
     implementation "co.aikar:acf-paper:0.5.1-SNAPSHOT"
+    implementation 'com.github.Redempt:RedLib:6.5.1.8'
 }
 
 shadowJar {
+//    minimize()
     relocate 'org.codemc.worldguardwrapper', 'me.untouchedodin0.privatemines.worldguardwrapper'
     relocate 'de.jeff_media.updatechecker', 'me.untouchedodin0.privatemines.updatechecker'
 }

@@ -5,12 +5,13 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.type.MineType;
 import me.untouchedodin0.privatemines.utils.Utils;
-import me.untouchedodin0.privatemines.utils.task.Task;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.codemc.worldguardwrapper.region.IWrappedRegion;
+import redempt.redlib.misc.Task;
+import redempt.redlib.misc.WeightedRandom;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -125,6 +126,7 @@ public class Mine {
     public void reset() {
         MineData mineData = getMineData();
         Map<Material, Double> materials = mineData.getMaterials();
+        WeightedRandom weightedRandom = new WeightedRandom<>();
 
         Location cornerA = mineData.getMinimumMining();
         Location cornerB = mineData.getMaximumMining();
