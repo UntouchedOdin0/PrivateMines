@@ -1,4 +1,4 @@
-package me.untouchedodin0.kotlin
+package me.untouchedodin0.kotlin.mine.type
 
 import me.untouchedodin0.privatemines.configmanager.annotations.ConfigMappable
 import me.untouchedodin0.privatemines.configmanager.annotations.ConfigPath
