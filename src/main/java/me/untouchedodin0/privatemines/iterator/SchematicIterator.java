@@ -65,9 +65,6 @@ public class SchematicIterator {
                     }
                 });
 
-                Bukkit.getLogger().info("corner1: " + corner1);
-                Bukkit.getLogger().info("corner2: " + corner2);
-                Bukkit.getLogger().info("spawn: " + spawn);
                 mineBlocks.spawnLocation = spawn;
                 mineBlocks.corners[0] = corner1;
 
@@ -80,7 +77,7 @@ public class SchematicIterator {
         return mineBlocks;
     }
 
-    public class MineBlocks {
+    public static class MineBlocks {
         public BlockVector3 spawnLocation;
         public BlockVector3[] corners;
 
