@@ -3,6 +3,7 @@ package me.untouchedodin0.privatemines.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
+import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -25,6 +26,12 @@ public class PrivateMinesCommand extends BaseCommand {
     public PrivateMinesCommand(PrivateMines privateMines) {
         this.privateMines = privateMines;
         this.mineStorage = privateMines.getMineStorage();
+    }
+
+    @Default
+    public void mainCommand(Player player) {
+        player.sendMessage("Hello.... Billy!");
+        player.sendMessage("Check out my menu!");
     }
 
     @Subcommand("give")

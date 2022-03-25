@@ -180,8 +180,13 @@ public class Mine {
     }
 
     public void saveMineData(MineData mineData) {
+        UUID uuid = getMineOwner();
+        String fileName = String.format("/%s.yml", uuid.toString());
+
         Path minesDirectory = privateMines.getMinesDirectory();
-        File file = new File(minesDirectory + "/test.yml");
+        File file = new File(minesDirectory + fileName);
+        privateMines.getLogger().info("Saving file " + file.getName() + "...");
+
         try {
             if (file.createNewFile()) {
                 privateMines.getLogger().info("Created new file: " + file.getPath());
