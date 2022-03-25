@@ -34,6 +34,7 @@ public class Mine {
 
     private UUID mineOwner;
     private MineType mineType;
+    private String mineTypeName;
     private BlockVector3 location;
     private IWrappedRegion iWrappedMiningRegion;
     private IWrappedRegion iWrappedFullRegion;
@@ -61,6 +62,14 @@ public class Mine {
 
     public void setMineType(MineType mineType) {
         this.mineType = mineType;
+    }
+
+    public String getMineTypeName() {
+        return mineTypeName;
+    }
+
+    public void setMineTypeName(String mineTypeName) {
+        this.mineTypeName = mineTypeName;
     }
 
     public BlockVector3 getLocation() {
@@ -179,9 +188,8 @@ public class Mine {
         privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
     }
 
-    public void saveMineData(MineData mineData) {
-        UUID uuid = getMineOwner();
-        String fileName = String.format("/%s.yml", uuid.toString());
+    public void saveMineData(Player player, MineData mineData) {
+        String fileName = String.format("/%s.yml", player.getUniqueId());
 
         Path minesDirectory = privateMines.getMinesDirectory();
         File file = new File(minesDirectory + fileName);
@@ -197,16 +205,24 @@ public class Mine {
 
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
 
+        String mineType = mineData.getMineType();
+
+        UUID owner = player.getUniqueId();
+        Location mineLocation = mineData.getMineLocation();
         Location corner1 = mineData.getMinimumMining();
         Location corner2 = mineData.getMaximumMining();
 
         Location spawn = mineData.getSpawnLocation();
 
+        privateMines.getLogger().info("mineTypename: " + mineTypeName);
+        privateMines.getLogger().info("mineLocation save: " + mineLocation);
         privateMines.getLogger().info("corner1 save: " + corner1);
         privateMines.getLogger().info("corner2 save: " + corner2);
-
         privateMines.getLogger().info("spawn save: " + spawn);
 
+        yml.set("mineOwner", owner.toString());
+        yml.set("mineType", mineType);
+        yml.set("mineLocation", LocationUtils.toString(mineLocation));
         yml.set("corner1", LocationUtils.toString(corner1));
         yml.set("corner2", LocationUtils.toString(corner2));
         yml.set("spawn", LocationUtils.toString(spawn));

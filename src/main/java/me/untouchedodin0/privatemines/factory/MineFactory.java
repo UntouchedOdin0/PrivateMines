@@ -54,7 +54,6 @@ public class MineFactory {
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         Mine mine = new Mine(privateMines);
         MineData mineData = new MineData();
-        UUID owner = player.getUniqueId();
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
@@ -124,25 +123,27 @@ public class MineFactory {
                         mineData.setMinimumMining(lrailsL.subtract(0, 0, 1));
                         mineData.setMaximumMining(urailsL.subtract(0, 0 , 1));
                         mineData.setSpawnLocation(spongeL);
+                        mineData.setMineLocation(location);
                         mineData.setFullRegion(newRegion);
+                        mineData.setMineType(mineType.getName());
 
                         privateMines.getLogger().info("newRegion: " + newRegion);
                     } catch (IncompleteRegionException e) {
                         e.printStackTrace();
                     }
 
-                    mine.setMineOwner(owner);
+                    mine.setMineOwner(player.getUniqueId());
                     mine.setMineType(mineType);
                     mine.setLocation(vector);
                     mine.setSpawnLocation(spongeL);
                     mine.setMineData(mineData);
-                    mine.saveMineData(mineData);
+                    mine.saveMineData(player, mineData);
 
                     privateMines.getLogger().info("full region: " + mineData.getFullRegion());
                     //noinspection unused
 
                     Task teleport = Task.syncDelayed(() -> spongeL.getBlock().setType(Material.AIR));
-                    privateMines.getMineStorage().addMine(owner, mine);
+                    privateMines.getMineStorage().addMine(player.getUniqueId(), mine);
 
                     TextComponent teleportMessage = new TextComponent(ChatColor.GREEN + "Click me to teleport to your mine!" );
                     teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));

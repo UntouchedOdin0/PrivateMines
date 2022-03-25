@@ -2,12 +2,15 @@ package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
+import me.untouchedodin0.kotlin.mine.storage.MineStorage;
+import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.configmanager.ConfigManager;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
-import me.untouchedodin0.privatemines.storage.MineStorage;
+import me.untouchedodin0.privatemines.mine.Mine;
+import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.version.VersionUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -15,7 +18,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.misc.LocationUtils;
 
@@ -28,6 +30,8 @@ import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class PrivateMines extends JavaPlugin {
@@ -43,25 +47,6 @@ public class PrivateMines extends JavaPlugin {
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
-    }
-
-    /**
-     * Gets the plugin that called the calling method of this method
-     * <p>
-     * Credits to Redempt
-     *
-     * @return The plugin which called the method
-     */
-    public static Plugin getCallingPlugin() {
-        Exception ex = new Exception();
-        try {
-            Class<?> clazz = Class.forName(ex.getStackTrace()[2].getClassName());
-            Plugin plugin = JavaPlugin.getProvidingPlugin(clazz);
-            return plugin.isEnabled() ? plugin : Bukkit.getPluginManager().getPlugin(plugin.getName());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     @Override
@@ -142,15 +127,38 @@ public class PrivateMines extends JavaPlugin {
             try {
                 Files.list(path).filter(jsonMatcher::matches).forEach(filePath -> {
                     File file = filePath.toFile();
+                    Mine mine = new Mine(privateMines);
+                    MineData mineData = new MineData();
+
                     privateMines.getLogger().info("Lets go load file " + file);
                     YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
+
+                    UUID owner = UUID.fromString(Objects.requireNonNull(yml.getString("mineOwner")));
+                    String mineTypeName = yml.getString("mineType");
                     Location corner1 = LocationUtils.fromString(yml.getString("corner1"));
                     Location corner2 = LocationUtils.fromString(yml.getString("corner2"));
                     Location spawn = LocationUtils.fromString(yml.getString("spawn"));
+                    Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
+                    MineType mineType = MineConfig.mineTypes.get(mineTypeName);
 
+                    privateMines.getLogger().info("owner: " + owner);
+                    privateMines.getLogger().info("mineTypeName: " + mineTypeName);
                     privateMines.getLogger().info("corner1: " + corner1);
                     privateMines.getLogger().info("corner2: " + corner2);
                     privateMines.getLogger().info("spawn: " + spawn);
+                    privateMines.getLogger().info("mineLocation: " + mineLocation);
+                    privateMines.getLogger().info("mineType: " + mineType);
+
+                    mineData.setMinimumMining(corner1);
+                    mineData.setMinimumMining(corner2);
+                    mineData.setSpawnLocation(spawn);
+                    mineData.setMineLocation(mineLocation);
+                    mineData.setMineType(mineTypeName);
+
+                    mine.setMineData(mineData);
+                    privateMines.getLogger().info("mines: " + getMineStorage().getMines());
+                    getMineStorage().addMine(owner, mine);
+                    privateMines.getLogger().info("mines: " + getMineStorage().getMines());
                 });
             } catch (IOException e) {
                 e.printStackTrace();

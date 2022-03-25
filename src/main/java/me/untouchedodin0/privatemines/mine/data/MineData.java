@@ -11,6 +11,7 @@ public class MineData {
 
     UUID mineOwner;
     UUID coOwner;
+    Location mineLocation;
     Location spawnLocation;
     Location npcLocation;
     Location minimumMining;
@@ -45,6 +46,14 @@ public class MineData {
 
     public void setCoOwner(UUID coOwner) {
         this.coOwner = coOwner;
+    }
+
+    public Location getMineLocation() {
+        return mineLocation;
+    }
+
+    public void setMineLocation(Location mineLocation) {
+        this.mineLocation = mineLocation;
     }
 
     public Location getSpawnLocation() {
