@@ -18,12 +18,16 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.mine.data.MineData;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Utils {
 
@@ -61,12 +65,29 @@ public class Utils {
         return new Location(world, vector3.getX(), vector3.getY(), vector3.getZ());
     }
 
+    public static CuboidRegion toWorldEditCuboid(me.untouchedodin0.privatemines.utils.regions.CuboidRegion cuboidRegion) {
+        var min = BlockVector3.at(
+                cuboidRegion.getMinimumPoint().getBlockX(),
+                cuboidRegion.getMinimumPoint().getBlockY(),
+                cuboidRegion.getMinimumPoint().getBlockZ()
+        );
+
+        var max = BlockVector3.at(
+                cuboidRegion.getMaximumPoint().getBlockX(),
+                cuboidRegion.getMaximumPoint().getBlockY(),
+                cuboidRegion.getMaximumPoint().getBlockZ()
+        );
+
+        return new CuboidRegion(min, max);
+    }
+
     /**
      * @param location - The location where you want the schematic to be pasted at
      * @param file     - The file of the schematic you want to paste into the world
      * @see org.bukkit.Location
      * @see java.io.File
      */
+
     public void paste(Location location, File file) {
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(file);
@@ -111,20 +132,41 @@ public class Utils {
         }
     }
 
+    public void saveMineData(UUID uuid, MineData mineData) {
+        Path minesDirectory = privateMines.getMinesDirectory();
+        File file = new File(minesDirectory + "/test.yml");
+        try {
+            if (file.createNewFile()) {
+                privateMines.getLogger().info("Created new file: " + file.getPath());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
 
-    public static CuboidRegion toWorldEditCuboid(me.untouchedodin0.privatemines.utils.regions.CuboidRegion cuboidRegion) {
-        var min = BlockVector3.at(
-                cuboidRegion.getMinimumPoint().getBlockX(),
-                cuboidRegion.getMinimumPoint().getBlockY(),
-                cuboidRegion.getMinimumPoint().getBlockZ()
-        );
+//        org.bukkit.World world = mineData.getMinimumMining().getWorld();
+//        privateMines.getLogger().info("world: " + world);
 
-        var max = BlockVector3.at(
-                cuboidRegion.getMaximumPoint().getBlockX(),
-                cuboidRegion.getMaximumPoint().getBlockY(),
-                cuboidRegion.getMaximumPoint().getBlockZ()
-        );
+        privateMines.getLogger().info("getMinimumMining: " + mineData.getMinimumMining());
+        privateMines.getLogger().info("getMaximumMining: " + mineData.getMaximumMining());
 
-        return new CuboidRegion(min, max);
+//        yml.set("corner1", LocationUtils.toString(mineData.getMinimumMining()));
+//        yml.set("corner2", LocationUtils.toString(mineData.getMaximumMining()));
+//        yml.set("fullMin", LocationUtils.toString(mineData.getMinimumFullRegion()));
+//        yml.set("fullMax", LocationUtils.toString(mineData.getMaximumFullRegion()));
+        yml.set("spawn", "spawnLoc");
+        try {
+            yml.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // TODO does this file structure work with having multiple mines?
+
+//        try {
+//            Files.write(playerDataFile, gson.toJson(mineData).getBytes());
+//        } catch (IOException e) {
+//            throw new RuntimeException("Could not save mine data", e);
+//        }
     }
 }

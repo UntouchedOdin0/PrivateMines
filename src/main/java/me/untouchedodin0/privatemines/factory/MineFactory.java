@@ -1,5 +1,6 @@
 package me.untouchedodin0.privatemines.factory;
 
+import com.google.gson.Gson;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -21,6 +22,7 @@ import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
+import me.untouchedodin0.privatemines.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -55,6 +57,8 @@ public class MineFactory {
         Mine mine = new Mine(privateMines);
         MineData mineData = new MineData();
         UUID owner = player.getUniqueId();
+        Utils utils = new Utils(privateMines);
+        Gson gson = new Gson();
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
@@ -136,6 +140,7 @@ public class MineFactory {
                     mine.setLocation(vector);
                     mine.setSpawnLocation(spongeL);
                     mine.setMineData(mineData);
+                    mine.saveMineData(mineData);
 
                     privateMines.getLogger().info("full region: " + mineData.getFullRegion());
                     //noinspection unused
@@ -144,6 +149,7 @@ public class MineFactory {
                         spongeL.getBlock().setType(Material.AIR);
                     });
                     privateMines.getMineStorage().addMine(owner, mine);
+
                     TextComponent teleportMessage = new TextComponent(ChatColor.GREEN + "Click me to teleport to your mine!" );
                     teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));
                     player.spigot().sendMessage(teleportMessage);
@@ -154,5 +160,9 @@ public class MineFactory {
                 }
             }
         });
+
+//        String json = gson.toJson(mine);
+//        privateMines.getLogger().info(json);
+//        utils.saveMineData(owner, mineData);
     }
 }

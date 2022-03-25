@@ -1,6 +1,7 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
+import com.google.gson.Gson;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.config.MineConfig;
@@ -35,6 +36,7 @@ public class PrivateMines extends JavaPlugin {
     private MineFactory mineFactory;
     private MineStorage mineStorage;
     private MineWorldManager mineWorldManager;
+    private Gson gson;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -72,6 +74,7 @@ public class PrivateMines extends JavaPlugin {
         mineFactory = new MineFactory();
         mineStorage = new MineStorage();
         mineWorldManager = new MineWorldManager();
+        gson = new Gson();
 
         registerCommands();
         setupSchematicUtils();

@@ -1,24 +1,18 @@
 package me.untouchedodin0.privatemines.utils.location;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
-public class LocationUtils {
+public class LocationUtilsOld {
 
     /**
      * An array of all the block faces which face in a single direction (positive X, negative X, etc.)
@@ -127,10 +121,10 @@ public class LocationUtils {
      * @return The stringified Location
      */
     public static String toString(Location loc, String separator) {
-        return new StringBuilder().append(loc.getWorld().getName()).append(separator)
-                .append(loc.getX()).append(separator)
-                .append(loc.getY()).append(separator)
-                .append(loc.getZ()).toString();
+        return Objects.requireNonNull(loc.getWorld()).getName() + separator +
+                loc.getX() + separator +
+                loc.getY() + separator +
+                loc.getZ();
     }
 
     /**

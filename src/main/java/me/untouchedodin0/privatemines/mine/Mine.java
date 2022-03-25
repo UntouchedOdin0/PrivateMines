@@ -12,11 +12,16 @@ import me.untouchedodin0.privatemines.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.codemc.worldguardwrapper.region.IWrappedRegion;
+import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.misc.WeightedRandom;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -172,5 +177,39 @@ public class Mine {
         Instant filled = Instant.now();
         Duration durationToFill = Duration.between(start, filled);
         privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
+    }
+
+    public void saveMineData(MineData mineData) {
+        Path minesDirectory = privateMines.getMinesDirectory();
+        File file = new File(minesDirectory + "/test.yml");
+        try {
+            if (file.createNewFile()) {
+                privateMines.getLogger().info("Created new file: " + file.getPath());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
+
+        Location corner1 = mineData.getMinimumMining();
+        Location corner2 = mineData.getMaximumMining();
+
+        Location spawn = mineData.getSpawnLocation();
+
+        privateMines.getLogger().info("corner1 save: " + corner1);
+        privateMines.getLogger().info("corner2 save: " + corner2);
+
+        privateMines.getLogger().info("spawn save: " + spawn);
+
+        yml.set("corner1", LocationUtils.toString(corner1));
+        yml.set("corner2", LocationUtils.toString(corner2));
+        yml.set("spawn", LocationUtils.toString(spawn));
+
+        try {
+            yml.save(file);
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
     }
 }
