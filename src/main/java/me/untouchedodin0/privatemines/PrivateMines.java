@@ -1,7 +1,6 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
-import com.google.gson.Gson;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.config.MineConfig;
@@ -10,7 +9,6 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.storage.MineStorage;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
-import me.untouchedodin0.privatemines.utils.exceptions.Exceptions;
 import me.untouchedodin0.privatemines.utils.version.VersionUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
@@ -31,11 +29,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
 
 public class PrivateMines extends JavaPlugin {
 
-    private static PaperCommandManager paperCommandManager;
     private static PrivateMines privateMines;
     private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
     private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
@@ -44,14 +40,9 @@ public class PrivateMines extends JavaPlugin {
     private MineFactory mineFactory;
     private MineStorage mineStorage;
     private MineWorldManager mineWorldManager;
-    private Gson gson;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
-    }
-
-    public static PaperCommandManager getPaperCommandManager() {
-        return paperCommandManager;
     }
 
     /**
@@ -82,7 +73,6 @@ public class PrivateMines extends JavaPlugin {
         mineFactory = new MineFactory();
         mineStorage = new MineStorage();
         mineWorldManager = new MineWorldManager();
-        gson = new Gson();
 
         registerCommands();
         setupSchematicUtils();
@@ -133,7 +123,7 @@ public class PrivateMines extends JavaPlugin {
     }
 
     private void registerCommands() {
-        paperCommandManager = new PaperCommandManager(this);
+        PaperCommandManager paperCommandManager = new PaperCommandManager(this);
         paperCommandManager.registerCommand(new PrivateMinesCommand(this));
     }
 
@@ -150,13 +140,13 @@ public class PrivateMines extends JavaPlugin {
             Thread thread = Thread.currentThread();
             privateMines.getLogger().info("Loading mines on thread #" + thread.getId());
             try {
-                Files.list(path).filter(jsonMatcher::matches).forEach(path1 -> {
-                    File file = path1.toFile();
+                Files.list(path).filter(jsonMatcher::matches).forEach(filePath -> {
+                    File file = filePath.toFile();
                     privateMines.getLogger().info("Lets go load file " + file);
-                    YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(file);
-                    Location corner1 = LocationUtils.fromString(yamlConfiguration.getString("corner1"));
-                    Location corner2 = LocationUtils.fromString(yamlConfiguration.getString("corner2"));
-                    Location spawn = LocationUtils.fromString(yamlConfiguration.getString("spawn"));
+                    YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
+                    Location corner1 = LocationUtils.fromString(yml.getString("corner1"));
+                    Location corner2 = LocationUtils.fromString(yml.getString("corner2"));
+                    Location spawn = LocationUtils.fromString(yml.getString("spawn"));
 
                     privateMines.getLogger().info("corner1: " + corner1);
                     privateMines.getLogger().info("corner2: " + corner2);
