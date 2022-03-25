@@ -10,20 +10,28 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.storage.MineStorage;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
+import me.untouchedodin0.privatemines.utils.exceptions.Exceptions;
 import me.untouchedodin0.privatemines.utils.version.VersionUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import redempt.redlib.misc.LocationUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 
 public class PrivateMines extends JavaPlugin {
 
@@ -118,9 +126,10 @@ public class PrivateMines extends JavaPlugin {
         getLogger().info("mineConfig: " + mineConfig);
         Duration loadTime = Duration.between(start, end);
         getLogger().info("time to load: " + loadTime.toMillis() + "ms");
+        loadMines();
 
         if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager"))
-        setupSlimeWorld();
+            setupSlimeWorld();
     }
 
     private void registerCommands() {
@@ -132,6 +141,33 @@ public class PrivateMines extends JavaPlugin {
         this.schematicStorage = new SchematicStorage();
         this.schematicIterator = new SchematicIterator(getSchematicStorage());
     }
+
+    public void loadMines() {
+        final PathMatcher jsonMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
+        Path path = getMinesDirectory();
+
+        CompletableFuture.runAsync(() -> {
+            Thread thread = Thread.currentThread();
+            privateMines.getLogger().info("Loading mines on thread #" + thread.getId());
+            try {
+                Files.list(path).filter(jsonMatcher::matches).forEach(path1 -> {
+                    File file = path1.toFile();
+                    privateMines.getLogger().info("Lets go load file " + file);
+                    YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(file);
+                    Location corner1 = LocationUtils.fromString(yamlConfiguration.getString("corner1"));
+                    Location corner2 = LocationUtils.fromString(yamlConfiguration.getString("corner2"));
+                    Location spawn = LocationUtils.fromString(yamlConfiguration.getString("spawn"));
+
+                    privateMines.getLogger().info("corner1: " + corner1);
+                    privateMines.getLogger().info("corner2: " + corner2);
+                    privateMines.getLogger().info("spawn: " + spawn);
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
 
     public SchematicStorage getSchematicStorage() {
         return schematicStorage;
