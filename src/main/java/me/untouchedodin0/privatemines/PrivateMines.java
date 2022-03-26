@@ -150,7 +150,7 @@ public class PrivateMines extends JavaPlugin {
                     privateMines.getLogger().info("mineType: " + mineType);
 
                     mineData.setMinimumMining(corner1);
-                    mineData.setMinimumMining(corner2);
+                    mineData.setMaximumMining(corner2);
                     mineData.setSpawnLocation(spawn);
                     mineData.setMineLocation(mineLocation);
                     mineData.setMineType(mineTypeName);

@@ -11,6 +11,7 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
+import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -67,8 +68,10 @@ public class PrivateMinesCommand extends BaseCommand {
             player.sendMessage("Player doesn't own a mine!");
         } else {
             Mine mine = mineStorage.get(player.getUniqueId());
-            mine.reset();
-            mine.teleport(player);
+            if (mine != null) {
+                mine.reset();
+                mine.teleport(player);
+            }
         }
     }
 
@@ -78,7 +81,10 @@ public class PrivateMinesCommand extends BaseCommand {
             player.sendMessage("Player doesn't own a mine!");
         } else {
             Mine mine = mineStorage.get(player.getUniqueId());
-            mine.reset();
+            if (mine != null) {
+                mine.reset();
+                mine.teleport(player);
+            }
         }
     }
 }

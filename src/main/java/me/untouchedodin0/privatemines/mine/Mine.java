@@ -129,7 +129,7 @@ public class Mine {
     }
 
     public void teleport(Player player) {
-        player.teleport(getSpawnLocation());
+        player.teleport(getMineData().getSpawnLocation());
     }
 
     public void delete() {
