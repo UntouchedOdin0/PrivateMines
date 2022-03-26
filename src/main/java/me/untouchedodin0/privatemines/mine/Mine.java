@@ -41,7 +41,6 @@ public class Mine {
     private Location spawnLocation;
     private MineData mineData;
     private Task task;
-    private double tax = 5;
 
     public Mine(PrivateMines privateMines) {
         this.privateMines = privateMines;
@@ -54,22 +53,6 @@ public class Mine {
 
     public void setMineOwner(UUID uuid) {
         this.mineOwner = uuid;
-    }
-
-    public MineType getMineType() {
-        return mineType;
-    }
-
-    public void setMineType(MineType mineType) {
-        this.mineType = mineType;
-    }
-
-    public String getMineTypeName() {
-        return mineTypeName;
-    }
-
-    public void setMineTypeName(String mineTypeName) {
-        this.mineTypeName = mineTypeName;
     }
 
     public BlockVector3 getLocation() {
@@ -96,14 +79,6 @@ public class Mine {
         this.iWrappedFullRegion = iWrappedFullRegion;
     }
 
-    public Location getSpawnLocation() {
-        return spawnLocation;
-    }
-
-    public void setSpawnLocation(Location spawnLocation) {
-        this.spawnLocation = spawnLocation;
-    }
-
     public MineData getMineData() {
         return mineData;
     }
@@ -118,14 +93,6 @@ public class Mine {
 
     public void setTask(Task task) {
         this.task = task;
-    }
-
-    public double getTax() {
-        return tax;
-    }
-
-    public void setTax(double tax) {
-        this.tax = tax;
     }
 
     public void teleport(Player player) {

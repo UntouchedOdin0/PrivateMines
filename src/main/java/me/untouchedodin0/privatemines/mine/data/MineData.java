@@ -26,6 +26,7 @@ public class MineData {
     String mineType;
 
     boolean isOpen;
+    double tax = 5;
 
     Map<Material, Double> materials = new EnumMap<>(Material.class);
     List<UUID> whitelistedPlayers = new ArrayList<>();
@@ -126,6 +127,14 @@ public class MineData {
 
     public void setOpen(boolean open) {
         this.isOpen = open;
+    }
+
+    public double getTax() {
+        return tax;
+    }
+
+    public void setTax(double tax) {
+        this.tax = tax;
     }
 
     public Map<Material, Double> getMaterials() {

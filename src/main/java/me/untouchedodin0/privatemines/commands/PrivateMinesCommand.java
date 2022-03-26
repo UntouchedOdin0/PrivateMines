@@ -11,12 +11,12 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
-import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import redempt.redlib.inventorygui.InventoryGUI;
 
 @CommandAlias("privatemines|pmines|pmine")
 public class PrivateMinesCommand extends BaseCommand {
@@ -33,6 +33,7 @@ public class PrivateMinesCommand extends BaseCommand {
     public void mainCommand(Player player) {
         player.sendMessage("Hello.... Billy!");
         player.sendMessage("Check out my menu!");
+        InventoryGUI inventoryGUI = new InventoryGUI(9, "Private Mines");
     }
 
     @Subcommand("give")

@@ -133,9 +133,7 @@ public class MineFactory {
                     }
 
                     mine.setMineOwner(player.getUniqueId());
-                    mine.setMineType(mineType);
                     mine.setLocation(vector);
-                    mine.setSpawnLocation(spongeL);
                     mine.setMineData(mineData);
                     mine.saveMineData(player, mineData);
 
