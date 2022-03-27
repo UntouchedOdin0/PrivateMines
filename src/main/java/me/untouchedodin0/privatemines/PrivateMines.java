@@ -46,7 +46,6 @@ public class PrivateMines extends JavaPlugin {
     private MineFactory mineFactory;
     private MineStorage mineStorage;
     private MineWorldManager mineWorldManager;
-    private Connection connection;
     private SQLHelper sqlHelper;
 
     public static PrivateMines getPrivateMines() {
@@ -98,7 +97,7 @@ public class PrivateMines extends JavaPlugin {
             schematicStorage.addSchematic(schematicFile, mineBlocks);
         });
 
-        connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("database.sql"));
+        Connection connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("database.sql"));
         sqlHelper = new SQLHelper(connection);
 
         privateMines.getLogger().info("Connection: " + connection);
@@ -114,9 +113,11 @@ public class PrivateMines extends JavaPlugin {
                 .replace("%corner2%", "i-am-the-corner2")
                 .replace("%spawn%", "i-am-the-spawn");
 
-        sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING);");
+        sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING, UNIQUE (mineOwner, mineLocation, corner1, corner2, spawn) ON CONFLICT IGNORE);");
 //        sqlHelper.executeUpdate(replacedCommand);
         Utils utils = new Utils(this);
+        utils.insertDataIntoDatabase(UUID.fromString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b"),
+                                     "utilsMineLocation", "utilsCorner1", "utilsCorner2", "utilsSpawn");
         utils.insertDataIntoDatabase(UUID.fromString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b"),
                                      "utilsMineLocation", "utilsCorner1", "utilsCorner2", "utilsSpawn");
         utils.loadSQL();
