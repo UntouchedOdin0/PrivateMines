@@ -12,6 +12,7 @@ import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
+import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.version.VersionUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
@@ -116,7 +117,9 @@ public class PrivateMines extends JavaPlugin {
                 .replace("%spawn%", "i-am-the-spawn");
 
         sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING);");
-        sqlHelper.executeUpdate(replacedCommand);
+//        sqlHelper.executeUpdate(replacedCommand);
+        Utils utils = new Utils(this);
+        utils.insertDataIntoDatabase(UUID.randomUUID(), "utilsMineLocation", "utilsCorner1", "utilsCorner2", "utilsSpawn");
 
 //        sqlHelper.execute("UPDATE privatemines SET mineOwner=? WHERE mineLocation=?;", UUID.randomUUID(), location);
 
@@ -211,6 +214,10 @@ public class PrivateMines extends JavaPlugin {
 
     public Path getMinesDirectory() {
         return minesDirectory;
+    }
+
+    public SQLHelper getSqlHelper() {
+        return sqlHelper;
     }
 
     public void setupSlimeWorld() {

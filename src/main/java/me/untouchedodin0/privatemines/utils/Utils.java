@@ -19,8 +19,11 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.data.MineData;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import redempt.redlib.sql.SQLHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,10 +35,11 @@ import java.util.UUID;
 public class Utils {
 
     private final PrivateMines privateMines;
-    private final Gson gson = new GsonBuilder().create();
+    private final SQLHelper sqlHelper;
 
     public Utils(PrivateMines privateMines) {
         this.privateMines = privateMines;
+        this.sqlHelper = privateMines.getSqlHelper();
     }
 
     public static Location getRelative(Region region, int x, int y, int z) {
@@ -168,5 +172,24 @@ public class Utils {
 //        } catch (IOException e) {
 //            throw new RuntimeException("Could not save mine data", e);
 //        }
+    }
+
+    public void insertDataIntoDatabase(UUID uuid, String mineLocation, String corner1, String corner2, String spawn) {
+        SQLHelper sqlHelper = privateMines.getSqlHelper();
+
+        Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
+        if (player != null) {
+            privateMines.getLogger().info("Found Player: " + player.getName());
+        }
+
+        String sqlCommand = "INSERT INTO privatemines(mineOwner, mineLocation, corner1, corner2, spawn) " +
+                "VALUES('%uuid%', '%minelocation%', '%corner1%', '%corner2%', '%spawn%');";
+        String replacedCommand = sqlCommand
+                .replace("%uuid%", uuid.toString())
+                .replace("%minelocation%", mineLocation)
+                .replace("%corner1%", corner1)
+                .replace("%corner2%", corner2)
+                .replace("%spawn%", spawn);
+        sqlHelper.executeUpdate(replacedCommand);
     }
 }
