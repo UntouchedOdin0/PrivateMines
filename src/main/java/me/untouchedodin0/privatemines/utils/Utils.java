@@ -181,6 +181,7 @@ public class Utils {
                 .replace("%corner1%", corner1)
                 .replace("%corner2%", corner2)
                 .replace("%spawn%", spawn);
+        privateMines.getLogger().info("replaced command: " + replacedCommand);
         sqlHelper.executeUpdate(replacedCommand);
     }
 

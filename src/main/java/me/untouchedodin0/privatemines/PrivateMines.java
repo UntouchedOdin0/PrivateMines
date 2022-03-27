@@ -117,7 +117,8 @@ public class PrivateMines extends JavaPlugin {
         sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING);");
 //        sqlHelper.executeUpdate(replacedCommand);
         Utils utils = new Utils(this);
-        utils.insertDataIntoDatabase(UUID.randomUUID(), "utilsMineLocation", "utilsCorner1", "utilsCorner2", "utilsSpawn");
+        utils.insertDataIntoDatabase(UUID.fromString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b"),
+                                     "utilsMineLocation", "utilsCorner1", "utilsCorner2", "utilsSpawn");
         utils.loadSQL();
 
 //        sqlHelper.execute("UPDATE privatemines SET mineOwner=? WHERE mineLocation=?;", UUID.randomUUID(), location);
