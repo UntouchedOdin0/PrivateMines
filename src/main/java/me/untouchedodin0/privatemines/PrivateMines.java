@@ -104,7 +104,12 @@ public class PrivateMines extends JavaPlugin {
 
         privateMines.getLogger().info("Connection: " + connection);
         privateMines.getLogger().info("sqlHelper: " + sqlHelper);
+        String sqlCommand = "INSERT INTO privatemines(mineOwner, mineLocation) VALUES('%uuid%', '%minelocation%');";
+        String replacedCommand;
+        replacedCommand = sqlCommand.replace("%uuid%", "i-am-the-player-uuid").replace("%minelocation%", "i-am-the-mine-location");
+
         sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING);");
+        sqlHelper.executeUpdate(replacedCommand);
 
 //        sqlHelper.execute("UPDATE privatemines SET mineOwner=? WHERE mineLocation=?;", UUID.randomUUID(), location);
 
