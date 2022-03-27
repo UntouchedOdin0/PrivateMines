@@ -1,7 +1,5 @@
 package me.untouchedodin0.privatemines.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -19,10 +17,8 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.data.MineData;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import redempt.redlib.sql.SQLHelper;
 
 import java.io.File;
@@ -176,11 +172,6 @@ public class Utils {
 
     public void insertDataIntoDatabase(UUID uuid, String mineLocation, String corner1, String corner2, String spawn) {
         SQLHelper sqlHelper = privateMines.getSqlHelper();
-
-        Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
-        if (player != null) {
-            privateMines.getLogger().info("Found Player: " + player.getName());
-        }
 
         String sqlCommand = "INSERT INTO privatemines(mineOwner, mineLocation, corner1, corner2, spawn) " +
                 "VALUES('%uuid%', '%minelocation%', '%corner1%', '%corner2%', '%spawn%');";
