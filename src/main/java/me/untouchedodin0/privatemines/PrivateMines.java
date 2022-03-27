@@ -20,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.misc.LocationUtils;
+import redempt.redlib.sql.SQLHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +28,8 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -44,6 +47,8 @@ public class PrivateMines extends JavaPlugin {
     private MineFactory mineFactory;
     private MineStorage mineStorage;
     private MineWorldManager mineWorldManager;
+    private Connection connection;
+    private SQLHelper sqlHelper;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -68,9 +73,6 @@ public class PrivateMines extends JavaPlugin {
             e.printStackTrace();
         }
 
-        getLogger().info("Schematic Storage: " + getSchematicStorage());
-        getLogger().info("Schematic Iterator: " + getSchematicIterator());
-        getLogger().info("Mid Version: " + VersionUtils.MID_VERSION);
         ConfigManager mineConfig = ConfigManager.create(this)
                 .addConverter(Material.class, Material::valueOf, Material::toString)
                 .target(MineConfig.class)
@@ -97,8 +99,16 @@ public class PrivateMines extends JavaPlugin {
             schematicStorage.addSchematic(schematicFile, mineBlocks);
         });
 
+        connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("database.sql"));
+        sqlHelper = new SQLHelper(connection);
+
+        privateMines.getLogger().info("Connection: " + connection);
+        privateMines.getLogger().info("sqlHelper: " + sqlHelper);
+        sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING);");
+
+//        sqlHelper.execute("UPDATE privatemines SET mineOwner=? WHERE mineLocation=?;", UUID.randomUUID(), location);
+
         Instant end = Instant.now();
-        getLogger().info("mineConfig: " + mineConfig);
         Duration loadTime = Duration.between(start, end);
         getLogger().info("time to load: " + loadTime.toMillis() + "ms");
         loadMines();
