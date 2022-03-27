@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PrivateMines extends JavaPlugin {
 
@@ -118,8 +119,13 @@ public class PrivateMines extends JavaPlugin {
         Utils utils = new Utils(this);
         utils.insertDataIntoDatabase(UUID.fromString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b"),
                                      "utilsMineLocation", "utilsCorner1", "utilsCorner2", "utilsSpawn");
-        utils.insertDataIntoDatabase(UUID.fromString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b"),
-                                     "utilsMineLocation", "utilsCorner1", "utilsCorner2", "utilsSpawn");
+        AtomicInteger atomicInteger = new AtomicInteger();
+
+        for (int i = 0; i < 1000; i++) {
+            utils.insertDataIntoDatabase(UUID.fromString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b"),
+                                         "utilsMineLocation", "utilsCorner1", "utilsCorner2", "utilsSpawn");
+            privateMines.getLogger().info("Attempted: " + atomicInteger.incrementAndGet() + " times!");
+        }
         utils.loadSQL();
 
 //        sqlHelper.execute("UPDATE privatemines SET mineOwner=? WHERE mineLocation=?;", UUID.randomUUID(), location);
