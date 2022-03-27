@@ -183,4 +183,21 @@ public class Utils {
                 .replace("%spawn%", spawn);
         sqlHelper.executeUpdate(replacedCommand);
     }
+
+    public void loadSQL() {
+        SQLHelper sqlHelper = privateMines.getSqlHelper();
+        SQLHelper.Results results = sqlHelper.queryResults("SELECT * FROM privatemines");
+        while (results.next()) {
+            String mineOwner = results.getString(1);
+            String mineLocation = results.getString(2);
+            String corner1 = results.getString(3);
+            String corner2 = results.getString(4);
+            String spawn = results.getString(5);
+            privateMines.getLogger().info("mineOwner: " + mineOwner);
+            privateMines.getLogger().info("mineLocation: " + mineLocation);
+            privateMines.getLogger().info("corner1: " + corner1);
+            privateMines.getLogger().info("corner2: " + corner2);
+            privateMines.getLogger().info("spawn: " + spawn);
+        }
+    }
 }

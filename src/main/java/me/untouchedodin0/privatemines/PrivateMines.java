@@ -118,6 +118,7 @@ public class PrivateMines extends JavaPlugin {
 //        sqlHelper.executeUpdate(replacedCommand);
         Utils utils = new Utils(this);
         utils.insertDataIntoDatabase(UUID.randomUUID(), "utilsMineLocation", "utilsCorner1", "utilsCorner2", "utilsSpawn");
+        utils.loadSQL();
 
 //        sqlHelper.execute("UPDATE privatemines SET mineOwner=? WHERE mineLocation=?;", UUID.randomUUID(), location);
 
