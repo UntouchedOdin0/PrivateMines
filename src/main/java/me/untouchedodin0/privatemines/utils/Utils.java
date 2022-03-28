@@ -185,10 +185,16 @@ public class Utils {
         sqlHelper.executeUpdate(replacedCommand);
     }
 
+    //todo fix the sql loading
     public void loadSQL() {
         SQLHelper sqlHelper = privateMines.getSqlHelper();
-        SQLHelper.Results results = sqlHelper.queryResults("SELECT * FROM privatemines");
+        SQLHelper.Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
+
+        privateMines.getLogger().info("LOADING SQL DATA:");
+        privateMines.getLogger().info("is results empty: " + results.isEmpty());
+
         while (results.next()) {
+            privateMines.getLogger().info("results: " + results);
             String mineOwner = results.getString(1);
             String mineLocation = results.getString(2);
             String corner1 = results.getString(3);

@@ -103,29 +103,9 @@ public class PrivateMines extends JavaPlugin {
 
         privateMines.getLogger().info("Connection: " + connection);
         privateMines.getLogger().info("sqlHelper: " + sqlHelper);
-        String sqlCommand = "INSERT INTO privatemines(mineOwner, mineLocation, corner1, corner2, spawn) " +
-                "VALUES('%uuid%', '%minelocation%', '%corner1%', '%corner2%', '%spawn%');";
-
-        String replacedCommand;
-        replacedCommand = sqlCommand
-                .replace("%uuid%", "i-am-the-player-uuid")
-                .replace("%minelocation%", "i-am-the-mine-location")
-                .replace("%corner1%", "i-am-the-corner-1")
-                .replace("%corner2%", "i-am-the-corner2")
-                .replace("%spawn%", "i-am-the-spawn");
 
         sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING, UNIQUE (mineOwner, mineLocation, corner1, corner2, spawn) ON CONFLICT IGNORE);");
-//        sqlHelper.executeUpdate(replacedCommand);
         Utils utils = new Utils(this);
-        utils.insertDataIntoDatabase(UUID.fromString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b"),
-                                     "utilsMineLocation", "utilsCorner1", "utilsCorner2", "utilsSpawn");
-        AtomicInteger atomicInteger = new AtomicInteger();
-
-        for (int i = 0; i < 1000; i++) {
-            utils.insertDataIntoDatabase(UUID.fromString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b"),
-                                         "utilsMineLocation", "utilsCorner1", "utilsCorner2", "utilsSpawn");
-            privateMines.getLogger().info("Attempted: " + atomicInteger.incrementAndGet() + " times!");
-        }
         utils.loadSQL();
 
 //        sqlHelper.execute("UPDATE privatemines SET mineOwner=? WHERE mineLocation=?;", UUID.randomUUID(), location);
