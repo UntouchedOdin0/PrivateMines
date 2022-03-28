@@ -1,6 +1,7 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
+import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.config.MineConfig;
@@ -16,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import redempt.redlib.RedLib;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.sql.SQLHelper;
 
@@ -87,6 +89,12 @@ public class PrivateMines extends JavaPlugin {
         sqlHelper = new SQLHelper(connection);
         sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING, UNIQUE (mineOwner, mineLocation, corner1, corner2, spawn) ON CONFLICT IGNORE);");
         Utils utils = new Utils(this);
+        PaperLib.suggestPaper(privateMines);
+
+        if (RedLib.MID_VERSION > 13) {
+            utils.complain();
+        }
+
 //        utils.loadSQL();
 
 //        sqlHelper.execute("UPDATE privatemines SET mineOwner=? WHERE mineLocation=?;", UUID.randomUUID(), location);

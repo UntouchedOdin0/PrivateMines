@@ -207,4 +207,11 @@ public class Utils {
             privateMines.getLogger().info("spawn: " + spawn);
         }
     }
+
+    public void complain() {
+        privateMines.getLogger().info("This version of Minecraft is extremely outdated and support for it has reached its end of life.");
+        privateMines.getLogger().info("You will be unable to run Private Mines on this Minecraft version,");
+        privateMines.getLogger().info(" and we will not to provide any further fixes or help with problems specific to legacy Minecraft versions.");
+        privateMines.getLogger().info("Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
+    }
 }
