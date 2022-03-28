@@ -26,21 +26,17 @@ import java.util.*;
 public class Mine {
 
     private final PrivateMines privateMines;
-    private final Utils utils;
 
     private UUID mineOwner;
-    private MineType mineType;
-    private String mineTypeName;
     private BlockVector3 location;
     private IWrappedRegion iWrappedMiningRegion;
     private IWrappedRegion iWrappedFullRegion;
-    private Location spawnLocation;
     private MineData mineData;
     private Task task;
 
     public Mine(PrivateMines privateMines) {
         this.privateMines = privateMines;
-        this.utils = new Utils(privateMines);
+        Utils utils = new Utils(privateMines);
     }
 
     public UUID getMineOwner() {
@@ -96,15 +92,10 @@ public class Mine {
     }
 
     public void delete() {
-        privateMines.getLogger().info("Deleting mine.....");
-
         MineData mineData = getMineData();
 
         Location cornerA = mineData.getMinimumFullRegion();
         Location cornerB = mineData.getMaximumFullRegion();
-
-        privateMines.getLogger().info("cornerA: " + cornerA);
-        privateMines.getLogger().info("cornerB: " + cornerB);
 
         World world = cornerA.getWorld();
 
@@ -140,12 +131,8 @@ public class Mine {
         MineType mineType = MineConfig.getMineTypes().get(mineData.getMineType());
 
         Map<Material, Double> materials = mineType.getMaterials();
-        Map<Material, Double> test = new HashMap<>();
 
         final WeightedRandom<Material> randomPattern = WeightedRandom.fromDoubleMap(materials);
-
-        privateMines.getLogger().info("materials: " + materials);
-        privateMines.getLogger().info("material percentages: " + randomPattern.getPercentages());
 
         Location cornerA = mineData.getMinimumMining();
         Location cornerB = mineData.getMaximumMining();
@@ -167,7 +154,6 @@ public class Mine {
                 for (int z = zMin; z <= zMax; z++) {
                     if (world != null) {
                         Material material = randomPattern.roll();
-                        privateMines.getLogger().info("random material: " + material);
                         world.getBlockAt(x, y, z).setType(material);
                     }
                     blocks++;
@@ -207,13 +193,6 @@ public class Mine {
         Location fullRegionMax = mineData.getMaximumFullRegion();
 
         Location spawn = mineData.getSpawnLocation();
-
-        privateMines.getLogger().info("mineType: " + mineType);
-        privateMines.getLogger().info("mineLocation save: " + mineLocation);
-        privateMines.getLogger().info("corner1 save: " + corner1);
-        privateMines.getLogger().info("corner2 save: " + corner2);
-
-        privateMines.getLogger().info("spawn save: " + spawn);
 
         yml.set("mineOwner", owner.toString());
         yml.set("mineType", mineType);
