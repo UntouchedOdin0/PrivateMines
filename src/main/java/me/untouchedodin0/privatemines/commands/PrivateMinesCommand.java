@@ -78,10 +78,10 @@ public class PrivateMinesCommand extends BaseCommand {
 
     @Subcommand("reset")
     public void reset(Player player) {
-        if (!mineStorage.hasMine(player.getUniqueId())) {
+        if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
             player.sendMessage("Player doesn't own a mine!");
         } else {
-            Mine mine = mineStorage.get(player.getUniqueId());
+            Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
             if (mine != null) {
                 mine.reset();
                 mine.teleport(player);

@@ -1,12 +1,9 @@
 package me.untouchedodin0.privatemines.mine;
 
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.Utils;
 import org.bukkit.Location;
@@ -24,8 +21,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class Mine {
 
@@ -100,24 +96,57 @@ public class Mine {
     }
 
     public void delete() {
-//        if (fullRegion == null) {
-//            privateMines.getLogger().warning("Region was null!");
-//            return;
-//        }
-//        privateMines.getLogger().info("fullRegion: " + fullRegion);
+        privateMines.getLogger().info("Deleting mine.....");
+
         MineData mineData = getMineData();
 
-        Location min = mineData.getMinimumFullRegion();
-        Location max = mineData.getMaximumFullRegion();
+        Location cornerA = mineData.getMinimumFullRegion();
+        Location cornerB = mineData.getMaximumFullRegion();
 
-        privateMines.getLogger().info("full region min: " + min);
-        privateMines.getLogger().info("full region max: " + max);
+        privateMines.getLogger().info("cornerA: " + cornerA);
+        privateMines.getLogger().info("cornerB: " + cornerB);
+
+        World world = cornerA.getWorld();
+
+        int blocks = 0;
+
+        int xMax = Integer.max(cornerA.getBlockX(), cornerB.getBlockX());
+        int xMin = Integer.min(cornerA.getBlockX(), cornerB.getBlockX());
+        int yMax = Integer.max(cornerA.getBlockY(), cornerB.getBlockY());
+        int yMin = Integer.min(cornerA.getBlockY(), cornerB.getBlockY());
+        int zMax = Integer.max(cornerA.getBlockZ(), cornerB.getBlockZ());
+        int zMin = Integer.min(cornerA.getBlockZ(), cornerB.getBlockZ());
+
+        Instant start = Instant.now();
+
+        for (int x = xMin; x <= xMax; x++) {
+            for (int y = yMin; y <= yMax; y++) {
+                for (int z = zMin; z <= zMax; z++) {
+                    if (world != null) {
+                        world.getBlockAt(x, y, z).setType(Material.AIR);
+                    }
+                    blocks++;
+                }
+            }
+        }
+
+        Instant filled = Instant.now();
+        Duration durationToFill = Duration.between(start, filled);
+        privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
     }
 
     public void reset() {
         MineData mineData = getMineData();
-        Map<Material, Double> materials = mineData.getMaterials();
-        WeightedRandom weightedRandom = new WeightedRandom<>();
+        MineType mineType = MineConfig.getMineTypes().get(mineData.getMineType());
+
+        Map<Material, Double> materials = mineType.getMaterials();
+        Map<Material, Double> test = new HashMap<>();
+
+        Random random = new Random();
+        final WeightedRandom<Material> randomPattern = WeightedRandom.fromDoubleMap(materials);
+
+        privateMines.getLogger().info("materials: " + materials);
+        privateMines.getLogger().info("material percentages: " + randomPattern.getPercentages());
 
         Location cornerA = mineData.getMinimumMining();
         Location cornerB = mineData.getMaximumMining();
@@ -138,7 +167,9 @@ public class Mine {
             for (int y = yMin; y <= yMax; y++) {
                 for (int z = zMin; z <= zMax; z++) {
                     if (world != null) {
-                        world.getBlockAt(x, y, z).setType(Material.STONE);
+                        Material material = randomPattern.roll();
+                        privateMines.getLogger().info("random material: " + material);
+                        world.getBlockAt(x, y, z).setType(material);
                     }
                     blocks++;
                 }
@@ -173,17 +204,16 @@ public class Mine {
         Location mineLocation = mineData.getMineLocation();
         Location corner1 = mineData.getMinimumMining();
         Location corner2 = mineData.getMaximumMining();
-//        Location fullRegionMin = mineData.getMinimumFullRegion();
-//        Location fullRegionMax = mineData.getMaximumFullRegion();
+        Location fullRegionMin = mineData.getMinimumFullRegion();
+        Location fullRegionMax = mineData.getMaximumFullRegion();
 
         Location spawn = mineData.getSpawnLocation();
 
-        privateMines.getLogger().info("mineTypename: " + mineTypeName);
+        privateMines.getLogger().info("mineType: " + mineType);
         privateMines.getLogger().info("mineLocation save: " + mineLocation);
         privateMines.getLogger().info("corner1 save: " + corner1);
         privateMines.getLogger().info("corner2 save: " + corner2);
-//        privateMines.getLogger().info("fullRegionMin save: " + fullRegionMin);
-//        privateMines.getLogger().info("fullRegionMax save: " + fullRegionMax);
+
         privateMines.getLogger().info("spawn save: " + spawn);
 
         yml.set("mineOwner", owner.toString());
@@ -191,8 +221,8 @@ public class Mine {
         yml.set("mineLocation", LocationUtils.toString(mineLocation));
         yml.set("corner1", LocationUtils.toString(corner1));
         yml.set("corner2", LocationUtils.toString(corner2));
-//        yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
-//        yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
+        yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
+        yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
         yml.set("spawn", LocationUtils.toString(spawn));
 
         try {

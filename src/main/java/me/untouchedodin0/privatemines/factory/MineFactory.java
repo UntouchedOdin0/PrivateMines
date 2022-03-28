@@ -89,8 +89,8 @@ public class MineFactory {
 
                     Location spongeL = new Location(location.getWorld(), vector.getBlockX(), vector.getBlockY(), vector.getBlockZ() + 1);
 
-                    Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ() + 1);
-                    Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ() + 1);
+                    Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ());
+                    Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
 
                     localSession.setClipboard(clipboardHolder);
 
@@ -120,14 +120,22 @@ public class MineFactory {
 
                     try {
                         newRegion = regionSelector.getRegion();
-                        mineData.setMinimumMining(lrailsL.subtract(0, 0, 1));
-                        mineData.setMaximumMining(urailsL.subtract(0, 0 , 1));
+
+                        Location fullMin = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMinimumPoint());
+                        Location fullMax = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMaximumPoint());
+
+                        mineData.setMinimumMining(lrailsL);
+                        mineData.setMaximumMining(urailsL);
+                        mineData.setMinimumFullRegion(fullMin);
+                        mineData.setMaximumFullRegion(fullMax);
                         mineData.setSpawnLocation(spongeL);
                         mineData.setMineLocation(location);
-//                        mineData.setFullRegion(newRegion);
                         mineData.setMineType(mineType.getName());
+                        mineData.setMaterials(mineType.getMaterials());
 
                         privateMines.getLogger().info("newRegion: " + newRegion);
+                        privateMines.getLogger().info("fullMin: " + fullMin);
+                        privateMines.getLogger().info("fullMax: " + fullMax);
                     } catch (IncompleteRegionException e) {
                         e.printStackTrace();
                     }

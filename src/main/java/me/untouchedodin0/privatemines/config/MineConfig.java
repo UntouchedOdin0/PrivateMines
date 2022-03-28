@@ -10,4 +10,8 @@ import java.util.Map;
 public class MineConfig {
 
     public static Map<String, MineType> mineTypes = new HashMap<>();
+
+    public static Map<String, MineType> getMineTypes() {
+        return mineTypes;
+    }
 }

@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class PrivateMines extends JavaPlugin {
 
@@ -106,7 +105,7 @@ public class PrivateMines extends JavaPlugin {
 
         sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING, UNIQUE (mineOwner, mineLocation, corner1, corner2, spawn) ON CONFLICT IGNORE);");
         Utils utils = new Utils(this);
-        utils.loadSQL();
+//        utils.loadSQL();
 
 //        sqlHelper.execute("UPDATE privatemines SET mineOwner=? WHERE mineLocation=?;", UUID.randomUUID(), location);
 
@@ -134,10 +133,8 @@ public class PrivateMines extends JavaPlugin {
         Path path = getMinesDirectory();
 
         CompletableFuture.runAsync(() -> {
-            Thread thread = Thread.currentThread();
-            privateMines.getLogger().info("Loading mines on thread #" + thread.getId());
             try {
-                Files.list(path).filter(jsonMatcher::matches).forEach(filePath -> {
+                Files.list(path).forEach(filePath -> {
                     File file = filePath.toFile();
                     Mine mine = new Mine(privateMines);
                     MineData mineData = new MineData();
@@ -149,20 +146,26 @@ public class PrivateMines extends JavaPlugin {
                     String mineTypeName = yml.getString("mineType");
                     Location corner1 = LocationUtils.fromString(yml.getString("corner1"));
                     Location corner2 = LocationUtils.fromString(yml.getString("corner2"));
+                    Location fullRegionMin = LocationUtils.fromString(yml.getString("fullRegionMin"));
+                    Location fullRegionMax = LocationUtils.fromString(yml.getString("fullRegionMax"));
                     Location spawn = LocationUtils.fromString(yml.getString("spawn"));
                     Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
                     MineType mineType = MineConfig.mineTypes.get(mineTypeName);
 
-                    privateMines.getLogger().info("owner: " + owner);
-                    privateMines.getLogger().info("mineTypeName: " + mineTypeName);
-                    privateMines.getLogger().info("corner1: " + corner1);
-                    privateMines.getLogger().info("corner2: " + corner2);
-                    privateMines.getLogger().info("spawn: " + spawn);
-                    privateMines.getLogger().info("mineLocation: " + mineLocation);
-                    privateMines.getLogger().info("mineType: " + mineType);
+                    getLogger().info("owner: " + owner);
+                    getLogger().info("mineTypeName: " + mineTypeName);
+                    getLogger().info("corner1: " + corner1);
+                    getLogger().info("corner2: " + corner2);
+                    getLogger().info("fullRegionMin: " + fullRegionMin);
+                    getLogger().info("fullRegionMax: " + fullRegionMax);
+                    getLogger().info("spawn: " + spawn);
+                    getLogger().info("mineLocation: " + mineLocation);
+                    getLogger().info("mineType: " + mineType);
 
                     mineData.setMinimumMining(corner1);
                     mineData.setMaximumMining(corner2);
+                    mineData.setMinimumFullRegion(fullRegionMin);
+                    mineData.setMaximumFullRegion(fullRegionMax);
                     mineData.setSpawnLocation(spawn);
                     mineData.setMineLocation(mineLocation);
                     mineData.setMineType(mineTypeName);
@@ -177,7 +180,6 @@ public class PrivateMines extends JavaPlugin {
             }
         });
     }
-
 
     public SchematicStorage getSchematicStorage() {
         return schematicStorage;
