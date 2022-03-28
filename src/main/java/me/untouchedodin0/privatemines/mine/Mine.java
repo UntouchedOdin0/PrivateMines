@@ -105,18 +105,13 @@ public class Mine {
 //            return;
 //        }
 //        privateMines.getLogger().info("fullRegion: " + fullRegion);
-        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(privateMines.getMineWorldManager().getMinesWorld());
         MineData mineData = getMineData();
 
-        EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
-        try {
-            editSession.setBlocks(mineData.getFullRegion(), BukkitAdapter.adapt(Material.AIR.createBlockData()));
-        } catch (MaxChangedBlocksException e) {
-            e.printStackTrace();
-        }
+        Location min = mineData.getMinimumFullRegion();
+        Location max = mineData.getMaximumFullRegion();
 
-        privateMines.getLogger().info("full region min: " + mineData.getFullRegion().getMinimumPoint());
-        privateMines.getLogger().info("full region max: " + mineData.getFullRegion().getMaximumPoint());
+        privateMines.getLogger().info("full region min: " + min);
+        privateMines.getLogger().info("full region max: " + max);
     }
 
     public void reset() {
@@ -178,6 +173,8 @@ public class Mine {
         Location mineLocation = mineData.getMineLocation();
         Location corner1 = mineData.getMinimumMining();
         Location corner2 = mineData.getMaximumMining();
+//        Location fullRegionMin = mineData.getMinimumFullRegion();
+//        Location fullRegionMax = mineData.getMaximumFullRegion();
 
         Location spawn = mineData.getSpawnLocation();
 
@@ -185,6 +182,8 @@ public class Mine {
         privateMines.getLogger().info("mineLocation save: " + mineLocation);
         privateMines.getLogger().info("corner1 save: " + corner1);
         privateMines.getLogger().info("corner2 save: " + corner2);
+//        privateMines.getLogger().info("fullRegionMin save: " + fullRegionMin);
+//        privateMines.getLogger().info("fullRegionMax save: " + fullRegionMax);
         privateMines.getLogger().info("spawn save: " + spawn);
 
         yml.set("mineOwner", owner.toString());
@@ -192,6 +191,8 @@ public class Mine {
         yml.set("mineLocation", LocationUtils.toString(mineLocation));
         yml.set("corner1", LocationUtils.toString(corner1));
         yml.set("corner2", LocationUtils.toString(corner2));
+//        yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
+//        yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
         yml.set("spawn", LocationUtils.toString(spawn));
 
         try {

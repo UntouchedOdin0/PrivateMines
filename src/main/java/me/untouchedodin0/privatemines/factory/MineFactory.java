@@ -28,7 +28,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
 import java.io.File;
@@ -37,12 +36,11 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
 public class MineFactory {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
-
+    
     /**
      * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
      *
@@ -56,7 +54,6 @@ public class MineFactory {
         Mine mine = new Mine(privateMines);
         MineData mineData = new MineData();
         Utils utils = new Utils(privateMines);
-        UUID owner = player.getUniqueId();
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
@@ -127,7 +124,7 @@ public class MineFactory {
                         mineData.setMaximumMining(urailsL.subtract(0, 0 , 1));
                         mineData.setSpawnLocation(spongeL);
                         mineData.setMineLocation(location);
-                        mineData.setFullRegion(newRegion);
+//                        mineData.setFullRegion(newRegion);
                         mineData.setMineType(mineType.getName());
 
                         privateMines.getLogger().info("newRegion: " + newRegion);
@@ -135,17 +132,11 @@ public class MineFactory {
                         e.printStackTrace();
                     }
 
-                    mine.setMineOwner(owner);
+                    mine.setMineOwner(player.getUniqueId());
                     mine.setLocation(vector);
                     mine.setMineData(mineData);
                     mine.saveMineData(player, mineData);
 
-                    String mineLocation = LocationUtils.toString(location);
-                    String corner1 = LocationUtils.toString(lrailsL.subtract(0, 0, 1));
-                    String corner2 = LocationUtils.toString(urailsL.subtract(0, 0, 1));
-                    String spawnLocation = LocationUtils.toString(spongeL);
-
-                    utils.insertDataIntoDatabase(owner, mineLocation, corner1, corner2, spawnLocation);
                     privateMines.getLogger().info("full region: " + mineData.getFullRegion());
                     //noinspection unused
 
