@@ -35,31 +35,23 @@ public class SchematicIterator {
         if (clipboardFormat != null) {
             try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(file))) {
                 clipboard = clipboardReader.read();
-                Bukkit.getLogger().info("Clipboard: " + clipboard);
-                Bukkit.getLogger().info("Clipboard Region: " + clipboard.getRegion());
 
                 Material cornerMaterial = Material.POWERED_RAIL;
                 Material spawnMaterial = Material.SPONGE;
                 BlockType cornerType = BlockType.REGISTRY.get(cornerMaterial.getKey().getKey());
                 BlockType spawnType = BlockType.REGISTRY.get(spawnMaterial.getKey().getKey());
 
-                Bukkit.getLogger().info("spawn type: " + spawnType);
-                Bukkit.getLogger().info("corner type: " + cornerType);
-
                 clipboard.getRegion().forEach(blockVector3 -> {
                     BlockType blockType = clipboard.getBlock(blockVector3).getBlockType();
 
                     if (blockType.equals(cornerType)) {
                         if (corner1 == null) {
-                            Bukkit.getLogger().info("powered rail " + blockVector3.toParserString());
                             corner1 = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
                         } else if (corner2 == null) {
-                            Bukkit.getLogger().info("powered rail " + blockVector3.toParserString());
                             corner2 = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
                         }
                     } else if (blockType.equals(spawnType)) {
                         if (spawn == null) {
-                            Bukkit.getLogger().info("Sponge: " + blockVector3.toParserString());
                             spawn = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
                         }
                     }

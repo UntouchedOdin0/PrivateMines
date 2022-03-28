@@ -132,10 +132,6 @@ public class MineFactory {
                         mineData.setMineLocation(location);
                         mineData.setMineType(mineType.getName());
                         mineData.setMaterials(mineType.getMaterials());
-
-                        privateMines.getLogger().info("newRegion: " + newRegion);
-                        privateMines.getLogger().info("fullMin: " + fullMin);
-                        privateMines.getLogger().info("fullMax: " + fullMax);
                     } catch (IncompleteRegionException e) {
                         e.printStackTrace();
                     }
@@ -145,7 +141,6 @@ public class MineFactory {
                     mine.setMineData(mineData);
                     mine.saveMineData(player, mineData);
 
-                    privateMines.getLogger().info("full region: " + mineData.getFullRegion());
                     //noinspection unused
 
                     Task teleport = Task.syncDelayed(() -> spongeL.getBlock().setType(Material.AIR));
