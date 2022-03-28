@@ -169,7 +169,6 @@ public class Mine {
 
     public void startResetTask() {
         int resetTime = 5;
-
         this.task = Task.syncRepeating(this::reset, 0L, resetTime * 20L);
     }
 
