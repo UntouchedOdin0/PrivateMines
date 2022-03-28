@@ -82,18 +82,7 @@ public class PrivateMines extends JavaPlugin {
                 getLogger().info("File doesn't exist!");
                 return;
             }
-            getLogger().info("MineType name: " + name);
-            getLogger().info("MineType mineType: " + mineType);
-            getLogger().info("MineType file: " + mineType.getFile());
-            getLogger().info("MineType schematicFile: " + schematicFile);
-            getLogger().info("MineType time: " + mineType.getResetTime());
-            getLogger().info("MineType reset percentage: " + mineType.getResetPercentage());
-            getLogger().info("Schematic iterator: " + schematicIterator);
-
             SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
-
-            getLogger().info("spawn: " + mineBlocks.getSpawnLocation());
-            getLogger().info("corners: " + Arrays.toString(mineBlocks.getCorners()));
             schematicStorage.addSchematic(schematicFile, mineBlocks);
         });
 
@@ -110,10 +99,9 @@ public class PrivateMines extends JavaPlugin {
 //        sqlHelper.execute("UPDATE privatemines SET mineOwner=? WHERE mineLocation=?;", UUID.randomUUID(), location);
 
         Instant end = Instant.now();
-        Duration loadTime = Duration.between(start, end);
-        getLogger().info("time to load: " + loadTime.toMillis() + "ms");
         loadMines();
-
+        Duration loadTime = Duration.between(start, end);
+        getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
         if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager"))
             setupSlimeWorld();
     }
@@ -138,8 +126,6 @@ public class PrivateMines extends JavaPlugin {
                     File file = filePath.toFile();
                     Mine mine = new Mine(privateMines);
                     MineData mineData = new MineData();
-
-                    privateMines.getLogger().info("Lets go load file " + file);
                     YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
 
                     UUID owner = UUID.fromString(Objects.requireNonNull(yml.getString("mineOwner")));
@@ -150,17 +136,6 @@ public class PrivateMines extends JavaPlugin {
                     Location fullRegionMax = LocationUtils.fromString(yml.getString("fullRegionMax"));
                     Location spawn = LocationUtils.fromString(yml.getString("spawn"));
                     Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
-                    MineType mineType = MineConfig.mineTypes.get(mineTypeName);
-
-                    getLogger().info("owner: " + owner);
-                    getLogger().info("mineTypeName: " + mineTypeName);
-                    getLogger().info("corner1: " + corner1);
-                    getLogger().info("corner2: " + corner2);
-                    getLogger().info("fullRegionMin: " + fullRegionMin);
-                    getLogger().info("fullRegionMax: " + fullRegionMax);
-                    getLogger().info("spawn: " + spawn);
-                    getLogger().info("mineLocation: " + mineLocation);
-                    getLogger().info("mineType: " + mineType);
 
                     mineData.setMinimumMining(corner1);
                     mineData.setMaximumMining(corner2);
@@ -171,9 +146,7 @@ public class PrivateMines extends JavaPlugin {
                     mineData.setMineType(mineTypeName);
 
                     mine.setMineData(mineData);
-                    privateMines.getLogger().info("mines: " + getMineStorage().getMines());
                     getMineStorage().addMine(owner, mine);
-                    privateMines.getLogger().info("mines: " + getMineStorage().getMines());
                 });
             } catch (IOException e) {
                 e.printStackTrace();
