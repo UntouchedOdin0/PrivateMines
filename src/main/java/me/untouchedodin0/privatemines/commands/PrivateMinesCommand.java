@@ -92,6 +92,10 @@ public class PrivateMinesCommand extends BaseCommand {
         }
     }
 
+    /*
+        This can create severe lag on the server, I take no blame for the lag caused.
+     */
+
     @Subcommand("dev/reset/stresstest")
     public void stressTest(Player player, int times) {
         if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
