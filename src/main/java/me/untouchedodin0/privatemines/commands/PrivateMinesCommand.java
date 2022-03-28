@@ -32,8 +32,6 @@ public class PrivateMinesCommand extends BaseCommand {
 
     @Default
     public void mainCommand(Player player) {
-        player.sendMessage("Hello.... Billy!");
-        player.sendMessage("Check out my menu!");
         MainMenu mainMenu = new MainMenu(mineStorage);
         mainMenu.openMainMenu(player);
     }
