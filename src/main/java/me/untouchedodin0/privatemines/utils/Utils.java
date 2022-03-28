@@ -17,6 +17,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.data.MineData;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 import redempt.redlib.sql.SQLHelper;
@@ -208,10 +209,10 @@ public class Utils {
         }
     }
 
-    public void complain() {
-        privateMines.getLogger().info("This version of Minecraft is extremely outdated and support for it has reached its end of life.");
-        privateMines.getLogger().info("You will be unable to run Private Mines on this Minecraft version,");
-        privateMines.getLogger().info(" and we will not to provide any further fixes or help with problems specific to legacy Minecraft versions.");
-        privateMines.getLogger().info("Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
+    public static void complain() {
+        PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "This version of Minecraft is extremely outdated and support\n for it has reached its end of life.");
+        PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "You will be unable to run Private Mines on this Minecraft version,");
+        PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "and we will not to provide any further fixes or help with problems specific to legacy Minecraft versions.");
+        PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
     }
 }

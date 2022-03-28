@@ -1,7 +1,6 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
-import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.config.MineConfig;
@@ -57,52 +56,52 @@ public class PrivateMines extends JavaPlugin {
         getLogger().info("Loading Private Mines v" + getDescription().getVersion());
         saveDefaultConfig();
         privateMines = this;
-        mineFactory = new MineFactory();
-        mineStorage = new MineStorage();
-        mineWorldManager = new MineWorldManager();
-
-        registerCommands();
-        setupSchematicUtils();
-        try {
-            Files.createDirectories(minesDirectory);
-            Files.createDirectories(schematicsDirectory);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        ConfigManager mineConfig = ConfigManager.create(this)
-                .addConverter(Material.class, Material::valueOf, Material::toString)
-                .target(MineConfig.class)
-                .saveDefaults()
-                .load();
-        MineConfig.mineTypes.forEach((name, mineType) -> {
-            File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
-            if (!schematicFile.exists()) {
-                getLogger().info("File doesn't exist!");
-                return;
-            }
-            SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
-            schematicStorage.addSchematic(schematicFile, mineBlocks);
-        });
-
-        Connection connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("database.sql"));
-        sqlHelper = new SQLHelper(connection);
-        sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING, UNIQUE (mineOwner, mineLocation, corner1, corner2, spawn) ON CONFLICT IGNORE);");
-        Utils utils = new Utils(this);
-        PaperLib.suggestPaper(privateMines);
-
         if (RedLib.MID_VERSION < 13) {
-            utils.complain();
-        }
+            Utils.complain();
+        } else {
+            mineFactory = new MineFactory();
+            mineStorage = new MineStorage();
+            mineWorldManager = new MineWorldManager();
+            Utils utils = new Utils(this);
+
+            registerCommands();
+            setupSchematicUtils();
+            try {
+                Files.createDirectories(minesDirectory);
+                Files.createDirectories(schematicsDirectory);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            ConfigManager mineConfig = ConfigManager.create(this)
+                    .addConverter(Material.class, Material::valueOf, Material::toString)
+                    .target(MineConfig.class)
+                    .saveDefaults()
+                    .load();
+
+            MineConfig.mineTypes.forEach((name, mineType) -> {
+                File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
+                if (!schematicFile.exists()) {
+                    getLogger().info("File doesn't exist!");
+                    return;
+                }
+                SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
+                schematicStorage.addSchematic(schematicFile, mineBlocks);
+            });
+
+            Connection connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("database.sql"));
+            sqlHelper = new SQLHelper(connection);
+            sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING, UNIQUE (mineOwner, mineLocation, corner1, corner2, spawn) ON CONFLICT IGNORE);");
 
 //        utils.loadSQL();
 
 //        sqlHelper.execute("UPDATE privatemines SET mineOwner=? WHERE mineLocation=?;", UUID.randomUUID(), location);
-        loadMines();
-        startAutoReset();
-        Instant end = Instant.now();
-        Duration loadTime = Duration.between(start, end);
-        getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
+            loadMines();
+            startAutoReset();
+            Instant end = Instant.now();
+            Duration loadTime = Duration.between(start, end);
+            getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
+        }
     }
 
     private void registerCommands() {
