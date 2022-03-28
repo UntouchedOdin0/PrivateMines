@@ -9,7 +9,7 @@ class MineType {
     @ConfigPath
     val name: String? = null
     val file: String? = null
-    val resetTime = 0
-    val resetPercentage = 0.0
+    val resetTime: Int = 0
+    val resetPercentage: Double = 0.0
     val materials: Map<Material, Double>? = null
 }

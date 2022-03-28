@@ -6,6 +6,7 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -164,6 +165,12 @@ public class Mine {
         Instant filled = Instant.now();
         Duration durationToFill = Duration.between(start, filled);
         privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
+    }
+
+    public void startResetTask() {
+        int resetTime = 5;
+
+        this.task = Task.syncRepeating(this::reset, 0L, resetTime * 20L);
     }
 
     public void saveMineData(Player player, MineData mineData) {

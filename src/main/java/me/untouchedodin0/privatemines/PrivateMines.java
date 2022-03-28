@@ -1,9 +1,7 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
-import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
-import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.configmanager.ConfigManager;
@@ -14,7 +12,6 @@ import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -31,7 +28,7 @@ import java.nio.file.PathMatcher;
 import java.sql.Connection;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -88,22 +85,16 @@ public class PrivateMines extends JavaPlugin {
 
         Connection connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("database.sql"));
         sqlHelper = new SQLHelper(connection);
-
-        privateMines.getLogger().info("Connection: " + connection);
-        privateMines.getLogger().info("sqlHelper: " + sqlHelper);
-
         sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING, UNIQUE (mineOwner, mineLocation, corner1, corner2, spawn) ON CONFLICT IGNORE);");
         Utils utils = new Utils(this);
 //        utils.loadSQL();
 
 //        sqlHelper.execute("UPDATE privatemines SET mineOwner=? WHERE mineLocation=?;", UUID.randomUUID(), location);
-
-        Instant end = Instant.now();
         loadMines();
+        startAutoReset();
+        Instant end = Instant.now();
         Duration loadTime = Duration.between(start, end);
         getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
-        if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager"))
-            setupSlimeWorld();
     }
 
     private void registerCommands() {
@@ -154,6 +145,11 @@ public class PrivateMines extends JavaPlugin {
         });
     }
 
+    public void startAutoReset() {
+        Map<UUID, Mine> mines = mineStorage.getMines();
+        mines.forEach((uuid, mine) -> mine.startResetTask());
+    }
+
     public SchematicStorage getSchematicStorage() {
         return schematicStorage;
     }
@@ -180,12 +176,5 @@ public class PrivateMines extends JavaPlugin {
 
     public SQLHelper getSqlHelper() {
         return sqlHelper;
-    }
-
-    public void setupSlimeWorld() {
-        privateMines.getLogger().info("Setting up the slime world...");
-        // Create a new empty property map
-        SlimePropertyMap slimePropertyMap = new SlimePropertyMap();
-        privateMines.getLogger().info("slimePropertyMap: " + slimePropertyMap);
     }
 }
