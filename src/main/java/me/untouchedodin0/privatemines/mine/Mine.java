@@ -142,7 +142,6 @@ public class Mine {
         Map<Material, Double> materials = mineType.getMaterials();
         Map<Material, Double> test = new HashMap<>();
 
-        Random random = new Random();
         final WeightedRandom<Material> randomPattern = WeightedRandom.fromDoubleMap(materials);
 
         privateMines.getLogger().info("materials: " + materials);
