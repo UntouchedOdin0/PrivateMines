@@ -13,11 +13,14 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.utils.inventory.MainMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import redempt.redlib.inventorygui.InventoryGUI;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 @CommandAlias("privatemines|pmines|pmine")
 public class PrivateMinesCommand extends BaseCommand {
@@ -85,6 +88,24 @@ public class PrivateMinesCommand extends BaseCommand {
             if (mine != null) {
                 mine.reset();
                 mine.teleport(player);
+            }
+        }
+    }
+
+    @Subcommand("dev/reset/stresstest")
+    public void stressTest(Player player, int times) {
+        if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
+            player.sendMessage("Player doesn't own a mine!");
+        } else {
+            Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
+            if (mine != null) {
+                player.sendMessage(ChatColor.GREEN + "Stress test resetting your mine " + ChatColor.GOLD + times + ChatColor.GREEN + " times!");
+                AtomicInteger atomicInteger = new AtomicInteger();
+
+                for (int i = 0; i < times; i++) {
+                    mine.reset();
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Finished Reset #" + atomicInteger.incrementAndGet()));
+                }
             }
         }
     }
