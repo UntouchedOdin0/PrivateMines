@@ -91,7 +91,7 @@ public class PrivateMines extends JavaPlugin {
         Utils utils = new Utils(this);
         PaperLib.suggestPaper(privateMines);
 
-        if (RedLib.MID_VERSION > 13) {
+        if (RedLib.MID_VERSION < 13) {
             utils.complain();
         }
 
