@@ -6,12 +6,12 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.codemc.worldguardwrapper.WorldGuardWrapper;
 import org.codemc.worldguardwrapper.region.IWrappedRegion;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
@@ -22,7 +22,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
 
 public class Mine {
 
@@ -94,6 +95,7 @@ public class Mine {
 
     public void delete() {
         MineData mineData = getMineData();
+        UUID uuid = mineData.getMineOwner();
 
         Location cornerA = mineData.getMinimumFullRegion();
         Location cornerB = mineData.getMaximumFullRegion();
@@ -125,6 +127,11 @@ public class Mine {
         Instant filled = Instant.now();
         Duration durationToFill = Duration.between(start, filled);
         privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
+        String regionName = String.format("mine-%s", uuid);
+        String regionFullName = String.format("mine-full-%s", uuid);
+
+        WorldGuardWrapper.getInstance().removeRegion(world, regionName);
+        WorldGuardWrapper.getInstance().removeRegion(world, regionFullName);
     }
 
     public void reset() {
