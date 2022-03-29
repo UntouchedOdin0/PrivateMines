@@ -12,7 +12,7 @@ import redempt.redlib.itemutils.ItemBuilder;
 
 public class MainMenu {
 
-    private MineStorage mineStorage;
+    private final MineStorage mineStorage;
 
     public MainMenu(MineStorage mineStorage) {
         this.mineStorage = mineStorage;
@@ -22,7 +22,7 @@ public class MainMenu {
         if (!mineStorage.hasMine(player.getUniqueId())) {
             player.sendMessage(ChatColor.RED + "You don't own a mine");
         } else {
-            InventoryGUI yourMine = new InventoryGUI(Bukkit.createInventory(null, 27, "Your Mine"));
+            InventoryGUI yourMine = new InventoryGUI(Bukkit.createInventory(null, 9, "Your Mine"));
             Mine mine = mineStorage.get(player.getUniqueId());
             ItemBuilder filler = new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName(" ");
             ItemButton fillerButton = ItemButton.create(filler, e -> e.setCancelled(true));
