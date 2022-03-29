@@ -20,6 +20,9 @@ import me.untouchedodin0.privatemines.mine.data.MineData;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.codemc.worldguardwrapper.WorldGuardWrapper;
+import org.codemc.worldguardwrapper.region.IWrappedRegion;
 import redempt.redlib.sql.SQLHelper;
 
 import java.io.File;
@@ -27,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 public class Utils {
@@ -214,5 +218,25 @@ public class Utils {
         PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "You will be unable to run Private Mines on this Minecraft version,");
         PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "and we will not to provide any further fixes or help with problems specific to legacy Minecraft versions.");
         PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
+    }
+
+    public static Optional<IWrappedRegion> createMiningWorldGuardRegion(Player player, org.bukkit.World world, Region cuboidRegion) {
+        UUID uuid = player.getUniqueId();
+        String regionName = String.format("mine-%s", uuid);
+        return Optional.ofNullable(WorldGuardWrapper.getInstance().addCuboidRegion(
+                regionName,
+                BukkitAdapter.adapt(world, cuboidRegion.getMinimumPoint()),
+                BukkitAdapter.adapt(world, cuboidRegion.getMaximumPoint())
+        ).orElseThrow(() -> new RuntimeException("Could not create worldguard region named " + regionName)));
+    }
+
+    public static Optional<IWrappedRegion> createFullWorldGuardRegion(Player player, org.bukkit.World world, Region cuboidRegion) {
+        UUID uuid = player.getUniqueId();
+        String regionName = String.format("mine-full-%s", uuid);
+        return Optional.ofNullable(WorldGuardWrapper.getInstance().addCuboidRegion(
+                regionName,
+                BukkitAdapter.adapt(world, cuboidRegion.getMinimumPoint()),
+                BukkitAdapter.adapt(world, cuboidRegion.getMaximumPoint())
+        ).orElseThrow(() -> new RuntimeException("Could not create worldguard region named " + regionName)));
     }
 }

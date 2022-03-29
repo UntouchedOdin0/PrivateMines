@@ -10,6 +10,7 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
@@ -28,6 +29,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.codemc.worldguardwrapper.region.IWrappedRegion;
 import redempt.redlib.misc.Task;
 
 import java.io.File;
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
 
 public class MineFactory {
 
@@ -53,7 +56,6 @@ public class MineFactory {
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         Mine mine = new Mine(privateMines);
         MineData mineData = new MineData();
-        Utils utils = new Utils(privateMines);
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
@@ -92,6 +94,7 @@ public class MineFactory {
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ());
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
 
+                    CuboidRegion mineWGRegion = new CuboidRegion(world, lrailsV, urailsV);
                     localSession.setClipboard(clipboardHolder);
 
                     Operation operation = clipboardHolder
@@ -123,6 +126,12 @@ public class MineFactory {
 
                         Location fullMin = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMinimumPoint());
                         Location fullMax = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMaximumPoint());
+                        CuboidRegion fullRegion = new CuboidRegion(newRegion.getMinimumPoint(), newRegion.getMaximumPoint());
+
+                        Optional<IWrappedRegion> miningWorldGuardRegion =
+                                Utils.createMiningWorldGuardRegion(player, BukkitAdapter.adapt(world), mineWGRegion);
+                        Optional<IWrappedRegion> fullWorldGuardRegion =
+                                Utils.createFullWorldGuardRegion(player, BukkitAdapter.adapt(world), fullRegion);
 
                         mineData.setMinimumMining(lrailsL);
                         mineData.setMaximumMining(urailsL);
