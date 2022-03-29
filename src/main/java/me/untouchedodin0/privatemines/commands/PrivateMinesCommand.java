@@ -102,6 +102,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
     @Subcommand("dev/reset/stresstest")
     @CommandPermission("privatemines.dev.stresstest")
+    @Syntax("<times> &e- Reset your mine a certain amount of times to test the speed")
     public void stressTest(Player player, int times) {
         if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
             player.sendMessage("Player doesn't own a mine!");
@@ -114,7 +115,9 @@ public class PrivateMinesCommand extends BaseCommand {
                 Instant start = Instant.now();
                 for (int i = 0; i < times; i++) {
                     mine.resetNoMessage();
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Finished Reset #" + atomicInteger.incrementAndGet()));
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                                                TextComponent.fromLegacyText(ChatColor.GREEN + "Finished Reset #" +
+                                                                                     atomicInteger.incrementAndGet()));
                 }
                 Instant filled = Instant.now();
                 Duration durationToFill = Duration.between(start, filled);
