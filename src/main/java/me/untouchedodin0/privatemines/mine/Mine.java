@@ -127,11 +127,6 @@ public class Mine {
         Instant filled = Instant.now();
         Duration durationToFill = Duration.between(start, filled);
         privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
-        String regionName = String.format("mine-%s", uuid);
-        String regionFullName = String.format("mine-full-%s", uuid);
-
-        WorldGuardWrapper.getInstance().removeRegion(world, regionName);
-        WorldGuardWrapper.getInstance().removeRegion(world, regionFullName);
     }
 
     public void reset() {
