@@ -11,8 +11,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.codemc.worldguardwrapper.WorldGuardWrapper;
-import org.codemc.worldguardwrapper.region.IWrappedRegion;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.misc.WeightedRandom;
@@ -31,8 +29,6 @@ public class Mine {
 
     private UUID mineOwner;
     private BlockVector3 location;
-    private IWrappedRegion iWrappedMiningRegion;
-    private IWrappedRegion iWrappedFullRegion;
     private MineData mineData;
     private Task task;
 
@@ -57,21 +53,21 @@ public class Mine {
         this.location = location;
     }
 
-    public IWrappedRegion getiWrappedMiningRegion() {
-        return iWrappedMiningRegion;
-    }
-
-    public void setiWrappedMiningRegion(IWrappedRegion iWrappedMiningRegion) {
-        this.iWrappedMiningRegion = iWrappedMiningRegion;
-    }
-
-    public IWrappedRegion getiWrappedFullRegion() {
-        return iWrappedFullRegion;
-    }
-
-    public void setiWrappedFullRegion(IWrappedRegion iWrappedFullRegion) {
-        this.iWrappedFullRegion = iWrappedFullRegion;
-    }
+//    public IWrappedRegion getiWrappedMiningRegion() {
+//        return iWrappedMiningRegion;
+//    }
+//
+//    public void setiWrappedMiningRegion(IWrappedRegion iWrappedMiningRegion) {
+//        this.iWrappedMiningRegion = iWrappedMiningRegion;
+//    }
+//
+//    public IWrappedRegion getiWrappedFullRegion() {
+//        return iWrappedFullRegion;
+//    }
+//
+//    public void setiWrappedFullRegion(IWrappedRegion iWrappedFullRegion) {
+//        this.iWrappedFullRegion = iWrappedFullRegion;
+//    }
 
     public MineData getMineData() {
         return mineData;

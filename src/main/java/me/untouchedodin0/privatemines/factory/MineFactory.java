@@ -16,6 +16,13 @@ import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
@@ -29,7 +36,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.codemc.worldguardwrapper.region.IWrappedRegion;
 import redempt.redlib.misc.Task;
 
 import java.io.File;
@@ -39,7 +45,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 public class MineFactory {
 
@@ -57,6 +62,7 @@ public class MineFactory {
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         Mine mine = new Mine(privateMines);
         MineData mineData = new MineData();
+        String regionName = String.format("mine-full-%s", player.getUniqueId());
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
@@ -135,15 +141,26 @@ public class MineFactory {
                         Location fullMin = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMinimumPoint());
                         Location fullMax = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMaximumPoint());
                         CuboidRegion fullRegion = new CuboidRegion(newRegion.getMinimumPoint(), newRegion.getMaximumPoint());
+                        ProtectedCuboidRegion miningWorldGuardRegion = new ProtectedCuboidRegion(regionName, lrailsV, urailsV);
+                        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+                        RegionManager regionManager = container.get(world);
+                        if (regionManager != null) {
+                            regionManager.addRegion(miningWorldGuardRegion);
+                        }
 
-                        Optional<IWrappedRegion> miningWorldGuardRegion =
-                                Utils.createMiningWorldGuardRegion(player, BukkitAdapter.adapt(world), mineWGRegion);
-                        Optional<IWrappedRegion> fullWorldGuardRegion =
-                                Utils.createFullWorldGuardRegion(player, BukkitAdapter.adapt(world), fullRegion);
+                        miningWorldGuardRegion.setFlag(Flags.BLOCK_BREAK, StateFlag.State.ALLOW);
+                        Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), "block-break");
+                        privateMines.getLogger().info("miningWorldGuardRegion: " + miningWorldGuardRegion);
+                        privateMines.getLogger().info("test flag: " + flag);
+                        privateMines.getLogger().info("test flag name: " + flag.getName());
+
+//                        Optional<IWrappedRegion> miningWorldGuardRegion =
+//                                Utils.createMiningWorldGuardRegion(player, BukkitAdapter.adapt(world), mineWGRegion);
+//                        Optional<IWrappedRegion> fullWorldGuardRegion =
+//                                Utils.createFullWorldGuardRegion(player, BukkitAdapter.adapt(world), fullRegion);
                         if (flags != null) {
                             Utils.setMineFlags(miningWorldGuardRegion, flags);
                         }
-                        Utils.setMineFullFlags(fullWorldGuardRegion);
 
                         mineData.setMinimumMining(lrailsL);
                         mineData.setMaximumMining(urailsL);

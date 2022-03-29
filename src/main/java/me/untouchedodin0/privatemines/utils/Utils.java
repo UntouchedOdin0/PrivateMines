@@ -15,18 +15,14 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.data.MineData;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-import org.codemc.worldguardwrapper.WorldGuardWrapper;
-import org.codemc.worldguardwrapper.flag.IWrappedFlag;
-import org.codemc.worldguardwrapper.flag.WrappedState;
-import org.codemc.worldguardwrapper.region.IWrappedRegion;
 import redempt.redlib.sql.SQLHelper;
 
 import java.io.File;
@@ -226,39 +222,9 @@ public class Utils {
         PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
     }
 
-    public static Optional<IWrappedRegion> createMiningWorldGuardRegion(Player player, org.bukkit.World world, Region cuboidRegion) {
-        UUID uuid = player.getUniqueId();
-        String regionName = String.format("mine-%s", uuid);
-        return Optional.ofNullable(WorldGuardWrapper.getInstance().addCuboidRegion(
-                regionName,
-                BukkitAdapter.adapt(world, cuboidRegion.getMinimumPoint()),
-                BukkitAdapter.adapt(world, cuboidRegion.getMaximumPoint())
-        ).orElseThrow(() -> new RuntimeException("Could not create worldguard region named " + regionName)));
-    }
-
-    public static Optional<IWrappedRegion> createFullWorldGuardRegion(Player player, org.bukkit.World world, Region cuboidRegion) {
-        UUID uuid = player.getUniqueId();
-        String regionName = String.format("mine-full-%s", uuid);
-        return Optional.ofNullable(WorldGuardWrapper.getInstance().addCuboidRegion(
-                regionName,
-                BukkitAdapter.adapt(world, cuboidRegion.getMinimumPoint()),
-                BukkitAdapter.adapt(world, cuboidRegion.getMaximumPoint())
-        ).orElseThrow(() -> new RuntimeException("Could not create worldguard region named " + regionName)));
-    }
-
     @SuppressWarnings("all") // I know I know, this is bad to do but ffs it wont' shut up
-    public static void setMineFlags(Optional<IWrappedRegion> iWrappedRegion, Map<String, Boolean> flags) {
-        final WorldGuardWrapper worldGuardWrapper = WorldGuardWrapper.getInstance();
-
-        Stream.of(
-                        worldGuardWrapper.getFlag("block-place", WrappedState.class),
-                        worldGuardWrapper.getFlag("block-break", WrappedState.class)
-                ).filter(Optional::isPresent)
-                .map(Optional::get)
-                .forEach(flag -> {
-                    if (iWrappedRegion.isEmpty()) return;
-                    iWrappedRegion.get().setFlag(flag, WrappedState.ALLOW);
-                });
+    public static void setMineFlags(ProtectedRegion protectedRegion, Map<String, Boolean> flags) {
+        FlagRegistry flagRegistry = WorldGuard.getInstance().getFlagRegistry();
 
         //todo fix this
 
@@ -277,18 +243,17 @@ public class Utils {
 //        });
     }
 
-    @SuppressWarnings("all") // I know I know, this is bad to do but ffs it wont' shut up
-    public static void setMineFullFlags(Optional<IWrappedRegion> iWrappedRegion) {
-        final WorldGuardWrapper worldGuardWrapper = WorldGuardWrapper.getInstance();
-        Stream.of(
-                        worldGuardWrapper.getFlag("block-place", WrappedState.class),
-                        worldGuardWrapper.getFlag("block-break", WrappedState.class),
-                        worldGuardWrapper.getFlag("mob-spawning", WrappedState.class)
-                ).filter(Optional::isPresent)
-                .map(Optional::get)
-                .forEach(flag -> {
-                    if (iWrappedRegion.isEmpty()) return;
-                    iWrappedRegion.get().setFlag(flag, WrappedState.DENY);
-                });
-    }
+//    public static void setMineFullFlags(Optional<IWrappedRegion> iWrappedRegion) {
+//        final WorldGuardWrapper worldGuardWrapper = WorldGuardWrapper.getInstance();
+//        Stream.of(
+//                        worldGuardWrapper.getFlag("block-place", WrappedState.class),
+//                        worldGuardWrapper.getFlag("block-break", WrappedState.class),
+//                        worldGuardWrapper.getFlag("mob-spawning", WrappedState.class)
+//                ).filter(Optional::isPresent)
+//                .map(Optional::get)
+//                .forEach(flag -> {
+//                    if (iWrappedRegion.isEmpty()) return;
+//                    iWrappedRegion.get().setFlag(flag, WrappedState.DENY);
+//                });
+//    }
 }
