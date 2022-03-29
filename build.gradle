@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'me.untouchedodin0'
-version '4.0-SNAPSHOT'
+version '4.0.1-SNAPSHOT'
 
 repositories {
     mavenLocal()
