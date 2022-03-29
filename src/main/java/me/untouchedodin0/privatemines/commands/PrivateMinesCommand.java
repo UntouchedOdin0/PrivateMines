@@ -1,10 +1,7 @@
 package me.untouchedodin0.privatemines.commands;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandCompletion;
-import co.aikar.commands.annotation.Default;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -20,6 +17,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @CommandAlias("privatemines|pmines|pmine")
@@ -41,6 +40,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
     @Subcommand("give")
     @CommandCompletion("@players")
+    @CommandPermission("privatemines.give")
     public void give(Player player, Player target) {
         player.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a private mine!");
         MineFactory mineFactory = new MineFactory();
@@ -52,6 +52,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
     @Subcommand("delete")
     @CommandCompletion("@players")
+    @CommandPermission("privatemines.delete")
     public void delete(Player player, Player target) {
         if (target != null) {
             if (!privateMines.getMineStorage().hasMine(target.getUniqueId())) {
@@ -67,6 +68,7 @@ public class PrivateMinesCommand extends BaseCommand {
     }
 
     @Subcommand("teleport")
+    @CommandPermission("privatemines.teleport")
     public void teleport(Player player) {
         if (!mineStorage.hasMine(player.getUniqueId())) {
             player.sendMessage("Player doesn't own a mine!");
@@ -80,9 +82,10 @@ public class PrivateMinesCommand extends BaseCommand {
     }
 
     @Subcommand("reset")
+    @CommandPermission("privatemines.teleport")
     public void reset(Player player) {
         if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
-            player.sendMessage("Player doesn't own a mine!");
+            player.sendMessage(ChatColor.RED + "Player doesn't own a mine!");
         } else {
             Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
             if (mine != null) {
@@ -97,6 +100,7 @@ public class PrivateMinesCommand extends BaseCommand {
      */
 
     @Subcommand("dev/reset/stresstest")
+    @CommandPermission("privatemines.dev.stresstest")
     public void stressTest(Player player, int times) {
         if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
             player.sendMessage("Player doesn't own a mine!");
@@ -106,10 +110,14 @@ public class PrivateMinesCommand extends BaseCommand {
                 player.sendMessage(ChatColor.GREEN + "Stress test resetting your mine " + ChatColor.GOLD + times + ChatColor.GREEN + " times!");
                 AtomicInteger atomicInteger = new AtomicInteger();
 
+                Instant start = Instant.now();
                 for (int i = 0; i < times; i++) {
-                    mine.reset();
+                    mine.resetNoMessage();
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Finished Reset #" + atomicInteger.incrementAndGet()));
                 }
+                Instant filled = Instant.now();
+                Duration durationToFill = Duration.between(start, filled);
+                player.sendMessage(String.format(ChatColor.GREEN + "It took %dms to fill your mine %d times!", durationToFill.toMillis(), times));
             }
         }
     }
