@@ -12,6 +12,7 @@ import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -120,32 +121,36 @@ public class PrivateMines extends JavaPlugin {
 
         CompletableFuture.runAsync(() -> {
             try {
-                Files.list(path).forEach(filePath -> {
-                    File file = filePath.toFile();
-                    Mine mine = new Mine(privateMines);
-                    MineData mineData = new MineData();
-                    YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
+                Files.list(path)
+                        .filter(jsonMatcher::matches)
+                        .forEach(filePath -> {
+                            File file = filePath.toFile();
+                            Mine mine = new Mine(privateMines);
+                            MineData mineData = new MineData();
+                            getLogger().info("Loading file " + file.getName() + "....");
+                            YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
 
-                    UUID owner = UUID.fromString(Objects.requireNonNull(yml.getString("mineOwner")));
-                    String mineTypeName = yml.getString("mineType");
-                    Location corner1 = LocationUtils.fromString(yml.getString("corner1"));
-                    Location corner2 = LocationUtils.fromString(yml.getString("corner2"));
-                    Location fullRegionMin = LocationUtils.fromString(yml.getString("fullRegionMin"));
-                    Location fullRegionMax = LocationUtils.fromString(yml.getString("fullRegionMax"));
-                    Location spawn = LocationUtils.fromString(yml.getString("spawn"));
-                    Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
+                            UUID owner = UUID.fromString(Objects.requireNonNull(yml.getString("mineOwner")));
+                            String mineTypeName = yml.getString("mineType");
+                            Location corner1 = LocationUtils.fromString(yml.getString("corner1"));
+                            Location corner2 = LocationUtils.fromString(yml.getString("corner2"));
+                            Location fullRegionMin = LocationUtils.fromString(yml.getString("fullRegionMin"));
+                            Location fullRegionMax = LocationUtils.fromString(yml.getString("fullRegionMax"));
+                            Location spawn = LocationUtils.fromString(yml.getString("spawn"));
+                            Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
 
-                    mineData.setMinimumMining(corner1);
-                    mineData.setMaximumMining(corner2);
-                    mineData.setMinimumFullRegion(fullRegionMin);
-                    mineData.setMaximumFullRegion(fullRegionMax);
-                    mineData.setSpawnLocation(spawn);
-                    mineData.setMineLocation(mineLocation);
-                    mineData.setMineType(mineTypeName);
+                            mineData.setMinimumMining(corner1);
+                            mineData.setMaximumMining(corner2);
+                            mineData.setMinimumFullRegion(fullRegionMin);
+                            mineData.setMaximumFullRegion(fullRegionMax);
+                            mineData.setSpawnLocation(spawn);
+                            mineData.setMineLocation(mineLocation);
+                            mineData.setMineType(mineTypeName);
 
-                    mine.setMineData(mineData);
-                    getMineStorage().addMine(owner, mine);
-                });
+                            mine.setMineData(mineData);
+                            getMineStorage().addMine(owner, mine);
+                            getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
+                        });
             } catch (IOException e) {
                 e.printStackTrace();
             }
