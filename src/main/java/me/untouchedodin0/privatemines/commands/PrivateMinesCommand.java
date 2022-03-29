@@ -61,7 +61,7 @@ public class PrivateMinesCommand extends BaseCommand {
                 Mine mine = privateMines.getMineStorage().get(target.getUniqueId());
                 player.sendMessage(ChatColor.GREEN + "Deleting " + target.getName() + "'s private mine!");
                 if (mine != null) {
-                    mine.delete();
+                    mine.delete(target.getUniqueId());
                 }
                 privateMines.getMineStorage().removeMine(target.getUniqueId());
             }

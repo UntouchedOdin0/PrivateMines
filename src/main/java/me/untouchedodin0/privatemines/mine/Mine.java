@@ -17,6 +17,7 @@ import redempt.redlib.misc.WeightedRandom;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
@@ -89,9 +90,8 @@ public class Mine {
         player.teleport(getMineData().getSpawnLocation());
     }
 
-    public void delete() {
+    public void delete(UUID uuid) {
         MineData mineData = getMineData();
-        UUID uuid = mineData.getMineOwner();
 
         Location cornerA = mineData.getMinimumFullRegion();
         Location cornerB = mineData.getMaximumFullRegion();
@@ -123,6 +123,18 @@ public class Mine {
         Instant filled = Instant.now();
         Duration durationToFill = Duration.between(start, filled);
         privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
+        privateMines.getLogger().info("mine owner: " + uuid);
+        privateMines.getMineStorage().removeMine(uuid);
+
+        String fileName = String.format("/%s.yml", uuid);
+
+        Path minesDirectory = privateMines.getMinesDirectory();
+        File file = new File(minesDirectory + fileName);
+        try {
+            Files.delete(file.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void reset() {

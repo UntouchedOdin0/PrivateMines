@@ -150,9 +150,6 @@ public class MineFactory {
 
                         miningWorldGuardRegion.setFlag(Flags.BLOCK_BREAK, StateFlag.State.ALLOW);
                         Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), "block-break");
-                        privateMines.getLogger().info("miningWorldGuardRegion: " + miningWorldGuardRegion);
-                        privateMines.getLogger().info("test flag: " + flag);
-                        privateMines.getLogger().info("test flag name: " + flag.getName());
 
 //                        Optional<IWrappedRegion> miningWorldGuardRegion =
 //                                Utils.createMiningWorldGuardRegion(player, BukkitAdapter.adapt(world), mineWGRegion);
@@ -162,6 +159,7 @@ public class MineFactory {
                             Utils.setMineFlags(miningWorldGuardRegion, flags);
                         }
 
+                        mineData.setMineOwner(player.getUniqueId());
                         mineData.setMinimumMining(lrailsL);
                         mineData.setMaximumMining(urailsL);
                         mineData.setMinimumFullRegion(fullMin);

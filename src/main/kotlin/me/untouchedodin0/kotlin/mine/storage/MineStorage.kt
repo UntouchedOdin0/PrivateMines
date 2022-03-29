@@ -18,7 +18,7 @@ class MineStorage {
 
     fun removeMine(uuid: UUID) {
         if (!mines.containsKey(uuid)) {
-            privateMines.logger.warning(String.format("Player %s doesn't a mine!!", uuid.toString()))
+            privateMines.logger.warning(String.format("Player %s doesn't have a mine!!", uuid.toString()))
         } else {
             mines.remove(uuid)
         }
