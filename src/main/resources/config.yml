@@ -1,8 +1,10 @@
 mineTypes:
   Test:
-    file: "debugschem.schem"
+    file: minewithgap.schem
     resetTime: 5
     resetPercentage: 50.0
     materials:
       STONE: 0.9
       COBBLESTONE: 0.1
+    flags:
+      block-break: true

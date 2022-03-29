@@ -37,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -61,6 +62,13 @@ public class MineFactory {
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         SchematicStorage storage = privateMines.getSchematicStorage();
         SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
+        Map<String, Boolean> flags = mineType.getFlags();
+
+        if (flags != null) {
+            flags.forEach((s, aBoolean) -> {
+                privateMines.getLogger().info("Flag: " + s + " bool: " + aBoolean);
+            });
+        }
 
         Task.asyncDelayed(() -> {
             if (clipboardFormat != null) {
@@ -132,6 +140,10 @@ public class MineFactory {
                                 Utils.createMiningWorldGuardRegion(player, BukkitAdapter.adapt(world), mineWGRegion);
                         Optional<IWrappedRegion> fullWorldGuardRegion =
                                 Utils.createFullWorldGuardRegion(player, BukkitAdapter.adapt(world), fullRegion);
+                        if (flags != null) {
+                            Utils.setMineFlags(miningWorldGuardRegion, flags);
+                        }
+                        Utils.setMineFullFlags(fullWorldGuardRegion);
 
                         mineData.setMinimumMining(lrailsL);
                         mineData.setMaximumMining(urailsL);

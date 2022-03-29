@@ -16,12 +16,16 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.data.MineData;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.codemc.worldguardwrapper.WorldGuardWrapper;
+import org.codemc.worldguardwrapper.flag.IWrappedFlag;
+import org.codemc.worldguardwrapper.flag.WrappedState;
 import org.codemc.worldguardwrapper.region.IWrappedRegion;
 import redempt.redlib.sql.SQLHelper;
 
@@ -29,9 +33,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class Utils {
 
@@ -238,5 +244,51 @@ public class Utils {
                 BukkitAdapter.adapt(world, cuboidRegion.getMinimumPoint()),
                 BukkitAdapter.adapt(world, cuboidRegion.getMaximumPoint())
         ).orElseThrow(() -> new RuntimeException("Could not create worldguard region named " + regionName)));
+    }
+
+    @SuppressWarnings("all") // I know I know, this is bad to do but ffs it wont' shut up
+    public static void setMineFlags(Optional<IWrappedRegion> iWrappedRegion, Map<String, Boolean> flags) {
+        final WorldGuardWrapper worldGuardWrapper = WorldGuardWrapper.getInstance();
+
+        Stream.of(
+                        worldGuardWrapper.getFlag("block-place", WrappedState.class),
+                        worldGuardWrapper.getFlag("block-break", WrappedState.class)
+                ).filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(flag -> {
+                    if (iWrappedRegion.isEmpty()) return;
+                    iWrappedRegion.get().setFlag(flag, WrappedState.ALLOW);
+                });
+
+        //todo fix this
+
+//        flags.entrySet().stream().forEach(stringBooleanEntry -> {
+//            String flag = stringBooleanEntry.getKey();
+//            boolean value = stringBooleanEntry.getValue();
+//
+//            Bukkit.getLogger().info("flag: " + flag);
+//            Bukkit.getLogger().info("value: " + value);
+////            Optional<IWrappedFlag<WrappedState>> iWrappedFlag = worldGuardWrapper.getFlag(flag, WrappedState.class);
+////            if (value == false) {
+////                iWrappedRegion.get().setFlag(iWrappedFlag.get(), WrappedState.DENY);
+////            } else if (value == true) {
+////                iWrappedRegion.get().setFlag(iWrappedFlag.get(), WrappedState.ALLOW);
+////            }
+//        });
+    }
+
+    @SuppressWarnings("all") // I know I know, this is bad to do but ffs it wont' shut up
+    public static void setMineFullFlags(Optional<IWrappedRegion> iWrappedRegion) {
+        final WorldGuardWrapper worldGuardWrapper = WorldGuardWrapper.getInstance();
+        Stream.of(
+                        worldGuardWrapper.getFlag("block-place", WrappedState.class),
+                        worldGuardWrapper.getFlag("block-break", WrappedState.class),
+                        worldGuardWrapper.getFlag("mob-spawning", WrappedState.class)
+                ).filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(flag -> {
+                    if (iWrappedRegion.isEmpty()) return;
+                    iWrappedRegion.get().setFlag(flag, WrappedState.DENY);
+                });
     }
 }
