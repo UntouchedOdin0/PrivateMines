@@ -12,7 +12,6 @@ import me.untouchedodin0.privatemines.utils.inventory.MainMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -56,13 +55,14 @@ public class PrivateMinesCommand extends BaseCommand {
     public void delete(Player player, Player target) {
         if (target != null) {
             if (!privateMines.getMineStorage().hasMine(target.getUniqueId())) {
-                player.sendMessage("Player doesn't own a mine!");
+                player.sendMessage(ChatColor.RED + "Player doesn't own a mine!");
             } else {
                 Mine mine = privateMines.getMineStorage().get(target.getUniqueId());
-                player.sendMessage("Deleting " + target.getName() + "'s private mine!");
-                mine.delete();
+                player.sendMessage(ChatColor.GREEN + "Deleting " + target.getName() + "'s private mine!");
+                if (mine != null) {
+                    mine.delete();
+                }
                 privateMines.getMineStorage().removeMine(target.getUniqueId());
-                Bukkit.getLogger().info("mines: " + privateMines.getMineStorage().getMines());
             }
         }
     }
