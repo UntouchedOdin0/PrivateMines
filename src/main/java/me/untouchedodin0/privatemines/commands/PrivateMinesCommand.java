@@ -15,6 +15,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import redempt.redlib.misc.ChatPrompt;
 
 import java.time.Duration;
 import java.time.Instant;
