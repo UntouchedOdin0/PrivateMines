@@ -152,16 +152,41 @@ task copyTo_DevServer2(type: Copy) {
 //    }
 //}
 
+//publishing {
+//    publications {
+//        maven(MavenPublication) {
+//            groupId = 'me.untouchedOdin0.PrivateMines'
+//            artifactId = rootProject.name
+//            version = "1.0"
+//            artifact jar
+//        }
+//    }
+//}
+
 publishing {
+    repositories {
+        maven {
+            def releasesRepoUrl = "http://s01.oss.sonatype.org/"
+            def snapshotsRepoUrl = "https://repo.bristermitten.me/repository/maven-snapshots"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            credentials {
+                username = System.getenv('MAVEN_USER')
+                password = System.getenv('MAVEN_PASSWORD')
+            }
+        }
+    }
     publications {
-        maven(MavenPublication) {
-            groupId = 'me.untouchedOdin0.PrivateMines'
-            artifactId = rootProject.name
-            version = "1.0"
-            artifact jar
+//        shadow(MavenPublication) {
+//            publication -> project.shadow.component(publication)
+//        }
+        mavenJava(MavenPublication) {
+            from components.java
+//                artifact sourceJar
         }
     }
 }
+
 
 test {
     useJUnitPlatform()
