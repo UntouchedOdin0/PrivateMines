@@ -5,7 +5,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.6.20-RC'
 }
 
-group 'me.untouchedodin0'
+group 'io.github.untouchedodin0'
 version '4.0.1-SNAPSHOT'
 
 repositories {
@@ -61,10 +61,36 @@ task copyTo_DevServer2(type: Copy) {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        maven(MavenPublication) {
+            groupId = 'me.untouchedodin0.privatemines'
+            artifactId = 'PrivateMines'
+            version = '1.1'
+
             from components.java
         }
     }
+
+    repositories {
+        maven {
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = "https://repo.bristermitten.me/repository/maven-releases"
+            def snapshotsRepoUrl = "https://repo.bristermitten.me/repository/maven-snapshots"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            credentials {
+                username project.hasProperty('mavenUser') ? mavenUser : System.getenv('MAVEN_USER')
+                password project.hasProperty('mavenPassword') ? mavenPassword : System.getenv('MAVEN_PASSWORD')
+            }
+        }
+    }
+
+//    publications {
+//        MavenJava(MavenPublication) {
+//            groupId = 'io.github.untouchedodin0'
+//            artifactId = 'PrivateMines'
+//            version = '1.1'
+//        }
+//    }
 }
 
 test {
