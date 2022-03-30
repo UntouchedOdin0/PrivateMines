@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'java-library'
     id 'com.github.johnrengelman.shadow' version '7.1.0'
     id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm' version '1.6.20-RC'
@@ -59,31 +60,44 @@ task copyTo_DevServer2(type: Copy) {
     into "E:/Coding/Spigot Test Servers/1.18.2 Privates Mines (Paper)/plugins"
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'me.untouchedodin0.privatemines'
-            artifactId = 'PrivateMines'
-            version = '1.1'
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            repository(url: "${nexusUrl}/content/repositories/releases") {
+//                authentication(userName: nexusUsername, password: nexusPassword)
+//            }
+//            snapshotRepository(url: "${nexusUrl}/content/repositories/snapshots") {
+//                authentication(userName: nexusUsername, password: nexusPassword)
+//            }
+//        }
+//    }
+//}
 
-            from components.java
-        }
-    }
-
-    repositories {
-        maven {
-            // change URLs to point to your repos, e.g. http://my.org/repo
-            def releasesRepoUrl = "https://repo.bristermitten.me/repository/maven-releases"
-            def snapshotsRepoUrl = "https://repo.bristermitten.me/repository/maven-snapshots"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-
-            credentials {
-                username project.hasProperty('mavenUser') ? mavenUser : System.getenv('MAVEN_USER')
-                password project.hasProperty('mavenPassword') ? mavenPassword : System.getenv('MAVEN_PASSWORD')
-            }
-        }
-    }
-
+//publishing {
+//    repositories {
+//        maven {
+//            // change URLs to point to your repos, e.g. http://my.org/repo
+//            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+//            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+//            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+//
+//            credentials {
+//                username project.hasProperty('mavenUser') ? mavenUser : System.getenv('MAVEN_USER')
+//                password project.hasProperty('mavenPassword') ? mavenPassword : System.getenv('MAVEN_PASSWORD')
+//            }
+//        }
+//    }
+//
+////    publications {
+////        maven(MavenPublication) {
+////            groupId = 'me.untouchedodin0.privatemines'
+////            artifactId = 'PrivateMines'
+////            version = '1.1'
+////
+////            from components.java
+////        }
+////    }
+//
 //    publications {
 //        MavenJava(MavenPublication) {
 //            groupId = 'io.github.untouchedodin0'
@@ -91,6 +105,62 @@ publishing {
 //            version = '1.1'
 //        }
 //    }
+//}
+
+//publishing {
+//    publications {
+//        maven(MavenPublication) {
+//            groupId = 'me.untouchedodin0.privatemines'
+//            artifactId = rootProject.name
+//            version = "4.0.1"
+//            artifact jar
+//        }
+//    }
+//}
+
+//publishing {
+//    publications {
+//        publication = create(MavenPublication) {
+//            from(components["java"])
+//            pom {
+//                description.set("Create upgradable private mines for your players to mine in!")
+//                name.set("privatemines")
+//            }
+//        }
+//    }
+//
+//    repositories {
+//        maven {
+//            String releasesUri = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+//            String snapshotsUri = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+//            if (version.toString().endsWith("SNAPSHOT")) {
+//                url = snapshotsUri
+//            } else {
+//                url = releasesUri
+//            }
+//
+//            ossrhUsername = System.getenv('MAVEN_USER')
+//            ossrhPassword = System.getenv('MAVEN_PASSWORD')
+//
+//            if (ossrhUsername != null && ossrhPassword != null) {
+//                credentials {
+//                    username = ossrhUsername
+//                    password = ossrhPassword
+//                }
+//            }
+//        }
+//    }
+//}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'me.untouchedOdin0.PrivateMines'
+            artifactId = rootProject.name
+            version = "1.0"
+            artifact jar
+        }
+    }
 }
 
 test {
