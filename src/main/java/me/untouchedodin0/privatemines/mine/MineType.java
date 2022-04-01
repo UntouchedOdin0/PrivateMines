@@ -1,8 +1,8 @@
 package me.untouchedodin0.privatemines.mine;
 
-import me.untouchedodin0.privatemines.configmanager.annotations.ConfigMappable;
-import me.untouchedodin0.privatemines.configmanager.annotations.ConfigPath;
 import org.bukkit.Material;
+import redempt.redlib.config.annotations.ConfigMappable;
+import redempt.redlib.config.annotations.ConfigPath;
 
 import java.util.Map;
 

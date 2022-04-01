@@ -1,3 +1,9 @@
+# The different Materials to look for within the mine structure.
+spawnPoint: "SPONGE"
+mineCorner: "POWERED_RAIL"
+sellNpc: "WOOL"
+upgradeMaterial: "OBSIDIAN"
+
 mineTypes:
   Test:
     file: minewithgap.schem

@@ -38,6 +38,7 @@ public class SchematicIterator {
 
                 Material cornerMaterial = Material.POWERED_RAIL;
                 Material spawnMaterial = Material.SPONGE;
+
                 BlockType cornerType = BlockType.REGISTRY.get(cornerMaterial.getKey().getKey());
                 BlockType spawnType = BlockType.REGISTRY.get(spawnMaterial.getKey().getKey());
 

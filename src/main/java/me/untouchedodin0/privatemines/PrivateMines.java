@@ -3,8 +3,8 @@ package me.untouchedodin0.privatemines;
 import co.aikar.commands.PaperCommandManager;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
+import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MineConfig;
-import me.untouchedodin0.privatemines.configmanager.ConfigManager;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
@@ -18,6 +18,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
+import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.sql.SQLHelper;
 
@@ -46,6 +47,8 @@ public class PrivateMines extends JavaPlugin {
     private MineStorage mineStorage;
     private MineWorldManager mineWorldManager;
     private SQLHelper sqlHelper;
+    private ConfigManager configManager;
+    private ConfigManager mineConfig;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -55,7 +58,7 @@ public class PrivateMines extends JavaPlugin {
     public void onEnable() {
         Instant start = Instant.now();
         getLogger().info("Loading Private Mines v" + getDescription().getVersion());
-        saveDefaultConfig();
+//        saveDefaultConfig();
         privateMines = this;
         if (RedLib.MID_VERSION < 13) {
             Utils.complain();
@@ -74,11 +77,11 @@ public class PrivateMines extends JavaPlugin {
                 e.printStackTrace();
             }
 
-            ConfigManager mineConfig = ConfigManager.create(this)
-                    .addConverter(Material.class, Material::valueOf, Material::toString)
-                    .target(MineConfig.class)
-                    .saveDefaults()
-                    .load();
+            configManager = ConfigManager.create(this).target(Config.class).saveDefaults().load();
+            mineConfig = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(MineConfig.class).saveDefaults().load();
+
+            getLogger().info("spawnPoint: " + Config.spawnPoint);
+            getLogger().info("cornerMaterial: " + Config.cornerMaterial);
 
             MineConfig.mineTypes.forEach((name, mineType) -> {
                 File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
@@ -88,6 +91,7 @@ public class PrivateMines extends JavaPlugin {
                 }
                 SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
                 schematicStorage.addSchematic(schematicFile, mineBlocks);
+                privateMines.getLogger().info("loaded file: " + schematicFile);
             });
 
             Connection connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("database.sql"));
