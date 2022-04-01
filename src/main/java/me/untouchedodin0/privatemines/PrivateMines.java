@@ -47,6 +47,7 @@ public class PrivateMines extends JavaPlugin {
     private MineStorage mineStorage;
     private MineWorldManager mineWorldManager;
     private SQLHelper sqlHelper;
+    private ConfigManager configManager;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -75,7 +76,7 @@ public class PrivateMines extends JavaPlugin {
                 e.printStackTrace();
             }
 
-            ConfigManager configManager = ConfigManager.create(this).target(Config.class).saveDefaults().load();
+            configManager = ConfigManager.create(this).target(Config.class).saveDefaults().load();
             ConfigManager mineConfig = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(MineConfig.class).saveDefaults().load();
 
             getLogger().info("spawnPoint: " + Config.spawnPoint);
@@ -187,5 +188,9 @@ public class PrivateMines extends JavaPlugin {
 
     public SQLHelper getSqlHelper() {
         return sqlHelper;
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
 }

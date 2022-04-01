@@ -19,7 +19,8 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.Flags;
-import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
@@ -49,7 +50,7 @@ import java.util.Objects;
 public class MineFactory {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
-    
+
     /**
      * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
      *
@@ -62,19 +63,13 @@ public class MineFactory {
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         Mine mine = new Mine(privateMines);
         MineData mineData = new MineData();
-        String regionName = String.format("mine-full-%s", player.getUniqueId());
+        String regionName = String.format("mine-%s", player.getUniqueId());
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         SchematicStorage storage = privateMines.getSchematicStorage();
         SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
         Map<String, Boolean> flags = mineType.getFlags();
-
-        if (flags != null) {
-            flags.forEach((s, aBoolean) -> {
-                privateMines.getLogger().info("Flag: " + s + " bool: " + aBoolean);
-            });
-        }
 
         Task.asyncDelayed(() -> {
             if (clipboardFormat != null) {
@@ -109,13 +104,17 @@ public class MineFactory {
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
 
                     CuboidRegion mineWGRegion = new CuboidRegion(world, lrailsV, urailsV);
+                    if (flags != null) {
+                        flags.forEach((s, aBoolean) -> {
+                            privateMines.getLogger().info("Flag: " + s + " bool: " + aBoolean);
+                            ProtectedCuboidRegion protectedCuboidRegion = new ProtectedCuboidRegion("testregion", lrailsV, urailsV);
+                            FlagRegistry flagRegistry = WorldGuard.getInstance().getFlagRegistry();
+                            Flag<?> foundFlag = Flags.fuzzyMatchFlag(flagRegistry, s);
+                        });
+                    }
                     localSession.setClipboard(clipboardHolder);
 
-                    Operation operation = clipboardHolder
-                            .createPaste(editSession)
-                            .to(vector)
-                            .ignoreAirBlocks(true)
-                            .build();
+                    Operation operation = clipboardHolder.createPaste(editSession).to(vector).ignoreAirBlocks(true).build();
                     try {
                         Operations.completeLegacy(operation);
                         editSession.close();
@@ -141,23 +140,44 @@ public class MineFactory {
                         Location fullMin = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMinimumPoint());
                         Location fullMax = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMaximumPoint());
                         CuboidRegion fullRegion = new CuboidRegion(newRegion.getMinimumPoint(), newRegion.getMaximumPoint());
+                        ProtectedCuboidRegion fullWorldGuardRegion = new ProtectedCuboidRegion(regionName, newRegion.getMinimumPoint(), newRegion.getMaximumPoint());
                         ProtectedCuboidRegion miningWorldGuardRegion = new ProtectedCuboidRegion(regionName, lrailsV, urailsV);
                         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
                         RegionManager regionManager = container.get(world);
                         if (regionManager != null) {
                             regionManager.addRegion(miningWorldGuardRegion);
                         }
+                        Task test = Task.syncDelayed(() -> {
+                            if (flags != null) {
+                                flags.forEach((s, aBoolean) -> {
+                                    Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), s);
+                                    if (aBoolean) {
+                                        try {
+                                            Utils.setFlag(miningWorldGuardRegion, flag, "allow");
+                                        } catch (InvalidFlagFormat e) {
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+                                        try {
+                                            Utils.setFlag(miningWorldGuardRegion, flag, "deny");
+                                        } catch (InvalidFlagFormat e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+                            }
+                        });
 
-                        miningWorldGuardRegion.setFlag(Flags.BLOCK_BREAK, StateFlag.State.ALLOW);
-                        Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), "block-break");
+//                        miningWorldGuardRegion.setFlag(Flags.BLOCK_BREAK, StateFlag.State.ALLOW);
 
 //                        Optional<IWrappedRegion> miningWorldGuardRegion =
 //                                Utils.createMiningWorldGuardRegion(player, BukkitAdapter.adapt(world), mineWGRegion);
 //                        Optional<IWrappedRegion> fullWorldGuardRegion =
 //                                Utils.createFullWorldGuardRegion(player, BukkitAdapter.adapt(world), fullRegion);
-                        if (flags != null) {
-                            Utils.setMineFlags(miningWorldGuardRegion, flags);
-                        }
+//                        if (flags != null) {
+//                            Utils.setMineFlags(miningWorldGuardRegion, flags);
+//                        }
+
 
                         mineData.setMineOwner(player.getUniqueId());
                         mineData.setMinimumMining(lrailsL);
@@ -182,7 +202,7 @@ public class MineFactory {
                     Task teleport = Task.syncDelayed(() -> spongeL.getBlock().setType(Material.AIR));
                     privateMines.getMineStorage().addMine(player.getUniqueId(), mine);
 
-                    TextComponent teleportMessage = new TextComponent(ChatColor.GREEN + "Click me to teleport to your mine!" );
+                    TextComponent teleportMessage = new TextComponent(ChatColor.GREEN + "Click me to teleport to your mine!");
                     teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));
                     player.spigot().sendMessage(teleportMessage);
 

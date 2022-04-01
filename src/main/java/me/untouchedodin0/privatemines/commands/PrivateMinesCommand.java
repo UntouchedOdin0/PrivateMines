@@ -5,6 +5,7 @@ import co.aikar.commands.annotation.*;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
@@ -15,6 +16,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.ChatPrompt;
 
 import java.time.Duration;
@@ -124,5 +126,12 @@ public class PrivateMinesCommand extends BaseCommand {
                 player.sendMessage(String.format(ChatColor.GREEN + "It took %dms to fill your mine %d times!", durationToFill.toMillis(), times));
             }
         }
+    }
+
+    @Subcommand("reload")
+    public void reload(Player player) {
+        ConfigManager configManager = privateMines.getConfigManager();
+        configManager.reload();
+        player.sendMessage(ChatColor.GREEN + "Private Mines has been reloaded!");
     }
 }

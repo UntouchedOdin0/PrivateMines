@@ -16,6 +16,9 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.FlagContext;
+import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -31,9 +34,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 public class Utils {
 
@@ -86,6 +87,49 @@ public class Utils {
         );
 
         return new CuboidRegion(min, max);
+    }
+
+    public static void complain() {
+        PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "This version of Minecraft is extremely outdated and support\n for it has reached its end of life.");
+        PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "You will be unable to run Private Mines on this Minecraft version,");
+        PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "and we will not to provide any further fixes or help with problems specific to legacy Minecraft versions.");
+        PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
+    }
+
+    @SuppressWarnings("all") // I know I know, this is bad to do but ffs it wont' shut up
+    public static void setMineFlags(ProtectedRegion protectedRegion, Map<String, Boolean> flags) {
+        FlagRegistry flagRegistry = WorldGuard.getInstance().getFlagRegistry();
+
+        //todo fix this
+
+//        flags.entrySet().stream().forEach(stringBooleanEntry -> {
+//            String flag = stringBooleanEntry.getKey();
+//            boolean value = stringBooleanEntry.getValue();
+//
+//            Bukkit.getLogger().info("flag: " + flag);
+//            Bukkit.getLogger().info("value: " + value);
+////            Optional<IWrappedFlag<WrappedState>> iWrappedFlag = worldGuardWrapper.getFlag(flag, WrappedState.class);
+////            if (value == false) {
+////                iWrappedRegion.get().setFlag(iWrappedFlag.get(), WrappedState.DENY);
+////            } else if (value == true) {
+////                iWrappedRegion.get().setFlag(iWrappedFlag.get(), WrappedState.ALLOW);
+////            }
+//        });
+    }
+
+    /**
+     * Utility method to set a flag.
+     * <p>
+     * Borrowed from https://github.com/EngineHub/WorldGuard/blob/bc63119373d4603e5b040460c41e712275a4d062/worldguard-core/src/main/java/com/sk89q/worldguard/commands/region/RegionCommandsBase.java#L414-L427
+     *
+     * @param region the region
+     * @param flag   the flag
+     * @param value  the value
+     * @throws InvalidFlagFormat thrown if the value is invalid
+     */
+    public static <V> void setFlag(ProtectedRegion region, Flag<V> flag, String value) throws InvalidFlagFormat {
+        V val = flag.parseInput(FlagContext.create().setInput(value).setObject("region", region).build());
+        region.setFlag(flag, val);
     }
 
     /**
@@ -192,6 +236,20 @@ public class Utils {
         sqlHelper.executeUpdate(replacedCommand);
     }
 
+//    public static void setMineFullFlags(Optional<IWrappedRegion> iWrappedRegion) {
+//        final WorldGuardWrapper worldGuardWrapper = WorldGuardWrapper.getInstance();
+//        Stream.of(
+//                        worldGuardWrapper.getFlag("block-place", WrappedState.class),
+//                        worldGuardWrapper.getFlag("block-break", WrappedState.class),
+//                        worldGuardWrapper.getFlag("mob-spawning", WrappedState.class)
+//                ).filter(Optional::isPresent)
+//                .map(Optional::get)
+//                .forEach(flag -> {
+//                    if (iWrappedRegion.isEmpty()) return;
+//                    iWrappedRegion.get().setFlag(flag, WrappedState.DENY);
+//                });
+//    }
+
     //todo fix the sql loading
     public void loadSQL() {
         SQLHelper sqlHelper = privateMines.getSqlHelper();
@@ -214,46 +272,4 @@ public class Utils {
             privateMines.getLogger().info("spawn: " + spawn);
         }
     }
-
-    public static void complain() {
-        PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "This version of Minecraft is extremely outdated and support\n for it has reached its end of life.");
-        PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "You will be unable to run Private Mines on this Minecraft version,");
-        PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "and we will not to provide any further fixes or help with problems specific to legacy Minecraft versions.");
-        PrivateMines.getPrivateMines().getLogger().info(ChatColor.RED + "Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
-    }
-
-    @SuppressWarnings("all") // I know I know, this is bad to do but ffs it wont' shut up
-    public static void setMineFlags(ProtectedRegion protectedRegion, Map<String, Boolean> flags) {
-        FlagRegistry flagRegistry = WorldGuard.getInstance().getFlagRegistry();
-
-        //todo fix this
-
-//        flags.entrySet().stream().forEach(stringBooleanEntry -> {
-//            String flag = stringBooleanEntry.getKey();
-//            boolean value = stringBooleanEntry.getValue();
-//
-//            Bukkit.getLogger().info("flag: " + flag);
-//            Bukkit.getLogger().info("value: " + value);
-////            Optional<IWrappedFlag<WrappedState>> iWrappedFlag = worldGuardWrapper.getFlag(flag, WrappedState.class);
-////            if (value == false) {
-////                iWrappedRegion.get().setFlag(iWrappedFlag.get(), WrappedState.DENY);
-////            } else if (value == true) {
-////                iWrappedRegion.get().setFlag(iWrappedFlag.get(), WrappedState.ALLOW);
-////            }
-//        });
-    }
-
-//    public static void setMineFullFlags(Optional<IWrappedRegion> iWrappedRegion) {
-//        final WorldGuardWrapper worldGuardWrapper = WorldGuardWrapper.getInstance();
-//        Stream.of(
-//                        worldGuardWrapper.getFlag("block-place", WrappedState.class),
-//                        worldGuardWrapper.getFlag("block-break", WrappedState.class),
-//                        worldGuardWrapper.getFlag("mob-spawning", WrappedState.class)
-//                ).filter(Optional::isPresent)
-//                .map(Optional::get)
-//                .forEach(flag -> {
-//                    if (iWrappedRegion.isEmpty()) return;
-//                    iWrappedRegion.get().setFlag(flag, WrappedState.DENY);
-//                });
-//    }
 }
