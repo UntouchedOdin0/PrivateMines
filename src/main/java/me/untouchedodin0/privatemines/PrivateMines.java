@@ -47,8 +47,6 @@ public class PrivateMines extends JavaPlugin {
     private MineStorage mineStorage;
     private MineWorldManager mineWorldManager;
     private SQLHelper sqlHelper;
-    private ConfigManager configManager;
-    private ConfigManager mineConfig;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -77,8 +75,8 @@ public class PrivateMines extends JavaPlugin {
                 e.printStackTrace();
             }
 
-            configManager = ConfigManager.create(this).target(Config.class).saveDefaults().load();
-            mineConfig = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(MineConfig.class).saveDefaults().load();
+            ConfigManager configManager = ConfigManager.create(this).target(Config.class).saveDefaults().load();
+            ConfigManager mineConfig = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(MineConfig.class).saveDefaults().load();
 
             getLogger().info("spawnPoint: " + Config.spawnPoint);
             getLogger().info("cornerMaterial: " + Config.cornerMaterial);
@@ -98,9 +96,6 @@ public class PrivateMines extends JavaPlugin {
             sqlHelper = new SQLHelper(connection);
             sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING, UNIQUE (mineOwner, mineLocation, corner1, corner2, spawn) ON CONFLICT IGNORE);");
 
-//        utils.loadSQL();
-
-//        sqlHelper.execute("UPDATE privatemines SET mineOwner=? WHERE mineLocation=?;", UUID.randomUUID(), location);
             loadMines();
             startAutoReset();
             Instant end = Instant.now();

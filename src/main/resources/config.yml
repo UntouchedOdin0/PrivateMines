@@ -3,6 +3,8 @@ spawnPoint: "SPONGE"
 mineCorner: "POWERED_RAIL"
 sellNpc: "WOOL"
 upgradeMaterial: "OBSIDIAN"
+notifyForUpdates: true
+mineDistance: 150
 
 mineTypes:
   Test:

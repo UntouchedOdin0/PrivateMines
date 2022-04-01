@@ -1,5 +1,6 @@
 package me.untouchedodin0.privatemines.utils.world;
 
+import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.utils.world.utils.Direction;
 import org.bukkit.*;
 
@@ -19,7 +20,7 @@ public class MineWorldManager {
                 new WorldCreator("privatemines")
                         .type(WorldType.FLAT)
                         .generator(new EmptyWorldGenerator()));
-        this.borderDistance = 150;
+        this.borderDistance = Config.mineDistance;
         this.direction = NORTH;
         defaultLocation = new Location(minesWorld, 0, 50, 0); // may need to raise the Y sometime?
     }
