@@ -91,7 +91,7 @@ public class PrivateMines extends JavaPlugin {
                 }
                 SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
                 schematicStorage.addSchematic(schematicFile, mineBlocks);
-                privateMines.getLogger().info("loaded file: " + schematicFile);
+                privateMines.getLogger().info("Loaded file: " + schematicFile);
             });
 
             Connection connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("database.sql"));
