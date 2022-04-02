@@ -17,7 +17,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import redempt.redlib.config.ConfigManager;
-import redempt.redlib.misc.ChatPrompt;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -43,14 +42,16 @@ public class PrivateMinesCommand extends BaseCommand {
     @Subcommand("give")
     @CommandCompletion("@players")
     @CommandPermission("privatemines.give")
-    public void give(Player player, Player target) {
+    public void give(Player player, Player target, String type) {
         player.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a private mine!");
         MineFactory mineFactory = new MineFactory();
         MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
         Location location = mineWorldManager.getNextFreeLocation();
         MineType mineType = MineConfig.mineTypes.get("Test");
+        privateMines.getLogger().info(MineConfig.mineTypes.keySet().toString());
         mineFactory.create(player, location, mineType);
     }
+
 
     @Subcommand("delete")
     @CommandCompletion("@players")

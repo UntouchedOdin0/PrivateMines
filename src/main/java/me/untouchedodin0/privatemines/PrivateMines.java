@@ -57,7 +57,7 @@ public class PrivateMines extends JavaPlugin {
     public void onEnable() {
         Instant start = Instant.now();
         getLogger().info("Loading Private Mines v" + getDescription().getVersion());
-//        saveDefaultConfig();
+        saveDefaultConfig();
         privateMines = this;
         if (RedLib.MID_VERSION < 13) {
             Utils.complain();
@@ -76,14 +76,20 @@ public class PrivateMines extends JavaPlugin {
                 e.printStackTrace();
             }
 
-            configManager = ConfigManager.create(this).target(Config.class).saveDefaults().load();
-            ConfigManager mineConfig = ConfigManager.create(this)
-                    .addConverter(Material.class, Material::valueOf, Material::toString)
-                    .target(MineConfig.class)
-                    .saveDefaults().load();
+            configManager = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(Config.class).load();
+            ConfigManager mineConfig = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(MineConfig.class).saveDefaults().load();
+
+            Material cornerMaterial = Config.mineCorner;
+            Material spawnMaterial  = Config.spawnPoint;
+            Material npcMaterial    = Config.sellNpc;
+
+            Bukkit.getLogger().info("cornerMaterial: " + cornerMaterial);
+            Bukkit.getLogger().info("spawnMaterial: " +  spawnMaterial);
+            Bukkit.getLogger().info("npcMaterial: " +  npcMaterial);
 
             MineConfig.mineTypes.forEach((name, mineType) -> {
                 File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
+                privateMines.getLogger().info("File: " + schematicFile);
                 if (!schematicFile.exists()) {
                     getLogger().info("File doesn't exist!");
                     return;

@@ -1,8 +1,8 @@
 # The different Materials to look for within the mine structure.
-spawnPoint: "SPONGE"
-mineCorner: "POWERED_RAIL"
-sellNpc: "WOOL"
-upgradeMaterial: "OBSIDIAN"
+spawnPoint: SPONGE
+mineCorner: POWERED_RAIL
+sellNpc: WHITE_WOOL
+upgradeMaterial: OBSIDIAN
 mineDistance: 150
 
 mineTypes:

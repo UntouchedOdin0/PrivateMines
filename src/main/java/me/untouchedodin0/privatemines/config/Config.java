@@ -9,9 +9,9 @@ public class Config {
     public static Material spawnPoint = Material.SPONGE;
     @Comment("The template material for the corners")
     @Comment("(Needs 2 in a mine to create the cuboid)")
-    public static Material cornerMaterial = Material.POWERED_RAIL;
+    public static Material mineCorner = Material.POWERED_RAIL;
     @Comment("The template material for the sell non player character")
-    public static Material npcMaterial = Material.WHITE_WOOL;
+    public static Material sellNpc = Material.WHITE_WOOL;
     @Comment("Check for any spigot updates")
     public static boolean notifyForUpdates = true;
     @Comment("The distance between the private mines")

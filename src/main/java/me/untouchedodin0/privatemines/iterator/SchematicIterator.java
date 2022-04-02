@@ -8,6 +8,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.io.File;
@@ -36,11 +37,19 @@ public class SchematicIterator {
             try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(file))) {
                 clipboard = clipboardReader.read();
 
-                Material cornerMaterial = Config.cornerMaterial;
+                Material cornerMaterial = Config.mineCorner;
                 Material spawnMaterial  = Config.spawnPoint;
+                Material npcMaterial    = Config.sellNpc;
+
+                Bukkit.getLogger().info("cornerMaterial: " + cornerMaterial);
+                Bukkit.getLogger().info("spawnMaterial: " +  spawnMaterial);
+                Bukkit.getLogger().info("npcMaterial: " +  npcMaterial);
 
                 BlockType cornerType = BlockType.REGISTRY.get(cornerMaterial.getKey().getKey());
                 BlockType spawnType = BlockType.REGISTRY.get(spawnMaterial.getKey().getKey());
+
+                Bukkit.getLogger().info("cornerType: " + cornerType);
+                Bukkit.getLogger().info("spawnType: " + spawnType);
 
                 clipboard.getRegion().forEach(blockVector3 -> {
                     BlockType blockType = clipboard.getBlock(blockVector3).getBlockType();
