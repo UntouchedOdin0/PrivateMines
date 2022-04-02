@@ -42,13 +42,12 @@ public class PrivateMinesCommand extends BaseCommand {
     @Subcommand("give")
     @CommandCompletion("@players")
     @CommandPermission("privatemines.give")
-    public void give(Player player, Player target, String type) {
+    public void give(Player player, Player target) {
         player.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a private mine!");
         MineFactory mineFactory = new MineFactory();
         MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
         Location location = mineWorldManager.getNextFreeLocation();
-        MineType mineType = MineConfig.mineTypes.get("Test");
-        privateMines.getLogger().info(MineConfig.mineTypes.keySet().toString());
+        MineType mineType = MineConfig.mineTypes.get("Default");
         mineFactory.create(player, location, mineType);
     }
 
