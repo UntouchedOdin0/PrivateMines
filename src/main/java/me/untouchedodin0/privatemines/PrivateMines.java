@@ -77,10 +77,10 @@ public class PrivateMines extends JavaPlugin {
             }
 
             configManager = ConfigManager.create(this).target(Config.class).saveDefaults().load();
-            ConfigManager mineConfig = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(MineConfig.class).saveDefaults().load();
-
-            getLogger().info("spawnPoint: " + Config.spawnPoint);
-            getLogger().info("cornerMaterial: " + Config.cornerMaterial);
+            ConfigManager mineConfig = ConfigManager.create(this)
+                    .addConverter(Material.class, Material::valueOf, Material::toString)
+                    .target(MineConfig.class)
+                    .saveDefaults().load();
 
             MineConfig.mineTypes.forEach((name, mineType) -> {
                 File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
