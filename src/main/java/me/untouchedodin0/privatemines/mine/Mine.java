@@ -8,9 +8,11 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MineConfig;
+import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -306,11 +308,17 @@ public class Mine {
     }
 
     public void upgrade() {
+        Player player = Bukkit.getOfflinePlayer(getMineOwner()).getPlayer();
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
+        MineFactory mineFactory = privateMines.getMineFactory();
         MineData mineData = getMineData();
         MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
         MineType nextType = mineTypeManager.getNextMineType(currentType);
 
+        privateMines.getLogger().info("the current type is: " + currentType.getName());
+        privateMines.getLogger().info("The next type is: " + nextType.getName());
+
+        Location mineLocation = mineData.getMineLocation();
         Location cornerA = mineData.getMinimumFullRegion();
         Location cornerB = mineData.getMaximumFullRegion();
 
@@ -337,5 +345,10 @@ public class Mine {
         Instant filled = Instant.now();
         Duration durationToFill = Duration.between(start, filled);
         privateMines.getLogger().info(String.format("Time took to clear mine for upgrade %dms", durationToFill.toMillis()));
+
+        mineData.setMineType(nextType.getName());
+        if (player != null) {
+            mineFactory.create(player, mineLocation, nextType);
+        }
     }
 }
