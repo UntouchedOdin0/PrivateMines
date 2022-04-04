@@ -168,17 +168,6 @@ public class MineFactory {
                             }
                         });
 
-//                        miningWorldGuardRegion.setFlag(Flags.BLOCK_BREAK, StateFlag.State.ALLOW);
-
-//                        Optional<IWrappedRegion> miningWorldGuardRegion =
-//                                Utils.createMiningWorldGuardRegion(player, BukkitAdapter.adapt(world), mineWGRegion);
-//                        Optional<IWrappedRegion> fullWorldGuardRegion =
-//                                Utils.createFullWorldGuardRegion(player, BukkitAdapter.adapt(world), fullRegion);
-//                        if (flags != null) {
-//                            Utils.setMineFlags(miningWorldGuardRegion, flags);
-//                        }
-
-
                         mineData.setMineOwner(player.getUniqueId());
                         mineData.setMinimumMining(lrailsL);
                         mineData.setMaximumMining(urailsL);

@@ -66,22 +66,6 @@ public class Mine {
         this.location = location;
     }
 
-//    public IWrappedRegion getiWrappedMiningRegion() {
-//        return iWrappedMiningRegion;
-//    }
-//
-//    public void setiWrappedMiningRegion(IWrappedRegion iWrappedMiningRegion) {
-//        this.iWrappedMiningRegion = iWrappedMiningRegion;
-//    }
-//
-//    public IWrappedRegion getiWrappedFullRegion() {
-//        return iWrappedFullRegion;
-//    }
-//
-//    public void setiWrappedFullRegion(IWrappedRegion iWrappedFullRegion) {
-//        this.iWrappedFullRegion = iWrappedFullRegion;
-//    }
-
     public MineData getMineData() {
         return mineData;
     }
@@ -139,11 +123,8 @@ public class Mine {
         Instant filled = Instant.now();
         Duration durationToFill = Duration.between(start, filled);
         privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
-        privateMines.getLogger().info("mine owner: " + uuid);
         privateMines.getMineStorage().removeMine(uuid);
-
         String fileName = String.format("/%s.yml", uuid);
-
         Path minesDirectory = privateMines.getMinesDirectory();
         File file = new File(minesDirectory + fileName);
         try {
@@ -317,7 +298,6 @@ public class Mine {
     }
 
     public void upgrade() {
-        privateMines.getLogger().info("" + getMineData().getMineOwner());
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineFactory mineFactory = privateMines.getMineFactory();
         MineData mineData = getMineData();
