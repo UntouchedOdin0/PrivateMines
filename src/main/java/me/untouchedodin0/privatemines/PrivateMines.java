@@ -8,6 +8,7 @@ import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
+import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.Utils;
@@ -46,6 +47,7 @@ public class PrivateMines extends JavaPlugin {
     private MineFactory mineFactory;
     private MineStorage mineStorage;
     private MineWorldManager mineWorldManager;
+    private MineTypeManager mineTypeManager;
     private SQLHelper sqlHelper;
     private ConfigManager configManager;
 
@@ -65,6 +67,8 @@ public class PrivateMines extends JavaPlugin {
             mineFactory = new MineFactory();
             mineStorage = new MineStorage();
             mineWorldManager = new MineWorldManager();
+            mineTypeManager = new MineTypeManager(this);
+
             Utils utils = new Utils(this);
 
             registerCommands();
@@ -80,12 +84,18 @@ public class PrivateMines extends JavaPlugin {
             ConfigManager mineConfig = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(MineConfig.class).saveDefaults().load();
 
             Material cornerMaterial = Config.mineCorner;
-            Material spawnMaterial  = Config.spawnPoint;
-            Material npcMaterial    = Config.sellNpc;
+            Material spawnMaterial = Config.spawnPoint;
+            Material npcMaterial = Config.sellNpc;
 
             Bukkit.getLogger().info("cornerMaterial: " + cornerMaterial);
-            Bukkit.getLogger().info("spawnMaterial: " +  spawnMaterial);
-            Bukkit.getLogger().info("npcMaterial: " +  npcMaterial);
+            Bukkit.getLogger().info("spawnMaterial: " + spawnMaterial);
+            Bukkit.getLogger().info("npcMaterial: " + npcMaterial);
+
+            MineConfig.getMineTypes().forEach((s, mineType) -> {
+                mineTypeManager.registerMineType(mineType);
+            });
+
+            getLogger().info("Default mine type is: " + mineTypeManager.getDefaultMineType().getName());
 
             MineConfig.mineTypes.forEach((name, mineType) -> {
                 File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
@@ -198,5 +208,9 @@ public class PrivateMines extends JavaPlugin {
 
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+
+    public MineTypeManager getMineTypeManager() {
+        return mineTypeManager;
     }
 }

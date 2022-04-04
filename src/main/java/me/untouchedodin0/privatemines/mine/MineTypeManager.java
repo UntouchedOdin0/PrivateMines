@@ -1,6 +1,7 @@
 package me.untouchedodin0.privatemines.mine;
 
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.kotlin.mine.type.MineType;
 
 import java.util.NavigableMap;
 import java.util.Optional;

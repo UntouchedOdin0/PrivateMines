@@ -9,6 +9,7 @@ import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
+import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.utils.inventory.MainMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.md_5.bungee.api.ChatMessageType;
@@ -27,10 +28,12 @@ public class PrivateMinesCommand extends BaseCommand {
 
     PrivateMines privateMines;
     MineStorage mineStorage;
+    MineTypeManager mineTypeManager;
 
     public PrivateMinesCommand(PrivateMines privateMines) {
         this.privateMines = privateMines;
         this.mineStorage = privateMines.getMineStorage();
+        this.mineTypeManager = privateMines.getMineTypeManager();
     }
 
     @Default
@@ -47,7 +50,9 @@ public class PrivateMinesCommand extends BaseCommand {
         MineFactory mineFactory = new MineFactory();
         MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
         Location location = mineWorldManager.getNextFreeLocation();
-        MineType mineType = MineConfig.mineTypes.get("Default");
+//        MineType mineType = MineConfig.mineTypes.get("Default");
+        MineType mineType = mineTypeManager.getDefaultMineType();
+        privateMines.getLogger().info("giving the player a mine using the mine type of " + mineType.getName());
         mineFactory.create(player, location, mineType);
     }
 
