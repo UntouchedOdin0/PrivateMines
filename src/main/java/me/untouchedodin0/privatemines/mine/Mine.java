@@ -305,6 +305,12 @@ public class Mine {
         MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
         MineType nextType = mineTypeManager.getNextMineType(currentType);
 
+        if (currentType == nextType) {
+            if (player != null) {
+                privateMines.getLogger().info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
+            }
+        }
+
         Location mineLocation = mineData.getMineLocation();
         Location cornerA = mineData.getMinimumFullRegion();
         Location cornerB = mineData.getMaximumFullRegion();
