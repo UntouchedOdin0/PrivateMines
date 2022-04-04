@@ -24,6 +24,15 @@ class MineStorage {
         }
     }
 
+    fun replaceMine(uuid: UUID, mine: Mine) {
+        if (!mines.containsKey(uuid)) {
+            privateMines.logger.warning(String.format("Player %s doesn't have a mine!!", uuid.toString()))
+        } else {
+            mines.replace(uuid, mine)
+            privateMines.logger.info(String.format("Successfully replaced %s's mine!", uuid.toString()))
+        }
+    }
+
     fun hasMine(uuid: UUID): Boolean {
         return mines.containsKey(uuid)
     }

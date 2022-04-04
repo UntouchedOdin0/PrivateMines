@@ -1,8 +1,10 @@
 package me.untouchedodin0.privatemines.mine;
 
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MineConfig;
@@ -227,6 +229,31 @@ public class Mine {
             if (type.equals(Material.OBSIDIAN)) canExpand = false;
         });
         return canExpand;
+    }
+
+    public void expand(final int amount) {
+        final World world = privateMines.getMineWorldManager().getMinesWorld();
+        boolean canExpand = canExpand(amount);
+        if (world == null) {
+            privateMines.getLogger().info("Failed to expand the mine due to the world being null");
+        } else {
+            final var fillType = BlockTypes.DIAMOND_BLOCK;
+            final var wallType = BlockTypes.BEDROCK;
+            final var min = getMineData().getMinimumMining();
+            final var max = getMineData().getMaximumMining();
+            final var mine = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
+            final var walls = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
+
+            if (fillType == null || wallType == null) return;
+
+            mine.expand(ExpansionUtils.expansionVectors(amount));
+            walls.expand(ExpansionUtils.expansionVectors(amount));
+
+            mineData.setMinimumMining(BukkitAdapter.adapt(world, mine.getMinimumPoint()));
+            mineData.setMinimumMining(BukkitAdapter.adapt(world, mine.getMaximumPoint()));
+            setMineData(mineData);
+            privateMines.getMineStorage().replaceMine(getMineOwner(), this);
+        }
     }
 
     public void startResetTask() {

@@ -103,6 +103,7 @@ public class PrivateMinesCommand extends BaseCommand {
         }
     }
 
+    //todo fix this
     @Subcommand("expand")
     @CommandPermission("privatemines.expand")
     public void expand(Player player, int amount) {
@@ -112,6 +113,7 @@ public class PrivateMinesCommand extends BaseCommand {
             Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
             if (mine != null) {
                 player.sendMessage("" + mine.canExpand(amount));
+                mine.expand(amount);
             }
         }
     }
