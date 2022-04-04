@@ -315,9 +315,6 @@ public class Mine {
         MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
         MineType nextType = mineTypeManager.getNextMineType(currentType);
 
-        privateMines.getLogger().info("the current type is: " + currentType.getName());
-        privateMines.getLogger().info("The next type is: " + nextType.getName());
-
         Location mineLocation = mineData.getMineLocation();
         Location cornerA = mineData.getMinimumFullRegion();
         Location cornerB = mineData.getMaximumFullRegion();
@@ -337,7 +334,7 @@ public class Mine {
             for (int y = yMin; y <= yMax; y++) {
                 for (int z = zMin; z <= zMax; z++) {
                     if (world != null) {
-                        world.getBlockAt(x, y, z).setType(Material.EMERALD_BLOCK);
+                        world.getBlockAt(x, y, z).setType(Material.AIR, false);
                     }
                 }
             }
