@@ -304,4 +304,38 @@ public class Mine {
             ioException.printStackTrace();
         }
     }
+
+    public void upgrade() {
+        MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
+        MineData mineData = getMineData();
+        MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
+        MineType nextType = mineTypeManager.getNextMineType(currentType);
+
+        Location cornerA = mineData.getMinimumFullRegion();
+        Location cornerB = mineData.getMaximumFullRegion();
+
+        World world = cornerA.getWorld();
+
+        int xMin = Integer.min(cornerA.getBlockX(), cornerB.getBlockX());
+        int xMax = Integer.max(cornerA.getBlockX(), cornerB.getBlockX());
+        int yMin = Integer.min(cornerA.getBlockY(), cornerB.getBlockY());
+        int yMax = Integer.max(cornerA.getBlockY(), cornerB.getBlockY());
+        int zMin = Integer.min(cornerA.getBlockZ(), cornerB.getBlockZ());
+        int zMax = Integer.max(cornerA.getBlockZ(), cornerB.getBlockZ());
+
+        Instant start = Instant.now();
+
+        for (int x = xMin; x <= xMax; x++) {
+            for (int y = yMin; y <= yMax; y++) {
+                for (int z = zMin; z <= zMax; z++) {
+                    if (world != null) {
+                        world.getBlockAt(x, y, z).setType(Material.EMERALD_BLOCK);
+                    }
+                }
+            }
+        }
+        Instant filled = Instant.now();
+        Duration durationToFill = Duration.between(start, filled);
+        privateMines.getLogger().info(String.format("Time took to clear mine for upgrade %dms", durationToFill.toMillis()));
+    }
 }

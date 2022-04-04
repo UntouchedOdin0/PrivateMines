@@ -5,8 +5,6 @@ import co.aikar.commands.annotation.*;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.config.Config;
-import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
@@ -79,7 +77,7 @@ public class PrivateMinesCommand extends BaseCommand {
     @CommandPermission("privatemines.teleport")
     public void teleport(Player player) {
         if (!mineStorage.hasMine(player.getUniqueId())) {
-            player.sendMessage("Player doesn't own a mine!");
+            player.sendMessage(ChatColor.RED + "Player doesn't own a mine!");
         } else {
             Mine mine = mineStorage.get(player.getUniqueId());
             if (mine != null) {
@@ -107,17 +105,30 @@ public class PrivateMinesCommand extends BaseCommand {
     @Subcommand("expand")
     @CommandPermission("privatemines.expand")
     public void expand(Player player, int amount) {
+        privateMines.getLogger().info("soon.");
+//        if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
+//            player.sendMessage(ChatColor.RED + "Player doesn't own a mine!");
+//        } else {
+//            Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
+//            if (mine != null) {
+//                player.sendMessage("" + mine.canExpand(amount));
+//                mine.expand(amount);
+//            }
+//        }
+    }
+
+    @Subcommand("upgrade")
+    @CommandPermission("privatemines.upgrade")
+    public void upgrade(Player player) {
         if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "Player doesn't own a mine!");
+            player.sendMessage(ChatColor.RED + "Target doesn't have a mine!");
         } else {
             Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
             if (mine != null) {
-                player.sendMessage("" + mine.canExpand(amount));
-                mine.expand(amount);
+                mine.upgrade();
             }
         }
     }
-
     /*
         This can create severe lag on the server, I take no blame for the lag caused.
      */
@@ -146,6 +157,14 @@ public class PrivateMinesCommand extends BaseCommand {
                 player.sendMessage(String.format(ChatColor.GREEN + "It took %dms to fill your mine %d times!", durationToFill.toMillis(), times));
             }
         }
+    }
+
+    @Subcommand("dev/types/listall")
+    @CommandPermission("privatemines.dev.listall")
+    public void listall(Player player) {
+        mineTypeManager.getMineTypes().forEach((s, mineType) -> {
+            player.sendMessage(ChatColor.GREEN + "- " + mineType.getName());
+        });
     }
 
     @Subcommand("reload")
