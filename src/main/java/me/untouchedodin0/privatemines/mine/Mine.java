@@ -1,10 +1,12 @@
 package me.untouchedodin0.privatemines.mine;
 
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MineConfig;
@@ -12,7 +14,10 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import redempt.redlib.misc.LocationUtils;
@@ -103,7 +108,13 @@ public class Mine {
         Location cornerA = mineData.getMinimumFullRegion();
         Location cornerB = mineData.getMaximumFullRegion();
 
+        Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
+        String regionName = String.format("mine-%s", Objects.requireNonNull(player).getUniqueId());
+
         World world = cornerA.getWorld();
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager regionManager = container.get(BukkitAdapter.adapt(Objects.requireNonNull(world)));
+        Objects.requireNonNull(regionManager).removeRegion(regionName);
 
         int blocks = 0;
 
@@ -119,9 +130,7 @@ public class Mine {
         for (int x = xMin; x <= xMax; x++) {
             for (int y = yMin; y <= yMax; y++) {
                 for (int z = zMin; z <= zMax; z++) {
-                    if (world != null) {
-                        world.getBlockAt(x, y, z).setType(Material.AIR);
-                    }
+                    world.getBlockAt(x, y, z).setType(Material.AIR);
                     blocks++;
                 }
             }
@@ -257,7 +266,9 @@ public class Mine {
     }
 
     public void startResetTask() {
-        int resetTime = 5;
+        MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
+        MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
+        int resetTime = mineType.getResetTime();
         this.task = Task.syncRepeating(this::reset, 0L, resetTime * 20L);
     }
 
