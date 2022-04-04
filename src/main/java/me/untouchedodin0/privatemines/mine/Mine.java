@@ -12,10 +12,7 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import redempt.redlib.misc.LocationUtils;
@@ -29,6 +26,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Mine {
@@ -308,10 +306,11 @@ public class Mine {
     }
 
     public void upgrade() {
-        Player player = Bukkit.getOfflinePlayer(getMineOwner()).getPlayer();
+        privateMines.getLogger().info("" + getMineData().getMineOwner());
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineFactory mineFactory = privateMines.getMineFactory();
         MineData mineData = getMineData();
+        Player player = Bukkit.getOfflinePlayer(mineData.getMineOwner()).getPlayer();
         MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
         MineType nextType = mineTypeManager.getNextMineType(currentType);
 
@@ -344,8 +343,7 @@ public class Mine {
         privateMines.getLogger().info(String.format("Time took to clear mine for upgrade %dms", durationToFill.toMillis()));
 
         mineData.setMineType(nextType.getName());
-        if (player != null) {
-            mineFactory.create(player, mineLocation, nextType);
-        }
+        mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
     }
 }
+
