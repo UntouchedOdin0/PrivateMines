@@ -1,10 +1,13 @@
 package me.untouchedodin0.privatemines.mine;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.mine.data.MineData;
+import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,6 +35,8 @@ public class Mine {
     private BlockVector3 location;
     private MineData mineData;
     private Task task;
+    private boolean canExpand = true;
+
 
     public Mine(PrivateMines privateMines) {
         this.privateMines = privateMines;
@@ -209,6 +214,19 @@ public class Mine {
                 }
             }
         }
+    }
+
+    public boolean canExpand(final int amount) {
+        final World world = privateMines.getMineWorldManager().getMinesWorld();
+        final var min = getMineData().getMinimumMining();
+        final var max = getMineData().getMaximumMining();
+        final var region = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
+        region.expand(ExpansionUtils.expansionVectors(amount + 1));
+        region.forEach(blockVector3 -> {
+            Material type = Utils.toLocation(blockVector3, world).getBlock().getType();
+            if (type.equals(Material.OBSIDIAN)) canExpand = false;
+        });
+        return canExpand;
     }
 
     public void startResetTask() {

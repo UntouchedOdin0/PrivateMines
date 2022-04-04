@@ -103,6 +103,19 @@ public class PrivateMinesCommand extends BaseCommand {
         }
     }
 
+    @Subcommand("expand")
+    @CommandPermission("privatemines.expand")
+    public void expand(Player player, int amount) {
+        if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "Player doesn't own a mine!");
+        } else {
+            Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
+            if (mine != null) {
+                player.sendMessage("" + mine.canExpand(amount));
+            }
+        }
+    }
+
     /*
         This can create severe lag on the server, I take no blame for the lag caused.
      */
