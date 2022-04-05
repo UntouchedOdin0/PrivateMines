@@ -20,7 +20,6 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
-import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
@@ -104,14 +103,6 @@ public class MineFactory {
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
 
                     CuboidRegion mineWGRegion = new CuboidRegion(world, lrailsV, urailsV);
-                    if (flags != null) {
-                        flags.forEach((s, aBoolean) -> {
-                            privateMines.getLogger().info("Flag: " + s + " bool: " + aBoolean);
-                            ProtectedCuboidRegion protectedCuboidRegion = new ProtectedCuboidRegion("testregion", lrailsV, urailsV);
-                            FlagRegistry flagRegistry = WorldGuard.getInstance().getFlagRegistry();
-                            Flag<?> foundFlag = Flags.fuzzyMatchFlag(flagRegistry, s);
-                        });
-                    }
                     localSession.setClipboard(clipboardHolder);
 
                     Operation operation = clipboardHolder.createPaste(editSession).to(vector).ignoreAirBlocks(true).build();
