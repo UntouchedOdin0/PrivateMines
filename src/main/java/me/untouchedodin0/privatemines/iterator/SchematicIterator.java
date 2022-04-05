@@ -41,15 +41,8 @@ public class SchematicIterator {
                 Material spawnMaterial  = Config.spawnPoint;
                 Material npcMaterial    = Config.sellNpc;
 
-                Bukkit.getLogger().info("cornerMaterial: " + cornerMaterial);
-                Bukkit.getLogger().info("spawnMaterial: " +  spawnMaterial);
-                Bukkit.getLogger().info("npcMaterial: " +  npcMaterial);
-
                 BlockType cornerType = BlockType.REGISTRY.get(cornerMaterial.getKey().getKey());
                 BlockType spawnType = BlockType.REGISTRY.get(spawnMaterial.getKey().getKey());
-
-                Bukkit.getLogger().info("cornerType: " + cornerType);
-                Bukkit.getLogger().info("spawnType: " + spawnType);
 
                 clipboard.getRegion().forEach(blockVector3 -> {
                     BlockType blockType = clipboard.getBlock(blockVector3).getBlockType();

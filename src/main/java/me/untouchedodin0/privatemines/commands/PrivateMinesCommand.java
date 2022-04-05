@@ -11,7 +11,10 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.utils.inventory.MainMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import static net.md_5.bungee.api.ChatColor.GRAY;
+import static net.md_5.bungee.api.ChatColor.GOLD;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -19,6 +22,8 @@ import redempt.redlib.config.ConfigManager;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @CommandAlias("privatemines|pmines|pmine")
@@ -54,7 +59,6 @@ public class PrivateMinesCommand extends BaseCommand {
         mineFactory.create(player, location, mineType);
     }
 
-
     @Subcommand("delete")
     @CommandCompletion("@players")
     @CommandPermission("privatemines.delete")
@@ -71,6 +75,19 @@ public class PrivateMinesCommand extends BaseCommand {
                 privateMines.getMineStorage().removeMine(target.getUniqueId());
             }
         }
+    }
+
+    @Subcommand("purge")
+    @CommandPermission("privatemines.purge")
+    public void purge(Player player) {
+        int totalMines = mineStorage.getTotalMines();
+        TextComponent clickMeToPurge = new TextComponent(GRAY + "Click me to purge ");
+        TextComponent amountOfMines = new TextComponent(String.format(GOLD + " %d", totalMines));
+        TextComponent mines = new TextComponent(GRAY + " mines");
+        clickMeToPurge.addExtra(amountOfMines);
+        clickMeToPurge.addExtra(mines);
+        clickMeToPurge.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/privatemines dev/purge/noconfirm"));
+        player.spigot().sendMessage(clickMeToPurge);
     }
 
     @Subcommand("teleport")
@@ -164,6 +181,15 @@ public class PrivateMinesCommand extends BaseCommand {
     public void listall(Player player) {
         mineTypeManager.getMineTypes().forEach((s, mineType) -> {
             player.sendMessage(ChatColor.GREEN + "- " + mineType.getName());
+        });
+    }
+
+    @Subcommand("dev/purge/noconfirm")
+    @CommandPermission("privatemines.purge.noconfirm")
+    public void purgeNoConfirm(Player player) {
+        Map<UUID, Mine> mines = mineStorage.getMines();
+        mines.forEach((uuid, mine) -> {
+            mine.delete(uuid);
         });
     }
 

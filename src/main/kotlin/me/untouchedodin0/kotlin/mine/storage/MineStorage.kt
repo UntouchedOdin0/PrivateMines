@@ -40,4 +40,8 @@ class MineStorage {
     operator fun get(uuid: UUID): Mine? {
         return mines[uuid]
     }
+
+    fun getTotalMines(): Int {
+        return mines.size
+    }
 }

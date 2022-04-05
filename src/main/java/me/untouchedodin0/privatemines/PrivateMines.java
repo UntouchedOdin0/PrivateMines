@@ -14,6 +14,7 @@ import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.Database;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -89,19 +90,12 @@ public class PrivateMines extends JavaPlugin {
             Material spawnMaterial = Config.spawnPoint;
             Material npcMaterial = Config.sellNpc;
 
-            Bukkit.getLogger().info("cornerMaterial: " + cornerMaterial);
-            Bukkit.getLogger().info("spawnMaterial: " + spawnMaterial);
-            Bukkit.getLogger().info("npcMaterial: " + npcMaterial);
-
             MineConfig.getMineTypes().forEach((s, mineType) -> {
                 mineTypeManager.registerMineType(mineType);
             });
 
-            getLogger().info("Default mine type is: " + mineTypeManager.getDefaultMineType().getName());
-
             MineConfig.mineTypes.forEach((name, mineType) -> {
                 File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
-                privateMines.getLogger().info("File: " + schematicFile);
                 if (!schematicFile.exists()) {
                     getLogger().info("File doesn't exist!");
                     return;
@@ -113,7 +107,6 @@ public class PrivateMines extends JavaPlugin {
 
             this.database = new SQLite();
             database.load();
-            privateMines.getLogger().info("database: " + database);
 
 //            Connection connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("database.sql"));
 //            sqlHelper = new SQLHelper(connection);
@@ -121,6 +114,10 @@ public class PrivateMines extends JavaPlugin {
 
             loadMines();
             startAutoReset();
+
+            SlimeUtils slimeUtils = new SlimeUtils();
+            slimeUtils.setupSlimeWorld(UUID.randomUUID());
+
             Instant end = Instant.now();
             Duration loadTime = Duration.between(start, end);
             getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
