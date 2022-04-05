@@ -39,11 +39,10 @@ import java.util.UUID;
 public class Utils {
 
     private final PrivateMines privateMines;
-    private final SQLHelper sqlHelper;
+    public static final String TABLE_NAME = "privatemines";
 
     public Utils(PrivateMines privateMines) {
         this.privateMines = privateMines;
-        this.sqlHelper = privateMines.getSqlHelper();
     }
 
     public static Location getRelative(Region region, int x, int y, int z) {
@@ -221,20 +220,20 @@ public class Utils {
 //        }
     }
 
-    public void insertDataIntoDatabase(UUID uuid, String mineLocation, String corner1, String corner2, String spawn) {
-        SQLHelper sqlHelper = privateMines.getSqlHelper();
-
-        String sqlCommand = "INSERT INTO privatemines(mineOwner, mineLocation, corner1, corner2, spawn) " +
-                "VALUES('%uuid%', '%minelocation%', '%corner1%', '%corner2%', '%spawn%');";
-        String replacedCommand = sqlCommand
-                .replace("%uuid%", uuid.toString())
-                .replace("%minelocation%", mineLocation)
-                .replace("%corner1%", corner1)
-                .replace("%corner2%", corner2)
-                .replace("%spawn%", spawn);
-        privateMines.getLogger().info("replaced command: " + replacedCommand);
-        sqlHelper.executeUpdate(replacedCommand);
-    }
+//    public void insertDataIntoDatabase(UUID uuid, String mineLocation, String corner1, String corner2, String spawn) {
+//        SQLHelper sqlHelper = privateMines.getSqlHelper();
+//
+//        String sqlCommand = "INSERT INTO privatemines(mineOwner, mineLocation, corner1, corner2, spawn) " +
+//                "VALUES('%uuid%', '%minelocation%', '%corner1%', '%corner2%', '%spawn%');";
+//        String replacedCommand = sqlCommand
+//                .replace("%uuid%", uuid.toString())
+//                .replace("%minelocation%", mineLocation)
+//                .replace("%corner1%", corner1)
+//                .replace("%corner2%", corner2)
+//                .replace("%spawn%", spawn);
+//        privateMines.getLogger().info("replaced command: " + replacedCommand);
+//        sqlHelper.executeUpdate(replacedCommand);
+//    }
 
 //    public static void setMineFullFlags(Optional<IWrappedRegion> iWrappedRegion) {
 //        final WorldGuardWrapper worldGuardWrapper = WorldGuardWrapper.getInstance();
@@ -250,26 +249,26 @@ public class Utils {
 //                });
 //    }
 
-    //todo fix the sql loading
-    public void loadSQL() {
-        SQLHelper sqlHelper = privateMines.getSqlHelper();
-        SQLHelper.Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
-
-        privateMines.getLogger().info("LOADING SQL DATA:");
-        privateMines.getLogger().info("is results empty: " + results.isEmpty());
-
-        while (results.next()) {
-            privateMines.getLogger().info("results: " + results);
-            String mineOwner = results.getString(1);
-            String mineLocation = results.getString(2);
-            String corner1 = results.getString(3);
-            String corner2 = results.getString(4);
-            String spawn = results.getString(5);
-            privateMines.getLogger().info("mineOwner: " + mineOwner);
-            privateMines.getLogger().info("mineLocation: " + mineLocation);
-            privateMines.getLogger().info("corner1: " + corner1);
-            privateMines.getLogger().info("corner2: " + corner2);
-            privateMines.getLogger().info("spawn: " + spawn);
-        }
-    }
+//    //todo fix the sql loading
+//    public void loadSQL() {
+//        SQLHelper sqlHelper = privateMines.getSqlHelper();
+//        SQLHelper.Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
+//
+//        privateMines.getLogger().info("LOADING SQL DATA:");
+//        privateMines.getLogger().info("is results empty: " + results.isEmpty());
+//
+//        while (results.next()) {
+//            privateMines.getLogger().info("results: " + results);
+//            String mineOwner = results.getString(1);
+//            String mineLocation = results.getString(2);
+//            String corner1 = results.getString(3);
+//            String corner2 = results.getString(4);
+//            String spawn = results.getString(5);
+//            privateMines.getLogger().info("mineOwner: " + mineOwner);
+//            privateMines.getLogger().info("mineLocation: " + mineLocation);
+//            privateMines.getLogger().info("corner1: " + corner1);
+//            privateMines.getLogger().info("corner2: " + corner2);
+//            privateMines.getLogger().info("spawn: " + spawn);
+//        }
+//    }
 }

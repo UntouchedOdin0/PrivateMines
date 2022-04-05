@@ -11,6 +11,8 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
+import me.untouchedodin0.privatemines.storage.sql.Database;
+import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
@@ -48,8 +50,8 @@ public class PrivateMines extends JavaPlugin {
     private MineStorage mineStorage;
     private MineWorldManager mineWorldManager;
     private MineTypeManager mineTypeManager;
-    private SQLHelper sqlHelper;
     private ConfigManager configManager;
+    private Database database;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -109,9 +111,13 @@ public class PrivateMines extends JavaPlugin {
                 privateMines.getLogger().info("Loaded file: " + schematicFile);
             });
 
-            Connection connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("database.sql"));
-            sqlHelper = new SQLHelper(connection);
-            sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING, UNIQUE (mineOwner, mineLocation, corner1, corner2, spawn) ON CONFLICT IGNORE);");
+            this.database = new SQLite();
+            database.load();
+            privateMines.getLogger().info("database: " + database);
+
+//            Connection connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("database.sql"));
+//            sqlHelper = new SQLHelper(connection);
+//            sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING, UNIQUE (mineOwner, mineLocation, corner1, corner2, spawn) ON CONFLICT IGNORE);");
 
             loadMines();
             startAutoReset();
@@ -201,10 +207,6 @@ public class PrivateMines extends JavaPlugin {
 
     public Path getMinesDirectory() {
         return minesDirectory;
-    }
-
-    public SQLHelper getSqlHelper() {
-        return sqlHelper;
     }
 
     public ConfigManager getConfigManager() {
