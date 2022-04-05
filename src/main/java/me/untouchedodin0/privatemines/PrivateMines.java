@@ -115,8 +115,10 @@ public class PrivateMines extends JavaPlugin {
             loadMines();
             startAutoReset();
 
-            SlimeUtils slimeUtils = new SlimeUtils();
-            slimeUtils.setupSlimeWorld(UUID.randomUUID());
+            if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
+                SlimeUtils slimeUtils = new SlimeUtils();
+                slimeUtils.setupSlimeWorld(UUID.randomUUID());
+            }
 
             Instant end = Instant.now();
             Duration loadTime = Duration.between(start, end);
