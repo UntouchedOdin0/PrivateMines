@@ -144,8 +144,8 @@ public class SlimeUtils {
 //        slimePropertyMap.setValue(spawnZ, 4);
 
         if (slimePlugin != null) {
-            SlimeLoader slimeLoader = slimePlugin.getLoader("file");
-            privateMines.getLogger().info("slimeLoader: " + slimeLoader);
+            //SlimeLoader slimeLoader = slimePlugin.getLoader("file");
+            //privateMines.getLogger().info("slimeLoader: " + slimeLoader);
             try {
                 Task.asyncDelayed(() -> {
                     SlimePropertyMap slimePropertyMap = new SlimePropertyMap();
@@ -154,12 +154,8 @@ public class SlimeUtils {
                     slimePropertyMap.setValue(SlimeProperties.SPAWN_Y, 1);
                     slimePropertyMap.setValue(SlimeProperties.SPAWN_Z, 1);
                     privateMines.getLogger().info("slimePropertyMap: " + slimePropertyMap);
-                    try {
-                        SlimeWorld slimeWorld = slimePlugin.loadWorld(slimeLoader, uuid.toString(), true, slimePropertyMap);
-                        privateMines.getLogger().info("slimeWorld: " + slimeWorld);
-                    } catch (UnknownWorldException | IOException | CorruptedWorldException | NewerFormatException | WorldInUseException ex) {
-                        ex.printStackTrace();
-                    }
+                    // Create an empty slime world, using the UUID as the world name
+                    createAndGenerateSlimeWorld(uuid.toString(), "file", true, slimePropertyMap);
                 });
             } catch (Exception e) {
                 e.printStackTrace();
