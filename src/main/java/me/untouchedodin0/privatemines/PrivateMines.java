@@ -24,6 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
+import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
 
 import java.io.File;
@@ -117,7 +118,11 @@ public class PrivateMines extends JavaPlugin {
 
             if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
                 SlimeUtils slimeUtils = new SlimeUtils();
-                slimeUtils.setupSlimeWorld(UUID.randomUUID());
+                Task task = Task.asyncDelayed(() -> {
+                    for (int i = 0; i < 100; i++) {
+                        slimeUtils.setupSlimeWorld(UUID.randomUUID());
+                    }
+                });
             }
 
             Instant end = Instant.now();

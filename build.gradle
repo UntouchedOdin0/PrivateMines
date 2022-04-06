@@ -57,8 +57,12 @@ task copyTo_DevServerOld(type: Copy) {
 
 task copyTo_DevServer(type: Copy) {
     from shadowJar
-//    into "E:/Coding/Spigot Test Servers/1.18 Slime World Manager (Paper)/plugins"
     into "E:/Coding/Spigot Test Servers/1.18.2 Privates Mines (Paper)/plugins"
+}
+
+task copyTo_DevServer1_17(type: Copy) {
+    from shadowJar
+    into "E:/Coding/Spigot Test Servers/1.18 Slime World Manager (Paper)/plugins"
 }
 
 //uploadArchives {
