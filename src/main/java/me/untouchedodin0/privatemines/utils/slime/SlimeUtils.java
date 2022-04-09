@@ -8,6 +8,8 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import org.bukkit.Bukkit;
 import redempt.redlib.misc.Task;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -15,6 +17,7 @@ public class SlimeUtils {
 
     private final PrivateMines privateMines = PrivateMines.getPrivateMines();
     private SlimePlugin slimePlugin;
+    private Map<UUID, SlimePropertyMap> slimeMap = new HashMap<>();
 
     /**
      * A no-operation consumer: takes an object and does absolutely nothing with it!
@@ -147,6 +150,7 @@ public class SlimeUtils {
                     slimePropertyMap.setValue(SlimeProperties.SPAWN_X, 1);
                     slimePropertyMap.setValue(SlimeProperties.SPAWN_Y, 1);
                     slimePropertyMap.setValue(SlimeProperties.SPAWN_Z, 1);
+                    slimeMap.putIfAbsent(uuid, slimePropertyMap);
                     privateMines.getLogger().info("slimePropertyMap: " + slimePropertyMap);
                     // Create an empty slime world, using the UUID as the world name
                     createAndGenerateSlimeWorld(uuid.toString(), "file", true, slimePropertyMap);
@@ -155,5 +159,9 @@ public class SlimeUtils {
                 e.printStackTrace();
             }
         }
+    }
+
+    public Map<UUID, SlimePropertyMap> getSlimeMap() {
+        return slimeMap;
     }
 }

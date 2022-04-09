@@ -2,6 +2,7 @@ package me.untouchedodin0.privatemines.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
+import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -9,14 +10,19 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.utils.inventory.MainMenu;
+import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+
 import static net.md_5.bungee.api.ChatColor.GRAY;
 import static net.md_5.bungee.api.ChatColor.GOLD;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import redempt.redlib.config.ConfigManager;
 
@@ -191,6 +197,30 @@ public class PrivateMinesCommand extends BaseCommand {
         mines.forEach((uuid, mine) -> {
             mine.delete(uuid);
         });
+    }
+
+
+    // loadSlimeWorld(String worldName, String loaderName, boolean readOnly, SlimePropertyMap propertyMap, Consumer<SlimeWorld> slimeWorldConsumer) {
+    @Subcommand("dev/slime/createmine")
+    public void createSlimeWorld(Player player) {
+        SlimeUtils slimeUtils = privateMines.getSlimeUtils();
+        Map<UUID, SlimePropertyMap> slimePropertyMapMap = slimeUtils.getSlimeMap();
+        UUID uuid = player.getUniqueId();
+        String name = uuid.toString();
+        SlimePropertyMap propertyMap = slimePropertyMapMap.get(uuid);
+        slimeUtils.setupSlimeWorld(uuid);
+//        slimeUtils.loadSlimeWorld(name, "file", false, propertyMap);
+        slimeUtils.loadAndGenerateSlimeWorld(name, "file", false, propertyMap);
+
+        World world = Bukkit.getWorld(name);
+        if (world == null) {
+            player.sendMessage("World is null");
+            return;
+        } else {
+            Location location = world.getSpawnLocation();
+            player.teleport(location);
+            player.sendMessage("location: " + location);
+        }
     }
 
     @Subcommand("reload")

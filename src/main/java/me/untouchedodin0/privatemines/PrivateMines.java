@@ -54,6 +54,7 @@ public class PrivateMines extends JavaPlugin {
     private MineTypeManager mineTypeManager;
     private ConfigManager configManager;
     private Database database;
+    private SlimeUtils slimeUtils;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -117,11 +118,9 @@ public class PrivateMines extends JavaPlugin {
             startAutoReset();
 
             if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
-                SlimeUtils slimeUtils = new SlimeUtils();
+                slimeUtils = new SlimeUtils();
                 Task task = Task.asyncDelayed(() -> {
-                    for (int i = 0; i < 100; i++) {
-                        slimeUtils.setupSlimeWorld(UUID.randomUUID());
-                    }
+                    slimeUtils.setupSlimeWorld(UUID.randomUUID());
                 });
             }
 
@@ -219,5 +218,9 @@ public class PrivateMines extends JavaPlugin {
 
     public MineTypeManager getMineTypeManager() {
         return mineTypeManager;
+    }
+
+    public SlimeUtils getSlimeUtils() {
+        return slimeUtils;
     }
 }

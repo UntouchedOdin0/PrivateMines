@@ -60,7 +60,7 @@ task copyTo_DevServer(type: Copy) {
     into "E:/Coding/Spigot Test Servers/1.18.2 Privates Mines (Paper)/plugins"
 }
 
-task copyTo_DevServer1_17(type: Copy) {
+task copyTo_SWM(type: Copy) {
     from shadowJar
     into "E:/Coding/Spigot Test Servers/1.18 Slime World Manager (Paper)/plugins"
 }
@@ -171,9 +171,9 @@ task copyTo_DevServer1_17(type: Copy) {
 publishing {
     repositories {
         maven {
-            def releasesRepoUrl = "http://s01.oss.sonatype.org/"
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/" //"https://s01.oss.sonatype.org/"
             def snapshotsRepoUrl = "https://repo.bristermitten.me/repository/maven-snapshots"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            url = releasesRepoUrl // version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 
             credentials {
                 username = System.getenv('MAVEN_USER')
