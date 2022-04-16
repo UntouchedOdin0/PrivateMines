@@ -25,7 +25,6 @@ import redempt.redlib.RedLib;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
-import redempt.redlib.sql.SQLHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +32,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.sql.Connection;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -46,6 +44,8 @@ public class PrivateMines extends JavaPlugin {
     private static PrivateMines privateMines;
     private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
     private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
+
+    private final Path addonsDirectory = getDataFolder().toPath().resolve("addons");
     private SchematicStorage schematicStorage;
     private SchematicIterator schematicIterator;
     private MineFactory mineFactory;
@@ -207,6 +207,10 @@ public class PrivateMines extends JavaPlugin {
 
     public Path getMinesDirectory() {
         return minesDirectory;
+    }
+
+    public Path getAddonsDirectory() {
+        return addonsDirectory;
     }
 
     public ConfigManager getConfigManager() {
