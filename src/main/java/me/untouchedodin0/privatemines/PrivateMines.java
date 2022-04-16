@@ -78,6 +78,7 @@ public class PrivateMines extends JavaPlugin {
 
             registerCommands();
             setupSchematicUtils();
+
             try {
                 Files.createDirectories(minesDirectory);
                 Files.createDirectories(schematicsDirectory);
@@ -87,10 +88,6 @@ public class PrivateMines extends JavaPlugin {
 
             configManager = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(Config.class).load();
             ConfigManager mineConfig = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(MineConfig.class).saveDefaults().load();
-
-            Material cornerMaterial = Config.mineCorner;
-            Material spawnMaterial = Config.spawnPoint;
-            Material npcMaterial = Config.sellNpc;
 
             MineConfig.getMineTypes().forEach((s, mineType) -> {
                 mineTypeManager.registerMineType(mineType);

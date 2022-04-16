@@ -8,7 +8,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.io.File;

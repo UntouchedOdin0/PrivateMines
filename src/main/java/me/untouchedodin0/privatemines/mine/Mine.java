@@ -305,6 +305,8 @@ public class Mine {
         MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
         MineType nextType = mineTypeManager.getNextMineType(currentType);
 
+        //todo Fix the old mine locations not updating to updating (mining cuboid region).
+
         if (currentType == nextType) {
             if (player != null) {
                 privateMines.getLogger().info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
