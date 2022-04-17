@@ -14,10 +14,12 @@ import com.sk89q.worldguard.*;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.*;
+import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
+import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.Utils;
@@ -27,6 +29,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
 import java.io.*;
@@ -36,6 +39,8 @@ import java.util.*;
 public class MineFactory {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
+    MineStorage mineStorage = privateMines.getMineStorage();
+    MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
 
     /**
      * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
@@ -55,9 +60,15 @@ public class MineFactory {
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         SchematicStorage storage = privateMines.getSchematicStorage();
         SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
+        privateMines.getLogger().info(schematicFile.getAbsolutePath());
+        privateMines.getLogger().info(mineBlocks.getSpawnLocation().toParserString());
+        privateMines.getLogger().info(mineBlocks.getCorner1().toParserString());
+        privateMines.getLogger().info(mineBlocks.getCorner2().toParserString());
+
         Map<String, Boolean> flags = mineType.getFlags();
 
         Task.asyncDelayed(() -> {
+
             if (clipboardFormat != null) {
                 try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(schematicFile))) {
 
@@ -88,6 +99,10 @@ public class MineFactory {
 
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ());
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
+
+                    privateMines.getLogger().info(LocationUtils.toString(spongeL));
+                    privateMines.getLogger().info(LocationUtils.toString(lrailsL));
+                    privateMines.getLogger().info(LocationUtils.toString(urailsL));
 
                     CuboidRegion mineWGRegion = new CuboidRegion(world, lrailsV, urailsV);
                     localSession.setClipboard(clipboardHolder);
@@ -167,7 +182,11 @@ public class MineFactory {
                     //noinspection unused
 
                     Task teleport = Task.syncDelayed(() -> spongeL.getBlock().setType(Material.AIR));
-                    privateMines.getMineStorage().addMine(player.getUniqueId(), mine);
+                    if (privateMines.getMineStorage().hasMine(player.getUniqueId())) {
+                        privateMines.getMineStorage().replaceMine(player.getUniqueId(), mine);
+                    } else {
+                        privateMines.getMineStorage().addMine(player.getUniqueId(), mine);
+                    }
 
                     TextComponent teleportMessage = new TextComponent(ChatColor.GREEN + "Click me to teleport to your mine!");
                     teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));
@@ -180,4 +199,15 @@ public class MineFactory {
             }
         });
     }
+
+//    {
+//        if (!mineStorage.hasMine(player.getUniqueId())) return;
+//        Mine currentMine = mineStorage.get(player.getUniqueId());
+//        if (currentMine != null) {
+//            MineType currentType = currentMine.getMineType();
+//            MineType nextType = mineTypeManager.getNextMineType(currentType);
+//            currentMine.replace(player.getUniqueId(), nextType);
+//        }
+//    }
 }
+

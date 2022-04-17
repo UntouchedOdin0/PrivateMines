@@ -37,6 +37,7 @@ import java.util.UUID;
 public class Mine {
 
     private final PrivateMines privateMines;
+    private final MineTypeManager mineTypeManager;
 
     private UUID mineOwner;
     private BlockVector3 location;
@@ -47,6 +48,7 @@ public class Mine {
 
     public Mine(PrivateMines privateMines) {
         this.privateMines = privateMines;
+        this.mineTypeManager = privateMines.getMineTypeManager();
         Utils utils = new Utils(privateMines);
     }
 
@@ -82,11 +84,63 @@ public class Mine {
         this.task = task;
     }
 
+    public MineType getMineType() {
+        return mineTypeManager.getMineType(mineData.getMineType());
+    }
+
     public void teleport(Player player) {
         player.teleport(getMineData().getSpawnLocation());
     }
 
     public void delete(UUID uuid) {
+        MineData mineData = getMineData();
+
+        Location cornerA = mineData.getMinimumFullRegion();
+        Location cornerB = mineData.getMaximumFullRegion();
+
+        Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
+        String regionName = String.format("mine-%s", Objects.requireNonNull(player).getUniqueId());
+
+        World world = cornerA.getWorld();
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager regionManager = container.get(BukkitAdapter.adapt(Objects.requireNonNull(world)));
+        Objects.requireNonNull(regionManager).removeRegion(regionName);
+
+        int blocks = 0;
+
+        int xMax = Integer.max(cornerA.getBlockX(), cornerB.getBlockX());
+        int xMin = Integer.min(cornerA.getBlockX(), cornerB.getBlockX());
+        int yMax = Integer.max(cornerA.getBlockY(), cornerB.getBlockY());
+        int yMin = Integer.min(cornerA.getBlockY(), cornerB.getBlockY());
+        int zMax = Integer.max(cornerA.getBlockZ(), cornerB.getBlockZ());
+        int zMin = Integer.min(cornerA.getBlockZ(), cornerB.getBlockZ());
+
+        Instant start = Instant.now();
+
+        for (int x = xMin; x <= xMax; x++) {
+            for (int y = yMin; y <= yMax; y++) {
+                for (int z = zMin; z <= zMax; z++) {
+                    world.getBlockAt(x, y, z).setType(Material.AIR);
+                    blocks++;
+                }
+            }
+        }
+
+        Instant filled = Instant.now();
+        Duration durationToFill = Duration.between(start, filled);
+        privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
+        privateMines.getMineStorage().removeMine(uuid);
+        String fileName = String.format("/%s.yml", uuid);
+        Path minesDirectory = privateMines.getMinesDirectory();
+        File file = new File(minesDirectory + fileName);
+        try {
+            Files.delete(file.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void replace(UUID uuid, MineType newType) {
         MineData mineData = getMineData();
 
         Location cornerA = mineData.getMinimumFullRegion();
@@ -260,40 +314,79 @@ public class Mine {
         File file = new File(minesDirectory + fileName);
         privateMines.getLogger().info("Saving file " + file.getName() + "...");
 
-        try {
-            if (file.createNewFile()) {
-                privateMines.getLogger().info("Created new file: " + file.getPath());
+        if (file.exists()) {
+            file.delete();
+            try {
+                if (file.createNewFile()) {
+                    privateMines.getLogger().info("Created new file: " + file.getPath());
+
+                    YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
+
+                    String mineType = mineData.getMineType();
+
+                    UUID owner = player.getUniqueId();
+                    Location mineLocation = mineData.getMineLocation();
+                    Location corner1 = mineData.getMinimumMining();
+                    Location corner2 = mineData.getMaximumMining();
+                    Location fullRegionMin = mineData.getMinimumFullRegion();
+                    Location fullRegionMax = mineData.getMaximumFullRegion();
+
+                    Location spawn = mineData.getSpawnLocation();
+
+                    yml.set("mineOwner", owner.toString());
+                    yml.set("mineType", mineType);
+                    yml.set("mineLocation", LocationUtils.toString(mineLocation));
+                    yml.set("corner1", LocationUtils.toString(corner1));
+                    yml.set("corner2", LocationUtils.toString(corner2));
+                    yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
+                    yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
+                    yml.set("spawn", LocationUtils.toString(spawn));
+
+                    try {
+                        yml.save(file);
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } else {
+            try {
+                if (file.createNewFile()) {
+                    privateMines.getLogger().info("Created new file: " + file.getPath());
 
-        YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
+                    YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
 
-        String mineType = mineData.getMineType();
+                    String mineType = mineData.getMineType();
 
-        UUID owner = player.getUniqueId();
-        Location mineLocation = mineData.getMineLocation();
-        Location corner1 = mineData.getMinimumMining();
-        Location corner2 = mineData.getMaximumMining();
-        Location fullRegionMin = mineData.getMinimumFullRegion();
-        Location fullRegionMax = mineData.getMaximumFullRegion();
+                    UUID owner = player.getUniqueId();
+                    Location mineLocation = mineData.getMineLocation();
+                    Location corner1 = mineData.getMinimumMining();
+                    Location corner2 = mineData.getMaximumMining();
+                    Location fullRegionMin = mineData.getMinimumFullRegion();
+                    Location fullRegionMax = mineData.getMaximumFullRegion();
 
-        Location spawn = mineData.getSpawnLocation();
+                    Location spawn = mineData.getSpawnLocation();
 
-        yml.set("mineOwner", owner.toString());
-        yml.set("mineType", mineType);
-        yml.set("mineLocation", LocationUtils.toString(mineLocation));
-        yml.set("corner1", LocationUtils.toString(corner1));
-        yml.set("corner2", LocationUtils.toString(corner2));
-        yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
-        yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
-        yml.set("spawn", LocationUtils.toString(spawn));
+                    yml.set("mineOwner", owner.toString());
+                    yml.set("mineType", mineType);
+                    yml.set("mineLocation", LocationUtils.toString(mineLocation));
+                    yml.set("corner1", LocationUtils.toString(corner1));
+                    yml.set("corner2", LocationUtils.toString(corner2));
+                    yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
+                    yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
+                    yml.set("spawn", LocationUtils.toString(spawn));
 
-        try {
-            yml.save(file);
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
+                    try {
+                        yml.save(file);
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -313,34 +406,7 @@ public class Mine {
             }
         } else {
             Location mineLocation = mineData.getMineLocation();
-            Location cornerA = mineData.getMinimumFullRegion();
-            Location cornerB = mineData.getMaximumFullRegion();
-
-            World world = cornerA.getWorld();
-
-            int xMin = Integer.min(cornerA.getBlockX(), cornerB.getBlockX());
-            int xMax = Integer.max(cornerA.getBlockX(), cornerB.getBlockX());
-            int yMin = Integer.min(cornerA.getBlockY(), cornerB.getBlockY());
-            int yMax = Integer.max(cornerA.getBlockY(), cornerB.getBlockY());
-            int zMin = Integer.min(cornerA.getBlockZ(), cornerB.getBlockZ());
-            int zMax = Integer.max(cornerA.getBlockZ(), cornerB.getBlockZ());
-
-            Instant start = Instant.now();
-
-            for (int x = xMin; x <= xMax; x++) {
-                for (int y = yMin; y <= yMax; y++) {
-                    for (int z = zMin; z <= zMax; z++) {
-                        if (world != null) {
-                            world.getBlockAt(x, y, z).setType(Material.AIR, false);
-                        }
-                    }
-                }
-            }
-            Instant filled = Instant.now();
-            Duration durationToFill = Duration.between(start, filled);
-            privateMines.getLogger().info(String.format("Time took to clear mine for upgrade %dms", durationToFill.toMillis()));
-
-            mineData.setMineType(nextType.getName());
+            delete(mineData.getMineOwner());
             mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
         }
     }
