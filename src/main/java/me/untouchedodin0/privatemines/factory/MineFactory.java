@@ -60,10 +60,6 @@ public class MineFactory {
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         SchematicStorage storage = privateMines.getSchematicStorage();
         SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
-        privateMines.getLogger().info(schematicFile.getAbsolutePath());
-        privateMines.getLogger().info(mineBlocks.getSpawnLocation().toParserString());
-        privateMines.getLogger().info(mineBlocks.getCorner1().toParserString());
-        privateMines.getLogger().info(mineBlocks.getCorner2().toParserString());
 
         Map<String, Boolean> flags = mineType.getFlags();
 
