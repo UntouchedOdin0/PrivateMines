@@ -2,6 +2,7 @@ package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
+import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MineConfig;
@@ -10,6 +11,7 @@ import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
+import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.Database;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
@@ -148,12 +150,13 @@ public class PrivateMines extends JavaPlugin {
                         .forEach(filePath -> {
                             File file = filePath.toFile();
                             Mine mine = new Mine(privateMines);
-                            MineData mineData = new MineData();
+//                            MineData mineData = new MineData();
                             getLogger().info("Loading file " + file.getName() + "....");
                             YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
 
                             UUID owner = UUID.fromString(Objects.requireNonNull(yml.getString("mineOwner")));
                             String mineTypeName = yml.getString("mineType");
+                            MineType mineType = mineTypeManager.getMineType(mineTypeName);
                             Location corner1 = LocationUtils.fromString(yml.getString("corner1"));
                             Location corner2 = LocationUtils.fromString(yml.getString("corner2"));
                             Location fullRegionMin = LocationUtils.fromString(yml.getString("fullRegionMin"));
@@ -161,15 +164,17 @@ public class PrivateMines extends JavaPlugin {
                             Location spawn = LocationUtils.fromString(yml.getString("spawn"));
                             Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
 
-                            mineData.setMineOwner(owner);
-                            mineData.setMinimumMining(corner1);
-                            mineData.setMaximumMining(corner2);
-                            mineData.setMinimumFullRegion(fullRegionMin);
-                            mineData.setMaximumFullRegion(fullRegionMax);
-                            mineData.setSpawnLocation(spawn);
-                            mineData.setMineLocation(mineLocation);
-                            mineData.setMineType(mineTypeName);
-
+                            privateMines.getLogger().info("debug full: " + fullRegionMax);
+                            MineData mineData = new MineDataBuilder()
+                                    .setOwner(owner)
+                                    .setMinimumMining(corner1)
+                                    .setMaximumMining(corner2)
+                                    .setMinimumFullRegion(fullRegionMin)
+                                    .setMaximumFullRegion(fullRegionMax)
+                                    .setSpawnLocation(spawn)
+                                    .setMineLocation(mineLocation)
+                                    .setMineType(mineType)
+                                    .build();
                             mine.setMineData(mineData);
                             getMineStorage().addMine(owner, mine);
                             getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
