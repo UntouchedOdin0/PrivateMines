@@ -1,9 +1,9 @@
 package me.untouchedodin0.privatemines.mine.data;
 
-import com.sk89q.worldedit.regions.Region;
-import me.untouchedodin0.privatemines.utils.regions.CuboidRegion;
+import me.untouchedodin0.kotlin.mine.type.MineType;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import redempt.redlib.region.CuboidRegion;
 
 import java.util.*;
 
@@ -16,15 +16,11 @@ public class MineData {
     Location npcLocation;
     Location minimumMining;
     Location maximumMining;
-    Location minimumFullRegion;
-    Location maximumFullRegion;
 
     CuboidRegion miningRegion;
-    Region fullRegion;
-
-    String worldName;
-    String mineType;
-
+    Location minimumFullRegion;
+    Location maximumFullRegion;
+    MineType mineType;
     boolean isOpen;
     double tax = 5;
 
@@ -81,6 +77,14 @@ public class MineData {
         this.maximumMining = maximumMining;
     }
 
+    public CuboidRegion getMiningRegion() {
+        return miningRegion;
+    }
+
+    public void setMiningRegion(CuboidRegion miningRegion) {
+        this.miningRegion = miningRegion;
+    }
+
     public Location getMinimumFullRegion() {
         return minimumFullRegion;
     }
@@ -97,27 +101,11 @@ public class MineData {
         this.maximumFullRegion = maximumFullRegion;
     }
 
-    public Region getFullRegion() {
-        return fullRegion;
-    }
-
-    public void setFullRegion(Region region) {
-        this.fullRegion = region;
-    }
-
-    public String getWorldName() {
-        return worldName;
-    }
-
-    public void setWorldName(String worldName) {
-        this.worldName = worldName;
-    }
-
-    public String getMineType() {
+    public MineType getMineType() {
         return mineType;
     }
 
-    public void setMineType(String mineType) {
+    public void setMineType(MineType mineType) {
         this.mineType = mineType;
     }
 
