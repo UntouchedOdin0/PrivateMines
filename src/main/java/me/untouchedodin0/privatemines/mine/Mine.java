@@ -396,18 +396,19 @@ public class Mine {
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineFactory mineFactory = privateMines.getMineFactory();
         MineData mineData = getMineData();
-        Player player = Bukkit.getOfflinePlayer(mineData.getMineOwner()).getPlayer();
+        UUID mineOwner = mineData.getMineOwner();
+        Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
         MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
         MineType nextType = mineTypeManager.getNextMineType(currentType);
 
-        if (currentType == nextType) {
-            if (player != null) {
+        if (player != null) {
+            if (currentType == nextType) {
                 privateMines.getLogger().info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
+            } else {
+                Location mineLocation = mineData.getMineLocation();
+                delete(mineOwner);
+                mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
             }
-        } else {
-            Location mineLocation = mineData.getMineLocation();
-            delete(mineData.getMineOwner());
-            mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
         }
     }
 }
