@@ -26,8 +26,12 @@ public class MineTypeManager {
         }
     }
 
-    public MineType getMineType(String name) {
-        return mineTypes.get(name);
+    public MineType getMineType(MineType name) {
+        return mineTypes.get(name.getName());
+    }
+
+    public MineType getMineType(String string) {
+        return mineTypes.get(string);
     }
 
     public MineType getDefaultMineType() {
