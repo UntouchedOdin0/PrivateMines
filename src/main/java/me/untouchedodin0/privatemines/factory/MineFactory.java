@@ -21,6 +21,7 @@ import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
+import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
@@ -51,9 +52,9 @@ public class MineFactory {
      */
 
     public void create(Player player, Location location, MineType mineType) {
+        UUID uuid = player.getUniqueId();
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         Mine mine = new Mine(privateMines);
-        MineData mineData = new MineData();
         String regionName = String.format("mine-%s", player.getUniqueId());
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
@@ -157,23 +158,21 @@ public class MineFactory {
                             }
                         });
 
-                        mineData.setMineOwner(player.getUniqueId());
-                        mineData.setMinimumMining(lrailsL);
-                        mineData.setMaximumMining(urailsL);
-                        mineData.setMinimumFullRegion(fullMin);
-                        mineData.setMaximumFullRegion(fullMax);
-                        mineData.setSpawnLocation(spongeL);
-                        mineData.setMineLocation(location);
-                        mineData.setMineType(mineType.getName());
-                        mineData.setMaterials(mineType.getMaterials());
+                        MineData mineData = new MineDataBuilder()
+                                .setOwner(uuid)
+                                .setMinimumMining(lrailsL)
+                                .setMaximumMining(urailsL)
+                                .setMinimumFullRegion(fullMin)
+                                .setMaximumFullRegion(fullMax)
+                                .setSpawnLocation(spongeL)
+                                .setMineLocation(location)
+                                .setMineType(mineType)
+                                .build();
+                        mine.setMineData(mineData);
+                        mine.saveMineData(player, mineData);
                     } catch (IncompleteRegionException e) {
                         e.printStackTrace();
                     }
-
-                    mine.setMineOwner(player.getUniqueId());
-                    mine.setLocation(vector);
-                    mine.setMineData(mineData);
-                    mine.saveMineData(player, mineData);
 
                     //noinspection unused
 
