@@ -322,7 +322,8 @@ public class Mine {
 
                     YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
 
-                    String mineType = mineData.getMineType();
+                    MineType mineType = mineData.getMineType();
+                    String mineTypeName = mineType.getName();
 
                     UUID owner = player.getUniqueId();
                     Location mineLocation = mineData.getMineLocation();
@@ -334,7 +335,7 @@ public class Mine {
                     Location spawn = mineData.getSpawnLocation();
 
                     yml.set("mineOwner", owner.toString());
-                    yml.set("mineType", mineType);
+                    yml.set("mineType", mineTypeName);
                     yml.set("mineLocation", LocationUtils.toString(mineLocation));
                     yml.set("corner1", LocationUtils.toString(corner1));
                     yml.set("corner2", LocationUtils.toString(corner2));
@@ -358,7 +359,8 @@ public class Mine {
 
                     YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
 
-                    String mineType = mineData.getMineType();
+                    MineType mineType = mineData.getMineType();
+                    String mineTypeName = mineType.getName();
 
                     UUID owner = player.getUniqueId();
                     Location mineLocation = mineData.getMineLocation();
@@ -370,7 +372,7 @@ public class Mine {
                     Location spawn = mineData.getSpawnLocation();
 
                     yml.set("mineOwner", owner.toString());
-                    yml.set("mineType", mineType);
+                    yml.set("mineType", mineTypeName);
                     yml.set("mineLocation", LocationUtils.toString(mineLocation));
                     yml.set("corner1", LocationUtils.toString(corner1));
                     yml.set("corner2", LocationUtils.toString(corner2));
