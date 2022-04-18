@@ -202,6 +202,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
     // loadSlimeWorld(String worldName, String loaderName, boolean readOnly, SlimePropertyMap propertyMap, Consumer<SlimeWorld> slimeWorldConsumer) {
     @Subcommand("dev/slime/createmine")
+    @CommandPermission("privatemines.slime.createmine")
     public void createSlimeWorld(Player player) {
         SlimeUtils slimeUtils = privateMines.getSlimeUtils();
         Map<UUID, SlimePropertyMap> slimePropertyMapMap = slimeUtils.getSlimeMap();
@@ -224,6 +225,7 @@ public class PrivateMinesCommand extends BaseCommand {
     }
 
     @Subcommand("reload")
+    @CommandPermission("privatemines.reload")
     public void reload(Player player) {
         ConfigManager configManager = privateMines.getConfigManager();
         configManager.reload();
