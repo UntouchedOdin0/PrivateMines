@@ -7,6 +7,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MineConfig;
@@ -89,7 +90,11 @@ public class Mine {
     }
 
     public void teleport(Player player) {
-        player.teleport(getMineData().getSpawnLocation());
+        if (PaperLib.isPaper()) {
+            PaperLib.teleportAsync(player, getMineData().getSpawnLocation());
+        } else {
+            player.teleport(getMineData().getSpawnLocation());
+        }
     }
 
     public void delete(UUID uuid) {
@@ -190,10 +195,9 @@ public class Mine {
 
     public void reset() {
         MineData mineData = getMineData();
-        MineType mineType = MineConfig.getMineTypes().get(mineData.getMineType());
+        MineType mineType = mineData.getMineType();
 
         Map<Material, Double> materials = mineType.getMaterials();
-
         final WeightedRandom<Material> randomPattern = WeightedRandom.fromDoubleMap(materials);
 
         Location cornerA = mineData.getMinimumMining();
@@ -216,7 +220,7 @@ public class Mine {
                 for (int z = zMin; z <= zMax; z++) {
                     if (world != null) {
                         Material material = randomPattern.roll();
-                        world.getBlockAt(x, y, z).setType(material);
+                        world.getBlockAt(x, y, z).setType(material, false);
                     }
                     blocks++;
                 }

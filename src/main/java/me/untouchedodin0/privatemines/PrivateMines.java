@@ -1,6 +1,7 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
+import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
@@ -89,7 +90,12 @@ public class PrivateMines extends JavaPlugin {
             }
 
             configManager = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(Config.class).load();
-            ConfigManager mineConfig = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(MineConfig.class).saveDefaults().load();
+            //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
+            ConfigManager mineConfig = ConfigManager.create(this)
+                    .addConverter(Material.class, Material::valueOf, Material::toString)
+                    .target(MineConfig.class)
+                    .saveDefaults()
+                    .load();
 
             MineConfig.getMineTypes().forEach((s, mineType) -> {
                 mineTypeManager.registerMineType(mineType);
@@ -115,6 +121,7 @@ public class PrivateMines extends JavaPlugin {
 
             loadMines();
             startAutoReset();
+            PaperLib.suggestPaper(this);
 
             if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
                 slimeUtils = new SlimeUtils();

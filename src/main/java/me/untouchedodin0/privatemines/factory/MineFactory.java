@@ -73,6 +73,7 @@ public class MineFactory {
 
                     World world = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()));
                     EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
+                    editSession.setFastMode(true);
                     LocalSession localSession = new LocalSession();
 
                     Clipboard clipboard = clipboardReader.read();
@@ -137,7 +138,7 @@ public class MineFactory {
                         if (regionManager != null) {
                             regionManager.addRegion(miningWorldGuardRegion);
                         }
-                        Task test = Task.syncDelayed(() -> {
+                        Task flagTask = Task.syncDelayed(() -> {
                             if (flags != null) {
                                 flags.forEach((s, aBoolean) -> {
                                     Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), s);
