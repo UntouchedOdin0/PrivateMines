@@ -152,6 +152,7 @@ public class PrivateMinesCommand extends BaseCommand {
             }
         }
     }
+
     /*
         This can create severe lag on the server, I take no blame for the lag caused.
      */
