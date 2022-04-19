@@ -9,6 +9,7 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
+import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.inventory.MainMenu;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -151,6 +152,16 @@ public class PrivateMinesCommand extends BaseCommand {
                 mine.upgrade();
             }
         }
+    }
+
+    @Subcommand("info")
+    @CommandPermission("privatemines.info")
+    public void info(Player player) {
+        Mine mine = mineStorage.getClosest(player.getLocation());
+        MineData mineData = mine.getMineData();
+        player.sendMessage("mine: " + mine);
+        player.sendMessage("owner: " + Bukkit.getPlayer(mineData.getMineOwner()));
+        player.sendMessage("owner uuid: " + mineData.getMineOwner());
     }
 
     /*

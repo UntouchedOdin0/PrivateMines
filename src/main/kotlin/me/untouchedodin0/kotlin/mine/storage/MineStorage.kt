@@ -2,6 +2,7 @@ package me.untouchedodin0.kotlin.mine.storage
 
 import me.untouchedodin0.privatemines.PrivateMines
 import me.untouchedodin0.privatemines.mine.Mine
+import org.bukkit.Location
 import java.util.*
 
 class MineStorage {
@@ -43,5 +44,22 @@ class MineStorage {
 
     fun getTotalMines(): Int {
         return mines.size
+    }
+
+    fun getClosest(location: Location): Mine {
+        val distances: MutableMap<Mine, Double> = HashMap()
+        var min: Map.Entry<Mine, Double>? = null
+        mines.forEach { (_: UUID?, mine: Mine) ->
+            val mineData = mine.mineData
+            val mineLocation = mineData.mineLocation
+            val distance = location.distance(mineLocation)
+            distances.putIfAbsent(mine, distance)
+        }
+        for (entry in distances.entries) {
+            if (min == null || min.value > entry.value) {
+                min = entry
+            }
+        }
+        return Objects.requireNonNull(min)!!.key
     }
 }
