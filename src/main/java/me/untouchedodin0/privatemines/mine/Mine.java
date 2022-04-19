@@ -90,6 +90,9 @@ public class Mine {
     }
 
     public void teleport(Player player) {
+        if (getMineData().getSpawnLocation().getBlock().getType().isBlock()) {
+            getMineData().getSpawnLocation().getBlock().setType(Material.AIR);
+        }
         if (PaperLib.isPaper()) {
             PaperLib.teleportAsync(player, getMineData().getSpawnLocation());
         } else {

@@ -3,17 +3,26 @@ package me.untouchedodin0.privatemines.factory;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.*;
-import com.sk89q.worldedit.function.operation.*;
-import com.sk89q.worldedit.math.*;
-import com.sk89q.worldedit.regions.*;
-import com.sk89q.worldedit.regions.selector.*;
-import com.sk89q.worldedit.session.*;
-import com.sk89q.worldedit.world.*;
-import com.sk89q.worldguard.*;
-import com.sk89q.worldguard.protection.flags.*;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
+import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.*;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -33,9 +42,14 @@ import org.bukkit.entity.Player;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
-import java.io.*;
-import java.time.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 public class MineFactory {
 
@@ -51,6 +65,7 @@ public class MineFactory {
      * @param mineType the type of mine to paste
      */
 
+    @SuppressWarnings("DanglingJavadoc")
     public void create(Player player, Location location, MineType mineType) {
         UUID uuid = player.getUniqueId();
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
@@ -73,7 +88,6 @@ public class MineFactory {
 
                     World world = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()));
                     EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
-                    editSession.setFastMode(true);
                     LocalSession localSession = new LocalSession();
 
                     Clipboard clipboard = clipboardReader.read();
@@ -106,12 +120,21 @@ public class MineFactory {
                     localSession.setClipboard(clipboardHolder);
 
                     Operation operation = clipboardHolder.createPaste(editSession).to(vector).ignoreAirBlocks(true).build();
-                    try {
-                        Operations.completeLegacy(operation);
-                        editSession.close();
-                    } catch (WorldEditException worldEditException) {
-                        worldEditException.printStackTrace();
-                    }
+                    Task.asyncDelayed(() -> {
+                        try {
+                            Operations.completeLegacy(operation);
+                            editSession.close();
+                        } catch (WorldEditException worldEditException) {
+                            worldEditException.printStackTrace();
+                        }
+                    });
+
+//                    try {
+//                        Operations.completeLegacy(operation);
+//                        editSession.close();
+//                    } catch (WorldEditException worldEditException) {
+//                        worldEditException.printStackTrace();
+//                    }
                     Instant pasted = Instant.now();
                     Duration durationPasted = Duration.between(start, pasted);
 
@@ -138,7 +161,14 @@ public class MineFactory {
                         if (regionManager != null) {
                             regionManager.addRegion(miningWorldGuardRegion);
                         }
-                        Task flagTask = Task.syncDelayed(() -> {
+
+                        /**
+                            This sadly has to be called synchronously else it'll throw a
+                            {@link java.lang.IllegalStateException}
+                            This is due to how WorldGuard handles their flags...
+                            @see com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent
+                         */
+                        Task.syncDelayed(() -> {
                             if (flags != null) {
                                 flags.forEach((s, aBoolean) -> {
                                     Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), s);
@@ -177,7 +207,7 @@ public class MineFactory {
 
                     //noinspection unused
 
-                    Task teleport = Task.syncDelayed(() -> spongeL.getBlock().setType(Material.AIR));
+                    Task.syncDelayed(() -> spongeL.getBlock().setType(Material.AIR));
                     if (privateMines.getMineStorage().hasMine(player.getUniqueId())) {
                         privateMines.getMineStorage().replaceMine(player.getUniqueId(), mine);
                     } else {
