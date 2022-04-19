@@ -237,7 +237,7 @@ public class Mine {
 
     public void resetNoMessage() {
         MineData mineData = getMineData();
-        MineType mineType = MineConfig.getMineTypes().get(mineData.getMineType());
+        MineType mineType = mineData.getMineType();
 
         Map<Material, Double> materials = mineType.getMaterials();
 
