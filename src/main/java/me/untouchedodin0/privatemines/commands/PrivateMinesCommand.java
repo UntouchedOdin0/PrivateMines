@@ -158,10 +158,13 @@ public class PrivateMinesCommand extends BaseCommand {
     @CommandPermission("privatemines.info")
     public void info(Player player) {
         Mine mine = mineStorage.getClosest(player, player.getLocation());
-        MineData mineData = mine.getMineData();
-        player.sendMessage("mine: " + mine);
-        player.sendMessage("owner: " + Bukkit.getPlayer(mineData.getMineOwner()));
-        player.sendMessage("owner uuid: " + mineData.getMineOwner());
+        MineData mineData;
+        if (mine != null) {
+            mineData = mine.getMineData();
+            player.sendMessage("mine: " + mine);
+            player.sendMessage("owner: " + Bukkit.getPlayer(mineData.getMineOwner()));
+            player.sendMessage("owner uuid: " + mineData.getMineOwner());
+        }
     }
 
     /*

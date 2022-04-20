@@ -69,7 +69,7 @@ class MineStorage {
             if (min == null || min.value > entry.value) {
                 min = entry
                 if (min.value > 20) {
-                    player.sendMessage(ChatColor.RED.toString() + "Yeah, nah.")
+                    player.sendMessage(ChatColor.RED.toString() + "You're not in any mines!")
                     return null
                 }
                 privateMines.logger.info("min value: ${min.value}")
