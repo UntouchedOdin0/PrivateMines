@@ -16,14 +16,11 @@ import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-
-import static net.md_5.bungee.api.ChatColor.GRAY;
-import static net.md_5.bungee.api.ChatColor.GOLD;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.config.ConfigManager;
 
@@ -32,6 +29,9 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static net.md_5.bungee.api.ChatColor.GOLD;
+import static net.md_5.bungee.api.ChatColor.GRAY;
 
 @CommandAlias("privatemines|pmines|pmine")
 public class PrivateMinesCommand extends BaseCommand {
@@ -55,7 +55,7 @@ public class PrivateMinesCommand extends BaseCommand {
     @Subcommand("give")
     @CommandCompletion("@players")
     @CommandPermission("privatemines.give")
-    public void give(Player player, Player target) {
+    public void give(CommandSender player, Player target) {
         player.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a private mine!");
         MineFactory mineFactory = new MineFactory();
         MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
@@ -63,7 +63,7 @@ public class PrivateMinesCommand extends BaseCommand {
 //        MineType mineType = MineConfig.mineTypes.get("Default");
         MineType mineType = mineTypeManager.getDefaultMineType();
         privateMines.getLogger().info("giving the player a mine using the mine type of " + mineType.getName());
-        mineFactory.create(player, location, mineType);
+        mineFactory.create(target, location, mineType);
     }
 
     @Subcommand("delete")
