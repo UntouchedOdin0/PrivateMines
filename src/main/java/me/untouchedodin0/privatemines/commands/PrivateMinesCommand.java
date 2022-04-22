@@ -16,13 +16,13 @@ import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.config.ConfigManager;
+import redempt.redlib.inventorygui.InventoryGUI;
+import redempt.redlib.inventorygui.ItemButton;
+import redempt.redlib.itemutils.ItemBuilder;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -30,8 +30,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static net.md_5.bungee.api.ChatColor.GOLD;
-import static net.md_5.bungee.api.ChatColor.GRAY;
+import static net.md_5.bungee.api.ChatColor.*;
 
 @CommandAlias("privatemines|pmines|pmine")
 public class PrivateMinesCommand extends BaseCommand {
@@ -60,7 +59,6 @@ public class PrivateMinesCommand extends BaseCommand {
         MineFactory mineFactory = new MineFactory();
         MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
         Location location = mineWorldManager.getNextFreeLocation();
-//        MineType mineType = MineConfig.mineTypes.get("Default");
         MineType mineType = mineTypeManager.getDefaultMineType();
         privateMines.getLogger().info("Giving the player a mine using the mine type of " + mineType.getName());
         mineFactory.create(target, location, mineType);
@@ -159,8 +157,43 @@ public class PrivateMinesCommand extends BaseCommand {
     public void info(Player player) {
         Mine mine = mineStorage.getClosest(player, player.getLocation());
         MineData mineData;
-        if (mine != null) {
+        if (mine == null) {
+            player.sendMessage(ChatColor.RED + "You're not in any mines!");
+        } else {
             mineData = mine.getMineData();
+            String name = Bukkit.getOfflinePlayer(mineData.getMineOwner()).getName();
+            String inventoryName = String.format("%s's Private Mine", name);
+            if (inventoryName.length() <= 32) {
+                // if inventory name is less than or equals to 32 (max inventory size) add players name into gui else don't
+                InventoryGUI inventoryGUI = new InventoryGUI(9, name + "'s Mine");
+                player.sendMessage("mine: " + mine);
+                player.sendMessage("owner: " + Bukkit.getPlayer(mineData.getMineOwner()));
+                player.sendMessage("owner uuid: " + mineData.getMineOwner());
+                ItemBuilder tax = new ItemBuilder(Material.PAPER)
+                        .setName(ChatColor.GREEN + "Tax")
+                        .setLore(ChatColor.GREEN + String.valueOf(mineData.getTax()) + "%");
+                ItemButton taxButton = ItemButton.create(tax, inventoryClickEvent -> {
+                    // put click t hings here?
+                });
+                ItemBuilder askToReset = new ItemBuilder(Material.STONE_BUTTON)
+                        .setName(ChatColor.GREEN + "Request Mine Reset")
+                        .addLore(ChatColor.GRAY + "Click me to request")
+                        .addLore(ChatColor.GRAY + "the owner to reset the mine");
+                ItemButton askToResetButton = ItemButton.create(askToReset, inventoryClickEvent -> {
+                    OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(mineData.getMineOwner());
+                    if (!offlinePlayer.isOnline()) return;
+                    Player owner = offlinePlayer.getPlayer();
+                    if (owner != null) {
+                        TextComponent clicktoreset = new TextComponent(GREEN + player.getName() + " has requested you to reset the mine, click me to reset the mine!");
+                        clicktoreset.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/privatemines reset"));
+                        owner.spigot().sendMessage(clicktoreset);
+                    }
+                });
+                inventoryGUI.addButton(0, taxButton);
+                inventoryGUI.addButton(1, askToResetButton);
+
+                inventoryGUI.open(player);
+            }
             player.sendMessage("mine: " + mine);
             player.sendMessage("owner: " + Bukkit.getPlayer(mineData.getMineOwner()));
             player.sendMessage("owner uuid: " + mineData.getMineOwner());
