@@ -50,7 +50,6 @@ public class PrivateMines extends JavaPlugin {
     private static PrivateMines privateMines;
     private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
     private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
-
     private final Path addonsDirectory = getDataFolder().toPath().resolve("addons");
     private SchematicStorage schematicStorage;
     private SchematicIterator schematicIterator;
@@ -113,8 +112,6 @@ public class PrivateMines extends JavaPlugin {
                 SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
                 schematicStorage.addSchematic(schematicFile, mineBlocks);
                 privateMines.getLogger().info("Loaded file: " + schematicFile);
-                privateMines.getLogger().info("minetype " + mineType.getName());
-                privateMines.getLogger().info("cost: " + mineType.getUpgradeCost());
             });
 
             this.database = new SQLite();
