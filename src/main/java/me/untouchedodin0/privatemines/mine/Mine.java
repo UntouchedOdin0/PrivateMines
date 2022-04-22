@@ -15,10 +15,8 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import net.milkbowl.vault.economy.Economy;
+import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import redempt.redlib.misc.LocationUtils;
@@ -407,14 +405,27 @@ public class Mine {
         Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
         MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
         MineType nextType = mineTypeManager.getNextMineType(currentType);
+        double upgradeCost = nextType.getUpgradeCost();
 
         if (player != null) {
             if (currentType == nextType) {
                 privateMines.getLogger().info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
             } else {
-                Location mineLocation = mineData.getMineLocation();
-                delete(mineOwner);
-                mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
+                if (upgradeCost == 0) {
+                    Location mineLocation = mineData.getMineLocation();
+                    delete(mineOwner);
+                    mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
+                } else {
+                    Economy economy = PrivateMines.getEconomy();
+                    double balance = economy.getBalance(player);
+                    if (balance < upgradeCost) {
+                        player.sendMessage(ChatColor.RED + "You don't have enough money to upgrade your mine!");
+                    } else {
+                        Location mineLocation = mineData.getMineLocation();
+                        delete(mineOwner);
+                        mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
+                    }
+                }
             }
         }
     }

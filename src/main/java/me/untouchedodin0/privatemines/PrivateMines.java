@@ -20,10 +20,12 @@ import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
 import redempt.redlib.config.ConfigManager;
@@ -60,6 +62,7 @@ public class PrivateMines extends JavaPlugin {
     private ConfigManager configManager;
     private Database database;
     private SlimeUtils slimeUtils;
+    private static Economy econ = null;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -131,9 +134,13 @@ public class PrivateMines extends JavaPlugin {
                     slimeUtils.setupSlimeWorld(UUID.randomUUID());
                 });
             }
-            getLogger().info("give on first join: " + Config.giveMineOnFirstJoin);
-            getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
 
+            getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+            if (!setupEconomy() ) {
+                privateMines.getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+                getServer().getPluginManager().disablePlugin(this);
+                return;
+            }
             Instant end = Instant.now();
             Duration loadTime = Duration.between(start, end);
             getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
@@ -148,6 +155,18 @@ public class PrivateMines extends JavaPlugin {
     public void setupSchematicUtils() {
         this.schematicStorage = new SchematicStorage();
         this.schematicIterator = new SchematicIterator(getSchematicStorage());
+    }
+
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return true;
     }
 
     public void loadMines() {
@@ -239,5 +258,9 @@ public class PrivateMines extends JavaPlugin {
 
     public SlimeUtils getSlimeUtils() {
         return slimeUtils;
+    }
+
+    public static Economy getEconomy() {
+        return econ;
     }
 }
