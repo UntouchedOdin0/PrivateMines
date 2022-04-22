@@ -16,4 +16,6 @@ public class Config {
     public static boolean notifyForUpdates = true;
     @Comment("The distance between the private mines")
     public static int mineDistance = 150;
+    @Comment("Should we give players a mine when they first join?")
+    public static boolean giveMineOnFirstJoin = false;
 }

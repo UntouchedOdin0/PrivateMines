@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+@Deprecated
 public class MineStorage {
 
     public Map<UUID, Mine> mines = new HashMap<>();

@@ -9,6 +9,7 @@ import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
+import me.untouchedodin0.privatemines.listener.PlayerJoinListener;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
@@ -112,6 +113,8 @@ public class PrivateMines extends JavaPlugin {
                 SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
                 schematicStorage.addSchematic(schematicFile, mineBlocks);
                 privateMines.getLogger().info("Loaded file: " + schematicFile);
+                privateMines.getLogger().info("minetype " + mineType.getName());
+                privateMines.getLogger().info("cost: " + mineType.getUpgradeCost());
             });
 
             this.database = new SQLite();
@@ -131,6 +134,8 @@ public class PrivateMines extends JavaPlugin {
                     slimeUtils.setupSlimeWorld(UUID.randomUUID());
                 });
             }
+            getLogger().info("give on first join: " + Config.giveMineOnFirstJoin);
+            getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
 
             Instant end = Instant.now();
             Duration loadTime = Duration.between(start, end);
