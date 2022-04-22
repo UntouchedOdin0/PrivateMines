@@ -23,12 +23,10 @@ import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
-import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
@@ -39,7 +37,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
 import java.io.File;
@@ -54,8 +51,6 @@ import java.util.UUID;
 public class MineFactory {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
-    MineStorage mineStorage = privateMines.getMineStorage();
-    MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
 
     /**
      * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
@@ -111,10 +106,6 @@ public class MineFactory {
 
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ());
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
-
-                    privateMines.getLogger().info(LocationUtils.toString(spongeL));
-                    privateMines.getLogger().info(LocationUtils.toString(lrailsL));
-                    privateMines.getLogger().info(LocationUtils.toString(urailsL));
 
                     CuboidRegion mineWGRegion = new CuboidRegion(world, lrailsV, urailsV);
                     localSession.setClipboard(clipboardHolder);
