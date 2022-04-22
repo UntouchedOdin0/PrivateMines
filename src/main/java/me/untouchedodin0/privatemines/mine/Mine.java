@@ -424,6 +424,7 @@ public class Mine {
                         Location mineLocation = mineData.getMineLocation();
                         delete(mineOwner);
                         mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
+                        economy.withdrawPlayer(player, nextType.getUpgradeCost());
                     }
                 }
             }

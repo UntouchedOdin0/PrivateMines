@@ -194,7 +194,6 @@ public class PrivateMines extends JavaPlugin {
                             Location spawn = LocationUtils.fromString(yml.getString("spawn"));
                             Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
 
-                            privateMines.getLogger().info("debug full: " + fullRegionMax);
                             MineData mineData = new MineDataBuilder()
                                     .setOwner(owner)
                                     .setMinimumMining(corner1)
