@@ -1,12 +1,12 @@
 plugins {
     id 'java'
     id 'java-library'
-    id 'com.github.johnrengelman.shadow' version '7.1.0'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
     id 'org.jetbrains.kotlin.jvm' version '1.6.20-RC'
 }
 
-group 'io.github.untouchedodin0'
+group 'me.untouchedodin0.privatemines'
 version '4.0.2-SNAPSHOT'
 
 repositories {
@@ -30,7 +30,6 @@ dependencies {
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.3.0-SNAPSHOT'
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.7'
     compileOnly 'org.projectlombok:lombok:1.18.22'
-//    compileOnly 'com.grinderwolf:slimeworldmanager-api:2.7.0-20220302.215927-13'
     compileOnly 'com.grinderwolf:slimeworldmanager-api:2.7.0-SNAPSHOT'
     compileOnly 'org.xerial:sqlite-jdbc:3.36.0.3'
 
@@ -51,7 +50,6 @@ shadowJar {
 
 task copyTo_DevServerOld(type: Copy) {
     from shadowJar
-//    into "E:/Coding/Spigot Test Servers/1.18 Slime World Manager (Paper)/plugins"
     into "E:/Coding/Spigot Test Servers/1.18 Private Mines (Paper and FAWE)/plugins"
 }
 
@@ -64,6 +62,30 @@ task copyTo_SWM(type: Copy) {
     from shadowJar
     into "E:/Coding/Spigot Test Servers/1.18 Slime World Manager (Paper)/plugins"
 }
+
+publishing {
+    publications {
+        library(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = 'central'
+            credentials(PasswordCredentials)
+            url = uri("https://repo.bristermitten.me/repository/maven-snapshots")
+        }
+    }
+}
+
+//publishing {
+//    publications.create<MavenPublication>("privatemines").from(components["java"])
+//    repositories.maven("https://s01.oss.sonatype.org/") {
+//        name = "mavencentral"
+//        credentials(PasswordCredentials)
+//    }
+//}
+
 
 //uploadArchives {
 //    repositories {

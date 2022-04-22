@@ -62,7 +62,7 @@ public class PrivateMinesCommand extends BaseCommand {
         Location location = mineWorldManager.getNextFreeLocation();
 //        MineType mineType = MineConfig.mineTypes.get("Default");
         MineType mineType = mineTypeManager.getDefaultMineType();
-        privateMines.getLogger().info("giving the player a mine using the mine type of " + mineType.getName());
+        privateMines.getLogger().info("Giving the player a mine using the mine type of " + mineType.getName());
         mineFactory.create(target, location, mineType);
     }
 

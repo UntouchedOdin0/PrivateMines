@@ -42,6 +42,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static java.nio.file.Files.list;
+
 public class PrivateMines extends JavaPlugin {
 
     private static PrivateMines privateMines;
@@ -152,7 +154,7 @@ public class PrivateMines extends JavaPlugin {
 
         CompletableFuture.runAsync(() -> {
             try {
-                Files.list(path)
+                list(path)
                         .filter(jsonMatcher::matches)
                         .forEach(filePath -> {
                             File file = filePath.toFile();
