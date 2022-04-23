@@ -78,4 +78,28 @@ class MineStorage {
         }
         return min!!.key
     }
+
+    fun getClosest(location: Location): Mine {
+        // Make a distances value and make an empty map for the distances
+        val distances: MutableMap<Mine, Double> = HashMap()
+        var min: Map.Entry<Mine, Double>? = null
+
+        // Iterate over all the mines calculating the distance
+        // from the location then add the mine, and it's distance
+        // into the map.
+
+        mines.forEach { (_: UUID?, mine: Mine) ->
+            val mineData = mine.mineData
+            val mineLocation = mineData.mineLocation
+            val distance = location.distance(mineLocation)
+            distances.putIfAbsent(mine, distance)
+        }
+        for (entry in distances.entries) {
+
+            if (min == null || min.value > entry.value) {
+                min = entry
+            }
+        }
+        return min!!.key
+    }
 }
