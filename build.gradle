@@ -33,6 +33,7 @@ dependencies {
     compileOnly 'com.grinderwolf:slimeworldmanager-api:2.7.0-SNAPSHOT'
     compileOnly 'org.xerial:sqlite-jdbc:3.36.0.3'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
+    compileOnly files('libs/UltraPrisonCore-1.10.18.jar')
 
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
