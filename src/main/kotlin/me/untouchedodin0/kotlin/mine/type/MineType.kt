@@ -13,6 +13,7 @@ class MineType {
     val resetTime: Int = 0
     val resetPercentage: Double = 0.0
     val upgradeCost: Double = 0.0
+    val upgradeCurrency: String? = null
     val materials: Map<Material, Double>? = null
     val flags: Map<String, Boolean>? = null
 }

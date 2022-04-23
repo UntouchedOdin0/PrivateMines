@@ -104,6 +104,7 @@ public class PrivateMines extends JavaPlugin {
 
             MineConfig.getMineTypes().forEach((s, mineType) -> {
                 mineTypeManager.registerMineType(mineType);
+                privateMines.getLogger().info("upgrade currency: " + mineType.getUpgradeCurrency());
             });
 
             MineConfig.mineTypes.forEach((name, mineType) -> {
@@ -136,7 +137,7 @@ public class PrivateMines extends JavaPlugin {
             }
 
             getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
-            if (!setupEconomy() ) {
+            if (!setupEconomy()) {
                 privateMines.getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
                 getServer().getPluginManager().disablePlugin(this);
                 return;

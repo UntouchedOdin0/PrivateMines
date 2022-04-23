@@ -12,7 +12,7 @@ mineTypes:
     resetTime: 5
     resetPercentage: 50.0
     upgradeCost: 1.0
-    upgradeCurrency: TOKENS
+    upgradeCurrency: VAULT # Supported currencies: VAULT, ULTRAPRISONCORE (Coming soon, hopefully...)
     materials:
       STONE: 0.9
       COBBLESTONE: 0.1
