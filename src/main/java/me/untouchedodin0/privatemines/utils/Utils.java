@@ -26,7 +26,6 @@ import me.untouchedodin0.privatemines.mine.data.MineData;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
-import redempt.redlib.sql.SQLHelper;
 
 import java.io.File;
 import java.io.FileInputStream;

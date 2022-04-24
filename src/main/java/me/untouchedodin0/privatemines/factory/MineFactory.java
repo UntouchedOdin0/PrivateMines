@@ -111,21 +111,21 @@ public class MineFactory {
                     localSession.setClipboard(clipboardHolder);
 
                     Operation operation = clipboardHolder.createPaste(editSession).to(vector).ignoreAirBlocks(true).build();
-                    Task.asyncDelayed(() -> {
-                        try {
-                            Operations.completeLegacy(operation);
-                            editSession.close();
-                        } catch (WorldEditException worldEditException) {
-                            worldEditException.printStackTrace();
-                        }
-                    });
+//                    Task.asyncDelayed(() -> {
+//                        try {
+//                            Operations.completeLegacy(operation);
+//                            editSession.close();
+//                        } catch (WorldEditException worldEditException) {
+//                            worldEditException.printStackTrace();
+//                        }
+//                    });
 
-//                    try {
-//                        Operations.completeLegacy(operation);
-//                        editSession.close();
-//                    } catch (WorldEditException worldEditException) {
-//                        worldEditException.printStackTrace();
-//                    }
+                    try {
+                        Operations.completeLegacy(operation);
+                        editSession.close();
+                    } catch (WorldEditException worldEditException) {
+                        worldEditException.printStackTrace();
+                    }
                     Instant pasted = Instant.now();
                     Duration durationPasted = Duration.between(start, pasted);
 
