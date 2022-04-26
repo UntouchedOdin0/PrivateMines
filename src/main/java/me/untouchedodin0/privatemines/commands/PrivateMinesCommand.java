@@ -27,6 +27,7 @@ import redempt.redlib.itemutils.ItemBuilder;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -174,6 +175,32 @@ public class PrivateMinesCommand extends BaseCommand {
                 } else {
                     player.sendMessage(ChatColor.RED + "Please set a valid tax amount!");
                 }
+            }
+        }
+    }
+
+    @Subcommand("ban")
+    @CommandPermission("privatemines.ban")
+    public void ban(Player player, Player target) {
+        if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You don't have a mine!");
+        } else {
+            Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
+            if (mine != null) {
+                mine.ban(Objects.requireNonNull(target.getPlayer()));
+            }
+        }
+    }
+
+    @Subcommand("unban")
+    @CommandPermission("privatemines.unban")
+    public void unban(Player player, Player target) {
+        if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You don't have a mine!");
+        } else {
+            Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
+            if (mine != null) {
+                mine.unban(target);
             }
         }
     }

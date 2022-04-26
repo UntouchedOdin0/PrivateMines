@@ -152,6 +152,7 @@ public class MineData {
     }
 
     public void removeBannedPlayer(UUID uuid) {
+        if (!bannedPlayers.contains(uuid)) return;
         bannedPlayers.remove(uuid);
     }
 

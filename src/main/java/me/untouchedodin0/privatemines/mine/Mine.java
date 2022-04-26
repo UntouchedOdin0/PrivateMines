@@ -10,7 +10,6 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
@@ -29,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -37,13 +37,11 @@ public class Mine {
 
     private final PrivateMines privateMines;
     private final MineTypeManager mineTypeManager;
-
     private UUID mineOwner;
     private BlockVector3 location;
     private MineData mineData;
     private Task task;
     private boolean canExpand = true;
-
 
     public Mine(PrivateMines privateMines) {
         this.privateMines = privateMines;
@@ -91,10 +89,14 @@ public class Mine {
         if (getMineData().getSpawnLocation().getBlock().getType().isBlock()) {
             getMineData().getSpawnLocation().getBlock().setType(Material.AIR);
         }
-        if (PaperLib.isPaper()) {
-            PaperLib.teleportAsync(player, getMineData().getSpawnLocation());
+        if (getMineData().getBannedPlayers().contains(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You're banned from this mine!");
         } else {
-            player.teleport(getMineData().getSpawnLocation());
+            if (PaperLib.isPaper()) {
+                PaperLib.teleportAsync(player, getMineData().getSpawnLocation());
+            } else {
+                player.teleport(getMineData().getSpawnLocation());
+            }
         }
     }
 
@@ -233,6 +235,24 @@ public class Mine {
         privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
     }
 
+    public void ban(Player player) {
+        if (mineData.getBannedPlayers().contains(player.getUniqueId())) return;
+        Player owner = Bukkit.getPlayer(mineData.getMineOwner());
+//        if (player.equals(owner)) return;
+        player.sendMessage(ChatColor.RED + "You've been banned from " + Objects.requireNonNull(owner).getName() + "'s mine!");
+        mineData.addBannedPlayer(player.getUniqueId());
+        setMineData(mineData);
+        saveMineData(Objects.requireNonNull(owner), mineData);
+    }
+
+    public void unban(Player player) {
+        Player owner = Bukkit.getPlayer(mineData.getMineOwner());
+        player.sendMessage(ChatColor.RED + "You've been unbanned from " + Objects.requireNonNull(owner).getName() + "'s mine!");
+        mineData.removeBannedPlayer(player.getUniqueId());
+        setMineData(mineData);
+        saveMineData(Objects.requireNonNull(owner), mineData);
+    }
+
     public void resetNoMessage() {
         MineData mineData = getMineData();
         MineType mineType = mineData.getMineType();
@@ -318,68 +338,45 @@ public class Mine {
         Path minesDirectory = privateMines.getMinesDirectory();
         File file = new File(minesDirectory + fileName);
         privateMines.getLogger().info("Saving file " + file.getName() + "...");
+        YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
+
+        MineType mineType = mineData.getMineType();
+        String mineTypeName = mineType.getName();
+
+        UUID owner = player.getUniqueId();
+        Location mineLocation = mineData.getMineLocation();
+        Location corner1 = mineData.getMinimumMining();
+        Location corner2 = mineData.getMaximumMining();
+        Location fullRegionMin = mineData.getMinimumFullRegion();
+        Location fullRegionMax = mineData.getMaximumFullRegion();
+
+        Location spawn = mineData.getSpawnLocation();
+        double tax = mineData.getTax();
+        boolean open = mineData.isOpen();
+        List<UUID> bannedPlayers = mineData.getBannedPlayers();
 
         if (file.exists()) {
-            file.delete();
+            yml.set("mineOwner", owner.toString());
+            yml.set("mineType", mineTypeName);
+            yml.set("mineLocation", LocationUtils.toString(mineLocation));
+            yml.set("corner1", LocationUtils.toString(corner1));
+            yml.set("corner2", LocationUtils.toString(corner2));
+            yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
+            yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
+            yml.set("spawn", LocationUtils.toString(spawn));
+            yml.set("tax", tax);
+            yml.set("isOpen", open);
+            yml.set("bannedPlayers", bannedPlayers.toString());
+
             try {
-                if (file.createNewFile()) {
-                    privateMines.getLogger().info("Created new file: " + file.getPath());
-
-                    YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
-
-                    MineType mineType = mineData.getMineType();
-                    String mineTypeName = mineType.getName();
-
-                    UUID owner = player.getUniqueId();
-                    Location mineLocation = mineData.getMineLocation();
-                    Location corner1 = mineData.getMinimumMining();
-                    Location corner2 = mineData.getMaximumMining();
-                    Location fullRegionMin = mineData.getMinimumFullRegion();
-                    Location fullRegionMax = mineData.getMaximumFullRegion();
-
-                    Location spawn = mineData.getSpawnLocation();
-                    double tax = mineData.getTax();
-                    boolean open = mineData.isOpen();
-
-                    yml.set("mineOwner", owner.toString());
-                    yml.set("mineType", mineTypeName);
-                    yml.set("mineLocation", LocationUtils.toString(mineLocation));
-                    yml.set("corner1", LocationUtils.toString(corner1));
-                    yml.set("corner2", LocationUtils.toString(corner2));
-                    yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
-                    yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
-                    yml.set("spawn", LocationUtils.toString(spawn));
-                    yml.set("tax", tax);
-                    yml.set("isOpen", open);
-
-                    try {
-                        yml.save(file);
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
-                    }
-                }
+                yml.save(file);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         } else {
             try {
                 if (file.createNewFile()) {
                     privateMines.getLogger().info("Created new file: " + file.getPath());
-
-                    YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
-
-                    MineType mineType = mineData.getMineType();
-                    String mineTypeName = mineType.getName();
-
-                    UUID owner = player.getUniqueId();
-                    Location mineLocation = mineData.getMineLocation();
-                    Location corner1 = mineData.getMinimumMining();
-                    Location corner2 = mineData.getMaximumMining();
-                    Location fullRegionMin = mineData.getMinimumFullRegion();
-                    Location fullRegionMax = mineData.getMaximumFullRegion();
-
-                    Location spawn = mineData.getSpawnLocation();
-
                     yml.set("mineOwner", owner.toString());
                     yml.set("mineType", mineTypeName);
                     yml.set("mineLocation", LocationUtils.toString(mineLocation));
