@@ -238,7 +238,7 @@ public class Mine {
     public void ban(Player player) {
         if (mineData.getBannedPlayers().contains(player.getUniqueId())) return;
         Player owner = Bukkit.getPlayer(mineData.getMineOwner());
-//        if (player.equals(owner)) return;
+        if (player.equals(owner)) return;
         player.sendMessage(ChatColor.RED + "You've been banned from " + Objects.requireNonNull(owner).getName() + "'s mine!");
         mineData.addBannedPlayer(player.getUniqueId());
         setMineData(mineData);
