@@ -216,15 +216,5 @@ public class MineFactory {
             }
         });
     }
-
-//    {
-//        if (!mineStorage.hasMine(player.getUniqueId())) return;
-//        Mine currentMine = mineStorage.get(player.getUniqueId());
-//        if (currentMine != null) {
-//            MineType currentType = currentMine.getMineType();
-//            MineType nextType = mineTypeManager.getNextMineType(currentType);
-//            currentMine.replace(player.getUniqueId(), nextType);
-//        }
-//    }
 }
 

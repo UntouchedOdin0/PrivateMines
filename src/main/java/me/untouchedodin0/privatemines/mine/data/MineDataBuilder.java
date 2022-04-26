@@ -1,13 +1,9 @@
 package me.untouchedodin0.privatemines.mine.data;
 
-import com.sk89q.worldedit.regions.Region;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import redempt.redlib.region.CuboidRegion;
 
-import java.util.EnumMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class MineDataBuilder {
@@ -23,15 +19,11 @@ public class MineDataBuilder {
     Location maximumFullRegion;
 
     CuboidRegion miningRegion;
-    Region fullRegion;
 
-    String worldName;
     MineType mineType;
 
     boolean isOpen;
     double tax = 5;
-
-    Map<Material, Double> materials = new EnumMap<>(Material.class);
 
     public MineDataBuilder setOwner(UUID uuid) {
         this.mineOwner = uuid;
