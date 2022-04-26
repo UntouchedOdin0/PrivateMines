@@ -216,9 +216,6 @@ public class PrivateMines extends JavaPlugin {
                                     .build();
                             mine.setMineData(mineData);
                             getMineStorage().addMine(owner, mine);
-                            getLogger().info("isOpen: " + isOpen);
-                            getLogger().info("tax: " + tax);
-
                             getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
                         });
             } catch (IOException e) {
@@ -281,9 +278,11 @@ public class PrivateMines extends JavaPlugin {
             getLogger().info("Registering Ultra Prison Core as the sell listener...");
             getServer().getPluginManager().registerEvents(new UPCSellListener(), this);
             return SellListener.ULTRAPRISONCORE;
-        } else {
-            getLogger().info("Loading up the internal sell listener system...");
-            return SellListener.INTERNAL;
+        } else if (Bukkit.getPluginManager().isPluginEnabled("AutoSell")) {
+            getLogger().info("Registering AutoSell as the sell listener...");
+            return SellListener.AUTOSELL;
         }
+        getLogger().info("Using the internal sell system!");
+        return SellListener.INTERNAL;
     }
 }
