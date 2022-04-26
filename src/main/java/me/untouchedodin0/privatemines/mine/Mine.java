@@ -339,6 +339,7 @@ public class Mine {
 
                     Location spawn = mineData.getSpawnLocation();
                     double tax = mineData.getTax();
+                    boolean open = mineData.isOpen();
 
                     yml.set("mineOwner", owner.toString());
                     yml.set("mineType", mineTypeName);
@@ -348,7 +349,8 @@ public class Mine {
                     yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
                     yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
                     yml.set("spawn", LocationUtils.toString(spawn));
-                    yml.set("tax", Double.toString(tax));
+                    yml.set("tax", tax);
+                    yml.set("isOpen", open);
 
                     try {
                         yml.save(file);

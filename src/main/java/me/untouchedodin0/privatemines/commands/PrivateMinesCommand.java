@@ -160,6 +160,10 @@ public class PrivateMinesCommand extends BaseCommand {
         } else {
             Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
             if (mine != null) {
+                if (tax == null) {
+                    player.sendMessage(ChatColor.GREEN + "Your tax is currently set to " + tax + "%");
+                    return;
+                }
                 MineData mineData = mine.getMineData();
                 if (tax <= 100 && tax > 0) {
                     mineData.setTax(tax);
@@ -188,9 +192,6 @@ public class PrivateMinesCommand extends BaseCommand {
             if (inventoryName.length() <= 32) {
                 // if inventory name is less than or equals to 32 (max inventory size) add players name into gui else don't
                 InventoryGUI inventoryGUI = new InventoryGUI(9, name + "'s Mine");
-                player.sendMessage("mine: " + mine);
-                player.sendMessage("owner: " + Bukkit.getPlayer(mineData.getMineOwner()));
-                player.sendMessage("owner uuid: " + mineData.getMineOwner());
                 ItemBuilder tax = new ItemBuilder(Material.PAPER)
                         .setName(ChatColor.GREEN + "Tax")
                         .setLore(ChatColor.GREEN + String.valueOf(mineData.getTax()) + "%");
@@ -216,9 +217,36 @@ public class PrivateMinesCommand extends BaseCommand {
 
                 inventoryGUI.open(player);
             }
-            player.sendMessage("mine: " + mine);
-            player.sendMessage("owner: " + Bukkit.getPlayer(mineData.getMineOwner()));
-            player.sendMessage("owner uuid: " + mineData.getMineOwner());
+        }
+    }
+
+    @Subcommand("open")
+    @CommandPermission("privatemines.open")
+    public void open(Player player) {
+        Mine mine = mineStorage.get(player.getUniqueId());
+        if (mine == null) {
+            player.sendMessage(ChatColor.RED + "You don't own a mine!");
+        } else {
+            MineData mineData = mine.getMineData();
+            mineData.setOpen(true);
+            mine.setMineData(mineData);
+            mine.saveMineData(player, mineData);
+            player.sendMessage(ChatColor.GREEN + "You have opened your mine!");
+        }
+    }
+
+    @Subcommand("close")
+    @CommandPermission("privatemines.close")
+    public void close(Player player) {
+        Mine mine = mineStorage.get(player.getUniqueId());
+        if (mine == null) {
+            player.sendMessage(ChatColor.RED + "You don't own a mine!");
+        } else {
+            MineData mineData = mine.getMineData();
+            mineData.setOpen(false);
+            mine.setMineData(mineData);
+            mine.saveMineData(player, mineData);
+            player.sendMessage(ChatColor.GRAY + "You have closed your mine!");
         }
     }
 

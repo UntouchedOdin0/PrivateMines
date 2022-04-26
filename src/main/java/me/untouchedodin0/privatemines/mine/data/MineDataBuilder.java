@@ -88,6 +88,16 @@ public class MineDataBuilder {
         return this;
     }
 
+    public MineDataBuilder setOpen(boolean isOpen) {
+        this.isOpen = isOpen;
+        return this;
+    }
+
+    public MineDataBuilder setTax(double tax) {
+        this.tax = tax;
+        return this;
+    }
+
     public MineData build() {
         // Create the mine data object and return it
         MineData mineData = new MineData();
@@ -102,6 +112,8 @@ public class MineDataBuilder {
         mineData.maximumFullRegion = maximumFullRegion;
         mineData.miningRegion = miningRegion;
         mineData.mineType = mineType;
+        mineData.isOpen = isOpen;
+        mineData.tax = tax;
         return mineData;
     }
 }

@@ -209,7 +209,6 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         // TODO does this file structure work with having multiple mines?
 
 //        try {

@@ -199,6 +199,8 @@ public class PrivateMines extends JavaPlugin {
                             Location fullRegionMax = LocationUtils.fromString(yml.getString("fullRegionMax"));
                             Location spawn = LocationUtils.fromString(yml.getString("spawn"));
                             Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
+                            boolean isOpen = yml.getBoolean("isOpen");
+                            double tax = yml.getDouble("tax");
 
                             MineData mineData = new MineDataBuilder()
                                     .setOwner(owner)
@@ -209,9 +211,14 @@ public class PrivateMines extends JavaPlugin {
                                     .setSpawnLocation(spawn)
                                     .setMineLocation(mineLocation)
                                     .setMineType(mineType)
+                                    .setOpen(isOpen)
+                                    .setTax(tax)
                                     .build();
                             mine.setMineData(mineData);
                             getMineStorage().addMine(owner, mine);
+                            getLogger().info("isOpen: " + isOpen);
+                            getLogger().info("tax: " + tax);
+
                             getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
                         });
             } catch (IOException e) {
