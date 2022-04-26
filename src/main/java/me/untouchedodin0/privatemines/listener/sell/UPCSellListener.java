@@ -1,5 +1,6 @@
 package me.untouchedodin0.privatemines.listener.sell;
 
+import dev.drawethree.ultraprisoncore.autosell.api.events.UltraPrisonAutoSellEvent;
 import dev.drawethree.ultraprisoncore.autosell.api.events.UltraPrisonSellAllEvent;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -26,8 +27,8 @@ public class UPCSellListener implements Listener {
         Location playerLocation = player.getLocation();
         Mine mine = mineStorage.getClosest(playerLocation);
         MineData mineData = mine.getMineData();
-
         Player owner = Bukkit.getOfflinePlayer(mineData.getMineOwner()).getPlayer();
+        if (player.equals(owner)) return;
 
         double tax = sellAllEvent.getSellPrice() / 100.0 * mineData.getTax();
         double sellPrice = sellAllEvent.getSellPrice();
@@ -35,7 +36,26 @@ public class UPCSellListener implements Listener {
         sellAllEvent.setSellPrice(afterTax);
         economy.depositPlayer(owner, tax);
         if (owner != null) {
-            owner.sendMessage(ChatColor.GREEN + "You've received $" + tax + " in taxes from " + player.getDisplayName() + "!");
+            owner.sendMessage(ChatColor.GREEN + "You've received $" + tax + " in taxes from " + player.getDisplayName() + ChatColor.GREEN + "!");
+        }
+    }
+
+    @EventHandler
+    public void onAutoSell(UltraPrisonAutoSellEvent autoSellEvent) {
+
+        Player player = autoSellEvent.getPlayer();
+        Location playerLocation = player.getLocation();
+        Mine mine = mineStorage.getClosest(playerLocation);
+        MineData mineData = mine.getMineData();
+        Player owner = Bukkit.getOfflinePlayer(mineData.getMineOwner()).getPlayer();
+        if (player.equals(owner)) return;
+
+        double tax = autoSellEvent.getMoneyToDeposit() / 100.0 * mineData.getTax();
+        double sellPrice = autoSellEvent.getMoneyToDeposit();
+        double afterTax = sellPrice - tax;
+        autoSellEvent.setMoneyToDeposit(afterTax);
+        if (owner != null) {
+            owner.sendMessage(ChatColor.GREEN + "You've received $" + tax + " in taxes from " + player.getDisplayName() + ChatColor.GREEN + "!");
         }
     }
 }

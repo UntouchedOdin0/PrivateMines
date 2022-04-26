@@ -10,6 +10,7 @@ import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.listener.PlayerJoinListener;
+import me.untouchedodin0.privatemines.listener.sell.UPCSellListener;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
@@ -17,6 +18,7 @@ import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.Database;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
+import me.untouchedodin0.privatemines.utils.SellListener;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -142,6 +144,9 @@ public class PrivateMines extends JavaPlugin {
                 getServer().getPluginManager().disablePlugin(this);
                 return;
             }
+
+            SellListener sellListener = registerSellListener();
+
             Instant end = Instant.now();
             Duration loadTime = Duration.between(start, end);
             getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
@@ -262,5 +267,16 @@ public class PrivateMines extends JavaPlugin {
 
     public static Economy getEconomy() {
         return econ;
+    }
+
+    public SellListener registerSellListener() {
+        if (Bukkit.getPluginManager().isPluginEnabled("UltraPrisonCore")) {
+            getLogger().info("Registering Ultra Prison Core as the sell listener...");
+            getServer().getPluginManager().registerEvents(new UPCSellListener(), this);
+            return SellListener.ULTRAPRISONCORE;
+        } else {
+            getLogger().info("Loading up the internal sell listener system...");
+            return SellListener.INTERNAL;
+        }
     }
 }

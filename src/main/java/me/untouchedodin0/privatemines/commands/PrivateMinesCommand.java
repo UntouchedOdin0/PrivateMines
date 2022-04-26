@@ -152,6 +152,28 @@ public class PrivateMinesCommand extends BaseCommand {
         }
     }
 
+    @Subcommand("tax")
+    @CommandPermission("privatemines.tax")
+    public void tax(Player player, Double tax) {
+        if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You don't have a mine!");
+        } else {
+            Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
+            if (mine != null) {
+                MineData mineData = mine.getMineData();
+                if (tax <= 100 && tax > 0) {
+                    mineData.setTax(tax);
+                    player.sendMessage(ChatColor.GREEN + "Successfully set your tax to " + tax + "%!");
+                    mine.setMineData(mineData);
+                    mineStorage.replaceMine(player.getUniqueId(), mine);
+                    mine.saveMineData(player, mineData);
+                } else {
+                    player.sendMessage(ChatColor.RED + "Please set a valid tax amount!");
+                }
+            }
+        }
+    }
+
     @Subcommand("info")
     @CommandPermission("privatemines.info")
     public void info(Player player) {

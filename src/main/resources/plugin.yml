@@ -2,3 +2,6 @@ name: PrivateMines
 main: me.untouchedodin0.privatemines.PrivateMines
 version: 4.0.3
 api-version: 1.13
+
+softdepend:
+  - UltraPrisonCore
