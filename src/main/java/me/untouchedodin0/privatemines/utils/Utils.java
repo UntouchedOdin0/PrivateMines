@@ -22,18 +22,14 @@ import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.mine.data.MineData;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 public class Utils {
 
@@ -180,93 +176,4 @@ public class Utils {
             }
         }
     }
-
-    public void saveMineData(UUID uuid, MineData mineData) {
-        Path minesDirectory = privateMines.getMinesDirectory();
-        File file = new File(minesDirectory + "/test.yml");
-        try {
-            if (file.createNewFile()) {
-                privateMines.getLogger().info("Created new file: " + file.getPath());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
-
-//        org.bukkit.World world = mineData.getMinimumMining().getWorld();
-//        privateMines.getLogger().info("world: " + world);
-
-        privateMines.getLogger().info("getMinimumMining: " + mineData.getMinimumMining());
-        privateMines.getLogger().info("getMaximumMining: " + mineData.getMaximumMining());
-
-//        yml.set("corner1", LocationUtils.toString(mineData.getMinimumMining()));
-//        yml.set("corner2", LocationUtils.toString(mineData.getMaximumMining()));
-//        yml.set("fullMin", LocationUtils.toString(mineData.getMinimumFullRegion()));
-//        yml.set("fullMax", LocationUtils.toString(mineData.getMaximumFullRegion()));
-        yml.set("spawn", "spawnLoc");
-        try {
-            yml.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        // TODO does this file structure work with having multiple mines?
-
-//        try {
-//            Files.write(playerDataFile, gson.toJson(mineData).getBytes());
-//        } catch (IOException e) {
-//            throw new RuntimeException("Could not save mine data", e);
-//        }
-    }
-
-//    public void insertDataIntoDatabase(UUID uuid, String mineLocation, String corner1, String corner2, String spawn) {
-//        SQLHelper sqlHelper = privateMines.getSqlHelper();
-//
-//        String sqlCommand = "INSERT INTO privatemines(mineOwner, mineLocation, corner1, corner2, spawn) " +
-//                "VALUES('%uuid%', '%minelocation%', '%corner1%', '%corner2%', '%spawn%');";
-//        String replacedCommand = sqlCommand
-//                .replace("%uuid%", uuid.toString())
-//                .replace("%minelocation%", mineLocation)
-//                .replace("%corner1%", corner1)
-//                .replace("%corner2%", corner2)
-//                .replace("%spawn%", spawn);
-//        privateMines.getLogger().info("replaced command: " + replacedCommand);
-//        sqlHelper.executeUpdate(replacedCommand);
-//    }
-
-//    public static void setMineFullFlags(Optional<IWrappedRegion> iWrappedRegion) {
-//        final WorldGuardWrapper worldGuardWrapper = WorldGuardWrapper.getInstance();
-//        Stream.of(
-//                        worldGuardWrapper.getFlag("block-place", WrappedState.class),
-//                        worldGuardWrapper.getFlag("block-break", WrappedState.class),
-//                        worldGuardWrapper.getFlag("mob-spawning", WrappedState.class)
-//                ).filter(Optional::isPresent)
-//                .map(Optional::get)
-//                .forEach(flag -> {
-//                    if (iWrappedRegion.isEmpty()) return;
-//                    iWrappedRegion.get().setFlag(flag, WrappedState.DENY);
-//                });
-//    }
-
-//    //todo fix the sql loading
-//    public void loadSQL() {
-//        SQLHelper sqlHelper = privateMines.getSqlHelper();
-//        SQLHelper.Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
-//
-//        privateMines.getLogger().info("LOADING SQL DATA:");
-//        privateMines.getLogger().info("is results empty: " + results.isEmpty());
-//
-//        while (results.next()) {
-//            privateMines.getLogger().info("results: " + results);
-//            String mineOwner = results.getString(1);
-//            String mineLocation = results.getString(2);
-//            String corner1 = results.getString(3);
-//            String corner2 = results.getString(4);
-//            String spawn = results.getString(5);
-//            privateMines.getLogger().info("mineOwner: " + mineOwner);
-//            privateMines.getLogger().info("mineLocation: " + mineLocation);
-//            privateMines.getLogger().info("corner1: " + corner1);
-//            privateMines.getLogger().info("corner2: " + corner2);
-//            privateMines.getLogger().info("spawn: " + spawn);
-//        }
-//    }
 }

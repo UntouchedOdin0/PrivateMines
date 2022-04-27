@@ -10,6 +10,7 @@ import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.listener.PlayerJoinListener;
+import me.untouchedodin0.privatemines.listener.sell.AutoSellListener;
 import me.untouchedodin0.privatemines.listener.sell.UPCSellListener;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
@@ -42,6 +43,7 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -280,6 +282,7 @@ public class PrivateMines extends JavaPlugin {
             return SellListener.ULTRAPRISONCORE;
         } else if (Bukkit.getPluginManager().isPluginEnabled("AutoSell")) {
             getLogger().info("Registering AutoSell as the sell listener...");
+            getServer().getPluginManager().registerEvents(new AutoSellListener(), this);
             return SellListener.AUTOSELL;
         }
         getLogger().info("Using the internal sell system!");
