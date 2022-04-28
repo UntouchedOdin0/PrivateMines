@@ -19,7 +19,6 @@ import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.Database;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
-import me.untouchedodin0.privatemines.utils.SellListener;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -88,6 +87,7 @@ public class PrivateMines extends JavaPlugin {
             Utils utils = new Utils(this);
 
             registerCommands();
+            registerSellListener();
             setupSchematicUtils();
 
             try {
@@ -145,8 +145,6 @@ public class PrivateMines extends JavaPlugin {
                 getServer().getPluginManager().disablePlugin(this);
                 return;
             }
-
-            SellListener sellListener = registerSellListener();
 
             Instant end = Instant.now();
             Duration loadTime = Duration.between(start, end);
@@ -274,17 +272,16 @@ public class PrivateMines extends JavaPlugin {
         return econ;
     }
 
-    public SellListener registerSellListener() {
+    public void registerSellListener() {
         if (Bukkit.getPluginManager().isPluginEnabled("UltraPrisonCore")) {
             getLogger().info("Registering Ultra Prison Core as the sell listener...");
             getServer().getPluginManager().registerEvents(new UPCSellListener(), this);
-            return SellListener.ULTRAPRISONCORE;
+            return;
         } else if (Bukkit.getPluginManager().isPluginEnabled("AutoSell")) {
             getLogger().info("Registering AutoSell as the sell listener...");
             getServer().getPluginManager().registerEvents(new AutoSellListener(), this);
-            return SellListener.AUTOSELL;
+            return;
         }
         getLogger().info("Using the internal sell system!");
-        return SellListener.INTERNAL;
     }
 }

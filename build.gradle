@@ -21,6 +21,7 @@ repositories {
     maven { url = 'https://repo.codemc.org/repository/maven-public/' }
     maven { url = 'https://redempt.dev' }
     maven { url = 'https://hub.jeff-media.com/nexus/repository/jeff-media-public/' }
+    maven { url = 'https://jitpack.io' }
 }
 
 dependencies {
@@ -34,15 +35,18 @@ dependencies {
     compileOnly 'org.xerial:sqlite-jdbc:3.36.0.3'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
     compileOnly 'me.lucko:helper:5.6.10'
+
     compileOnly files('libs/UltraPrisonCore-1.10.18.jar')
     compileOnly files('libs/AutoSellAPI-1.2.0.jar')
 
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
     implementation 'com.github.Redempt:RedLib:6.5.1.8'
+
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'com.flowpowered:flow-math:1.0.3'
     implementation 'io.papermc:paperlib:1.0.7'
+    implementation 'com.github.unldenis:Hologram-Lib:master-SNAPSHOT'
 }
 
 shadowJar {

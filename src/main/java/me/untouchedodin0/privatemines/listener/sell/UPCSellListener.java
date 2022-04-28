@@ -6,6 +6,7 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.data.MineData;
+import me.untouchedodin0.privatemines.utils.Utils;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -55,7 +56,7 @@ public class UPCSellListener implements Listener {
         double afterTax = sellPrice - tax;
         autoSellEvent.setMoneyToDeposit(afterTax);
         if (owner != null) {
-            owner.sendMessage(ChatColor.GREEN + "You've received $" + tax + " in taxes from " + player.getDisplayName() + ChatColor.GREEN + "!");
+            Utils.sendActionBar(owner, "You've received $" + tax + " in taxes from " + player.getDisplayName() + ChatColor.GREEN + "!");
         }
     }
 }

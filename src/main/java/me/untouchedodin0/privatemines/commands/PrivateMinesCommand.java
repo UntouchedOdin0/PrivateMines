@@ -187,7 +187,7 @@ public class PrivateMinesCommand extends BaseCommand {
         } else {
             Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
             if (mine != null) {
-                mine.ban(Objects.requireNonNull(target.getPlayer()));
+                mine.ban(Objects.requireNonNull(target));
             }
         }
     }
