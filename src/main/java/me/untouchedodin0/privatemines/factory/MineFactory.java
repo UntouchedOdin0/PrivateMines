@@ -1,5 +1,6 @@
 package me.untouchedodin0.privatemines.factory;
 
+import com.fastasyncworldedit.core.Fawe;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -42,6 +43,7 @@ import redempt.redlib.misc.Task;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -83,6 +85,12 @@ public class MineFactory {
 
                     World world = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()));
                     EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
+                    try {
+                        EditSessionBuilder editSessionBuilder = EditSessionBuilder.class.getDeclaredConstructor().newInstance();
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                             NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
                     LocalSession localSession = new LocalSession();
 
                     Clipboard clipboard = clipboardReader.read();

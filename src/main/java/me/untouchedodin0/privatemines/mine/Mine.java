@@ -209,12 +209,12 @@ public class Mine {
 
         int blocks = 0;
 
-        int xMin = cornerA.getBlockX();
-        int xMax = cornerB.getBlockX();
-        int yMin = cornerA.getBlockY();
-        int yMax = cornerB.getBlockY();
-        int zMin = cornerA.getBlockZ();
-        int zMax = cornerB.getBlockZ();
+        int xMax = Integer.max(cornerA.getBlockX(), cornerB.getBlockX());
+        int xMin = Integer.min(cornerA.getBlockX(), cornerB.getBlockX());
+        int yMax = Integer.max(cornerA.getBlockY(), cornerB.getBlockY());
+        int yMin = Integer.min(cornerA.getBlockY(), cornerB.getBlockY());
+        int zMax = Integer.max(cornerA.getBlockZ(), cornerB.getBlockZ());
+        int zMin = Integer.min(cornerA.getBlockZ(), cornerB.getBlockZ());
 
         Instant start = Instant.now();
 
