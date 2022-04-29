@@ -84,14 +84,12 @@ public class MineFactory {
                     Instant start = Instant.now();
 
                     World world = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()));
-                    EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).build();
-                    try {
-                        EditSessionBuilder editSessionBuilder = EditSessionBuilder.class.getDeclaredConstructor().newInstance();
-                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                             NoSuchMethodException e) {
-                        throw new RuntimeException(e);
-                    }
+                    EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).fastMode(true).build();
                     LocalSession localSession = new LocalSession();
+
+                    privateMines.getLogger().info("world: " + world);
+                    privateMines.getLogger().info("editSession: " + editSession);
+                    privateMines.getLogger().info("localSession: " + localSession);
 
                     Clipboard clipboard = clipboardReader.read();
                     ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
