@@ -108,40 +108,29 @@ public class Mine {
     public void delete(UUID uuid) {
         MineData mineData = getMineData();
 
-        Location cornerA = mineData.getMinimumFullRegion();
-        Location cornerB = mineData.getMaximumFullRegion();
+        Location corner1 = mineData.getMinimumFullRegion();
+        BlockVector3 corner1BV3 = BukkitAdapter.asBlockVector(mineData.getMinimumFullRegion());
+        BlockVector3 corner2BV3 = BukkitAdapter.asBlockVector(mineData.getMaximumFullRegion());
 
         Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
         String regionName = String.format("mine-%s", Objects.requireNonNull(player).getUniqueId());
 
-        World world = cornerA.getWorld();
+        World world = corner1.getWorld();
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionManager regionManager = container.get(BukkitAdapter.adapt(Objects.requireNonNull(world)));
         Objects.requireNonNull(regionManager).removeRegion(regionName);
-
-        int blocks = 0;
-
-        int xMax = Integer.max(cornerA.getBlockX(), cornerB.getBlockX());
-        int xMin = Integer.min(cornerA.getBlockX(), cornerB.getBlockX());
-        int yMax = Integer.max(cornerA.getBlockY(), cornerB.getBlockY());
-        int yMin = Integer.min(cornerA.getBlockY(), cornerB.getBlockY());
-        int zMax = Integer.max(cornerA.getBlockZ(), cornerB.getBlockZ());
-        int zMin = Integer.min(cornerA.getBlockZ(), cornerB.getBlockZ());
-
         Instant start = Instant.now();
+        final RandomPattern randomPattern = new RandomPattern();
+        Pattern air = BukkitAdapter.adapt(Material.AIR.createBlockData());
+        randomPattern.add(air, 1.0);
 
-        for (int x = xMin; x <= xMax; x++) {
-            for (int y = yMin; y <= yMax; y++) {
-                for (int z = zMin; z <= zMax; z++) {
-                    world.getBlockAt(x, y, z).setType(Material.AIR);
-                    blocks++;
-                }
-            }
+        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
+            Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1BV3, corner2BV3);
+            editSession.setBlocks(region, randomPattern);
         }
 
         Instant filled = Instant.now();
         Duration durationToFill = Duration.between(start, filled);
-        privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
         privateMines.getMineStorage().removeMine(uuid);
         String fileName = String.format("/%s.yml", uuid);
         Path minesDirectory = privateMines.getMinesDirectory();
