@@ -126,14 +126,19 @@ public class MineFactory {
 //                        }
 //                    });
 
-                    try {
-                        Operations.completeLegacy(operation);
-                        editSession.close();
-                    } catch (WorldEditException worldEditException) {
-                        worldEditException.printStackTrace();
-                    }
+                    Instant startPaste = Instant.now();
+                    Task.asyncDelayed(() -> {
+                        try {
+                            Operations.complete(operation);
+                            // may need to use Operations.completeLegacy(operation);
+                            editSession.close();
+                        } catch (WorldEditException worldEditException) {
+                            worldEditException.printStackTrace();
+                        }
+                    });
+
                     Instant pasted = Instant.now();
-                    Duration durationPasted = Duration.between(start, pasted);
+                    Duration durationPasted = Duration.between(startPaste, pasted);
 
                     Region region = clipboard.getRegion();
                     Region newRegion;
