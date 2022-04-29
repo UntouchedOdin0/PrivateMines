@@ -1,6 +1,5 @@
 package me.untouchedodin0.privatemines.factory;
 
-import com.fastasyncworldedit.core.Fawe;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -43,7 +42,6 @@ import redempt.redlib.misc.Task;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -87,10 +85,6 @@ public class MineFactory {
                     EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).fastMode(true).build();
                     LocalSession localSession = new LocalSession();
 
-                    privateMines.getLogger().info("world: " + world);
-                    privateMines.getLogger().info("editSession: " + editSession);
-                    privateMines.getLogger().info("localSession: " + localSession);
-
                     Clipboard clipboard = clipboardReader.read();
                     ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
 
@@ -117,14 +111,6 @@ public class MineFactory {
                     localSession.setClipboard(clipboardHolder);
 
                     Operation operation = clipboardHolder.createPaste(editSession).to(vector).ignoreAirBlocks(true).build();
-//                    Task.asyncDelayed(() -> {
-//                        try {
-//                            Operations.completeLegacy(operation);
-//                            editSession.close();
-//                        } catch (WorldEditException worldEditException) {
-//                            worldEditException.printStackTrace();
-//                        }
-//                    });
 
                     Instant startPaste = Instant.now();
                     Task.asyncDelayed(() -> {
