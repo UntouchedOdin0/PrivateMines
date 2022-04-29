@@ -1,8 +1,13 @@
 package me.untouchedodin0.privatemines.mine;
 
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -199,37 +204,28 @@ public class Mine {
     public void reset() {
         MineData mineData = getMineData();
         MineType mineType = mineData.getMineType();
+        Location location = mineData.getMinimumMining();
+        BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
+        BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
 
         Map<Material, Double> materials = mineType.getMaterials();
-        final WeightedRandom<Material> randomPattern = WeightedRandom.fromDoubleMap(materials);
+        final RandomPattern randomPattern = new RandomPattern();
 
-        Location cornerA = mineData.getMinimumMining();
-        Location cornerB = mineData.getMaximumMining();
-        World world = cornerA.getWorld();
-
-        int blocks = 0;
-
-        int xMax = Integer.max(cornerA.getBlockX(), cornerB.getBlockX());
-        int xMin = Integer.min(cornerA.getBlockX(), cornerB.getBlockX());
-        int yMax = Integer.max(cornerA.getBlockY(), cornerB.getBlockY());
-        int yMin = Integer.min(cornerA.getBlockY(), cornerB.getBlockY());
-        int zMax = Integer.max(cornerA.getBlockZ(), cornerB.getBlockZ());
-        int zMin = Integer.min(cornerA.getBlockZ(), cornerB.getBlockZ());
-
-        Instant start = Instant.now();
-
-        for (int x = xMin; x <= xMax; x++) {
-            for (int y = yMin; y <= yMax; y++) {
-                for (int z = zMin; z <= zMax; z++) {
-                    if (world != null) {
-                        Material material = randomPattern.roll();
-                        world.getBlockAt(x, y, z).setType(material, false);
-                    }
-                    blocks++;
-                }
-            }
+        if (materials != null) {
+            materials.forEach((material, chance) -> {
+                Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+                randomPattern.add(pattern, chance);
+            });
         }
 
+        World world = location.getWorld();
+
+        int blocks = 0;
+        Instant start = Instant.now();
+        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
+            Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
+            editSession.setBlocks(region, randomPattern);
+        }
         Instant filled = Instant.now();
         Duration durationToFill = Duration.between(start, filled);
         privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
