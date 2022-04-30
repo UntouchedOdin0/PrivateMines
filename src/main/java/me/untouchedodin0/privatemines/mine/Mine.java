@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class Mine {
 
@@ -131,6 +132,10 @@ public class Mine {
 
         Instant filled = Instant.now();
         Duration durationToFill = Duration.between(start, filled);
+
+        long durationInMS = TimeUnit.NANOSECONDS.toMillis(durationToFill.toNanos());
+
+        privateMines.getLogger().info(String.format("It took %dms to reset the mine", durationInMS));
         privateMines.getMineStorage().removeMine(uuid);
         String fileName = String.format("/%s.yml", uuid);
         Path minesDirectory = privateMines.getMinesDirectory();
@@ -209,15 +214,10 @@ public class Mine {
 
         World world = location.getWorld();
 
-        int blocks = 0;
-        Instant start = Instant.now();
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
             Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
             editSession.setBlocks(region, randomPattern);
         }
-        Instant filled = Instant.now();
-        Duration durationToFill = Duration.between(start, filled);
-        privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
     }
 
     public void ban(Player player) {

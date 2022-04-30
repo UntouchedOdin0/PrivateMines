@@ -47,6 +47,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class MineFactory {
 
@@ -122,9 +123,6 @@ public class MineFactory {
                             worldEditException.printStackTrace();
                         }
                     });
-
-                    Instant pasted = Instant.now();
-                    Duration durationPasted = Duration.between(startPaste, pasted);
 
                     Region region = clipboard.getRegion();
                     Region newRegion;
@@ -206,7 +204,11 @@ public class MineFactory {
                     teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));
                     player.spigot().sendMessage(teleportMessage);
 
-                    privateMines.getLogger().info("Mine creation time: " + durationPasted.toMillis() + "ms");
+                    Instant pasted = Instant.now();
+                    Duration durationPasted = Duration.between(startPaste, pasted);
+
+                    final long microseconds = TimeUnit.NANOSECONDS.toMicros(durationPasted.toNanos());
+                    privateMines.getLogger().info("Mine creation time: " + microseconds + "micro seconds");
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
