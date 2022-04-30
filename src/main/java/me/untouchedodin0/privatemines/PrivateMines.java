@@ -20,6 +20,8 @@ import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.Database;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.metrics.Metrics;
+import me.untouchedodin0.privatemines.utils.metrics.Metrics.SingleLineChart;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.milkbowl.vault.economy.Economy;
@@ -52,6 +54,8 @@ import static java.nio.file.Files.list;
 public class PrivateMines extends JavaPlugin {
 
     private static PrivateMines privateMines;
+    private static final int PLUGIN_ID = 11413;
+
     private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
     private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
     private final Path addonsDirectory = getDataFolder().toPath().resolve("addons");
@@ -145,7 +149,8 @@ public class PrivateMines extends JavaPlugin {
                 getServer().getPluginManager().disablePlugin(this);
                 return;
             }
-
+            Metrics metrics = new Metrics(this, PLUGIN_ID);
+            metrics.addCustomChart(new SingleLineChart("mines", () -> mineStorage.getTotalMines()));
             Instant end = Instant.now();
             Duration loadTime = Duration.between(start, end);
             getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");

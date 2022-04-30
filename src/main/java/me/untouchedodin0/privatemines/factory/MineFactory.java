@@ -63,6 +63,7 @@ public class MineFactory {
 
     @SuppressWarnings("DanglingJavadoc")
     public void create(Player player, Location location, MineType mineType) {
+        Instant start = Instant.now();
         UUID uuid = player.getUniqueId();
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         Mine mine = new Mine(privateMines);
@@ -79,9 +80,6 @@ public class MineFactory {
 
             if (clipboardFormat != null) {
                 try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(schematicFile))) {
-
-                    Instant start = Instant.now();
-
                     World world = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()));
                     EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).fastMode(true).build();
                     LocalSession localSession = new LocalSession();
@@ -113,7 +111,6 @@ public class MineFactory {
 
                     Operation operation = clipboardHolder.createPaste(editSession).to(vector).ignoreAirBlocks(true).build();
 
-                    Instant startPaste = Instant.now();
                     Task.asyncDelayed(() -> {
                         try {
                             Operations.complete(operation);
@@ -204,11 +201,11 @@ public class MineFactory {
                     teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));
                     player.spigot().sendMessage(teleportMessage);
 
-                    Instant pasted = Instant.now();
-                    Duration durationPasted = Duration.between(startPaste, pasted);
+                    Instant finished = Instant.now();
+                    Duration creationDuration = Duration.between(start, finished);
 
-                    final long microseconds = TimeUnit.NANOSECONDS.toMicros(durationPasted.toNanos());
-                    privateMines.getLogger().info("Mine creation time: " + microseconds + "micro seconds");
+                    final long microseconds = TimeUnit.NANOSECONDS.toMicros(creationDuration.toNanos());
+                    privateMines.getLogger().info("Mine creation time: " + microseconds + " micro seconds");
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
