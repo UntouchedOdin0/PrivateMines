@@ -216,6 +216,7 @@ public class Mine {
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
             Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
+            //todo make a mask to only replace air (makes it faster).
             editSession.setBlocks(region, randomPattern);
         }
     }
