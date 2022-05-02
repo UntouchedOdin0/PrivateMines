@@ -8,9 +8,9 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
@@ -61,7 +61,6 @@ public class MineFactory {
      * @param mineType the type of mine to paste
      */
 
-    @SuppressWarnings("DanglingJavadoc")
     public void create(Player player, Location location, MineType mineType) {
         Instant start = Instant.now();
         UUID uuid = player.getUniqueId();
@@ -77,7 +76,6 @@ public class MineFactory {
         Map<String, Boolean> flags = mineType.getFlags();
 
         Task.asyncDelayed(() -> {
-
             if (clipboardFormat != null) {
                 try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(schematicFile))) {
                     World world = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()));
@@ -105,21 +103,16 @@ public class MineFactory {
 
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ());
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
-
-                    CuboidRegion mineWGRegion = new CuboidRegion(world, lrailsV, urailsV);
                     localSession.setClipboard(clipboardHolder);
 
                     Operation operation = clipboardHolder.createPaste(editSession).to(vector).ignoreAirBlocks(true).build();
 
-                    Task.asyncDelayed(() -> {
-                        try {
-                            Operations.complete(operation);
-                            // may need to use Operations.completeLegacy(operation);
-                            editSession.close();
-                        } catch (WorldEditException worldEditException) {
-                            worldEditException.printStackTrace();
-                        }
-                    });
+                    try {
+                        Operations.complete(operation);
+                        editSession.close();
+                    } catch (WorldEditException worldEditException) {
+                        worldEditException.printStackTrace();
+                    }
 
                     Region region = clipboard.getRegion();
                     Region newRegion;
@@ -136,8 +129,6 @@ public class MineFactory {
 
                         Location fullMin = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMinimumPoint());
                         Location fullMax = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMaximumPoint());
-                        CuboidRegion fullRegion = new CuboidRegion(newRegion.getMinimumPoint(), newRegion.getMaximumPoint());
-                        ProtectedCuboidRegion fullWorldGuardRegion = new ProtectedCuboidRegion(regionName, newRegion.getMinimumPoint(), newRegion.getMaximumPoint());
                         ProtectedCuboidRegion miningWorldGuardRegion = new ProtectedCuboidRegion(regionName, lrailsV, urailsV);
                         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
                         RegionManager regionManager = container.get(world);
@@ -146,11 +137,12 @@ public class MineFactory {
                         }
 
                         /**
-                            This sadly has to be called synchronously else it'll throw a
-                            {@link java.lang.IllegalStateException}
-                            This is due to how WorldGuard handles their flags...
-                            @see com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent
+                         This sadly has to be called synchronously else it'll throw a
+                         {@link java.lang.IllegalStateException}
+                         This is due to how WorldGuard handles their flags...
+                         @see com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent
                          */
+
                         Task.syncDelayed(() -> {
                             if (flags != null) {
                                 flags.forEach((s, aBoolean) -> {
@@ -188,24 +180,31 @@ public class MineFactory {
                         e.printStackTrace();
                     }
 
-                    //noinspection unused
+                    try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(world).fastMode(true).build()) {
+                        BlockVector3 spawn = BlockVector3.at(spongeL.getBlockX(), spongeL.getBlockY(), spongeL.getBlockZ());
+                        Pattern pattern = BukkitAdapter.adapt(Material.AIR.createBlockData());
+                        session.setBlock(spawn, pattern);
+                    }
 
-                    Task.syncDelayed(() -> spongeL.getBlock().setType(Material.AIR));
                     if (privateMines.getMineStorage().hasMine(player.getUniqueId())) {
                         privateMines.getMineStorage().replaceMine(player.getUniqueId(), mine);
                     } else {
                         privateMines.getMineStorage().addMine(player.getUniqueId(), mine);
                     }
 
+                    mine.reset();
                     TextComponent teleportMessage = new TextComponent(ChatColor.GREEN + "Click me to teleport to your mine!");
                     teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));
-                    player.spigot().sendMessage(teleportMessage);
+//                    player.spigot().sendMessage(teleportMessage);
 
                     Instant finished = Instant.now();
                     Duration creationDuration = Duration.between(start, finished);
 
-                    final long microseconds = TimeUnit.NANOSECONDS.toMicros(creationDuration.toNanos());
-                    privateMines.getLogger().info("Mine creation time: " + microseconds + " micro seconds");
+                    final long microseconds = TimeUnit.NANOSECONDS.toMillis(creationDuration.toNanos());
+                    privateMines.getLogger().info("Mine creation time: " + microseconds + " milliseconds");
+                    Task.syncDelayed(() -> {
+                        player.teleport(spongeL);
+                    });
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }

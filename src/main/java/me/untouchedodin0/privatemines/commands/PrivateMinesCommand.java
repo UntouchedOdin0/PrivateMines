@@ -29,6 +29,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.md_5.bungee.api.ChatColor.*;
@@ -104,7 +105,6 @@ public class PrivateMinesCommand extends BaseCommand {
         } else {
             Mine mine = mineStorage.get(player.getUniqueId());
             if (mine != null) {
-                mine.reset();
                 mine.teleport(player);
             }
         }
@@ -292,17 +292,22 @@ public class PrivateMinesCommand extends BaseCommand {
             if (mine != null) {
                 player.sendMessage(ChatColor.GREEN + "Stress test resetting your mine " + ChatColor.GOLD + times + ChatColor.GREEN + " times!");
                 AtomicInteger atomicInteger = new AtomicInteger();
-
                 Instant start = Instant.now();
-                for (int i = 0; i < times; i++) {
-                    mine.resetNoMessage();
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                                                TextComponent.fromLegacyText(ChatColor.GREEN + "Finished Reset #" +
-                                                                                     atomicInteger.incrementAndGet()));
-                }
-                Instant filled = Instant.now();
-                Duration durationToFill = Duration.between(start, filled);
-                player.sendMessage(String.format(ChatColor.GREEN + "It took %dms to fill your mine %d times!", durationToFill.toMillis(), times));
+
+                CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> {
+                    for (int i = 0; i < times; i++) {
+                        mine.reset();
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                                                    TextComponent.fromLegacyText(ChatColor.GREEN + "Finished Reset #" +
+                                                                                         atomicInteger.incrementAndGet()));
+                    }
+                }).thenRun(() -> {
+                    Instant filled = Instant.now();
+                    Duration durationToFill = Duration.between(start, filled);
+                    System.out.println("Finished stress test in " + Duration.between(start, Instant.now()).toMillis() + "ms");
+                    System.out.println("Thread id: " + Thread.currentThread().getId());
+                    player.sendMessage(String.format(ChatColor.GREEN + "It took %dms to fill your mine %d times!", durationToFill.toMillis(), times));
+                });
             }
         }
     }
