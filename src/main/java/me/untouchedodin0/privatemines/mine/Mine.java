@@ -239,40 +239,6 @@ public class Mine {
         saveMineData(Objects.requireNonNull(owner), mineData);
     }
 
-    public void resetNoMessage() {
-        MineData mineData = getMineData();
-        MineType mineType = mineData.getMineType();
-
-        Map<Material, Double> materials = mineType.getMaterials();
-
-        final WeightedRandom<Material> randomPattern = WeightedRandom.fromDoubleMap(materials);
-
-        Location cornerA = mineData.getMinimumMining();
-        Location cornerB = mineData.getMaximumMining();
-        World world = cornerA.getWorld();
-
-        int blocks = 0;
-
-        int xMax = Integer.max(cornerA.getBlockX(), cornerB.getBlockX());
-        int xMin = Integer.min(cornerA.getBlockX(), cornerB.getBlockX());
-        int yMax = Integer.max(cornerA.getBlockY(), cornerB.getBlockY());
-        int yMin = Integer.min(cornerA.getBlockY(), cornerB.getBlockY());
-        int zMax = Integer.max(cornerA.getBlockZ(), cornerB.getBlockZ());
-        int zMin = Integer.min(cornerA.getBlockZ(), cornerB.getBlockZ());
-
-        for (int x = xMin; x <= xMax; x++) {
-            for (int y = yMin; y <= yMax; y++) {
-                for (int z = zMin; z <= zMax; z++) {
-                    if (world != null) {
-                        Material material = randomPattern.roll();
-                        world.getBlockAt(x, y, z).setType(material);
-                    }
-                    blocks++;
-                }
-            }
-        }
-    }
-
     public boolean canExpand(final int amount) {
         final World world = privateMines.getMineWorldManager().getMinesWorld();
         final var min = getMineData().getMinimumMining();

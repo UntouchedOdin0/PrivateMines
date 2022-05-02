@@ -19,6 +19,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import redempt.crunch.CompiledExpression;
+import redempt.crunch.Crunch;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.inventorygui.InventoryGUI;
 import redempt.redlib.inventorygui.ItemButton;
@@ -307,6 +309,40 @@ public class PrivateMinesCommand extends BaseCommand {
                     System.out.println("Finished stress test in " + Duration.between(start, Instant.now()).toMillis() + "ms");
                     System.out.println("Thread id: " + Thread.currentThread().getId());
                     player.sendMessage(String.format(ChatColor.GREEN + "It took %dms to fill your mine %d times!", durationToFill.toMillis(), times));
+                });
+            }
+        }
+    }
+
+    @Subcommand("dev/reset/stresstest/expression")
+    @CommandPermission("privatemines.dev.stresstest.expression")
+    @Syntax("<times> &e- Reset your mine a certain amount of times to test the speed using an expression")
+    public void stressTestExpression(Player player, String expression) {
+        if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
+            player.sendMessage("Player doesn't own a mine!");
+        } else {
+            Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
+            if (mine != null) {
+                CompiledExpression compiledExpression = Crunch.compileExpression(expression);
+                double value = compiledExpression.evaluate();
+
+                player.sendMessage(ChatColor.GREEN + "Stress test resetting your mine " + ChatColor.GOLD + compiledExpression.evaluate() + ChatColor.GREEN + " times!");
+                AtomicInteger atomicInteger = new AtomicInteger();
+                Instant start = Instant.now();
+
+                CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> {
+                    for (int i = 0; i < value; i++) {
+                        mine.reset();
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                                                    TextComponent.fromLegacyText(ChatColor.GREEN + "Finished Reset #" +
+                                                                                         atomicInteger.incrementAndGet()));
+                    }
+                }).thenRun(() -> {
+                    Instant filled = Instant.now();
+                    Duration durationToFill = Duration.between(start, filled);
+                    System.out.println("Finished stress test in " + Duration.between(start, Instant.now()).toMillis() + "ms");
+                    System.out.println("Thread id: " + Thread.currentThread().getId());
+                    player.sendMessage(String.format(ChatColor.GREEN + "It took %dms to fill your mine %d times!", durationToFill.toMillis(), (int) value));
                 });
             }
         }
