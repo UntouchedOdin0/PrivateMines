@@ -139,7 +139,7 @@ public class PrivateMines extends JavaPlugin {
 
             if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
                 slimeUtils = new SlimeUtils();
-                Task task = Task.asyncDelayed(() -> {
+                Task.asyncDelayed(() -> {
                     slimeUtils.setupSlimeWorld(UUID.randomUUID());
                 });
             }
