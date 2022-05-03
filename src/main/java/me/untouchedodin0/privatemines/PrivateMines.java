@@ -5,6 +5,7 @@ import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
+import me.untouchedodin0.privatemines.commands.UsePlayerShop;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
@@ -161,6 +162,7 @@ public class PrivateMines extends JavaPlugin {
     private void registerCommands() {
         PaperCommandManager paperCommandManager = new PaperCommandManager(this);
         paperCommandManager.registerCommand(new PrivateMinesCommand(this));
+        paperCommandManager.registerCommand(new UsePlayerShop(this, mineStorage));
     }
 
     public void setupSchematicUtils() {

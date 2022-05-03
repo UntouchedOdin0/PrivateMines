@@ -71,6 +71,13 @@ public class MineData {
         return mineType;
     }
 
+    public void setShop(Shop shop) {
+        this.shop = shop;
+    }
+
+    public Shop getShop() {
+        return shop;
+    }
 
     public boolean isOpen() {
         return isOpen;

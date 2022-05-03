@@ -30,6 +30,7 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.playershops.Shop;
+import me.untouchedodin0.privatemines.playershops.ShopBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
@@ -45,6 +46,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -67,16 +69,27 @@ public class MineFactory {
         UUID uuid = player.getUniqueId();
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         Mine mine = new Mine(privateMines);
-        Shop shop = new Shop();
+        Map<String, Boolean> flags = mineType.getFlags();
+        Map<Material, Double> prices = new HashMap<>();
 
+//        Material[] mats = Material.values();
+        Map<Material, Double> materials = mineType.getMaterials();
+        if (materials != null) {
+            materials.forEach((material, aDouble) -> {
+                privateMines.getLogger().info("Material: " + material.name() + " Price: " + aDouble);
+                prices.put(material, aDouble);
+            });
+        }
+
+        Shop shop = new ShopBuilder().setOwner(uuid).setPrices(prices).build();
+
+        privateMines.getLogger().info("Materials: " + prices.entrySet());
         String regionName = String.format("mine-%s", player.getUniqueId());
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         SchematicStorage storage = privateMines.getSchematicStorage();
         SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
-
-        Map<String, Boolean> flags = mineType.getFlags();
 
         Task.asyncDelayed(() -> {
             if (clipboardFormat != null) {
@@ -176,6 +189,7 @@ public class MineFactory {
                                 .setSpawnLocation(spongeL)
                                 .setMineLocation(location)
                                 .setMineType(mineType)
+                                .setShop(shop)
                                 .build();
                         mine.setMineData(mineData);
                         mine.saveMineData(player, mineData);
