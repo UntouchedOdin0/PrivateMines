@@ -51,8 +51,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-import static java.nio.file.Files.list;
-
 public class PrivateMines extends JavaPlugin {
 
     private static PrivateMines privateMines;
@@ -113,7 +111,6 @@ public class PrivateMines extends JavaPlugin {
 
             MineConfig.getMineTypes().forEach((s, mineType) -> {
                 mineTypeManager.registerMineType(mineType);
-                privateMines.getLogger().info("upgrade currency: " + mineType.getUpgradeCurrency());
             });
 
             MineConfig.mineTypes.forEach((name, mineType) -> {

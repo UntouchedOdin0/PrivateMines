@@ -73,20 +73,20 @@ task copyTo_SWM(type: Copy) {
     into "E:/Coding/Spigot Test Servers/1.18 Slime World Manager (Paper)/plugins"
 }
 
-publishing {
-    publications {
-        library(MavenPublication) {
-            from components.java
-        }
-    }
-    repositories {
-        maven {
-            name = 'central'
-            credentials(PasswordCredentials)
-            url = uri("https://repo.bristermitten.me/repository/maven-snapshots")
-        }
-    }
-}
+//publishing {
+//    publications {
+//        library(MavenPublication) {
+//            from components.java
+//        }
+//    }
+//    repositories {
+//        maven {
+//            name = 'central'
+//            credentials(PasswordCredentials)
+//            url = uri("https://repo.bristermitten.me/repository/maven-snapshots")
+//        }
+//    }
+//}
 
 //publishing {
 //    publications.create<MavenPublication>("privatemines").from(components["java"])
