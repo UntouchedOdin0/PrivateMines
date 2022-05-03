@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 import static java.nio.file.Files.list;
 
@@ -184,46 +185,43 @@ public class PrivateMines extends JavaPlugin {
         Path path = getMinesDirectory();
 
         CompletableFuture.runAsync(() -> {
-            try {
-                list(path)
-                        .filter(jsonMatcher::matches)
-                        .forEach(filePath -> {
-                            File file = filePath.toFile();
-                            Mine mine = new Mine(privateMines);
-//                            MineData mineData = new MineData();
-                            getLogger().info("Loading file " + file.getName() + "....");
-                            YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
+            try (Stream<Path> paths = Files.walk(path).filter(jsonMatcher::matches)) {
+                paths.forEach(streamPath -> {
+                    File file = streamPath.toFile();
+                    Mine mine = new Mine(privateMines);
+                    getLogger().info("Loading file " + file.getName() + "....");
+                    YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
 
-                            UUID owner = UUID.fromString(Objects.requireNonNull(yml.getString("mineOwner")));
-                            String mineTypeName = yml.getString("mineType");
-                            MineType mineType = mineTypeManager.getMineType(mineTypeName);
-                            Location corner1 = LocationUtils.fromString(yml.getString("corner1"));
-                            Location corner2 = LocationUtils.fromString(yml.getString("corner2"));
-                            Location fullRegionMin = LocationUtils.fromString(yml.getString("fullRegionMin"));
-                            Location fullRegionMax = LocationUtils.fromString(yml.getString("fullRegionMax"));
-                            Location spawn = LocationUtils.fromString(yml.getString("spawn"));
-                            Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
-                            boolean isOpen = yml.getBoolean("isOpen");
-                            double tax = yml.getDouble("tax");
+                    UUID owner = UUID.fromString(Objects.requireNonNull(yml.getString("mineOwner")));
+                    String mineTypeName = yml.getString("mineType");
+                    MineType mineType = mineTypeManager.getMineType(mineTypeName);
+                    Location corner1 = LocationUtils.fromString(yml.getString("corner1"));
+                    Location corner2 = LocationUtils.fromString(yml.getString("corner2"));
+                    Location fullRegionMin = LocationUtils.fromString(yml.getString("fullRegionMin"));
+                    Location fullRegionMax = LocationUtils.fromString(yml.getString("fullRegionMax"));
+                    Location spawn = LocationUtils.fromString(yml.getString("spawn"));
+                    Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
+                    boolean isOpen = yml.getBoolean("isOpen");
+                    double tax = yml.getDouble("tax");
 
-                            MineData mineData = new MineDataBuilder()
-                                    .setOwner(owner)
-                                    .setMinimumMining(corner1)
-                                    .setMaximumMining(corner2)
-                                    .setMinimumFullRegion(fullRegionMin)
-                                    .setMaximumFullRegion(fullRegionMax)
-                                    .setSpawnLocation(spawn)
-                                    .setMineLocation(mineLocation)
-                                    .setMineType(mineType)
-                                    .setOpen(isOpen)
-                                    .setTax(tax)
-                                    .build();
-                            mine.setMineData(mineData);
-                            getMineStorage().addMine(owner, mine);
-                            getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
-                        });
+                    MineData mineData = new MineDataBuilder()
+                            .setOwner(owner)
+                            .setMinimumMining(corner1)
+                            .setMaximumMining(corner2)
+                            .setMinimumFullRegion(fullRegionMin)
+                            .setMaximumFullRegion(fullRegionMax)
+                            .setSpawnLocation(spawn)
+                            .setMineLocation(mineLocation)
+                            .setMineType(mineType)
+                            .setOpen(isOpen)
+                            .setTax(tax)
+                            .build();
+                    mine.setMineData(mineData);
+                    getMineStorage().addMine(owner, mine);
+                    getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
+                });
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         });
     }
