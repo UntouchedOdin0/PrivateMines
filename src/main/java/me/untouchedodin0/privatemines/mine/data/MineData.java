@@ -1,6 +1,7 @@
 package me.untouchedodin0.privatemines.mine.data;
 
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.privatemines.playershops.Shop;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import redempt.redlib.region.CuboidRegion;
@@ -21,6 +22,8 @@ public class MineData {
     Location minimumFullRegion;
     Location maximumFullRegion;
     MineType mineType;
+
+    Shop shop;
     boolean isOpen;
     double tax = 5;
 
@@ -33,33 +36,16 @@ public class MineData {
         return mineOwner;
     }
 
-    public void setMineOwner(UUID mineOwner) {
-        this.mineOwner = mineOwner;
-    }
-
-    public UUID getCoOwner() {
-        return coOwner;
-    }
-
-    public void setCoOwner(UUID coOwner) {
-        this.coOwner = coOwner;
-    }
 
     public Location getMineLocation() {
         return mineLocation;
     }
 
-    public void setMineLocation(Location mineLocation) {
-        this.mineLocation = mineLocation;
-    }
 
     public Location getSpawnLocation() {
         return spawnLocation;
     }
 
-    public void setSpawnLocation(Location spawnLocation) {
-        this.spawnLocation = spawnLocation;
-    }
 
     public Location getMinimumMining() {
         return minimumMining;
@@ -73,41 +59,18 @@ public class MineData {
         return maximumMining;
     }
 
-    public void setMaximumMining(Location maximumMining) {
-        this.maximumMining = maximumMining;
-    }
-
-    public CuboidRegion getMiningRegion() {
-        return miningRegion;
-    }
-
-    public void setMiningRegion(CuboidRegion miningRegion) {
-        this.miningRegion = miningRegion;
-    }
-
     public Location getMinimumFullRegion() {
         return minimumFullRegion;
-    }
-
-    public void setMinimumFullRegion(Location minimumFullRegion) {
-        this.minimumFullRegion = minimumFullRegion;
     }
 
     public Location getMaximumFullRegion() {
         return maximumFullRegion;
     }
 
-    public void setMaximumFullRegion(Location maximumFullRegion) {
-        this.maximumFullRegion = maximumFullRegion;
-    }
-
     public MineType getMineType() {
         return mineType;
     }
 
-    public void setMineType(MineType mineType) {
-        this.mineType = mineType;
-    }
 
     public boolean isOpen() {
         return isOpen;
@@ -123,14 +86,6 @@ public class MineData {
 
     public void setTax(double tax) {
         this.tax = tax;
-    }
-
-    public Map<Material, Double> getMaterials() {
-        return materials;
-    }
-
-    public void setMaterials(Map<Material, Double> materials) {
-        this.materials = materials;
     }
 
     public void addWhitelistedPlayer(UUID uuid) {

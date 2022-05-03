@@ -1,6 +1,7 @@
 package me.untouchedodin0.privatemines.mine.data;
 
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.privatemines.playershops.Shop;
 import org.bukkit.Location;
 import redempt.redlib.region.CuboidRegion;
 
@@ -9,7 +10,6 @@ import java.util.UUID;
 public class MineDataBuilder {
 
     UUID mineOwner;
-    UUID coOwner;
     Location mineLocation;
     Location spawnLocation;
     Location npcLocation;
@@ -19,19 +19,15 @@ public class MineDataBuilder {
     Location maximumFullRegion;
 
     CuboidRegion miningRegion;
-
     MineType mineType;
+
+    Shop shop = new Shop();
 
     boolean isOpen;
     double tax = 5;
 
     public MineDataBuilder setOwner(UUID uuid) {
         this.mineOwner = uuid;
-        return this;
-    }
-
-    public MineDataBuilder setCoOwner(UUID uuid) {
-        this.coOwner = uuid;
         return this;
     }
 
@@ -70,11 +66,6 @@ public class MineDataBuilder {
         return this;
     }
 
-    public MineDataBuilder setMiningRegion(CuboidRegion cuboidRegion) {
-        this.miningRegion = cuboidRegion;
-        return this;
-    }
-
     public MineDataBuilder setMineType(MineType mineType) {
         this.mineType = mineType;
         return this;
@@ -90,11 +81,15 @@ public class MineDataBuilder {
         return this;
     }
 
+    public MineDataBuilder setShop(Shop shop) {
+        this.shop = shop;
+        return this;
+    }
+
     public MineData build() {
         // Create the mine data object and return it
         MineData mineData = new MineData();
         mineData.mineOwner = mineOwner;
-        mineData.coOwner = coOwner;
         mineData.mineLocation = mineLocation;
         mineData.spawnLocation = spawnLocation;
         mineData.npcLocation = npcLocation;
@@ -106,6 +101,7 @@ public class MineDataBuilder {
         mineData.mineType = mineType;
         mineData.isOpen = isOpen;
         mineData.tax = tax;
+        mineData.shop = shop;
         return mineData;
     }
 }

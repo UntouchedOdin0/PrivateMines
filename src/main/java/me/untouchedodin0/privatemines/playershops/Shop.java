@@ -1,6 +1,6 @@
 package me.untouchedodin0.privatemines.playershops;
 
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldedit.regions.Region;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,7 +20,7 @@ public class Shop {
 
     UUID owner;
     Map<Material, Double> prices = new HashMap<>();
-    ProtectedCuboidRegion region;
+    Region region;
 
     public UUID getOwner() {
         return owner;
@@ -42,5 +42,13 @@ public class Shop {
                 player.sendMessage(ChatColor.GREEN + "Updated prices of " + material + " to $" + price);
             }
         }
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
+    public void setPrices(Map<Material, Double> prices) {
+        this.prices = prices;
     }
 }

@@ -1,8 +1,8 @@
 package me.untouchedodin0.privatemines.utils.world;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.bukkit.World;
 import org.bukkit.generator.ChunkGenerator;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
