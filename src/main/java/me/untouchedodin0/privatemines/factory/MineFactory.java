@@ -75,15 +75,10 @@ public class MineFactory {
 //        Material[] mats = Material.values();
         Map<Material, Double> materials = mineType.getMaterials();
         if (materials != null) {
-            materials.forEach((material, aDouble) -> {
-                privateMines.getLogger().info("Material: " + material.name() + " Price: " + aDouble);
-                prices.put(material, aDouble);
-            });
+            prices.putAll(materials);
         }
 
         Shop shop = new ShopBuilder().setOwner(uuid).setPrices(prices).build();
-
-        privateMines.getLogger().info("Materials: " + prices.entrySet());
         String regionName = String.format("mine-%s", player.getUniqueId());
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
