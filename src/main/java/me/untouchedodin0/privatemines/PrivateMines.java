@@ -21,6 +21,8 @@ import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.Database;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.addon.AddonLoader;
+import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.metrics.Metrics;
 import me.untouchedodin0.privatemines.utils.metrics.Metrics.SingleLineChart;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
@@ -66,6 +68,9 @@ public class PrivateMines extends JavaPlugin {
     private MineWorldManager mineWorldManager;
     private MineTypeManager mineTypeManager;
     private ConfigManager configManager;
+
+    private AddonManager addonManager;
+    private AddonLoader addonLoader;
     private Database database;
     private SlimeUtils slimeUtils;
     private static Economy econ = null;
@@ -134,6 +139,8 @@ public class PrivateMines extends JavaPlugin {
             loadMines();
             startAutoReset();
             PaperLib.suggestPaper(this);
+            addonLoader = new AddonLoader();
+            addonManager = new AddonManager(this);
 
             if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
                 slimeUtils = new SlimeUtils();
@@ -264,6 +271,10 @@ public class PrivateMines extends JavaPlugin {
 
     public MineTypeManager getMineTypeManager() {
         return mineTypeManager;
+    }
+
+    public AddonManager getAddonManager() {
+        return addonManager;
     }
 
     public SlimeUtils getSlimeUtils() {
