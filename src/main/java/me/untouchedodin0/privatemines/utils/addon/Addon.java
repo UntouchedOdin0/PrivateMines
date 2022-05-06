@@ -27,6 +27,14 @@ public abstract class Addon {
 
     public abstract void onReload();
 
+    public File getAddonJarFile() {
+        return addonJarFile;
+    }
+
+    public void setAddonJarFile(File addonJarFile) {
+        this.addonJarFile = addonJarFile;
+    }
+
     public final String getName() {
         return name;
     }
@@ -65,10 +73,6 @@ public abstract class Addon {
 
     public void setConfigFile(File configFile) {
         this.configFile = configFile;
-    }
-
-    public File getAddonJarFile() {
-        return addonJarFile;
     }
 
     public YamlConfiguration getConfig() {

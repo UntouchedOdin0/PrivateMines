@@ -92,8 +92,10 @@ public class PrivateMines extends JavaPlugin {
             mineStorage = new MineStorage();
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
+            addonManager = new AddonManager(this);
 
             Utils utils = new Utils(this);
+            AddonLoader addonLoader = new AddonLoader();
 
             registerCommands();
             registerSellListener();
@@ -139,8 +141,6 @@ public class PrivateMines extends JavaPlugin {
             loadMines();
             startAutoReset();
             PaperLib.suggestPaper(this);
-            addonLoader = new AddonLoader();
-            addonManager = new AddonManager(this);
 
             if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
                 slimeUtils = new SlimeUtils();
@@ -225,6 +225,22 @@ public class PrivateMines extends JavaPlugin {
                     mine.setMineData(mineData);
                     getMineStorage().addMine(owner, mine);
                     getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
+                });
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public void loadAddons() {
+        final PathMatcher jarMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
+        Path path = getAddonsDirectory();
+
+        CompletableFuture.runAsync(() -> {
+            try (Stream<Path> paths = Files.walk(path).filter(jarMatcher::matches)) {
+                paths.forEach(streamPath -> {
+                    File file = streamPath.toFile();
+                    getLogger().info("Loading addon file " + file.getName() + "....");
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);

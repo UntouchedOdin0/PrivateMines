@@ -8,10 +8,17 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -22,30 +29,85 @@ public class AddonLoader {
 
     public AddonLoader() {
         final File addonFolder = new File(privateMines.getDataFolder(), "addons");
-        if (!addonFolder.exists()) {
-            boolean created = addonFolder.mkdirs();
-        }
+        final PathMatcher jarMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
+        Path path = privateMines.getAddonsDirectory();
 
-        if (addonFolder.exists()) return;
-        final File[] addonFiles = addonFolder.listFiles();
+        privateMines.getLogger().info("Loading addons...");
 
-        for (File addonFile : addonFiles) {
-            if (!addonFile.getName().endsWith(".jar")) return;
-            privateMines.getLogger().info("Loading addon file: " + addonFile);
+        CompletableFuture.runAsync(() -> {
+            try (Stream<Path> paths = Files.walk(path).filter(jarMatcher::matches)) {
+                paths.forEach(streamPath -> {
+                    File file = streamPath.toFile();
+                    privateMines.getLogger().info("Loading addon file " + file.getName() + "....");
+                    try {
+                        URL url = file.toURI().toURL();
+                        URLClassLoader classLoader = (URLClassLoader)ClassLoader.getSystemClassLoader();
+                        Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+                        method.setAccessible(true);
+                        method.invoke(classLoader, url);
 
-            try (ZipFile zipFile = new ZipFile(addonFile)) {
-                final InputStream inputStream = zipFile.getInputStream(zipFile.getEntry("addon.yml"));
-                if (inputStream == null) {
-                    privateMines.getLogger().warning("Could not find addon.yml in " + addonFile.getName());
-                } else {
-                    final YamlConfiguration addonConfig = this.getYamlFromStream(inputStream);
-                    final Addon addon = this.loadAddon(addonFile, addonConfig);
-                    addonManager.addAddon(addon);
-                }
+                        privateMines.getLogger().info("URL: " + url);
+                        privateMines.getLogger().info("ClassLoader: " + classLoader);
+                        privateMines.getLogger().info("Method: " + method);
+
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+//                    try (ZipFile zipFile = new ZipFile(file)) {
+//                        final InputStream inputStream = zipFile.getInputStream(zipFile.getEntry("addon.yml"));
+//                        if (inputStream == null) {
+//                            privateMines.getLogger().warning("Could not find addon.yml in " + file.getName());
+//                        } else {
+//                            final YamlConfiguration addonConfig = this.getYamlFromStream(inputStream);
+//                        }
+//                    } catch (IOException e) {
+//                        privateMines.getLogger().warning("Could not load addon.yml in " + file.getName());
+//                    }
+//                    Addon addon = new Addon() {
+//                        @Override
+//                        public void onEnable() {
+//                            privateMines.getLogger().info("Addon: " + getName() + " has been enabled!");
+//                        }
+//
+//                        @Override
+//                        public void onDisable() {
+//
+//                        }
+//
+//                        @Override
+//                        public void onReload() {
+//
+//                        }
+//                    };
+//                });
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+                });
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
+        });
+
+//        for (File addonFile : addonFiles) {
+//            if (!addonFile.getName().endsWith(".jar")) return;
+//            privateMines.getLogger().info("Loading addon file: " + addonFile);
+//
+//            try (ZipFile zipFile = new ZipFile(addonFile)) {
+//                final InputStream inputStream = zipFile.getInputStream(zipFile.getEntry("addon.yml"));
+//                if (inputStream == null) {
+//                    privateMines.getLogger().warning("Could not find addon.yml in " + addonFile.getName());
+//                } else {
+//                    final YamlConfiguration addonConfig = this.getYamlFromStream(inputStream);
+//                    final Addon addon = this.loadAddon(addonFile, addonConfig);
+//                    addonManager.addAddon(addon);
+//                }
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
     }
 
     /**
