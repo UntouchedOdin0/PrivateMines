@@ -18,4 +18,6 @@ public class Config {
     public static int mineDistance = 150;
     @Comment("Should we give players a mine when they first join?")
     public static boolean giveMineOnFirstJoin = false;
+    @Comment("Should we only replace air blocks when the mine resets?")
+    public static boolean onlyReplaceAir = true;
 }

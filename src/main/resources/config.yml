@@ -5,6 +5,7 @@ sellNpc: WHITE_WOOL
 upgradeMaterial: OBSIDIAN
 mineDistance: 150
 giveMineOnFirstJoin: true
+onlyReplaceAir: true
 
 mineTypes:
   Test:

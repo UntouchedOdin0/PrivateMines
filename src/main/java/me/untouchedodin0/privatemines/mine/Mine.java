@@ -8,8 +8,6 @@ import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -17,6 +15,7 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
@@ -27,7 +26,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
-import redempt.redlib.misc.WeightedRandom;
 
 import java.io.File;
 import java.io.IOException;
@@ -215,13 +213,18 @@ public class Mine {
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
             Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
-            //todo make a mask to only replace air (makes it faster).
-//            editSession.replaceBlocks(region, )
-            if (BlockTypes.AIR != null) {
-                editSession.replaceBlocks(region, Collections.singleton(BlockTypes.AIR.getDefaultState().toBaseBlock()), randomPattern);
+
+            if (Config.onlyReplaceAir) {
+                if (BlockTypes.AIR != null) {
+                    editSession.replaceBlocks(region, Collections.singleton(BlockTypes.AIR.getDefaultState().toBaseBlock()), randomPattern);
+                    int changedBlocks = editSession.getBlockChangeCount();
+                    privateMines.getLogger().info(String.format("Changed %d blocks", changedBlocks));
+                }
+            } else {
+                editSession.setBlocks(region, randomPattern);
                 int changedBlocks = editSession.getBlockChangeCount();
+                privateMines.getLogger().info(String.format("Changed %d blocks", changedBlocks));
             }
-//            editSession.setBlocks(region, randomPattern);
         }
     }
 
