@@ -135,6 +135,7 @@ public class MineFactory {
                     localSession.setRegionSelector(world, regionSelector);
                     regionSelector.learnChanges();
 
+                    //noinspection DanglingJavadoc
                     try {
                         newRegion = regionSelector.getRegion();
 
@@ -153,7 +154,6 @@ public class MineFactory {
                          This is due to how WorldGuard handles their flags...
                          @see com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent
                          */
-
                         Task.syncDelayed(() -> {
                             if (flags != null) {
                                 flags.forEach((s, aBoolean) -> {
@@ -214,9 +214,7 @@ public class MineFactory {
 
                     final long microseconds = TimeUnit.NANOSECONDS.toMillis(creationDuration.toNanos());
                     privateMines.getLogger().info("Mine creation time: " + microseconds + " milliseconds");
-                    Task.syncDelayed(() -> {
-                        player.teleport(spongeL);
-                    });
+                    Task.syncDelayed(() -> player.teleport(spongeL));
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
