@@ -218,12 +218,10 @@ public class Mine {
                 if (BlockTypes.AIR != null) {
                     editSession.replaceBlocks(region, Collections.singleton(BlockTypes.AIR.getDefaultState().toBaseBlock()), randomPattern);
                     int changedBlocks = editSession.getBlockChangeCount();
-                    privateMines.getLogger().info(String.format("Changed %d blocks", changedBlocks));
                 }
             } else {
                 editSession.setBlocks(region, randomPattern);
                 int changedBlocks = editSession.getBlockChangeCount();
-                privateMines.getLogger().info(String.format("Changed %d blocks", changedBlocks));
             }
         }
     }
