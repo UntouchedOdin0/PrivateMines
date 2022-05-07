@@ -219,6 +219,31 @@ public class Mine {
         }
     }
 
+    public void resetNoCheck() {
+        MineData mineData = getMineData();
+        MineType mineType = mineData.getMineType();
+        Location location = mineData.getMinimumMining();
+        BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
+        BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
+
+        Map<Material, Double> materials = mineType.getMaterials();
+        final RandomPattern randomPattern = new RandomPattern();
+
+        if (materials != null) {
+            materials.forEach((material, chance) -> {
+                Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+                randomPattern.add(pattern, chance);
+            });
+        }
+
+        World world = location.getWorld();
+
+        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
+            Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
+            editSession.setBlocks(region, randomPattern);
+        }
+    }
+
     public void startResetTask() {
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineType mineType = mineTypeManager.getMineType(mineData.getMineType());

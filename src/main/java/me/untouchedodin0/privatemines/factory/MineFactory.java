@@ -204,7 +204,7 @@ public class MineFactory {
                         privateMines.getMineStorage().addMine(player.getUniqueId(), mine);
                     }
 
-                    mine.reset();
+                    mine.resetNoCheck();
                     TextComponent teleportMessage = new TextComponent(ChatColor.GREEN + "Click me to teleport to your mine!");
                     teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));
 //                    player.spigot().sendMessage(teleportMessage);
