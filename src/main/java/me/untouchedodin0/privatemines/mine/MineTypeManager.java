@@ -58,6 +58,12 @@ public class MineTypeManager {
                 .getValue();
     }
 
+    public MineType getNextMineType(String name) {
+        return Optional.ofNullable(mineTypes.higherEntry(name))
+                .orElse(mineTypes.lastEntry())
+                .getValue();
+    }
+
     public NavigableMap<String, MineType> getMineTypes() {
         return mineTypes;
     }

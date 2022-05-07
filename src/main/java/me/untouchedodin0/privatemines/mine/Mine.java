@@ -43,7 +43,6 @@ public class Mine {
     private UUID mineOwner;
     private BlockVector3 location;
     private MineData mineData;
-    private Task task;
     private boolean canExpand = true;
 
     public Mine(PrivateMines privateMines) {
@@ -74,14 +73,6 @@ public class Mine {
 
     public void setMineData(MineData mineData) {
         this.mineData = mineData;
-    }
-
-    public Task getTask() {
-        return task;
-    }
-
-    public void setTask(Task task) {
-        this.task = task;
     }
 
     public MineType getMineType() {
@@ -144,6 +135,10 @@ public class Mine {
         }
     }
 
+    /**
+     * @Deprecated This isn't really used anymore.
+     */
+    @Deprecated
     public void replace(UUID uuid, MineType newType) {
         MineData mineData = getMineData();
 
@@ -217,13 +212,18 @@ public class Mine {
             if (Config.onlyReplaceAir) {
                 if (BlockTypes.AIR != null) {
                     editSession.replaceBlocks(region, Collections.singleton(BlockTypes.AIR.getDefaultState().toBaseBlock()), randomPattern);
-                    int changedBlocks = editSession.getBlockChangeCount();
                 }
             } else {
                 editSession.setBlocks(region, randomPattern);
-                int changedBlocks = editSession.getBlockChangeCount();
             }
         }
+    }
+
+    public void startResetTask() {
+        MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
+        MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
+        int resetTime = mineType.getResetTime();
+        Task.asyncRepeating(this::reset, 0L, resetTime * 20L);
     }
 
     public void ban(Player player) {
@@ -280,13 +280,6 @@ public class Mine {
             setMineData(mineData);
             privateMines.getMineStorage().replaceMine(getMineOwner(), this);
         }
-    }
-
-    public void startResetTask() {
-        MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
-        MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
-        int resetTime = mineType.getResetTime();
-        this.task = Task.syncRepeating(this::reset, 0L, resetTime * 20L);
     }
 
     public void saveMineData(Player player, MineData mineData) {
@@ -362,7 +355,7 @@ public class Mine {
         UUID mineOwner = mineData.getMineOwner();
         Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
         MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
-        MineType nextType = mineTypeManager.getNextMineType(currentType);
+        MineType nextType = mineTypeManager.getNextMineType(currentType.getName());
         double upgradeCost = nextType.getUpgradeCost();
 
         if (player != null) {

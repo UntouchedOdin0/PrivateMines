@@ -116,7 +116,6 @@ public class PrivateMines extends JavaPlugin {
                     .saveDefaults()
                     .load();
 
-            privateMines.getLogger().info("Should we only replace air? " + Config.onlyReplaceAir);
             MineConfig.getMineTypes().forEach((s, mineType) -> {
                 mineTypeManager.registerMineType(mineType);
             });
