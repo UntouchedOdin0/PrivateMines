@@ -18,10 +18,7 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
-import me.untouchedodin0.privatemines.storage.sql.Database;
-import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
-import me.untouchedodin0.privatemines.utils.addon.AddonLoader;
 import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.metrics.Metrics;
 import me.untouchedodin0.privatemines.utils.metrics.Metrics.SingleLineChart;
@@ -70,8 +67,7 @@ public class PrivateMines extends JavaPlugin {
     private ConfigManager configManager;
 
     private AddonManager addonManager;
-    private AddonLoader addonLoader;
-    private Database database;
+
     private SlimeUtils slimeUtils;
     private static Economy econ = null;
 
@@ -94,9 +90,6 @@ public class PrivateMines extends JavaPlugin {
             mineTypeManager = new MineTypeManager(this);
             addonManager = new AddonManager(this);
 
-            Utils utils = new Utils(this);
-            AddonLoader addonLoader = new AddonLoader();
-
             registerCommands();
             registerSellListener();
             setupSchematicUtils();
@@ -116,10 +109,7 @@ public class PrivateMines extends JavaPlugin {
                     .saveDefaults()
                     .load();
 
-            MineConfig.getMineTypes().forEach((s, mineType) -> {
-                mineTypeManager.registerMineType(mineType);
-            });
-
+            MineConfig.getMineTypes().forEach((s, mineType) -> mineTypeManager.registerMineType(mineType));
             MineConfig.mineTypes.forEach((name, mineType) -> {
                 File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
                 if (!schematicFile.exists()) {
@@ -131,22 +121,13 @@ public class PrivateMines extends JavaPlugin {
                 privateMines.getLogger().info("Loaded file: " + schematicFile);
             });
 
-            this.database = new SQLite();
-            database.load();
-
-//            Connection connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("database.sql"));
-//            sqlHelper = new SQLHelper(connection);
-//            sqlHelper.execute("CREATE TABLE IF NOT EXISTS privatemines (mineOwner UUID, mineLocation STRING, corner1 STRING, corner2 STRING, spawn STRING, UNIQUE (mineOwner, mineLocation, corner1, corner2, spawn) ON CONFLICT IGNORE);");
-
             loadMines();
             startAutoReset();
             PaperLib.suggestPaper(this);
 
             if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
                 slimeUtils = new SlimeUtils();
-                Task.asyncDelayed(() -> {
-                    slimeUtils.setupSlimeWorld(UUID.randomUUID());
-                });
+                Task.asyncDelayed(() -> slimeUtils.setupSlimeWorld(UUID.randomUUID()));
             }
 
             getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
@@ -232,6 +213,7 @@ public class PrivateMines extends JavaPlugin {
         });
     }
 
+    @SuppressWarnings("unused")
     public void loadAddons() {
         final PathMatcher jarMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
         Path path = getAddonsDirectory();
@@ -255,10 +237,6 @@ public class PrivateMines extends JavaPlugin {
 
     public SchematicStorage getSchematicStorage() {
         return schematicStorage;
-    }
-
-    public SchematicIterator getSchematicIterator() {
-        return schematicIterator;
     }
 
     public MineFactory getMineFactory() {
