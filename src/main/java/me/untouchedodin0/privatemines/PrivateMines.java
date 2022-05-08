@@ -122,7 +122,7 @@ public class PrivateMines extends JavaPlugin {
             });
 
             loadMines();
-            startAutoReset();
+//            startAutoReset();
             PaperLib.suggestPaper(this);
 
             if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
@@ -205,6 +205,7 @@ public class PrivateMines extends JavaPlugin {
                             .build();
                     mine.setMineData(mineData);
                     getMineStorage().addMine(owner, mine);
+                    mine.startResetTask();
                     getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
                 });
             } catch (IOException e) {
@@ -232,6 +233,7 @@ public class PrivateMines extends JavaPlugin {
 
     public void startAutoReset() {
         Map<UUID, Mine> mines = mineStorage.getMines();
+//        Task.asyncDelayed(() -> mines.forEach((uuid, mine) -> mine.startResetTask()));
         mines.forEach((uuid, mine) -> mine.startResetTask());
     }
 

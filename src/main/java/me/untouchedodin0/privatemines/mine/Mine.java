@@ -229,6 +229,7 @@ public class Mine {
     }
 
     public void startResetTask() {
+        privateMines.getLogger().info("TEST TEST TEST TEST");
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
         int resetTime = mineType.getResetTime();
@@ -269,23 +270,52 @@ public class Mine {
     public void expand(final int amount) {
         final World world = privateMines.getMineWorldManager().getMinesWorld();
         boolean canExpand = canExpand(amount);
-        if (world == null) {
-            privateMines.getLogger().info("Failed to expand the mine due to the world being null");
+
+        privateMines.getLogger().info("World: " + world.getName());
+        privateMines.getLogger().info("Can Expand: " + canExpand);
+        if (!canExpand) {
+            privateMines.getLogger().info("Failed to expand the mine due to the mine being too large");
         } else {
             final var fillType = BlockTypes.DIAMOND_BLOCK;
             final var wallType = BlockTypes.BEDROCK;
             final var min = getMineData().getMinimumMining();
             final var max = getMineData().getMaximumMining();
-            final var mine = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
-            final var walls = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
+            final Region mine = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
+            final Region walls = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
 
             if (fillType == null || wallType == null) return;
 
             mine.expand(ExpansionUtils.expansionVectors(amount));
             walls.expand(ExpansionUtils.expansionVectors(amount));
+            walls.expand(
+                         BlockVector3.UNIT_X,
+                         BlockVector3.UNIT_Z,
+                         BlockVector3.UNIT_MINUS_X,
+                         BlockVector3.UNIT_MINUS_Y,
+                         BlockVector3.UNIT_MINUS_Z);
+
+            Map<Material, Double> materials = new HashMap<>();
+            Map<Material, Double> wallsMaterials = Collections.singletonMap(Material.BEACON, 1.0);
+            materials.put(Material.EMERALD_BLOCK, 1.0);
+            final RandomPattern randomPattern = new RandomPattern();
+            final RandomPattern wallPattern = new RandomPattern();
+
+            materials.forEach((material, chance) -> {
+                Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+                randomPattern.add(pattern, chance);
+            });
+            wallsMaterials.forEach((material, chance) -> {
+                Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+                wallPattern.add(pattern, chance);
+            });
+
+            try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
+                editSession.setBlocks(walls, BukkitAdapter.adapt(Material.BEDROCK.createBlockData()));
+                editSession.setBlocks(mine, randomPattern);
+            }
 
             mineData.setMinimumMining(BukkitAdapter.adapt(world, mine.getMinimumPoint()));
-            mineData.setMinimumMining(BukkitAdapter.adapt(world, mine.getMaximumPoint()));
+            mineData.setMaximumMining(BukkitAdapter.adapt(world, mine.getMaximumPoint()));
             setMineData(mineData);
             privateMines.getMineStorage().replaceMine(mineData.getMineOwner(), this);
         }
