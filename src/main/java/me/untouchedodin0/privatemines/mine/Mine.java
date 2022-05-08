@@ -289,10 +289,12 @@ public class Mine {
             walls.expand(ExpansionUtils.expansionVectors(amount));
             walls.expand(
                          BlockVector3.UNIT_X,
+                         BlockVector3.UNIT_Y,
                          BlockVector3.UNIT_Z,
                          BlockVector3.UNIT_MINUS_X,
                          BlockVector3.UNIT_MINUS_Y,
                          BlockVector3.UNIT_MINUS_Z);
+            walls.expand(BlockVector3.UNIT_Y);
 
             Map<Material, Double> materials = new HashMap<>();
             Map<Material, Double> wallsMaterials = Collections.singletonMap(Material.BEACON, 1.0);
