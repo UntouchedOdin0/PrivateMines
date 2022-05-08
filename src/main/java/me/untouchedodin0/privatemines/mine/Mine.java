@@ -39,24 +39,12 @@ import java.util.concurrent.TimeUnit;
 public class Mine {
 
     private final PrivateMines privateMines;
-    private final MineTypeManager mineTypeManager;
-    private UUID mineOwner;
     private BlockVector3 location;
     private MineData mineData;
     private boolean canExpand = true;
 
     public Mine(PrivateMines privateMines) {
         this.privateMines = privateMines;
-        this.mineTypeManager = privateMines.getMineTypeManager();
-        Utils utils = new Utils(privateMines);
-    }
-
-    public UUID getMineOwner() {
-        return mineOwner;
-    }
-
-    public void setMineOwner(UUID uuid) {
-        this.mineOwner = uuid;
     }
 
     public BlockVector3 getLocation() {
@@ -73,10 +61,6 @@ public class Mine {
 
     public void setMineData(MineData mineData) {
         this.mineData = mineData;
-    }
-
-    public MineType getMineType() {
-        return mineTypeManager.getMineType(mineData.getMineType());
     }
 
     public void teleport(Player player) {
@@ -303,7 +287,7 @@ public class Mine {
             mineData.setMinimumMining(BukkitAdapter.adapt(world, mine.getMinimumPoint()));
             mineData.setMinimumMining(BukkitAdapter.adapt(world, mine.getMaximumPoint()));
             setMineData(mineData);
-            privateMines.getMineStorage().replaceMine(getMineOwner(), this);
+            privateMines.getMineStorage().replaceMine(mineData.getMineOwner(), this);
         }
     }
 
