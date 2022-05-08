@@ -296,7 +296,7 @@ public class PrivateMinesCommand extends BaseCommand {
                 AtomicInteger atomicInteger = new AtomicInteger();
                 Instant start = Instant.now();
 
-                CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> {
+                CompletableFuture.runAsync(() -> {
                     for (int i = 0; i < times; i++) {
                         mine.reset();
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
@@ -329,8 +329,7 @@ public class PrivateMinesCommand extends BaseCommand {
                 player.sendMessage(ChatColor.GREEN + "Stress test resetting your mine " + ChatColor.GOLD + compiledExpression.evaluate() + ChatColor.GREEN + " times!");
                 AtomicInteger atomicInteger = new AtomicInteger();
                 Instant start = Instant.now();
-
-                CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> {
+                CompletableFuture.runAsync(() -> {
                     for (int i = 0; i < value; i++) {
                         mine.reset();
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
@@ -351,18 +350,14 @@ public class PrivateMinesCommand extends BaseCommand {
     @Subcommand("dev/types/listall")
     @CommandPermission("privatemines.dev.listall")
     public void listall(Player player) {
-        mineTypeManager.getMineTypes().forEach((s, mineType) -> {
-            player.sendMessage(ChatColor.GREEN + "- " + mineType.getName());
-        });
+        mineTypeManager.getMineTypes().forEach((s, mineType) -> player.sendMessage(ChatColor.GREEN + "- " + mineType.getName()));
     }
 
     @Subcommand("dev/purge/noconfirm")
     @CommandPermission("privatemines.purge.noconfirm")
     public void purgeNoConfirm(Player player) {
         Map<UUID, Mine> mines = mineStorage.getMines();
-        mines.forEach((uuid, mine) -> {
-            mine.delete(uuid);
-        });
+        mines.forEach((uuid, mine) -> mine.delete(uuid));
     }
 
 

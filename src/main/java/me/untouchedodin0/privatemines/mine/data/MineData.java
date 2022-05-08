@@ -36,7 +36,6 @@ public class MineData {
         return mineOwner;
     }
 
-
     public Location getMineLocation() {
         return mineLocation;
     }
