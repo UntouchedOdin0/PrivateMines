@@ -300,11 +300,8 @@ public class Mine {
                            BlockVector3.UNIT_Z,
                            BlockVector3.UNIT_MINUS_X,
                            BlockVector3.UNIT_MINUS_Z);
-
             Map<Material, Double> materials = mineData.getMineType().getMaterials();
-
             final RandomPattern randomPattern = new RandomPattern();
-
             if (materials != null) {
                 materials.forEach((material, chance) -> {
                     Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
@@ -315,7 +312,6 @@ public class Mine {
             try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
                 editSession.setBlocks(walls, BukkitAdapter.adapt(Material.BEDROCK.createBlockData()));
                 editSession.setBlocks(fillAir, BukkitAdapter.adapt(Material.AIR.createBlockData()));
-//                editSession.setBlocks(mine, randomPattern);
             }
 
             mineData.setMinimumMining(BukkitAdapter.adapt(world, mine.getMinimumPoint()));
