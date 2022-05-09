@@ -41,6 +41,7 @@ public class Mine {
     private final PrivateMines privateMines;
     private BlockVector3 location;
     private MineData mineData;
+    private Task task;
     private boolean canExpand = true;
 
     public Mine(PrivateMines privateMines) {
@@ -117,6 +118,7 @@ public class Mine {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        cancelTask();
     }
 
     /**
@@ -229,11 +231,16 @@ public class Mine {
     }
 
     public void startResetTask() {
-        privateMines.getLogger().info("TEST TEST TEST TEST");
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
         int resetTime = mineType.getResetTime();
-        Task.asyncRepeating(this::reset, 0L, resetTime * 20L);
+        this.task = Task.asyncRepeating(this::reset, 0L, resetTime * 20L);
+    }
+
+    public void cancelTask() {
+        if (task != null) {
+            task.cancel();
+        }
     }
 
     public void ban(Player player) {
@@ -267,12 +274,12 @@ public class Mine {
         return canExpand;
     }
 
+    // Let's just not touch this :)
+
     public void expand(final int amount) {
         final World world = privateMines.getMineWorldManager().getMinesWorld();
         boolean canExpand = canExpand(amount);
 
-        privateMines.getLogger().info("World: " + world.getName());
-        privateMines.getLogger().info("Can Expand: " + canExpand);
         if (!canExpand) {
             privateMines.getLogger().info("Failed to expand the mine due to the mine being too large");
         } else {
@@ -321,6 +328,7 @@ public class Mine {
             setMineData(mineData);
             privateMines.getMineStorage().replaceMine(mineData.getMineOwner(), this);
             reset();
+            saveMineData(Objects.requireNonNull(Bukkit.getPlayer(mineData.getMineOwner())), mineData);
         }
     }
 
