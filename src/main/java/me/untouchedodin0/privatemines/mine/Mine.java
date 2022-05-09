@@ -299,30 +299,23 @@ public class Mine {
                            BlockVector3.UNIT_Y,
                            BlockVector3.UNIT_Z,
                            BlockVector3.UNIT_MINUS_X,
-                           BlockVector3.UNIT_MINUS_Y,
                            BlockVector3.UNIT_MINUS_Z);
 
-//            walls.expand(BlockVector3.UNIT_Y);
+            Map<Material, Double> materials = mineData.getMineType().getMaterials();
 
-            Map<Material, Double> materials = new HashMap<>();
-            Map<Material, Double> wallsMaterials = Collections.singletonMap(Material.BEACON, 1.0);
-            materials.put(Material.EMERALD_BLOCK, 1.0);
             final RandomPattern randomPattern = new RandomPattern();
-            final RandomPattern wallPattern = new RandomPattern();
 
-            materials.forEach((material, chance) -> {
-                Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
-                randomPattern.add(pattern, chance);
-            });
-            wallsMaterials.forEach((material, chance) -> {
-                Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
-                wallPattern.add(pattern, chance);
-            });
+            if (materials != null) {
+                materials.forEach((material, chance) -> {
+                    Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+                    randomPattern.add(pattern, chance);
+                });
+            }
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
                 editSession.setBlocks(walls, BukkitAdapter.adapt(Material.BEDROCK.createBlockData()));
                 editSession.setBlocks(fillAir, BukkitAdapter.adapt(Material.AIR.createBlockData()));
-                editSession.setBlocks(mine, randomPattern);
+//                editSession.setBlocks(mine, randomPattern);
             }
 
             mineData.setMinimumMining(BukkitAdapter.adapt(world, mine.getMinimumPoint()));
