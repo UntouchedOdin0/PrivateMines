@@ -281,6 +281,7 @@ public class Mine {
             final var min = getMineData().getMinimumMining();
             final var max = getMineData().getMaximumMining();
             final Region mine = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
+            final Region fillAir = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
             final Region walls = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
 
             if (fillType == null || wallType == null) return;
@@ -294,7 +295,14 @@ public class Mine {
                          BlockVector3.UNIT_MINUS_X,
                          BlockVector3.UNIT_MINUS_Y,
                          BlockVector3.UNIT_MINUS_Z);
-            walls.expand(BlockVector3.UNIT_Y);
+            fillAir.expand(BlockVector3.UNIT_X,
+                           BlockVector3.UNIT_Y,
+                           BlockVector3.UNIT_Z,
+                           BlockVector3.UNIT_MINUS_X,
+                           BlockVector3.UNIT_MINUS_Y,
+                           BlockVector3.UNIT_MINUS_Z);
+
+//            walls.expand(BlockVector3.UNIT_Y);
 
             Map<Material, Double> materials = new HashMap<>();
             Map<Material, Double> wallsMaterials = Collections.singletonMap(Material.BEACON, 1.0);
@@ -313,13 +321,17 @@ public class Mine {
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
                 editSession.setBlocks(walls, BukkitAdapter.adapt(Material.BEDROCK.createBlockData()));
+                editSession.setBlocks(fillAir, BukkitAdapter.adapt(Material.AIR.createBlockData()));
                 editSession.setBlocks(mine, randomPattern);
             }
 
             mineData.setMinimumMining(BukkitAdapter.adapt(world, mine.getMinimumPoint()));
             mineData.setMaximumMining(BukkitAdapter.adapt(world, mine.getMaximumPoint()));
+            mineData.setMinimumFullRegion(mineData.getMinimumFullRegion().subtract(amount, amount, amount));
+            mineData.setMaximumFullRegion(mineData.getMaximumFullRegion().add(amount, amount, amount));
             setMineData(mineData);
             privateMines.getMineStorage().replaceMine(mineData.getMineOwner(), this);
+            reset();
         }
     }
 

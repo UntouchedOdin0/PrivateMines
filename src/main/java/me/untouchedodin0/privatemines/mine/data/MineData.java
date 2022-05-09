@@ -65,8 +65,16 @@ public class MineData {
         return minimumFullRegion;
     }
 
+    public void setMinimumFullRegion(Location minimumFullRegion) {
+        this.minimumFullRegion = minimumFullRegion;
+    }
+
     public Location getMaximumFullRegion() {
         return maximumFullRegion;
+    }
+
+    public void setMaximumFullRegion(Location maximumFullRegion) {
+        this.maximumFullRegion = maximumFullRegion;
     }
 
     public MineType getMineType() {
