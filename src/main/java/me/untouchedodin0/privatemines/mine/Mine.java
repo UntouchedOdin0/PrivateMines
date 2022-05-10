@@ -42,6 +42,7 @@ public class Mine {
     private BlockVector3 location;
     private MineData mineData;
     private boolean canExpand = true;
+    private Task task;
 
     public Mine(PrivateMines privateMines) {
         this.privateMines = privateMines;
@@ -106,12 +107,14 @@ public class Mine {
         Duration durationToFill = Duration.between(start, filled);
 
         long durationInMS = TimeUnit.NANOSECONDS.toMillis(durationToFill.toNanos());
+        cancelTask();
 
         privateMines.getLogger().info(String.format("It took %dms to reset the mine", durationInMS));
         privateMines.getMineStorage().removeMine(uuid);
         String fileName = String.format("/%s.yml", uuid);
         Path minesDirectory = privateMines.getMinesDirectory();
         File file = new File(minesDirectory + fileName);
+
         try {
             Files.delete(file.toPath());
         } catch (IOException e) {
@@ -229,11 +232,16 @@ public class Mine {
     }
 
     public void startResetTask() {
-        privateMines.getLogger().info("TEST TEST TEST TEST");
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
         int resetTime = mineType.getResetTime();
-        Task.asyncRepeating(this::reset, 0L, resetTime * 20L);
+        this.task = Task.asyncRepeating(this::reset, 0L, resetTime * 20L);
+    }
+
+    public void cancelTask() {
+        if (task != null) {
+            task.cancel();
+        }
     }
 
     public void ban(Player player) {
