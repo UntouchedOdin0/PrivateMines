@@ -41,7 +41,6 @@ public class Mine {
     private final PrivateMines privateMines;
     private BlockVector3 location;
     private MineData mineData;
-    private Task task;
     private boolean canExpand = true;
 
     public Mine(PrivateMines privateMines) {
@@ -118,7 +117,6 @@ public class Mine {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        cancelTask();
     }
 
     /**
@@ -231,16 +229,11 @@ public class Mine {
     }
 
     public void startResetTask() {
+        privateMines.getLogger().info("TEST TEST TEST TEST");
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
         int resetTime = mineType.getResetTime();
-        this.task = Task.asyncRepeating(this::reset, 0L, resetTime * 20L);
-    }
-
-    public void cancelTask() {
-        if (task != null) {
-            task.cancel();
-        }
+        Task.asyncRepeating(this::reset, 0L, resetTime * 20L);
     }
 
     public void ban(Player player) {
@@ -274,11 +267,9 @@ public class Mine {
         return canExpand;
     }
 
-    // Let's just not touch this :)
-
-    public void expand(final int amount) {
+    public void expand() {
         final World world = privateMines.getMineWorldManager().getMinesWorld();
-        boolean canExpand = canExpand(amount);
+        boolean canExpand = canExpand(1);
 
         if (!canExpand) {
             privateMines.getLogger().info("Failed to expand the mine due to the mine being too large");
@@ -293,8 +284,8 @@ public class Mine {
 
             if (fillType == null || wallType == null) return;
 
-            mine.expand(ExpansionUtils.expansionVectors(amount));
-            walls.expand(ExpansionUtils.expansionVectors(amount));
+            mine.expand(ExpansionUtils.expansionVectors(1));
+            walls.expand(ExpansionUtils.expansionVectors(1));
             walls.expand(
                          BlockVector3.UNIT_X,
                          BlockVector3.UNIT_Y,
@@ -323,12 +314,11 @@ public class Mine {
 
             mineData.setMinimumMining(BukkitAdapter.adapt(world, mine.getMinimumPoint()));
             mineData.setMaximumMining(BukkitAdapter.adapt(world, mine.getMaximumPoint()));
-            mineData.setMinimumFullRegion(mineData.getMinimumFullRegion().subtract(amount, amount, amount));
-            mineData.setMaximumFullRegion(mineData.getMaximumFullRegion().add(amount, amount, amount));
+            mineData.setMinimumFullRegion(mineData.getMinimumFullRegion().subtract(1, 1, 1));
+            mineData.setMaximumFullRegion(mineData.getMaximumFullRegion().add(1, 1, 1));
             setMineData(mineData);
             privateMines.getMineStorage().replaceMine(mineData.getMineOwner(), this);
             reset();
-            saveMineData(Objects.requireNonNull(Bukkit.getPlayer(mineData.getMineOwner())), mineData);
         }
     }
 

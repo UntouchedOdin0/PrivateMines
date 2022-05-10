@@ -135,18 +135,11 @@ public class PrivateMinesCommand extends BaseCommand {
         } else {
             Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
             if (mine != null) {
-                mine.expand(amount);
+                for (int i = 0; i < amount; i++) {
+                    mine.expand();
+                }
             }
         }
-//        if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
-//            player.sendMessage(ChatColor.RED + "Player doesn't own a mine!");
-//        } else {
-//            Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
-//            if (mine != null) {
-//                player.sendMessage("" + mine.canExpand(amount));
-//                mine.expand(amount);
-//            }
-//        }
     }
 
     @Subcommand("upgrade")
