@@ -13,6 +13,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import io.papermc.lib.PaperLib;
+import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
@@ -399,6 +400,7 @@ public class Mine {
     public void upgrade() {
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineFactory mineFactory = privateMines.getMineFactory();
+        MineStorage mineStorage = privateMines.getMineStorage();
         MineData mineData = getMineData();
         UUID mineOwner = mineData.getMineOwner();
         Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
@@ -414,6 +416,10 @@ public class Mine {
                     Location mineLocation = mineData.getMineLocation();
                     delete(mineOwner);
                     mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
+                    Mine mine = mineStorage.get(mineOwner);
+                    if (mine != null) {
+                        mine.teleport(player);
+                    }
                 } else {
                     Economy economy = PrivateMines.getEconomy();
                     double balance = economy.getBalance(player);
@@ -424,6 +430,10 @@ public class Mine {
                         delete(mineOwner);
                         mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
                         economy.withdrawPlayer(player, nextType.getUpgradeCost());
+                        Mine mine = mineStorage.get(mineOwner);
+                        if (mine != null) {
+                            mine.teleport(player);
+                        }
                     }
                 }
             }
