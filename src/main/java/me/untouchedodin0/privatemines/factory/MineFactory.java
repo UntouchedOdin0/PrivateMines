@@ -25,6 +25,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.events.PrivateMineCreationEvent;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.data.MineData;
@@ -36,6 +37,7 @@ import me.untouchedodin0.privatemines.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -198,15 +200,17 @@ public class MineFactory {
                         session.setBlock(spawn, pattern);
                     }
 
-                    if (privateMines.getMineStorage().hasMine(player.getUniqueId())) {
-                        privateMines.getMineStorage().replaceMine(player.getUniqueId(), mine);
+                    if (privateMines.getMineStorage().hasMine(uuid)) {
+                        privateMines.getMineStorage().replaceMine(uuid, mine);
                     } else {
-                        privateMines.getMineStorage().addMine(player.getUniqueId(), mine);
+                        privateMines.getMineStorage().addMine(uuid, mine);
                     }
 
                     mine.resetNoCheck();
                     TextComponent teleportMessage = new TextComponent(ChatColor.GREEN + "Click me to teleport to your mine!");
                     teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));
+                    PrivateMineCreationEvent privateMineCreationEvent = new PrivateMineCreationEvent(uuid, mine);
+                    Bukkit.getPluginManager().callEvent(privateMineCreationEvent);
 
                     Instant finished = Instant.now();
                     Duration creationDuration = Duration.between(start, finished);

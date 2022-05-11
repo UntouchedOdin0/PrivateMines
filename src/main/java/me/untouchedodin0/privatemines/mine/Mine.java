@@ -17,6 +17,9 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
+import me.untouchedodin0.privatemines.events.PrivateMineDeleteEvent;
+import me.untouchedodin0.privatemines.events.PrivateMineResetEvent;
+import me.untouchedodin0.privatemines.events.PrivateMineUpgradeEvent;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
@@ -81,6 +84,11 @@ public class Mine {
     }
 
     public void delete(UUID uuid) {
+        PrivateMineDeleteEvent privateMineDeleteEvent = new PrivateMineDeleteEvent(uuid, this);
+        Bukkit.getPluginManager().callEvent(privateMineDeleteEvent);
+
+        if (privateMineDeleteEvent.isCancelled()) return;
+
         MineData mineData = getMineData();
 
         Location corner1 = mineData.getMinimumFullRegion();
@@ -185,6 +193,11 @@ public class Mine {
         Map<Material, Double> materials = mineType.getMaterials();
         final RandomPattern randomPattern = new RandomPattern();
 
+        PrivateMineResetEvent privateMineResetEvent = new PrivateMineResetEvent(mineData.getMineOwner(), this);
+        Bukkit.getPluginManager().callEvent(privateMineResetEvent);
+
+        if (privateMineResetEvent.isCancelled()) return;
+
         if (materials != null) {
             materials.forEach((material, chance) -> {
                 Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
@@ -216,6 +229,11 @@ public class Mine {
 
         Map<Material, Double> materials = mineType.getMaterials();
         final RandomPattern randomPattern = new RandomPattern();
+
+        PrivateMineResetEvent privateMineResetEvent = new PrivateMineResetEvent(mineData.getMineOwner(), this);
+        Bukkit.getPluginManager().callEvent(privateMineResetEvent);
+
+        if (privateMineResetEvent.isCancelled()) return;
 
         if (materials != null) {
             materials.forEach((material, chance) -> {
@@ -407,7 +425,14 @@ public class Mine {
         MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
         MineType nextType = mineTypeManager.getNextMineType(currentType.getName());
         double upgradeCost = nextType.getUpgradeCost();
-
+        PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner,
+                                                                                      this,
+                                                                                      currentType,
+                                                                                      nextType);
+        Bukkit.getPluginManager().callEvent(privateMineUpgradeEvent);
+        if (privateMineUpgradeEvent.isCancelled()) {
+            return;
+        }
         if (player != null) {
             if (currentType == nextType) {
                 privateMines.getLogger().info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
