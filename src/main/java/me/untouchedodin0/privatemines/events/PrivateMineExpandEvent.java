@@ -13,15 +13,17 @@ public class PrivateMineExpandEvent extends Event {
 
     public UUID owner;
     public Mine mine;
-    public int oldSize;
-    public int newSize;
+    public int width;
+    public int height;
+    public int length;
     public boolean cancelled;
 
-    public PrivateMineExpandEvent(UUID owner, Mine mine, int oldSize, int newSize) {
+    public PrivateMineExpandEvent(UUID owner, Mine mine, int width, int height, int length) {
         this.owner = owner;
         this.mine = mine;
-        this.oldSize = oldSize;
-        this.newSize = newSize;
+        this.width = width;
+        this.height = height;
+        this.length = length;
     }
 
     public UUID getOwner() {
@@ -32,12 +34,16 @@ public class PrivateMineExpandEvent extends Event {
         return mine;
     }
 
-    public int getOldSize() {
-        return oldSize;
+    public int getWidth() {
+        return width;
     }
 
-    public int getNewSize() {
-        return newSize;
+    public int getHeight() {
+        return height;
+    }
+
+    public int getLength() {
+        return length;
     }
 
     public boolean isCancelled() {

@@ -18,6 +18,7 @@ import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.events.PrivateMineDeleteEvent;
+import me.untouchedodin0.privatemines.events.PrivateMineExpandEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineResetEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineUpgradeEvent;
 import me.untouchedodin0.privatemines.factory.MineFactory;
@@ -311,6 +312,10 @@ public class Mine {
 
             if (fillType == null || wallType == null) return;
 
+            privateMines.getLogger().info(String.format("Expanding mine new width: %d", mine.getWidth()));
+            privateMines.getLogger().info(String.format("Expanding mine new height: %d", mine.getHeight()));
+            privateMines.getLogger().info(String.format("Expanding mine new length: %d", mine.getLength()));
+
             mine.expand(ExpansionUtils.expansionVectors(1));
             walls.expand(ExpansionUtils.expansionVectors(1));
             walls.expand(
@@ -333,6 +338,15 @@ public class Mine {
                     randomPattern.add(pattern, chance);
                 });
             }
+
+            PrivateMineExpandEvent privateMineExpandEvent = new PrivateMineExpandEvent(
+                    mineData.getMineOwner(),
+                    this,
+                    mine.getWidth(),
+                    mine.getHeight(),
+                    mine.getLength());
+            Task.syncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineExpandEvent));
+            if (privateMineExpandEvent.isCancelled()) return;
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
                 editSession.setBlocks(walls, BukkitAdapter.adapt(Material.BEDROCK.createBlockData()));
