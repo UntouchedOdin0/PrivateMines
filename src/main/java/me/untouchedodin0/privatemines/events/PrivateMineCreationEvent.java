@@ -10,7 +10,6 @@ import java.util.UUID;
 public class PrivateMineCreationEvent extends Event {
 
     public static final HandlerList handlers = new HandlerList();
-
     public UUID owner;
     public Mine mine;
     public boolean cancelled;

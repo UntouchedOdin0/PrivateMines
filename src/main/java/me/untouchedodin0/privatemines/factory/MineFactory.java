@@ -210,14 +210,16 @@ public class MineFactory {
                     TextComponent teleportMessage = new TextComponent(ChatColor.GREEN + "Click me to teleport to your mine!");
                     teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));
                     PrivateMineCreationEvent privateMineCreationEvent = new PrivateMineCreationEvent(uuid, mine);
-                    Bukkit.getPluginManager().callEvent(privateMineCreationEvent);
 
                     Instant finished = Instant.now();
                     Duration creationDuration = Duration.between(start, finished);
 
                     final long microseconds = TimeUnit.NANOSECONDS.toMillis(creationDuration.toNanos());
                     privateMines.getLogger().info("Mine creation time: " + microseconds + " milliseconds");
-                    Task.syncDelayed(() -> player.teleport(spongeL));
+                    Task.syncDelayed(() -> {
+                        player.teleport(spongeL);
+                        Bukkit.getPluginManager().callEvent(privateMineCreationEvent);
+                    });
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }

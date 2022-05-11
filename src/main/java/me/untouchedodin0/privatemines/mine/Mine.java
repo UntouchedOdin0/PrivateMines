@@ -194,7 +194,7 @@ public class Mine {
         final RandomPattern randomPattern = new RandomPattern();
 
         PrivateMineResetEvent privateMineResetEvent = new PrivateMineResetEvent(mineData.getMineOwner(), this);
-        Bukkit.getPluginManager().callEvent(privateMineResetEvent);
+        Task.syncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineResetEvent));
 
         if (privateMineResetEvent.isCancelled()) return;
 
@@ -231,7 +231,7 @@ public class Mine {
         final RandomPattern randomPattern = new RandomPattern();
 
         PrivateMineResetEvent privateMineResetEvent = new PrivateMineResetEvent(mineData.getMineOwner(), this);
-        Bukkit.getPluginManager().callEvent(privateMineResetEvent);
+        Task.syncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineResetEvent));
 
         if (privateMineResetEvent.isCancelled()) return;
 
