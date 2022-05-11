@@ -19,7 +19,6 @@ import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.Utils;
-import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.metrics.Metrics;
 import me.untouchedodin0.privatemines.utils.metrics.Metrics.SingleLineChart;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
@@ -66,7 +65,6 @@ public class PrivateMines extends JavaPlugin {
     private MineTypeManager mineTypeManager;
     private ConfigManager configManager;
 
-    private AddonManager addonManager;
 
     private SlimeUtils slimeUtils;
     private static Economy econ = null;
@@ -88,7 +86,6 @@ public class PrivateMines extends JavaPlugin {
             mineStorage = new MineStorage();
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
-            addonManager = new AddonManager(this);
 
             registerCommands();
             registerSellListener();
@@ -267,10 +264,6 @@ public class PrivateMines extends JavaPlugin {
 
     public MineTypeManager getMineTypeManager() {
         return mineTypeManager;
-    }
-
-    public AddonManager getAddonManager() {
-        return addonManager;
     }
 
     public SlimeUtils getSlimeUtils() {
