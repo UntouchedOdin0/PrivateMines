@@ -8,3 +8,6 @@ the capability to load mines from schematics.
 - [knightzmc](https://github.com/knightzmc)
 - [bobby29831](https://github.com/bobby29831)
 - [bbSnavy](https://github.com/bbSnavy)
+
+### License
+
