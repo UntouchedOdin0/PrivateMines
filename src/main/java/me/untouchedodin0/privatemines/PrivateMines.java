@@ -64,8 +64,6 @@ public class PrivateMines extends JavaPlugin {
     private MineWorldManager mineWorldManager;
     private MineTypeManager mineTypeManager;
     private ConfigManager configManager;
-
-
     private SlimeUtils slimeUtils;
     private static Economy econ = null;
 
