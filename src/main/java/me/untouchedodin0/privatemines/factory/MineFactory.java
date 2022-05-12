@@ -98,7 +98,6 @@ public class MineFactory {
         Map<String, Boolean> flags = mineType.getFlags();
         Map<Material, Double> prices = new HashMap<>();
 
-//        Material[] mats = Material.values();
         Map<Material, Double> materials = mineType.getMaterials();
         if (materials != null) {
             prices.putAll(materials);
@@ -249,6 +248,10 @@ public class MineFactory {
                 }
             }
         });
+    }
+
+    public void create(UUID uuid, Location location, MineType mineType) {
+        create(Objects.requireNonNull(Bukkit.getPlayer(uuid)), location, mineType);
     }
 }
 

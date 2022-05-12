@@ -1,6 +1,8 @@
 package me.untouchedodin0.privatemines;
 
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
+import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import org.bukkit.Location;
 
@@ -11,6 +13,7 @@ public class PrivateMinesAPI {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
     MineStorage mineStorage = privateMines.getMineStorage();
+    MineFactory mineFactory = privateMines.getMineFactory();
 
     public Mine getMine(UUID uuid) {
         if (!mineStorage.hasMine(uuid)) return null;
@@ -27,5 +30,9 @@ public class PrivateMinesAPI {
 
     public boolean hasMine(UUID uuid) {
         return mineStorage.hasMine(uuid);
+    }
+
+    public void createMine(UUID uuid, Location location, MineType mineType) {
+        mineFactory.create(uuid, location, mineType);
     }
 }
