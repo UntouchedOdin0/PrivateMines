@@ -40,6 +40,8 @@ public class Config {
     public static boolean notifyForUpdates = true;
     @Comment("The distance between the private mines")
     public static int mineDistance = 150;
+    @Comment("The height of where the private mines are pasted")
+    public static int mineYLevel = 50;
     @Comment("Should we give players a mine when they first join?")
     public static boolean giveMineOnFirstJoin = false;
     @Comment("Should we only replace air blocks when the mine resets?")
