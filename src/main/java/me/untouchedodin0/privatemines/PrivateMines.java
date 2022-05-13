@@ -136,7 +136,6 @@ public class PrivateMines extends JavaPlugin {
             Instant end = Instant.now();
             Duration loadTime = Duration.between(start, end);
             getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
-            getLogger().info("Y Level: " + Config.mineYLevel);
         }
     }
 
