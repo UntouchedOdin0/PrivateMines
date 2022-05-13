@@ -34,7 +34,6 @@ public class MineWorldManager {
 
     private final Location defaultLocation;
     private final int borderDistance;
-    private final int mineYLevel = Config.mineYLevel;
     private int distance = 0;
     private Direction direction;
     private final World minesWorld;
@@ -47,6 +46,7 @@ public class MineWorldManager {
                         .generator(new EmptyWorldGenerator()));
         this.borderDistance = Config.mineDistance;
         this.direction = NORTH;
+        int mineYLevel = Config.mineYLevel;
         defaultLocation = new Location(minesWorld, 0, mineYLevel, 0);
     }
 

@@ -1,18 +1,18 @@
 /**
  * MIT License
- *
+ * <p>
  * Copyright (c) 2021 - 2022 Kyle Hicks
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -81,6 +81,8 @@ import java.util.concurrent.TimeUnit;
 public class MineFactory {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
+    EditSession editSession;
+
 
     /**
      * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
@@ -115,7 +117,11 @@ public class MineFactory {
             if (clipboardFormat != null) {
                 try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(schematicFile))) {
                     World world = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()));
-                    EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).fastMode(true).build();
+                    if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
+                        editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).fastMode(true).build();
+                    } else {
+                        editSession = WorldEdit.getInstance().newEditSession(world);
+                    }
                     LocalSession localSession = new LocalSession();
 
                     Clipboard clipboard = clipboardReader.read();
