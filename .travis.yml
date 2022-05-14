@@ -6,4 +6,4 @@ dist: trusty
 jdk: oraclejdk16
 
 script:
-  - ./gradlew build --scan -s
+  - ./gradlew shadowJar --scan -s
