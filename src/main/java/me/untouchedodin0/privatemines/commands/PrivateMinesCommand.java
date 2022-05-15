@@ -31,6 +31,7 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.factory.MineFactory;
+import me.untouchedodin0.privatemines.messages.LangKeys;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
@@ -98,7 +99,7 @@ public class PrivateMinesCommand extends BaseCommand {
     public void delete(Player player, Player target) {
         if (target != null) {
             if (!privateMines.getMineStorage().hasMine(target.getUniqueId())) {
-                player.sendMessage(ChatColor.RED + "Player doesn't own a mine!");
+                getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_PLAYER_DOESNT_OWN_A_MINE);
             } else {
                 Mine mine = privateMines.getMineStorage().get(target.getUniqueId());
                 player.sendMessage(ChatColor.GREEN + "Deleting " + target.getName() + "'s private mine!");
@@ -127,11 +128,12 @@ public class PrivateMinesCommand extends BaseCommand {
     @CommandPermission("privatemines.teleport")
     public void teleport(Player player) {
         if (!mineStorage.hasMine(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "Player doesn't own a mine!");
+            getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_PLAYER_DOESNT_OWN_A_MINE);
         } else {
             Mine mine = mineStorage.get(player.getUniqueId());
             if (mine != null) {
                 mine.teleport(player);
+                getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_TELEPORTED);
             }
         }
     }
@@ -140,12 +142,13 @@ public class PrivateMinesCommand extends BaseCommand {
     @CommandPermission("privatemines.teleport")
     public void reset(Player player) {
         if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "Player doesn't own a mine!");
+            getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_PLAYER_DOESNT_OWN_A_MINE);
         } else {
             Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
             if (mine != null) {
                 mine.reset();
                 mine.teleport(player);
+                getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_RESET);
             }
         }
     }
@@ -155,7 +158,7 @@ public class PrivateMinesCommand extends BaseCommand {
     @CommandPermission("privatemines.expand")
     public void expand(Player player, int amount) {
         if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "Player doesn't own a mine!");
+            getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_PLAYER_DOESNT_OWN_A_MINE);
         } else {
             Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
             if (mine != null) {
@@ -170,7 +173,7 @@ public class PrivateMinesCommand extends BaseCommand {
     @CommandPermission("privatemines.upgrade")
     public void upgrade(Player player) {
         if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "Target doesn't have a mine!");
+            getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_PLAYER_DOESNT_OWN_A_MINE);
         } else {
             Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
             if (mine != null) {
@@ -183,7 +186,7 @@ public class PrivateMinesCommand extends BaseCommand {
     @CommandPermission("privatemines.tax")
     public void tax(Player player, Double tax) {
         if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You don't have a mine!");
+            getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_PLAYER_DOESNT_OWN_A_MINE);
         } else {
             Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
             if (mine != null) {

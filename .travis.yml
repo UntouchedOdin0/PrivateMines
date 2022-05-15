@@ -1,9 +1,0 @@
-language: java
-install: skip
-
-os: linux
-dist: trusty
-jdk: oraclejdk16
-
-script:
-  - ./gradlew shadowJar --scan -s

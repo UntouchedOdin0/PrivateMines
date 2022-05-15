@@ -143,6 +143,7 @@ public class PrivateMines extends JavaPlugin {
         PaperCommandManager paperCommandManager = new PaperCommandManager(this);
         paperCommandManager.registerCommand(new PrivateMinesCommand(this));
         paperCommandManager.registerCommand(new UsePlayerShop(this, mineStorage));
+        paperCommandManager.getLocales().addBundleClassLoader(getClassLoader());
     }
 
     public void setupSchematicUtils() {
