@@ -66,6 +66,7 @@ public class PrivateMines extends JavaPlugin {
     private ConfigManager configManager;
     private SlimeUtils slimeUtils;
     private static Economy econ = null;
+    private static PaperCommandManager paperCommandManager;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -140,10 +141,12 @@ public class PrivateMines extends JavaPlugin {
     }
 
     private void registerCommands() {
-        PaperCommandManager paperCommandManager = new PaperCommandManager(this);
+        paperCommandManager = new PaperCommandManager(this);
         paperCommandManager.registerCommand(new PrivateMinesCommand(this));
         paperCommandManager.registerCommand(new UsePlayerShop(this, mineStorage));
         paperCommandManager.getLocales().addBundleClassLoader(getClassLoader());
+        paperCommandManager.getLocales().loadLanguages();
+        privateMines.getLogger().info("Locales: " + paperCommandManager.getLocales().toString());
     }
 
     public void setupSchematicUtils() {
@@ -263,6 +266,10 @@ public class PrivateMines extends JavaPlugin {
 
     public MineTypeManager getMineTypeManager() {
         return mineTypeManager;
+    }
+
+    public PaperCommandManager getPaperCommandManager() {
+        return paperCommandManager;
     }
 
     public SlimeUtils getSlimeUtils() {

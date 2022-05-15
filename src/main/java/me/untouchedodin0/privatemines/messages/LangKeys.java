@@ -6,6 +6,7 @@ import co.aikar.locales.MessageKeyProvider;
 public enum LangKeys implements MessageKeyProvider {
 
     INFO_PRIVATEMINE_GIVEN,
+    INFO_PRIVATEMINE_GIVEN_TO,
     INFO_PRIVATEMINE_DELETED,
     INFO_PRIVATEMINE_RESET,
     INFO_PRIVATEMINE_TELEPORTED,
