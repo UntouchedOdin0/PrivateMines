@@ -35,6 +35,7 @@ import me.untouchedodin0.privatemines.messages.LangKeys;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
+import me.untouchedodin0.privatemines.utils.inventory.LocaleInventory;
 import me.untouchedodin0.privatemines.utils.inventory.MainMenu;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -306,6 +307,11 @@ public class PrivateMinesCommand extends BaseCommand {
             mine.saveMineData(player, mineData);
             player.sendMessage(ChatColor.GRAY + "You have closed your mine!");
         }
+    }
+
+    @Subcommand("changelocale")
+    public void changeLocale(Player player) {
+        LocaleInventory.openLocaleMenu(player);
     }
 
     /*

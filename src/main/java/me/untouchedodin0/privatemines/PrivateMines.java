@@ -123,7 +123,7 @@ public class PrivateMines extends JavaPlugin {
             sqlite.load();
 
             loadMines();
-//            startAutoReset();
+            startAutoReset();
             PaperLib.suggestPaper(this);
 
             if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
@@ -154,7 +154,6 @@ public class PrivateMines extends JavaPlugin {
     public void setupLanguages() {
         paperCommandManager.getLocales().addBundleClassLoader(getClassLoader());
         paperCommandManager.getLocales().loadLanguages();
-        privateMines.getLogger().info("Locales: " + paperCommandManager.getLocales().toString());
     }
 
     public void setupSchematicUtils() {

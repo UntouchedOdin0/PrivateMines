@@ -22,6 +22,7 @@ repositories {
     maven { url = 'https://redempt.dev' }
     maven { url = 'https://hub.jeff-media.com/nexus/repository/jeff-media-public/' }
     maven { url = 'https://jitpack.io' }
+    maven { url = 'https://libraries.minecraft.net/' }
 }
 
 dependencies {
@@ -36,6 +37,7 @@ dependencies {
     compileOnly 'org.xerial:sqlite-jdbc:3.36.0.3'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
     compileOnly 'me.lucko:helper:5.6.10'
+    compileOnly 'com.mojang:authlib:1.5.21'
 
     compileOnly files('libs/UltraPrisonCore-1.10.18.jar')
     compileOnly files('libs/AutoSellAPI-1.2.0.jar')

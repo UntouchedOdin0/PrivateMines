@@ -278,7 +278,7 @@ public class Mine {
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
         int resetTime = mineType.getResetTime();
-        this.task = Task.asyncRepeating(this::reset, 0L, resetTime * 20L);
+        this.task = Task.asyncRepeating(this::reset, 0L, resetTime * 20 * 60L);
     }
 
     public void cancelTask() {
