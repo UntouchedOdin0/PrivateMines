@@ -26,7 +26,10 @@ public class LocaleInventory {
 
         PaperCommandManager paperCommandManager = privateMines.getPaperCommandManager();
         InventoryGUI changeLocale = new InventoryGUI(Bukkit.createInventory(null, 9, "Change locale"));
+
         ItemStack englishSkull = SkullCreator.itemFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODc5ZDk5ZDljNDY0NzRlMjcxM2E3ZTg0YTk1ZTRjZTdlOGZmOGVhNGQxNjQ0MTNhNTkyZTQ0MzVkMmM2ZjlkYyJ9fX0=");
+        ItemStack franceSkull = SkullCreator.itemFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjkwMzM0OWZhNDViZGQ4NzEyNmQ5Y2QzYzZjMGFiYmE3ZGJkNmY1NmZiOGQ3ODcwMTg3M2ExZTdjOGVlMzNjZiJ9fX0=");
+
         ItemBuilder english = new ItemBuilder(englishSkull)
                 .setName(ChatColor.YELLOW + "English")
                 .setLore(ChatColor.GRAY + "Click to change to " + ChatColor.GREEN + "English");
@@ -38,7 +41,21 @@ public class LocaleInventory {
             paperCommandManager.setPlayerLocale(player, Locale.ENGLISH);
             player.sendMessage(paperCommandManager.getCommandIssuer(player).getPlayer().getLocale());
         });
+
+        ItemBuilder france = new ItemBuilder(franceSkull)
+                .setName(ChatColor.YELLOW + "Français")
+                .setLore(ChatColor.GRAY + "Cliquez pour passer à " + ChatColor.GREEN + "Français");
+        ItemButton franceButton = ItemButton.create(france, event -> {
+            event.setCancelled(true);
+            player.sendMessage(String.format(ChatColor.GREEN + "Vous avez changé vos paramètres régionaux en %s",
+                                             Objects.requireNonNull(Objects.requireNonNull(event.getCurrentItem()).getItemMeta()).getDisplayName()));
+            player.closeInventory();
+            paperCommandManager.setPlayerLocale(player, Locale.ENGLISH);
+            player.sendMessage(paperCommandManager.getCommandIssuer(player).getPlayer().getLocale());
+        });
+
         changeLocale.addButton(0, englishButton);
+        changeLocale.addButton(1, franceButton);
         changeLocale.open(player);
     }
 }
