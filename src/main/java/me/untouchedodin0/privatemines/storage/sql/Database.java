@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public abstract class Database {
@@ -97,13 +98,13 @@ public abstract class Database {
     }
 
     // Now we need methods to save things to the database
-    public void setTokens(Player player, Integer tokens, Integer total) {
+    public void setTokens(UUID uuid, Integer tokens, Integer total) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
             connection = getSQLConnection();
             preparedStatement = connection.prepareStatement("REPLACE INTO " + databaseName + " (player,kills,total) VALUES(?,?,?)"); // IMPORTANT. In SQLite class, We made 3 colums. player, Kills, Total.
-            preparedStatement.setString(1, player.getName().toLowerCase());                                             // YOU MUST put these into this line!! And depending on how many
+            preparedStatement.setString(1, uuid.toString());                                             // YOU MUST put these into this line!! And depending on how many
             // colums you put (say you made 5) All 5 need to be in the brackets
             // Seperated with comma's (,) AND there needs to be the same amount of
             // question marks in the VALUES brackets. Right now i only have 3 colums

@@ -23,6 +23,8 @@ public class SQLite extends Database{
             "`fullRegionMin` text NOT NULL," +
             "`fullRegionMax` text NOT NULL," +
             "`spawn` text NOT NULL," +
+            "`tax` double NOT NULL," +
+            "`isOpen` boolean NOT NULL," +
             "PRIMARY KEY (`mineOwner`)" +  // This is creating 3 colums Player, Kills, Total. Primary key is what you are going to use as your indexer. Here we want to use player so
             ");"; // we can search by player, and get kills and total. If you some how were searching kills it would provide total and player.
 
@@ -32,7 +34,7 @@ public class SQLite extends Database{
         File dataFolder = new File(privateMines.getDataFolder(), databaseName + ".db");
         if (!dataFolder.exists()){
             try {
-                dataFolder.createNewFile();
+                boolean created = dataFolder.createNewFile();
             } catch (IOException e) {
                 privateMines.getLogger().log(Level.SEVERE, "File write error: "+ databaseName + ".db");
             }
@@ -53,7 +55,9 @@ public class SQLite extends Database{
     }
 
     public void load() {
+        privateMines.getLogger().log(Level.INFO, "Loading SQLite database...");
         connection = getSQLConnection();
+        privateMines.getLogger().info("Connection: " + connection);
         try {
             Statement s = connection.createStatement();
             s.executeUpdate(SQLiteCreateTokensTable);

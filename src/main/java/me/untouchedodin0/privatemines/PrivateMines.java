@@ -18,6 +18,7 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
+import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.metrics.Metrics;
 import me.untouchedodin0.privatemines.utils.metrics.Metrics.SingleLineChart;
@@ -116,6 +117,9 @@ public class PrivateMines extends JavaPlugin {
                 schematicStorage.addSchematic(schematicFile, mineBlocks);
                 privateMines.getLogger().info("Loaded file: " + schematicFile);
             });
+
+            SQLite sqlite = new SQLite();
+            sqlite.load();
 
             loadMines();
 //            startAutoReset();
