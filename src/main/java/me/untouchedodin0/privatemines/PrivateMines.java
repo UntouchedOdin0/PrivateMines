@@ -90,6 +90,7 @@ public class PrivateMines extends JavaPlugin {
             registerCommands();
             registerSellListener();
             setupSchematicUtils();
+            setupLanguages();
 
             try {
                 Files.createDirectories(minesDirectory);
@@ -148,6 +149,9 @@ public class PrivateMines extends JavaPlugin {
         paperCommandManager = new PaperCommandManager(this);
         paperCommandManager.registerCommand(new PrivateMinesCommand(this));
         paperCommandManager.registerCommand(new UsePlayerShop(this, mineStorage));
+    }
+
+    public void setupLanguages() {
         paperCommandManager.getLocales().addBundleClassLoader(getClassLoader());
         paperCommandManager.getLocales().loadLanguages();
         privateMines.getLogger().info("Locales: " + paperCommandManager.getLocales().toString());
