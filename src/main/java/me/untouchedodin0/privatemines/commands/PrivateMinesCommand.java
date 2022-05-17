@@ -92,8 +92,8 @@ public class PrivateMinesCommand extends BaseCommand {
         MineType mineType = mineTypeManager.getDefaultMineType();
         privateMines.getLogger().info("Giving the player a mine using the mine type of " + mineType.getName());
         mineFactory.create(target, location, mineType);
-        privateMines.getPaperCommandManager().getCommandIssuer(player).sendInfo(LangKeys.INFO_PRIVATEMINE_GIVEN);
-        getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_GIVEN_TO, target.getName());
+//        privateMines.getPaperCommandManager().getCommandIssuer(player).sendInfo(LangKeys.INFO_PRIVATEMINE_GIVEN_TO, target.getName());
+//        privateMines.getPaperCommandManager().getCommandIssuer(target).sendInfo(LangKeys.INFO_PRIVATEMINE_GIVEN);
     }
 
     @Subcommand("delete")
@@ -105,7 +105,7 @@ public class PrivateMinesCommand extends BaseCommand {
                 getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_PLAYER_DOESNT_OWN_A_MINE);
             } else {
                 Mine mine = privateMines.getMineStorage().get(target.getUniqueId());
-                getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_DELETED, target.getName());
+                player.sendMessage(ChatColor.GREEN + "Deleting " + target.getName() + "'s private mine!");
                 if (mine != null) {
                     mine.delete(target.getUniqueId());
                 }

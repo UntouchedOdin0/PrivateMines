@@ -106,7 +106,8 @@ public class MineFactory {
         }
 
         Shop shop = new ShopBuilder().setOwner(uuid).setPrices(prices).build();
-        String regionName = String.format("mine-%s", player.getUniqueId());
+        String mineRegionName = String.format("mine-%s", player.getUniqueId());
+        String fullRegionName = String.format("mine-full-%s", player.getUniqueId());
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
@@ -172,11 +173,17 @@ public class MineFactory {
 
                         Location fullMin = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMinimumPoint());
                         Location fullMax = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMaximumPoint());
-                        ProtectedCuboidRegion miningWorldGuardRegion = new ProtectedCuboidRegion(regionName, lrailsV, urailsV);
+
+                        privateMines.getLogger().info("Full Min: " + fullMin);
+                        privateMines.getLogger().info("Full Max: " + fullMax);
+
+                        ProtectedCuboidRegion miningWorldGuardRegion = new ProtectedCuboidRegion(mineRegionName, lrailsV, urailsV);
+                        ProtectedCuboidRegion fullWorldGuardRegion = new ProtectedCuboidRegion(fullRegionName, newRegion.getMinimumPoint(), newRegion.getMaximumPoint());
                         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
                         RegionManager regionManager = container.get(world);
                         if (regionManager != null) {
                             regionManager.addRegion(miningWorldGuardRegion);
+                            regionManager.addRegion(fullWorldGuardRegion);
                         }
 
                         /**

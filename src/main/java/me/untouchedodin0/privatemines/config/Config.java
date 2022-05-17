@@ -28,7 +28,6 @@ import org.bukkit.Material;
 import redempt.redlib.config.annotations.Comment;
 
 public class Config {
-
     @Comment("The template material for the spawn point")
     public static Material spawnPoint = Material.SPONGE;
     @Comment("The template material for the corners")
@@ -46,4 +45,6 @@ public class Config {
     public static boolean giveMineOnFirstJoin = false;
     @Comment("Should we only replace air blocks when the mine resets?")
     public static boolean onlyReplaceAir = true;
+    @Comment("Which locale should we use?")
+    public static String locale = "en_US";
 }

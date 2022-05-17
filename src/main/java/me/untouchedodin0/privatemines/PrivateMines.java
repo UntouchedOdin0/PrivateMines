@@ -19,6 +19,8 @@ import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
+import me.untouchedodin0.privatemines.utils.locale.LocaleManager;
+import me.untouchedodin0.privatemines.utils.locale.LocaleObject;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.metrics.Metrics;
 import me.untouchedodin0.privatemines.utils.metrics.Metrics.SingleLineChart;
@@ -32,18 +34,19 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
+import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -58,6 +61,10 @@ public class PrivateMines extends JavaPlugin {
     private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
     private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
     private final Path addonsDirectory = getDataFolder().toPath().resolve("addons");
+    private final Path localesDirectory = getDataFolder().toPath().resolve("locales");
+
+    private final Map<String, Messages> locales = new HashMap<>();
+    private final Map<UUID, LocaleObject> playerLocales = new HashMap<>();
     private SchematicStorage schematicStorage;
     private SchematicIterator schematicIterator;
     private MineFactory mineFactory;
@@ -65,6 +72,7 @@ public class PrivateMines extends JavaPlugin {
     private MineWorldManager mineWorldManager;
     private MineTypeManager mineTypeManager;
     private ConfigManager configManager;
+    private LocaleManager localeManager;
     private SlimeUtils slimeUtils;
     private static Economy econ = null;
     private static PaperCommandManager paperCommandManager;
@@ -86,6 +94,7 @@ public class PrivateMines extends JavaPlugin {
             mineStorage = new MineStorage();
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
+            localeManager = new LocaleManager();
 
             registerCommands();
             registerSellListener();
@@ -122,6 +131,34 @@ public class PrivateMines extends JavaPlugin {
             SQLite sqlite = new SQLite();
             sqlite.load();
 
+            File localeDirectory = new File("plugins/PrivateMines/locales/");
+            if (!localeDirectory.exists()) {
+                localeDirectory.mkdir();
+            }
+            File localeFile = new File("plugins/PrivateMines/locales/" + Config.locale + ".txt");
+            privateMines.getLogger().info(localeFile.getAbsolutePath());
+            privateMines.getLogger().info(localeFile.getName());
+            InputStream inputStream;
+            if (localeFile.exists()){
+                try {
+                    inputStream = new FileInputStream(localeFile);
+                    Path localePath = localeFile.toPath();
+                    Messages messages = Messages.load(inputStream, localePath);
+                    String locale = localeFile.getName().replace(".txt", "");
+                    privateMines.getLogger().info("Loaded locale: " + localeFile.getName());
+                    privateMines.getLogger().info("messages: " + messages);
+                    privateMines.getLogger().info("locale: " + locale);
+                    LocaleObject localeObject = new LocaleObject(locale, messages);
+                    localeManager.addLocaleObject(localeFile, localeObject);
+                    Map<File, LocaleObject> localeObjectMap = localeManager.getLocaleObjects();
+                    localeObjectMap.forEach((file, localeObject1) -> {
+                        privateMines.getLogger().info("Loaded locale file: " + file.getName());
+                        privateMines.getLogger().info("Loaded locale object: " + localeObject1);
+                    });
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             loadMines();
             startAutoReset();
             PaperLib.suggestPaper(this);
@@ -259,6 +296,10 @@ public class PrivateMines extends JavaPlugin {
         return mineWorldManager;
     }
 
+    public LocaleManager getLocaleManager() {
+        return localeManager;
+    }
+
     public Path getMinesDirectory() {
         return minesDirectory;
     }
@@ -298,5 +339,20 @@ public class PrivateMines extends JavaPlugin {
             return;
         }
         getLogger().info("Using the internal sell system!");
+    }
+
+    public void putPlayerInLocale(UUID uuid, LocaleObject localeObject) {
+        playerLocales.put(uuid, localeObject);
+    }
+
+    public LocaleObject get(UUID uuid) {
+        return playerLocales.get(uuid);
+    }
+
+    public Map<String, Messages> getLocales() {
+        return locales;
+    }
+    public Map<UUID, LocaleObject> getPlayerLocales() {
+        return playerLocales;
     }
 }

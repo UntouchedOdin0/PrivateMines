@@ -286,7 +286,6 @@ public class Mine {
             task.cancel();
         }
     }
-
     public void ban(Player player) {
         if (mineData.getBannedPlayers().contains(player.getUniqueId())) return;
         Player owner = Bukkit.getPlayer(mineData.getMineOwner());

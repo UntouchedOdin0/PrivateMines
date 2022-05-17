@@ -61,10 +61,6 @@ shadowJar {
     relocate "io.papermc.lib", "me.untouchedodin0.privatemines.paperlib"
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
-
 task copyTo_DevServerOld(type: Copy) {
     from shadowJar
     into "E:/Coding/Spigot Test Servers/1.18 Private Mines (Paper and FAWE)/plugins"
