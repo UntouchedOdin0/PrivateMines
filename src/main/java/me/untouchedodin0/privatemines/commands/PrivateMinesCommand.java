@@ -54,7 +54,6 @@ import redempt.redlib.itemutils.ItemBuilder;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -143,7 +142,7 @@ public class PrivateMinesCommand extends BaseCommand {
     }
 
     @Subcommand("reset")
-    @CommandPermission("privatemines.teleport")
+    @CommandPermission("privatemines.reset")
     public void reset(Player player) {
         if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
             getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_PLAYER_DOESNT_OWN_A_MINE);
