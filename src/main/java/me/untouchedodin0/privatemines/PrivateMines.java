@@ -99,6 +99,7 @@ public class PrivateMines extends JavaPlugin {
             registerCommands();
             registerSellListener();
             setupSchematicUtils();
+            saveLocaleFiles();
             setupLanguages();
 
             try {
@@ -131,34 +132,7 @@ public class PrivateMines extends JavaPlugin {
             SQLite sqlite = new SQLite();
             sqlite.load();
 
-            File localeDirectory = new File("plugins/PrivateMines/locales/");
-            if (!localeDirectory.exists()) {
-                localeDirectory.mkdir();
-            }
-            File localeFile = new File("plugins/PrivateMines/locales/" + Config.locale + ".txt");
-            privateMines.getLogger().info(localeFile.getAbsolutePath());
-            privateMines.getLogger().info(localeFile.getName());
-            InputStream inputStream;
-            if (localeFile.exists()){
-                try {
-                    inputStream = new FileInputStream(localeFile);
-                    Path localePath = localeFile.toPath();
-                    Messages messages = Messages.load(inputStream, localePath);
-                    String locale = localeFile.getName().replace(".txt", "");
-                    privateMines.getLogger().info("Loaded locale: " + localeFile.getName());
-                    privateMines.getLogger().info("messages: " + messages);
-                    privateMines.getLogger().info("locale: " + locale);
-                    LocaleObject localeObject = new LocaleObject(locale, messages);
-                    localeManager.addLocaleObject(localeFile, localeObject);
-                    Map<File, LocaleObject> localeObjectMap = localeManager.getLocaleObjects();
-                    localeObjectMap.forEach((file, localeObject1) -> {
-                        privateMines.getLogger().info("Loaded locale file: " + file.getName());
-                        privateMines.getLogger().info("Loaded locale object: " + localeObject1);
-                    });
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+
             loadMines();
             startAutoReset();
             PaperLib.suggestPaper(this);
@@ -341,6 +315,14 @@ public class PrivateMines extends JavaPlugin {
         getLogger().info("Using the internal sell system!");
     }
 
+    public void saveLocaleFiles() {
+        getLogger().info("Saving locale files...");
+        saveResource("locales/acf-privatemines_de.properties", false);
+        saveResource("locales/acf-privatemines_en.properties", false);
+        saveResource("locales/acf-privatemines_es.properties", false);
+        saveResource("locales/acf-privatemines_fr.properties", false);
+        getLogger().info("Successfully saved locale files!");
+    }
     public void putPlayerInLocale(UUID uuid, LocaleObject localeObject) {
         playerLocales.put(uuid, localeObject);
     }

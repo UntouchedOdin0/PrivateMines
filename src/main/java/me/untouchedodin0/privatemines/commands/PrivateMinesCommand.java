@@ -1,18 +1,18 @@
 /**
  * MIT License
- *
+ * <p>
  * Copyright (c) 2021 - 2022 Kyle Hicks
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -54,6 +54,7 @@ import redempt.redlib.itemutils.ItemBuilder;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -383,18 +384,38 @@ public class PrivateMinesCommand extends BaseCommand {
     }
 
     @Subcommand("dev/types/listall")
-    @CommandPermission("privatemines.dev.listall")
-    public void listall(Player player) {
+    @CommandPermission("privatemines.dev.listall.types")
+    public void listallTypes(Player player) {
         mineTypeManager.getMineTypes().forEach((s, mineType) -> player.sendMessage(ChatColor.GREEN + "- " + mineType.getName()));
+    }
+
+    @Subcommand("dev/storage/listall")
+    @CommandPermission("privatemines.dev.listall.storage")
+    public void listallStorage(Player player) {
+        MineStorage mineStorage = privateMines.getMineStorage();
+        mineStorage.getMines().forEach((uuid, mine) -> {
+            MineData mineData = mine.getMineData();
+            UUID mineOwner = mineData.getMineOwner();
+            player.sendMessage(ChatColor.GREEN + "- "
+                                       + Bukkit.getOfflinePlayer(mineOwner).getName()
+                                       + ChatColor.GRAY + " (" + mineOwner + ")");
+        });
     }
 
     @Subcommand("dev/purge/noconfirm")
     @CommandPermission("privatemines.purge.noconfirm")
     public void purgeNoConfirm(Player player) {
         Map<UUID, Mine> mines = mineStorage.getMines();
-        mines.forEach((uuid, mine) -> mine.delete(uuid));
-    }
 
+        if (mines.isEmpty()) {
+            player.sendMessage(ChatColor.RED + "No mines to purge!");
+        } else {
+            for (Mine mine : mines.values()) {
+                player.sendMessage(ChatColor.GREEN + "Purging mine " + mine);
+                mine.delete(mine.getMineData().getMineOwner());
+            }
+        }
+    }
 
     // loadSlimeWorld(String worldName, String loaderName, boolean readOnly, SlimePropertyMap propertyMap, Consumer<SlimeWorld> slimeWorldConsumer) {
     @Subcommand("dev/slime/createmine")

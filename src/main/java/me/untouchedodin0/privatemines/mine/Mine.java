@@ -383,6 +383,7 @@ public class Mine {
             privateMines.getMineStorage().replaceMine(mineData.getMineOwner(), this);
             reset();
         }
+        this.canExpand = true;
     }
 
     public void saveMineData(Player player, MineData mineData) {
