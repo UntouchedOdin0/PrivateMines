@@ -1,18 +1,18 @@
 /**
  * MIT License
- *
+ * <p>
  * Copyright (c) 2021 - 2022 Kyle Hicks
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -286,6 +286,7 @@ public class Mine {
             task.cancel();
         }
     }
+
     public void ban(Player player) {
         if (mineData.getBannedPlayers().contains(player.getUniqueId())) return;
         Player owner = Bukkit.getPlayer(mineData.getMineOwner());
@@ -334,19 +335,15 @@ public class Mine {
 
             if (fillType == null || wallType == null) return;
 
-            privateMines.getLogger().info(String.format("Expanding mine new width: %d", mine.getWidth()));
-            privateMines.getLogger().info(String.format("Expanding mine new height: %d", mine.getHeight()));
-            privateMines.getLogger().info(String.format("Expanding mine new length: %d", mine.getLength()));
-
             mine.expand(ExpansionUtils.expansionVectors(1));
             walls.expand(ExpansionUtils.expansionVectors(1));
             walls.expand(
-                         BlockVector3.UNIT_X,
-                         BlockVector3.UNIT_Y,
-                         BlockVector3.UNIT_Z,
-                         BlockVector3.UNIT_MINUS_X,
-                         BlockVector3.UNIT_MINUS_Y,
-                         BlockVector3.UNIT_MINUS_Z);
+                    BlockVector3.UNIT_X,
+                    BlockVector3.UNIT_Y,
+                    BlockVector3.UNIT_Z,
+                    BlockVector3.UNIT_MINUS_X,
+                    BlockVector3.UNIT_MINUS_Y,
+                    BlockVector3.UNIT_MINUS_Z);
             fillAir.expand(BlockVector3.UNIT_X,
                            BlockVector3.UNIT_Y,
                            BlockVector3.UNIT_Z,
@@ -410,6 +407,15 @@ public class Mine {
         List<UUID> bannedPlayers = mineData.getBannedPlayers();
 
         if (file.exists()) {
+            boolean deleted = file.delete();
+            try {
+                boolean createdNewFile = file.createNewFile();
+                if (createdNewFile) {
+                    privateMines.getLogger().info("Created new file " + file.getName());
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             yml.set("mineOwner", owner.toString());
             yml.set("mineType", mineTypeName);
             yml.set("mineLocation", LocationUtils.toString(mineLocation));

@@ -47,6 +47,7 @@ import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.events.PrivateMineCreationEvent;
@@ -114,6 +115,8 @@ public class MineFactory {
         SchematicStorage storage = privateMines.getSchematicStorage();
         SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
 
+        privateMines.getLogger().info("MineBlocks: " + mineBlocks);
+
         Task.asyncDelayed(() -> {
             if (clipboardFormat != null) {
                 try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(schematicFile))) {
@@ -173,9 +176,6 @@ public class MineFactory {
 
                         Location fullMin = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMinimumPoint());
                         Location fullMax = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMaximumPoint());
-
-                        privateMines.getLogger().info("Full Min: " + fullMin);
-                        privateMines.getLogger().info("Full Max: " + fullMax);
 
                         ProtectedCuboidRegion miningWorldGuardRegion = new ProtectedCuboidRegion(mineRegionName, lrailsV, urailsV);
                         ProtectedCuboidRegion fullWorldGuardRegion = new ProtectedCuboidRegion(fullRegionName, newRegion.getMinimumPoint(), newRegion.getMaximumPoint());
@@ -263,8 +263,15 @@ public class MineFactory {
         });
     }
 
-    public void create(UUID uuid, Location location, MineType mineType) {
-        create(Objects.requireNonNull(Bukkit.getPlayer(uuid)), location, mineType);
+    public void createUpgraded(UUID uuid, Location location, MineType mineType) {
+        MineStorage mineStorage = privateMines.getMineStorage();
+        if (mineStorage.hasMine(uuid)) {
+            Mine mine = mineStorage.get(uuid);
+            if (mine != null) {
+                mine.delete(uuid);
+                create(Objects.requireNonNull(Bukkit.getPlayer(uuid)), location, mineType);
+            }
+        }
     }
 }
 

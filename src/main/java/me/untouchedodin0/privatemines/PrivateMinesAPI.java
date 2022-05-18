@@ -33,6 +33,6 @@ public class PrivateMinesAPI {
     }
 
     public void createMine(UUID uuid, Location location, MineType mineType) {
-        mineFactory.create(uuid, location, mineType);
+        mineFactory.createUpgraded(uuid, location, mineType);
     }
 }
