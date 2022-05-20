@@ -13,6 +13,7 @@ mineTypes:
   Test:
     file: minewithgap.schem
     resetTime: 5
+    expand: 1
     resetPercentage: 50.0
     upgradeCost: 1.0
     upgradeCurrency: VAULT # Supported currencies: VAULT, ULTRAPRISONCORE (Coming soon, hopefully...)

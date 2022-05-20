@@ -11,6 +11,7 @@ class MineType {
     val name: String? = null
     val file: String? = null
     val resetTime: Int = 0
+    val expand: Int = 0
     val resetPercentage: Double = 0.0
     val upgradeCost: Double = 0.0
     val upgradeCurrency: String? = null
