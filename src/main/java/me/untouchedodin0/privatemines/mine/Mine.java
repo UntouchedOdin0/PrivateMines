@@ -377,7 +377,7 @@ public class Mine {
             mineData.setMinimumFullRegion(mineData.getMinimumFullRegion().subtract(1, 1, 1));
             mineData.setMaximumFullRegion(mineData.getMaximumFullRegion().add(1, 1, 1));
             setMineData(mineData);
-            privateMines.getMineStorage().replaceMine(mineData.getMineOwner(), this);
+            privateMines.getMineStorage().replaceMineNoLog(mineData.getMineOwner(), this);
             reset();
         }
         this.canExpand = true;

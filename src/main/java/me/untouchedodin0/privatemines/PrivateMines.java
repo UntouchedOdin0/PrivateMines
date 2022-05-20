@@ -98,13 +98,11 @@ public class PrivateMines extends JavaPlugin {
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
             localeManager = new LocaleManager();
-            this.translator = Translator.of(this);
 
             registerCommands();
             registerSellListener();
             setupSchematicUtils();
             saveLocaleFiles();
-            setupLanguages();
 
             try {
                 Files.createDirectories(minesDirectory);
@@ -135,7 +133,6 @@ public class PrivateMines extends JavaPlugin {
 
             SQLite sqlite = new SQLite();
             sqlite.load();
-
 
             loadMines();
             startAutoReset();
@@ -314,10 +311,6 @@ public class PrivateMines extends JavaPlugin {
 
     public static Economy getEconomy() {
         return econ;
-    }
-
-    public Translator getTranslator() {
-        return translator;
     }
 
     public void registerSellListener() {
