@@ -115,9 +115,6 @@ public class MineFactory {
         SchematicStorage storage = privateMines.getSchematicStorage();
         SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
 
-        privateMines.getLogger().info("Pasting schematic: " + schematicFile);
-        privateMines.getLogger().info("MineBlocks: " + mineBlocks);
-
         Task.asyncDelayed(() -> {
             if (clipboardFormat != null) {
                 try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(schematicFile))) {
@@ -145,7 +142,6 @@ public class MineFactory {
 
                     BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2().add(0, 0, 1));
                     BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1().add(0, 0, 1));
-
 
 
                     Location spongeL = new Location(location.getWorld(), vector.getBlockX(), vector.getBlockY(), vector.getBlockZ() + 1);

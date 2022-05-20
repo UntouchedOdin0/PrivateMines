@@ -1,6 +1,7 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
+import com.convallyria.languagy.api.language.Translator;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
@@ -31,6 +32,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.EventHandler;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
@@ -73,6 +75,7 @@ public class PrivateMines extends JavaPlugin {
     private MineTypeManager mineTypeManager;
     private ConfigManager configManager;
     private LocaleManager localeManager;
+    private Translator translator;
     private SlimeUtils slimeUtils;
     private static Economy econ = null;
     private static PaperCommandManager paperCommandManager;
@@ -95,6 +98,7 @@ public class PrivateMines extends JavaPlugin {
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
             localeManager = new LocaleManager();
+            this.translator = Translator.of(this);
 
             registerCommands();
             registerSellListener();
@@ -154,6 +158,16 @@ public class PrivateMines extends JavaPlugin {
             Duration loadTime = Duration.between(start, end);
             getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
         }
+    }
+
+    @Override
+    public void onDisable() {
+        getLogger().info("Shutting down translation service...");
+        translator.close();
+        getLogger().info("Translation service shut down.");
+        getLogger().info(String.format("%s v%s has successfully been Disabled",
+                                       getDescription().getName(),
+                                       getDescription().getVersion()));
     }
 
     private void registerCommands() {
@@ -300,6 +314,10 @@ public class PrivateMines extends JavaPlugin {
 
     public static Economy getEconomy() {
         return econ;
+    }
+
+    public Translator getTranslator() {
+        return translator;
     }
 
     public void registerSellListener() {
