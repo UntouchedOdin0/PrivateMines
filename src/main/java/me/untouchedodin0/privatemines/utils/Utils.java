@@ -57,10 +57,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class Utils {
     private final PrivateMines privateMines;
     public static final String TABLE_NAME = "privatemines";
+    public static final Pattern pastePattern = Pattern.compile("[a-z]{10}");
 
     public Utils(PrivateMines privateMines) {
         this.privateMines = privateMines;

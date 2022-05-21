@@ -102,7 +102,14 @@ public class PrivateMines extends JavaPlugin {
             registerCommands();
             registerSellListener();
             setupSchematicUtils();
-            saveLocaleFiles();
+            Messages.load(this);
+
+            privateMines.getLogger().info(Messages.msg("youHaveBeenGivenAMine"));
+            privateMines.getLogger().info(Messages.msg("yourMineHasBeenDeleted"));
+            privateMines.getLogger().info(Messages.msg("yourMineHasBeenReset"));
+            privateMines.getLogger().info(Messages.msg("youHaveBeenTeleportedToYourMine"));
+            privateMines.getLogger().info(Messages.msg("youDontOwnAMine"));
+            privateMines.getLogger().info(Messages.msg("youHaveGivenPlayerAMine"));
 
             try {
                 Files.createDirectories(minesDirectory);

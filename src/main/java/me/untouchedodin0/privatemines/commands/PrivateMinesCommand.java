@@ -27,6 +27,7 @@ package me.untouchedodin0.privatemines.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
+import com.sk89q.worldedit.WorldEdit;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -35,6 +36,7 @@ import me.untouchedodin0.privatemines.messages.LangKeys;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
+import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.inventory.LocaleInventory;
 import me.untouchedodin0.privatemines.utils.inventory.MainMenu;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
@@ -47,18 +49,25 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.crunch.CompiledExpression;
 import redempt.crunch.Crunch;
+import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.inventorygui.InventoryGUI;
 import redempt.redlib.inventorygui.ItemButton;
 import redempt.redlib.itemutils.ItemBuilder;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
 
 import static net.md_5.bungee.api.ChatColor.*;
 
@@ -144,14 +153,17 @@ public class PrivateMinesCommand extends BaseCommand {
     @Subcommand("reset")
     @CommandPermission("privatemines.reset")
     public void reset(Player player) {
+        String noMine = Messages.msg("youDontOwnAMine");
+        String mineReset = Messages.msg("yourMineHasBeenReset");
+
         if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
-            getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_PLAYER_DOESNT_OWN_A_MINE);
+            player.sendMessage(noMine);
         } else {
             Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
             if (mine != null) {
                 mine.reset();
                 mine.teleport(player);
-                getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_RESET);
+                player.sendMessage(mineReset);
             }
         }
     }
@@ -440,6 +452,43 @@ public class PrivateMinesCommand extends BaseCommand {
         }
     }
 
+    @Subcommand("debugpaste")
+    @CommandPermission("privatemines.debugpaste")
+    public void debugPaste(Player player) {
+        player.sendMessage("Pasting debug paste");
+
+        String pluginName = privateMines.getDescription().getName();
+        String pluginVersion = privateMines.getDescription().getVersion();
+        String worldEditVersion = WorldEdit.getVersion();
+        String isRunningFastAsyncWorldEdit = Bukkit.getServer().getPluginManager().isPluginEnabled("FastAsyncWorldEdit") ? "Yes" : "No";
+
+        String sb =
+                "Plugin Name: "       + pluginName +
+                "\n"                  +
+                "Plugin Version: "    + pluginVersion +
+                "\n"                  +
+                "WorldEdit Version: " + worldEditVersion +
+                "\n"                  +
+                "Is FastAsyncWorldEdit enabled? " + isRunningFastAsyncWorldEdit;
+
+        final HttpClient httpClient = HttpClient.newHttpClient();
+        final HttpRequest httpRequest = HttpRequest.newBuilder(URI.create("https://www.toptal.com/developers/hastebin/documents"))
+                .POST(HttpRequest.BodyPublishers.ofString(sb))
+                .build();
+        final CompletableFuture<HttpResponse<String>> responseFuture = httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
+        try {
+            String body = responseFuture.get().body();
+            Matcher matcher = Utils.pastePattern.matcher(body);
+
+            if (matcher.find()) {
+                String pasteId = matcher.group(0);
+                String url = "https://www.toptal.com/developers/hastebin/" + pasteId;
+                player.sendMessage(url);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
     @Subcommand("reload")
     @CommandPermission("privatemines.reload")
     public void reload(Player player) {

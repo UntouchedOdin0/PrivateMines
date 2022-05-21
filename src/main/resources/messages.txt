@@ -1,0 +1,6 @@
+youHaveBeenGivenAMine:You have been given a private mine.
+yourMineHasBeenDeleted:Your private mines has been deleted.
+yourMineHasBeenReset:Your private mine has been reset.
+youHaveBeenTeleportedToYourMine:You have been teleported to your private mine.
+youDontOwnAMine:You don't own a private mine.
+youHaveGivenPlayerAMine:You have given {name} a private mine.
