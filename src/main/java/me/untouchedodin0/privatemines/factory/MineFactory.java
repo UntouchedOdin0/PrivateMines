@@ -66,6 +66,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
 import java.io.File;
@@ -106,6 +107,7 @@ public class MineFactory {
             prices.putAll(materials);
         }
 
+        privateMines.getLogger().info(LocationUtils.toString(location));
         Shop shop = new ShopBuilder().setOwner(uuid).setPrices(prices).build();
         String mineRegionName = String.format("mine-%s", player.getUniqueId());
         String fullRegionName = String.format("mine-full-%s", player.getUniqueId());

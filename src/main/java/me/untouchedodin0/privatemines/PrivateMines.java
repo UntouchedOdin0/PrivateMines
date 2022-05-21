@@ -59,6 +59,8 @@ public class PrivateMines extends JavaPlugin {
 
     private static PrivateMines privateMines;
     private static final int PLUGIN_ID = 11413;
+    public int Y_LEVEL = 50;
+    public int MINE_DISTANCE = 150;
 
     private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
     private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
@@ -125,6 +127,15 @@ public class PrivateMines extends JavaPlugin {
                     .target(MineConfig.class)
                     .saveDefaults()
                     .load();
+
+            this.Y_LEVEL = Config.mineYLevel;
+            this.MINE_DISTANCE = Config.mineDistance;
+
+            privateMines.getLogger().info("Y Level: " + Y_LEVEL);
+            privateMines.getLogger().info("mine distance: " + MINE_DISTANCE);
+
+            Location location = mineWorldManager.getNextFreeLocation();
+            privateMines.getLogger().info("Location: " + location);
 
             MineConfig.getMineTypes().forEach((s, mineType) -> mineTypeManager.registerMineType(mineType));
             MineConfig.mineTypes.forEach((name, mineType) -> {
@@ -333,6 +344,10 @@ public class PrivateMines extends JavaPlugin {
         getLogger().info("Using the internal sell system!");
     }
 
+    public int getYLevel() {
+        return Y_LEVEL;
+    }
+
     public void saveLocaleFiles() {
         getLogger().info("Saving locale files...");
         saveResource("locales/acf-privatemines_de.properties", false);
@@ -341,6 +356,7 @@ public class PrivateMines extends JavaPlugin {
         saveResource("locales/acf-privatemines_fr.properties", false);
         getLogger().info("Successfully saved locale files!");
     }
+
     public void putPlayerInLocale(UUID uuid, LocaleObject localeObject) {
         playerLocales.put(uuid, localeObject);
     }

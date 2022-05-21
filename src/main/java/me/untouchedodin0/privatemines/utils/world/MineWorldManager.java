@@ -24,7 +24,7 @@
 
 package me.untouchedodin0.privatemines.utils.world;
 
-import me.untouchedodin0.privatemines.config.Config;
+import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.utils.world.utils.Direction;
 import org.bukkit.*;
 
@@ -43,10 +43,9 @@ public class MineWorldManager {
                 new WorldCreator("privatemines")
                         .type(WorldType.FLAT)
                         .generator(new EmptyWorldGenerator()));
-        this.borderDistance = Config.mineDistance;
-        this.direction = NORTH;
-        int mineYLevel = Config.mineYLevel;
-        defaultLocation = new Location(minesWorld, 0, mineYLevel, 0);
+        int yLevel = PrivateMines.getPrivateMines().getConfig().getInt("mineYLevel");
+        this.borderDistance = PrivateMines.getPrivateMines().getConfig().getInt("mineDistance");
+        this.defaultLocation = new Location(minesWorld, 0, yLevel, 0);
     }
 
     public synchronized Location getNextFreeLocation() {
