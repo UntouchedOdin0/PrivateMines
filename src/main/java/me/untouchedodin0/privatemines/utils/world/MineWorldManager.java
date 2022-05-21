@@ -39,7 +39,6 @@ public class MineWorldManager {
     private final World minesWorld;
 
     public MineWorldManager() {
-        WorldCreator worldCreator = WorldCreator.name("privatemines");
         minesWorld = Bukkit.createWorld(
                 new WorldCreator("privatemines")
                         .type(WorldType.FLAT)
