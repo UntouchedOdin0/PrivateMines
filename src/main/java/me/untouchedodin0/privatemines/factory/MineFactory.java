@@ -143,15 +143,10 @@ public class MineFactory {
                     BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2().add(0, 0, 1));
                     BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1().add(0, 0, 1));
 
-
                     Location spongeL = new Location(location.getWorld(), vector.getBlockX(), vector.getBlockY(), vector.getBlockZ() + 1);
 
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ());
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
-
-                    privateMines.getLogger().info("Schematic: " + schematicFile.getName());
-                    privateMines.getLogger().info("LRAILS: " + lrailsL);
-                    privateMines.getLogger().info("URAILS: " + urailsL);
 
                     localSession.setClipboard(clipboardHolder);
 
