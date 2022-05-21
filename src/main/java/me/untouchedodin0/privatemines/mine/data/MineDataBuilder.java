@@ -40,12 +40,9 @@ public class MineDataBuilder {
     Location maximumMining;
     Location minimumFullRegion;
     Location maximumFullRegion;
-
     CuboidRegion miningRegion;
     MineType mineType;
-
     Shop shop = new Shop();
-
     boolean isOpen;
     double tax = 5;
 

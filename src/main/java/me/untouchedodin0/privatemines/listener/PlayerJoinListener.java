@@ -43,7 +43,6 @@ public class PlayerJoinListener implements Listener {
     MineFactory mineFactory = privateMines.getMineFactory();
     MineStorage mineStorage = privateMines.getMineStorage();
     MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
-
     @EventHandler
     public void onJoin(PlayerJoinEvent playerJoinEvent) {
         Player player = playerJoinEvent.getPlayer();

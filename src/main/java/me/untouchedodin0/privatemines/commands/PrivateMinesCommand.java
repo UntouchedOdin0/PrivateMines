@@ -101,6 +101,7 @@ public class PrivateMinesCommand extends BaseCommand {
         MineType mineType = mineTypeManager.getDefaultMineType();
         privateMines.getLogger().info("Giving the player a mine using the mine type of " + mineType.getName());
         mineFactory.create(target, location, mineType);
+        player.sendMessage(Messages.msg("youHaveBeenGivenAMine"));
 //        privateMines.getPaperCommandManager().getCommandIssuer(player).sendInfo(LangKeys.INFO_PRIVATEMINE_GIVEN_TO, target.getName());
 //        privateMines.getPaperCommandManager().getCommandIssuer(target).sendInfo(LangKeys.INFO_PRIVATEMINE_GIVEN);
     }
