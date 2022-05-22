@@ -457,7 +457,7 @@ public class PrivateMinesCommand extends BaseCommand {
     @Subcommand("debugpaste")
     @CommandPermission("privatemines.debugpaste")
     public void debugPaste(Player player) {
-        player.sendMessage("Pasting debug paste");
+        player.sendMessage(ChatColor.GREEN + "Pasting debug paste");
 
         String pluginName = privateMines.getDescription().getName();
         String pluginVersion = privateMines.getDescription().getVersion();
@@ -485,7 +485,7 @@ public class PrivateMinesCommand extends BaseCommand {
             if (matcher.find()) {
                 String pasteId = matcher.group(0);
                 String url = "https://www.toptal.com/developers/hastebin/" + pasteId;
-                player.sendMessage(url);
+                player.sendMessage(ChatColor.GREEN + url);
             }
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
