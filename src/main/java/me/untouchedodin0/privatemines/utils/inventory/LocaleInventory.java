@@ -29,7 +29,6 @@ public class LocaleInventory {
     public static void openLocaleMenu(Player player) {
 
         PaperCommandManager paperCommandManager = privateMines.getPaperCommandManager();
-        LocaleManager localeManager = privateMines.getLocaleManager();
 
         InventoryGUI changeLocale = new InventoryGUI(Bukkit.createInventory(null, 9, "Change locale"));
         ItemStack englishSkull = SkullCreator.itemFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODc5ZDk5ZDljNDY0NzRlMjcxM2E3ZTg0YTk1ZTRjZTdlOGZmOGVhNGQxNjQ0MTNhNTkyZTQ0MzVkMmM2ZjlkYyJ9fX0=");

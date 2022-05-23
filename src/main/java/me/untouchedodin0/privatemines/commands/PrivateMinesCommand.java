@@ -141,13 +141,16 @@ public class PrivateMinesCommand extends BaseCommand {
     @Subcommand("teleport")
     @CommandPermission("privatemines.teleport")
     public void teleport(Player player) {
+        String doesntOwnAMine = Messages.msg("youDontOwnAMine");
+        String teleportedToMine = Messages.msg("youHaveBeenTeleportedToYourMine");
+
         if (!mineStorage.hasMine(player.getUniqueId())) {
-            getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_PLAYER_DOESNT_OWN_A_MINE);
+            player.sendMessage(doesntOwnAMine);
         } else {
             Mine mine = mineStorage.get(player.getUniqueId());
             if (mine != null) {
                 mine.teleport(player);
-                getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_TELEPORTED);
+                player.sendMessage(teleportedToMine);
             }
         }
     }

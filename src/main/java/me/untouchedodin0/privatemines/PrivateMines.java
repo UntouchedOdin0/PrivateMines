@@ -76,8 +76,6 @@ public class PrivateMines extends JavaPlugin {
     private MineWorldManager mineWorldManager;
     private MineTypeManager mineTypeManager;
     private ConfigManager configManager;
-    private LocaleManager localeManager;
-    private Translator translator;
     private SlimeUtils slimeUtils;
     private static Economy econ = null;
     private static PaperCommandManager paperCommandManager;
@@ -99,19 +97,11 @@ public class PrivateMines extends JavaPlugin {
             mineStorage = new MineStorage();
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
-            localeManager = new LocaleManager();
 
             registerCommands();
             registerSellListener();
             setupSchematicUtils();
             Messages.load(this);
-
-            privateMines.getLogger().info(Messages.msg("youHaveBeenGivenAMine"));
-            privateMines.getLogger().info(Messages.msg("yourMineHasBeenDeleted"));
-            privateMines.getLogger().info(Messages.msg("yourMineHasBeenReset"));
-            privateMines.getLogger().info(Messages.msg("youHaveBeenTeleportedToYourMine"));
-            privateMines.getLogger().info(Messages.msg("youDontOwnAMine"));
-            privateMines.getLogger().info(Messages.msg("youHaveGivenPlayerAMine"));
 
             try {
                 Files.createDirectories(minesDirectory);
@@ -130,12 +120,6 @@ public class PrivateMines extends JavaPlugin {
 
             this.Y_LEVEL = Config.mineYLevel;
             this.MINE_DISTANCE = Config.mineDistance;
-
-            privateMines.getLogger().info("Y Level: " + Y_LEVEL);
-            privateMines.getLogger().info("mine distance: " + MINE_DISTANCE);
-
-            Location location = mineWorldManager.getNextFreeLocation();
-            privateMines.getLogger().info("Location: " + location);
 
             MineConfig.getMineTypes().forEach((s, mineType) -> mineTypeManager.registerMineType(mineType));
             MineConfig.mineTypes.forEach((name, mineType) -> {
@@ -178,7 +162,6 @@ public class PrivateMines extends JavaPlugin {
     @Override
     public void onDisable() {
         getLogger().info("Shutting down translation service...");
-        translator.close();
         getLogger().info("Translation service shut down.");
         getLogger().info(String.format("%s v%s has successfully been Disabled",
                                        getDescription().getName(),
@@ -297,10 +280,6 @@ public class PrivateMines extends JavaPlugin {
 
     public MineWorldManager getMineWorldManager() {
         return mineWorldManager;
-    }
-
-    public LocaleManager getLocaleManager() {
-        return localeManager;
     }
 
     public Path getMinesDirectory() {
