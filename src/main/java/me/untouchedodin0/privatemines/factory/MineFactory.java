@@ -108,7 +108,7 @@ public class MineFactory {
         privateMines.getLogger().info(LocationUtils.toString(location));
         Shop shop = new ShopBuilder().setOwner(uuid).setPrices(prices).build();
         String mineRegionName = String.format("mine-%s", player.getUniqueId());
-        String fullRegionName = String.format("mine-full-%s", player.getUniqueId());
+        String fullRegionName = String.format("full-mine-%s", player.getUniqueId());
 
         ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());

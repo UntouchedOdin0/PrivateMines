@@ -121,11 +121,14 @@ public class Mine {
 
         Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
         String regionName = String.format("mine-%s", Objects.requireNonNull(player).getUniqueId());
+        String fullRegionName = String.format("full-mine-%s", Objects.requireNonNull(player).getUniqueId());
 
         World world = corner1.getWorld();
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionManager regionManager = container.get(BukkitAdapter.adapt(Objects.requireNonNull(world)));
         Objects.requireNonNull(regionManager).removeRegion(regionName);
+        Objects.requireNonNull(regionManager).removeRegion(fullRegionName);
+
         Instant start = Instant.now();
         final RandomPattern randomPattern = new RandomPattern();
         Pattern air = BukkitAdapter.adapt(Material.AIR.createBlockData());
