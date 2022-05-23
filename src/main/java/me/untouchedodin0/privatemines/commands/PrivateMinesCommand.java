@@ -85,26 +85,42 @@ public class PrivateMinesCommand extends BaseCommand {
     }
 
     @Default
-    public void mainCommand(Player player) {
-        MainMenu mainMenu = new MainMenu(mineStorage);
-        mainMenu.openMainMenu(player);
+    public void mainCommand(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            return;
+        } else {
+            MainMenu mainMenu = new MainMenu(mineStorage);
+            mainMenu.openMainMenu(player);
+        }
     }
 
     @Subcommand("give")
     @CommandCompletion("@players")
     @CommandPermission("privatemines.give")
-    public void give(CommandSender player, Player target) {
-        player.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a private mine!");
+    public void give(CommandSender player, OfflinePlayer target) {
+        Player targetPlayer = target.getPlayer();
         MineFactory mineFactory = new MineFactory();
         MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
         Location location = mineWorldManager.getNextFreeLocation();
         privateMines.getLogger().info("Next free location: " + location.getX() + ", " + location.getY() + ", " + location.getZ());
         MineType mineType = mineTypeManager.getDefaultMineType();
-        privateMines.getLogger().info("Giving the player a mine using the mine type of " + mineType.getName());
-        mineFactory.create(target, location, mineType);
-        player.sendMessage(Messages.msg("youHaveBeenGivenAMine"));
-//        privateMines.getPaperCommandManager().getCommandIssuer(player).sendInfo(LangKeys.INFO_PRIVATEMINE_GIVEN_TO, target.getName());
-//        privateMines.getPaperCommandManager().getCommandIssuer(target).sendInfo(LangKeys.INFO_PRIVATEMINE_GIVEN);
+
+        if (targetPlayer != null) {
+            if (mineStorage.hasMine(targetPlayer.getUniqueId())) {
+                player.sendMessage(ChatColor.RED + "That player already has a mine!");
+            } else {
+                player.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a private mine!");
+                privateMines.getLogger().info("Giving the player a mine using the mine type of " + mineType.getName());
+                mineFactory.create(targetPlayer, location, mineType);
+                targetPlayer.sendMessage(Messages.msg("youHaveBeenGivenAMine"));
+            }
+        }
+    }
+
+    @Subcommand("testcommand")
+    public void test(CommandSender sender, OfflinePlayer player) {
+        sender.sendMessage("Test");
+        sender.sendMessage("Giving " + player + " a private mine! (test)");
     }
 
     @Subcommand("delete")

@@ -85,7 +85,6 @@ public class MineFactory {
     PrivateMines privateMines = PrivateMines.getPrivateMines();
     EditSession editSession;
 
-
     /**
      * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
      *
@@ -93,7 +92,6 @@ public class MineFactory {
      * @param location the location of the mine
      * @param mineType the type of mine to paste
      */
-
     public void create(Player player, Location location, MineType mineType) {
         Instant start = Instant.now();
         UUID uuid = player.getUniqueId();
