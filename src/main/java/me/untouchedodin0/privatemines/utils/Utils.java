@@ -95,6 +95,17 @@ public class Utils {
         return new Location(world, vector3.getX(), vector3.getY(), vector3.getZ());
     }
 
+    // Credits to Redempt for this method
+    // https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/region/CuboidRegion.java#L78-L87
+    public static boolean contains(Location min, Location max, Location loc) {
+        if (min.getWorld() != null && max.getWorld() != null && loc.getWorld() != null) {
+            return loc.getWorld().getName().equals(min.getWorld().getName()) &&
+                    loc.getX() >= min.getX() && loc.getY() >= min.getY() && loc.getZ() >= min.getZ() &&
+                    loc.getX() < max.getX() && loc.getY() < max.getY() && loc.getZ() < max.getZ();
+        }
+        return false;
+    }
+
     public static CuboidRegion toWorldEditCuboid(me.untouchedodin0.privatemines.utils.regions.CuboidRegion cuboidRegion) {
         var min = BlockVector3.at(
                 cuboidRegion.getMinimumPoint().getBlockX(),

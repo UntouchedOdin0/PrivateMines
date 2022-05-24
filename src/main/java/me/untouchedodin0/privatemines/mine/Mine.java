@@ -27,11 +27,14 @@ package me.untouchedodin0.privatemines.mine;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -71,6 +74,7 @@ public class Mine {
     private MineData mineData;
     private boolean canExpand = true;
     private Task task;
+    private Task percentageTask;
 
     public Mine(PrivateMines privateMines) {
         this.privateMines = privateMines;
@@ -234,6 +238,12 @@ public class Mine {
 
         World world = location.getWorld();
 
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (Utils.contains(mineData.getMinimumMining(), mineData.getMaximumMining(), player.getLocation())) {
+                teleport(player);
+            }
+        }
+
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
             Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
 
@@ -290,6 +300,32 @@ public class Mine {
         }
     }
 
+    public void startPercentageTask() {
+        this.percentageTask = Task.asyncRepeating(() -> {
+            double percentage = getPercentage();
+            Bukkit.broadcastMessage(ChatColor.GOLD + "Mine " + mineData.getMineOwner() + " is " + percentage + "% mined.");
+            if (percentage >= 50) {
+                reset();
+                Bukkit.broadcastMessage(ChatColor.RED + "Mine " + mineData.getMineOwner() + " has been reset!");
+            }
+        }, 0L, 20L);
+    }
+
+    public double getPercentage() {
+        CuboidRegion region = new CuboidRegion(BlockVector3.at(mineData.getMinimumMining().getBlockX(), mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()), BlockVector3.at(mineData.getMaximumMining().getBlockX(), mineData.getMaximumMining().getBlockY(), mineData.getMaximumMining().getBlockZ()));
+
+        long total = region.getVolume();
+        int airBlocks = 0;
+        Set<BaseBlock> blocks = new HashSet<>();
+        if (BlockTypes.AIR != null) {
+            blocks.add(BlockTypes.AIR.getDefaultState().toBaseBlock());
+            try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(mineData.getMinimumMining().getWorld())).fastMode(true).build()) {
+                airBlocks = editSession.countBlocks(region, blocks);
+            }
+        }
+        return (float) airBlocks * 100L / total;
+    }
+
     public void ban(Player player) {
         if (mineData.getBannedPlayers().contains(player.getUniqueId())) return;
         Player owner = Bukkit.getPlayer(mineData.getMineOwner());
@@ -340,18 +376,8 @@ public class Mine {
 
             mine.expand(ExpansionUtils.expansionVectors(1));
             walls.expand(ExpansionUtils.expansionVectors(1));
-            walls.expand(
-                    BlockVector3.UNIT_X,
-                    BlockVector3.UNIT_Y,
-                    BlockVector3.UNIT_Z,
-                    BlockVector3.UNIT_MINUS_X,
-                    BlockVector3.UNIT_MINUS_Y,
-                    BlockVector3.UNIT_MINUS_Z);
-            fillAir.expand(BlockVector3.UNIT_X,
-                           BlockVector3.UNIT_Y,
-                           BlockVector3.UNIT_Z,
-                           BlockVector3.UNIT_MINUS_X,
-                           BlockVector3.UNIT_MINUS_Z);
+            walls.expand(BlockVector3.UNIT_X, BlockVector3.UNIT_Y, BlockVector3.UNIT_Z, BlockVector3.UNIT_MINUS_X, BlockVector3.UNIT_MINUS_Y, BlockVector3.UNIT_MINUS_Z);
+            fillAir.expand(BlockVector3.UNIT_X, BlockVector3.UNIT_Y, BlockVector3.UNIT_Z, BlockVector3.UNIT_MINUS_X, BlockVector3.UNIT_MINUS_Z);
             Map<Material, Double> materials = mineData.getMineType().getMaterials();
             final RandomPattern randomPattern = new RandomPattern();
             if (materials != null) {
@@ -361,12 +387,7 @@ public class Mine {
                 });
             }
 
-            PrivateMineExpandEvent privateMineExpandEvent = new PrivateMineExpandEvent(
-                    mineData.getMineOwner(),
-                    this,
-                    mine.getWidth(),
-                    mine.getHeight(),
-                    mine.getLength());
+            PrivateMineExpandEvent privateMineExpandEvent = new PrivateMineExpandEvent(mineData.getMineOwner(), this, mine.getWidth(), mine.getHeight(), mine.getLength());
             Task.syncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineExpandEvent));
             if (privateMineExpandEvent.isCancelled()) return;
 
@@ -398,13 +419,7 @@ public class Mine {
 
         if (fillType == null || wallType == null) return;
 
-        mine.expand(
-                BlockVector3.UNIT_X,
-                BlockVector3.UNIT_Y,
-                BlockVector3.UNIT_Z,
-                BlockVector3.UNIT_MINUS_X,
-                BlockVector3.UNIT_MINUS_Y,
-                BlockVector3.UNIT_MINUS_Z);
+        mine.expand(BlockVector3.UNIT_X, BlockVector3.UNIT_Y, BlockVector3.UNIT_Z, BlockVector3.UNIT_MINUS_X, BlockVector3.UNIT_MINUS_Y, BlockVector3.UNIT_MINUS_Z);
         Map<Material, Double> materials = mineData.getMineType().getMaterials();
         final RandomPattern randomPattern = new RandomPattern();
         if (materials != null) {
@@ -414,12 +429,7 @@ public class Mine {
             });
         }
 
-        PrivateMineExpandEvent privateMineExpandEvent = new PrivateMineExpandEvent(
-                mineData.getMineOwner(),
-                this,
-                mine.getWidth(),
-                mine.getHeight(),
-                mine.getLength());
+        PrivateMineExpandEvent privateMineExpandEvent = new PrivateMineExpandEvent(mineData.getMineOwner(), this, mine.getWidth(), mine.getHeight(), mine.getLength());
         Task.syncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineExpandEvent));
         if (privateMineExpandEvent.isCancelled()) return;
 
@@ -522,10 +532,7 @@ public class Mine {
         MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
         MineType nextType = mineTypeManager.getNextMineType(currentType.getName());
         double upgradeCost = nextType.getUpgradeCost();
-        PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner,
-                                                                                      this,
-                                                                                      currentType,
-                                                                                      nextType);
+        PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this, currentType, nextType);
         Bukkit.getPluginManager().callEvent(privateMineUpgradeEvent);
         if (privateMineUpgradeEvent.isCancelled()) {
             return;
