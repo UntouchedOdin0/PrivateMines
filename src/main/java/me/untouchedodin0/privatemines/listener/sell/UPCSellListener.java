@@ -57,14 +57,15 @@ public class UPCSellListener implements Listener {
         double sellPrice = sellAllEvent.getSellPrice();
         double afterTax = sellPrice - tax;
         sellAllEvent.setSellPrice(afterTax);
-        economy.depositPlayer(owner, tax);
         if (owner != null) {
+            economy.depositPlayer(owner, tax);
             owner.sendMessage(ChatColor.GREEN + "You've received $" + tax + " in taxes from " + player.getDisplayName() + ChatColor.GREEN + "!");
         }
     }
 
     @EventHandler
     public void onAutoSell(UltraPrisonAutoSellEvent autoSellEvent) {
+        Economy economy = PrivateMines.getEconomy();
 
         Player player = autoSellEvent.getPlayer();
         Location playerLocation = player.getLocation();
@@ -78,7 +79,8 @@ public class UPCSellListener implements Listener {
         double afterTax = sellPrice - tax;
         autoSellEvent.setMoneyToDeposit(afterTax);
         if (owner != null) {
-            Utils.sendActionBar(owner, "You've received $" + tax + " in taxes from " + player.getDisplayName() + ChatColor.GREEN + "!");
+            economy.depositPlayer(owner, tax);
+            Utils.sendActionBar(owner, ChatColor.GREEN + "You've received $" + tax + " in taxes from " + player.getDisplayName() + ChatColor.GREEN + "!");
         }
     }
 }
