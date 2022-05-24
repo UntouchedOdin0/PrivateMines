@@ -182,7 +182,7 @@ public class PrivateMinesCommand extends BaseCommand {
         } else {
             Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
             if (mine != null) {
-//                mine.reset();
+                mine.reset();
                 mine.teleport(player);
                 player.sendMessage(mineReset);
                 player.sendMessage("" + mine.getPercentage());

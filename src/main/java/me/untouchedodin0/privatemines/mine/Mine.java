@@ -27,8 +27,6 @@ package me.untouchedodin0.privatemines.mine;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.function.mask.BlockMask;
-import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -237,12 +235,8 @@ public class Mine {
         }
 
         World world = location.getWorld();
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (Utils.contains(mineData.getMinimumMining(), mineData.getMaximumMining(), player.getLocation())) {
-                teleport(player);
-            }
-        }
+        Player player = Bukkit.getPlayer(mineData.getMineOwner());
+        teleport(player);
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
             Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
@@ -291,7 +285,7 @@ public class Mine {
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
         int resetTime = mineType.getResetTime();
-        this.task = Task.asyncRepeating(this::reset, 0L, resetTime * 20 * 60L);
+        this.task = Task.syncRepeating(this::reset, 0L, resetTime * 20 * 60L);
     }
 
     public void cancelTask() {
@@ -301,9 +295,8 @@ public class Mine {
     }
 
     public void startPercentageTask() {
-        this.percentageTask = Task.asyncRepeating(() -> {
+        this.percentageTask = Task.syncRepeating(() -> {
             double percentage = getPercentage();
-            Bukkit.broadcastMessage(ChatColor.GOLD + "Mine " + mineData.getMineOwner() + " is " + percentage + "% mined.");
             if (percentage >= 50) {
                 reset();
                 Bukkit.broadcastMessage(ChatColor.RED + "Mine " + mineData.getMineOwner() + " has been reset!");
