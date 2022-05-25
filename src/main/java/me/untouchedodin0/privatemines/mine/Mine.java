@@ -294,6 +294,10 @@ public class Mine {
         if (task != null) {
             task.cancel();
         }
+
+        if (percentageTask != null) {
+            percentageTask.cancel();
+        }
     }
 
     public void startPercentageTask() {

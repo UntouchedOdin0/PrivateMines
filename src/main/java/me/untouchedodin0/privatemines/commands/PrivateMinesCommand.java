@@ -117,12 +117,6 @@ public class PrivateMinesCommand extends BaseCommand {
         }
     }
 
-    @Subcommand("testcommand")
-    public void test(CommandSender sender, OfflinePlayer player) {
-        sender.sendMessage("Test");
-        sender.sendMessage("Giving " + player + " a private mine! (test)");
-    }
-
     @Subcommand("delete")
     @CommandCompletion("@players")
     @CommandPermission("privatemines.delete")
@@ -367,7 +361,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
                 CompletableFuture.runAsync(() -> {
                     for (int i = 0; i < times; i++) {
-                        mine.reset();
+                        mine.resetNoCheck();
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                                                     TextComponent.fromLegacyText(ChatColor.GREEN + "Finished Reset #" +
                                                                                          atomicInteger.incrementAndGet()));
