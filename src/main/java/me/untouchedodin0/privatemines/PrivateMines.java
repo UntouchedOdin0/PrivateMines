@@ -263,7 +263,6 @@ public class PrivateMines extends JavaPlugin {
 
     public void startAutoReset() {
         Map<UUID, Mine> mines = mineStorage.getMines();
-//        Task.asyncDelayed(() -> mines.forEach((uuid, mine) -> mine.startResetTask()));
         mines.forEach((uuid, mine) -> mine.startResetTask());
     }
 

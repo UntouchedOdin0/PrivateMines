@@ -236,7 +236,9 @@ public class Mine {
 
         World world = location.getWorld();
         Player player = Bukkit.getPlayer(mineData.getMineOwner());
-        teleport(player);
+        if (player != null && player.isOnline()) {
+            teleport(player);
+        }
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
             Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
