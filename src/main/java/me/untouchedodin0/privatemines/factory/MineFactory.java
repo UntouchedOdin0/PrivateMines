@@ -26,6 +26,7 @@ package me.untouchedodin0.privatemines.factory;
 
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.adapter.UnsupportedVersionEditException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
@@ -160,6 +161,11 @@ public class MineFactory {
                         Operations.complete(operation);
                         editSession.close();
                     } catch (WorldEditException worldEditException) {
+                        if (worldEditException.getCause() instanceof UnsupportedVersionEditException) {
+                            privateMines.getLogger().warning("WorldEdit version " + WorldEdit.getVersion() + " is not supported," +
+                                                                     "if this issue persists, please try using FastAsyncWorldEdit.");
+                            return;
+                        }
                         worldEditException.printStackTrace();
                     }
 
