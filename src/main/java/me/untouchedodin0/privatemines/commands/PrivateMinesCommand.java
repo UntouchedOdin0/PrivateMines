@@ -102,7 +102,6 @@ public class PrivateMinesCommand extends BaseCommand {
         MineFactory mineFactory = new MineFactory();
         MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
         Location location = mineWorldManager.getNextFreeLocation();
-        privateMines.getLogger().info("Next free location: " + location.getX() + ", " + location.getY() + ", " + location.getZ());
         MineType mineType = mineTypeManager.getDefaultMineType();
 
         if (targetPlayer != null) {

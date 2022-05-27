@@ -305,7 +305,7 @@ public class Mine {
             double percentage = getPercentage();
             if (percentage >= 50) {
                 reset();
-                Bukkit.broadcastMessage(ChatColor.RED + "Mine " + mineData.getMineOwner() + " has been reset!");
+                Bukkit.broadcastMessage(ChatColor.GREEN + Bukkit.getOfflinePlayer(mineData.getMineOwner()).getName() + "'s private mine has been reset!");
             }
         }, 0L, 20L);
     }
