@@ -46,9 +46,10 @@ public class MineWorldManager {
         int yLevel = PrivateMines.getPrivateMines().getConfig().getInt("mineYLevel");
         this.borderDistance = PrivateMines.getPrivateMines().getConfig().getInt("mineDistance");
 
-        if (minesWorld != null && yLevel < minesWorld.getMaxHeight()) {
+        if (minesWorld != null && yLevel > minesWorld.getMaxHeight()) {
             PrivateMines privateMines = PrivateMines.getPrivateMines();
-            privateMines.getLogger().warning("Mine Y level was set to " + yLevel + " but the max height of the world is " + minesWorld.getMaxHeight() + "!\n" +
+            privateMines.getLogger().warning("Mine Y level was set to " + yLevel +
+                                                     " but the max height of the world is " + minesWorld.getMaxHeight() + "!\n" +
                                                      "Mine Y level has been set to 50!");
             yLevel = 50;
         }
