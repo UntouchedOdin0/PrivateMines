@@ -1,18 +1,18 @@
 /**
  * MIT License
- *
+ * <p>
  * Copyright (c) 2021 - 2022 Kyle Hicks
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -46,12 +46,17 @@ public class MineWorldManager {
         int yLevel = PrivateMines.getPrivateMines().getConfig().getInt("mineYLevel");
         this.borderDistance = PrivateMines.getPrivateMines().getConfig().getInt("mineDistance");
 
-        if (minesWorld != null && yLevel > minesWorld.getMaxHeight()) {
+        if (minesWorld != null) {
             PrivateMines privateMines = PrivateMines.getPrivateMines();
-            privateMines.getLogger().warning("Mine Y level was set to " + yLevel +
-                                                     " but the max height of the world is " + minesWorld.getMaxHeight() + "!\n" +
-                                                     "Mine Y level has been set to 50!");
-            yLevel = 50;
+            privateMines.getLogger().info("world y level: " + minesWorld.getMaxHeight());
+
+            if (yLevel > minesWorld.getMaxHeight()) {
+                privateMines.getLogger().info(String.format("Mine Y level was set to %d but the max height of the world is %d Mine Y level has been set to %d!",
+                                                            yLevel, minesWorld.getMaxHeight(), 50));
+                yLevel = 50;
+                PrivateMines.getPrivateMines().getConfig().set("mineYLevel", 50);
+                privateMines.saveConfig();
+            }
         }
         this.defaultLocation = new Location(minesWorld, 0, yLevel, 0);
     }
