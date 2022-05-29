@@ -1,7 +1,6 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
-import com.convallyria.languagy.api.language.Translator;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
@@ -20,8 +19,6 @@ import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
-import me.untouchedodin0.privatemines.utils.locale.LocaleManager;
-import me.untouchedodin0.privatemines.utils.locale.LocaleObject;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.metrics.Metrics;
 import me.untouchedodin0.privatemines.utils.metrics.Metrics.SingleLineChart;
@@ -32,7 +29,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.EventHandler;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
@@ -41,19 +37,23 @@ import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
+
+/**
+ * TODO Make a way for people to register mines via a discord channel before server launches
+ */
 
 public class PrivateMines extends JavaPlugin {
 
@@ -65,10 +65,7 @@ public class PrivateMines extends JavaPlugin {
     private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
     private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
     private final Path addonsDirectory = getDataFolder().toPath().resolve("addons");
-    private final Path localesDirectory = getDataFolder().toPath().resolve("locales");
 
-    private final Map<String, Messages> locales = new HashMap<>();
-    private final Map<UUID, LocaleObject> playerLocales = new HashMap<>();
     private SchematicStorage schematicStorage;
     private SchematicIterator schematicIterator;
     private MineFactory mineFactory;
@@ -172,11 +169,6 @@ public class PrivateMines extends JavaPlugin {
         paperCommandManager = new PaperCommandManager(this);
         paperCommandManager.registerCommand(new PrivateMinesCommand(this));
         paperCommandManager.registerCommand(new UsePlayerShop(this, mineStorage));
-    }
-
-    public void setupLanguages() {
-        paperCommandManager.getLocales().addBundleClassLoader(getClassLoader());
-        paperCommandManager.getLocales().loadLanguages();
     }
 
     public void setupSchematicUtils() {
@@ -321,33 +313,5 @@ public class PrivateMines extends JavaPlugin {
             return;
         }
         getLogger().info("Using the internal sell system!");
-    }
-
-    public int getYLevel() {
-        return Y_LEVEL;
-    }
-
-    public void saveLocaleFiles() {
-        getLogger().info("Saving locale files...");
-        saveResource("locales/acf-privatemines_de.properties", false);
-        saveResource("locales/acf-privatemines_en.properties", false);
-        saveResource("locales/acf-privatemines_es.properties", false);
-        saveResource("locales/acf-privatemines_fr.properties", false);
-        getLogger().info("Successfully saved locale files!");
-    }
-
-    public void putPlayerInLocale(UUID uuid, LocaleObject localeObject) {
-        playerLocales.put(uuid, localeObject);
-    }
-
-    public LocaleObject get(UUID uuid) {
-        return playerLocales.get(uuid);
-    }
-
-    public Map<String, Messages> getLocales() {
-        return locales;
-    }
-    public Map<UUID, LocaleObject> getPlayerLocales() {
-        return playerLocales;
     }
 }
