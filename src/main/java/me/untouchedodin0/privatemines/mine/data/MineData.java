@@ -61,17 +61,12 @@ public class MineData {
     public Location getMineLocation() {
         return mineLocation;
     }
-
-
     public Location getSpawnLocation() {
         return spawnLocation;
     }
-
-
     public Location getMinimumMining() {
         return minimumMining;
     }
-
     public void setMinimumMining(Location minimumMining) {
         this.minimumMining = minimumMining;
     }
