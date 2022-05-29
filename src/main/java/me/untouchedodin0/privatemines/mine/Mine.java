@@ -218,6 +218,10 @@ public class Mine {
         Location location = mineData.getMinimumMining();
         BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
         BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
+        BlockVector3 min = BukkitAdapter.asBlockVector(mineData.getMinimumFullRegion());
+        BlockVector3 max = BukkitAdapter.asBlockVector(mineData.getMaximumFullRegion());
+        @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+        CuboidRegion fullRegion = new CuboidRegion(BukkitAdapter.adapt(location.getWorld()), corner1, corner2);
 
         Map<Material, Double> materials = mineType.getMaterials();
         final RandomPattern randomPattern = new RandomPattern();
@@ -237,7 +241,12 @@ public class Mine {
         World world = location.getWorld();
         Player player = Bukkit.getPlayer(mineData.getMineOwner());
         if (player != null && player.isOnline()) {
-            teleport(player);
+            boolean isPlayerInRegion = fullRegion.contains(player.getLocation().getBlockX(),
+                                                           player.getLocation().getBlockY(),
+                                                           player.getLocation().getBlockZ());
+            if (isPlayerInRegion) {
+                teleport(player);
+            }
         }
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
