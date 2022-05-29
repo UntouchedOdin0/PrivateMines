@@ -218,8 +218,6 @@ public class Mine {
         Location location = mineData.getMinimumMining();
         BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
         BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
-        BlockVector3 min = BukkitAdapter.asBlockVector(mineData.getMinimumFullRegion());
-        BlockVector3 max = BukkitAdapter.asBlockVector(mineData.getMaximumFullRegion());
         @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
         CuboidRegion fullRegion = new CuboidRegion(BukkitAdapter.adapt(location.getWorld()), corner1, corner2);
 
@@ -480,6 +478,9 @@ public class Mine {
 
         if (file.exists()) {
             boolean deleted = file.delete();
+            if (deleted) {
+                privateMines.getLogger().info("File " + file.getName() + " deleted successfully.");
+            }
             try {
                 boolean createdNewFile = file.createNewFile();
                 if (createdNewFile) {
@@ -533,7 +534,6 @@ public class Mine {
     public void upgrade() {
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineFactory mineFactory = privateMines.getMineFactory();
-        MineStorage mineStorage = privateMines.getMineStorage();
         MineData mineData = getMineData();
         UUID mineOwner = mineData.getMineOwner();
         Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
