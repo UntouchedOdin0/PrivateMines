@@ -3,7 +3,6 @@ package me.untouchedodin0.privatemines.commands;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
@@ -15,6 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
 
+@SuppressWarnings("unused")
 public class PrivateMinesCommand {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
