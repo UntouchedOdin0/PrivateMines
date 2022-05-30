@@ -57,7 +57,6 @@ public class SQLite extends Database{
     public void load() {
         privateMines.getLogger().log(Level.INFO, "Loading SQLite database...");
         connection = getSQLConnection();
-        privateMines.getLogger().info("Connection: " + connection);
         try {
             Statement s = connection.createStatement();
             s.executeUpdate(SQLiteCreateTokensTable);
