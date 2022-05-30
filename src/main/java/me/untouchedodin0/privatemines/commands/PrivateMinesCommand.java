@@ -6,6 +6,7 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
+import me.untouchedodin0.privatemines.utils.inventory.MainMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -23,7 +24,9 @@ public class PrivateMinesCommand {
 
     @CommandHook("main")
     public void main(CommandSender sender) {
-        sender.sendMessage("This is the main command!");
+        Player player = (Player) sender;
+        MainMenu mainMenu = new MainMenu(mineStorage);
+        mainMenu.openMainMenu(player);
     }
 
     @CommandHook("give")
