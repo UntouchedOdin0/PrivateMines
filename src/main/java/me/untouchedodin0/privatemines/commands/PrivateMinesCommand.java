@@ -3,6 +3,7 @@ package me.untouchedodin0.privatemines.commands;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
@@ -98,8 +99,8 @@ public class PrivateMinesCommand {
         } else {
             Mine mine = mineStorage.get(target.getUniqueId());
             if (mine != null) {
-                mine.teleport(player);
-                player.sendMessage("You are gonna visit " + target.getName() + "'s private mine!");
+                mine.teleportDelayed(player, Config.teleportDelay * 20);
+                player.sendMessage(ChatColor.GREEN + "You are now visiting " + target.getName() + "'s mine!");
             }
         }
     }
