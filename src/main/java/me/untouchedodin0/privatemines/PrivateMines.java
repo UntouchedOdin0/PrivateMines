@@ -4,6 +4,7 @@ import co.aikar.commands.PaperCommandManager;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommandDeprecated;
 import me.untouchedodin0.privatemines.commands.UsePlayerShop;
 import me.untouchedodin0.privatemines.config.Config;
@@ -32,6 +33,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
+import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
@@ -95,7 +97,11 @@ public class PrivateMines extends JavaPlugin {
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
 
-            registerCommands();
+            new CommandParser(getResource("commands.rdcml"))
+                    .parse()
+                    .register("privatemines",
+                              new PrivateMinesCommand());
+
             registerSellListener();
             setupSchematicUtils();
             Messages.load(this);
@@ -166,9 +172,11 @@ public class PrivateMines extends JavaPlugin {
     }
 
     private void registerCommands() {
-        paperCommandManager = new PaperCommandManager(this);
-        paperCommandManager.registerCommand(new PrivateMinesCommandDeprecated(this));
-        paperCommandManager.registerCommand(new UsePlayerShop(this, mineStorage));
+        new CommandParser(getResource("commands.rdcml")).parse().register("privatemines",
+                                                                          new PrivateMinesCommand());
+//        paperCommandManager = new PaperCommandManager(this);
+//        paperCommandManager.registerCommand(new PrivateMinesCommandDeprecated(this));
+//        paperCommandManager.registerCommand(new UsePlayerShop(this, mineStorage));
     }
 
     public void setupSchematicUtils() {

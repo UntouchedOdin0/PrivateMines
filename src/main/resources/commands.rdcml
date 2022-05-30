@@ -1,0 +1,39 @@
+privatemine,privatemines,pmine,pmines {
+    hook main
+
+    give player:target {
+        hook give
+        help Gives a private mine to a player
+        permission privatemines.give
+    }
+
+    delete player:target {
+        hook delete
+        help Deletes a private mine from a player
+        permission privatemines.delete
+    }
+
+    reset {
+        hook reset
+        help Resets your private mine
+        permission privatemines.reset
+    }
+
+    upgrade {
+        hook upgrade
+        help Upgrades your private mine
+        permission privatemines.upgrade
+    }
+
+    teleport,tp,home {
+        hook teleport
+        help Teleport to your own mine
+        permission privatemines.teleport
+        user player
+    }
+
+    visit player:target {
+        hook visit
+        help Teleport to another player's mine
+    }
+}
