@@ -109,17 +109,6 @@ public class Mine {
         }
     }
 
-    public void teleportDelayed(Player player, int delay) {
-        if (getMineData().getSpawnLocation().getBlock().getType().isBlock()) {
-            getMineData().getSpawnLocation().getBlock().setType(Material.AIR);
-        }
-        if (getMineData().getBannedPlayers().contains(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You're banned from this mine!");
-        } else {
-            LocationUtils.delayedTeleport(player, getMineData().getSpawnLocation(), delay);
-        }
-    }
-
     public void delete() {
         UUID uuid = getMineData().getMineOwner();
         PrivateMineDeleteEvent privateMineDeleteEvent = new PrivateMineDeleteEvent(uuid, this);

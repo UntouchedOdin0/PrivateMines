@@ -114,7 +114,7 @@ public class PrivateMinesCommand {
         } else {
             Mine mine = mineStorage.get(target.getUniqueId());
             if (mine != null) {
-                mine.teleportDelayed(player, Config.teleportDelay * 20);
+                mine.teleport(player);
                 player.sendMessage(ChatColor.GREEN + "You are now visiting " + target.getName() + "'s mine!");
             }
         }
