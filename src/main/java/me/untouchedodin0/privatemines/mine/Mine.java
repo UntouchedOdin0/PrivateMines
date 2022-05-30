@@ -127,6 +127,8 @@ public class Mine {
 
         if (privateMineDeleteEvent.isCancelled()) return;
 
+        if (task != null) task.cancel();
+        if (percentageTask != null) percentageTask.cancel();
         MineData mineData = getMineData();
 
         Location corner1 = mineData.getMinimumFullRegion();

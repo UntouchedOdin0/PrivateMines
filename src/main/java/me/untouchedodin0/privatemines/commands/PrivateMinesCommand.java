@@ -68,13 +68,29 @@ public class PrivateMinesCommand {
     }
 
     @CommandHook("upgrade")
-    public void upgrade(Player player) {
+    public void upgrade(CommandSender commandSender, Player player) {
         if (!mineStorage.hasMine(player.getUniqueId())) {
             player.sendMessage(ChatColor.RED + "You do not have a mine!");
         } else {
             Mine mine = mineStorage.get(player.getUniqueId());
             if (mine != null) {
                 mine.upgrade();
+            }
+        }
+    }
+
+    @CommandHook("expand")
+    public void expand(Player player, Player target, int amount) {
+        if (!mineStorage.hasMine(target.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "That player does not have a mine!");
+        } else {
+            Mine mine = mineStorage.get(target.getUniqueId());
+            if (mine != null) {
+                if (mine.canExpand(amount)) {
+                    for (int i = 0; i < amount; i++) {
+                        mine.expand();
+                    }
+                }
             }
         }
     }
@@ -91,7 +107,6 @@ public class PrivateMinesCommand {
             }
         }
     }
-
     @CommandHook("visit")
     public void visit(Player player, OfflinePlayer target) {
         if (!mineStorage.hasMine(target.getUniqueId())) {

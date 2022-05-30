@@ -19,10 +19,16 @@ privatemine,privatemines,pmine,pmines {
         permission privatemines.reset
     }
 
-    upgrade {
+    upgrade player:target {
         hook upgrade
         help Upgrades your private mine
         permission privatemines.upgrade
+    }
+
+    expand player:target int:amount {
+        hook expand
+        help Expands your private mine
+        permission privatemines.expand
     }
 
     teleport,tp,home {
