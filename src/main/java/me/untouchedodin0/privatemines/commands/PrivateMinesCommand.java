@@ -24,9 +24,10 @@ public class PrivateMinesCommand {
 
     @CommandHook("main")
     public void main(CommandSender sender) {
-        Player player = (Player) sender;
-        MainMenu mainMenu = new MainMenu(mineStorage);
-        mainMenu.openMainMenu(player);
+        if (sender instanceof Player player) {
+            MainMenu mainMenu = new MainMenu(mineStorage);
+            mainMenu.openMainMenu(player);
+        }
     }
 
     @CommandHook("give")
