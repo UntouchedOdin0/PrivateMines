@@ -48,8 +48,6 @@ public class MineWorldManager {
 
         if (minesWorld != null) {
             PrivateMines privateMines = PrivateMines.getPrivateMines();
-            privateMines.getLogger().info("world y level: " + minesWorld.getMaxHeight());
-
             if (yLevel > minesWorld.getMaxHeight()) {
                 privateMines.getLogger().info(String.format("Mine Y level was set to %d but the max height of the world is %d Mine Y level has been set to %d!",
                                                             yLevel, minesWorld.getMaxHeight(), 50));
