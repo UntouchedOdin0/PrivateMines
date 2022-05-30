@@ -42,6 +42,7 @@ public class SchematicIterator {
 
     SchematicStorage schematicStorage;
     BlockVector3 spawn;
+    BlockVector3 npc;
     BlockVector3 corner1;
     BlockVector3 corner2;
 
@@ -65,7 +66,8 @@ public class SchematicIterator {
                 Material npcMaterial    = Config.sellNpc;
 
                 BlockType cornerType = BlockType.REGISTRY.get(cornerMaterial.getKey().getKey());
-                BlockType spawnType = BlockType.REGISTRY.get(spawnMaterial.getKey().getKey());
+                BlockType spawnType  = BlockType.REGISTRY.get(spawnMaterial.getKey().getKey());
+                BlockType npcType    = BlockType.REGISTRY.get(npcMaterial.getKey().getKey());
 
                 clipboard.getRegion().forEach(blockVector3 -> {
                     BlockType blockType = clipboard.getBlock(blockVector3).getBlockType();
@@ -80,16 +82,19 @@ public class SchematicIterator {
                         if (spawn == null) {
                             spawn = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
                         }
+                    } else if (blockType.equals(npcType)) {
+                        if (npc == null) {
+                            npc = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
+                        }
                     }
                 });
 
                 mineBlocks.spawnLocation = BlockVector3.at(spawn.getX(), spawn.getY(), spawn.getZ());
                 mineBlocks.corners[0] = BlockVector3.at(corner1.getX(), corner1.getY(), corner1.getZ());
-
-                //ignore for now
                 mineBlocks.corners[1] = BlockVector3.at(corner2.getX(), corner2.getY(), corner2.getZ());
 
                 spawn = null;
+                npc = null;
                 corner1 = null;
                 corner2 = null;
             } catch (IOException e) {
@@ -101,16 +106,16 @@ public class SchematicIterator {
 
     public static class MineBlocks {
         public BlockVector3 spawnLocation;
+        public BlockVector3 npcLocation;
         public BlockVector3[] corners;
 
         public BlockVector3 getSpawnLocation() {
             return spawnLocation;
         }
 
-        public BlockVector3[] getCorners() {
-            return corners;
+        public BlockVector3 getNpcLocation() {
+            return npcLocation;
         }
-
         public BlockVector3 getCorner1() {
             return corners[0];
         }
