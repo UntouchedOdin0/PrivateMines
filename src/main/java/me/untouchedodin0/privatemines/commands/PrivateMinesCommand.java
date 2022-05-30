@@ -97,7 +97,7 @@ public class PrivateMinesCommand extends BaseCommand {
     @Subcommand("give")
     @CommandCompletion("@players")
     @CommandPermission("privatemines.give")
-    public void give(CommandSender player, OfflinePlayer target) {
+    public void give(@Optional Player player, OfflinePlayer target) {
         Player targetPlayer = target.getPlayer();
         MineFactory mineFactory = new MineFactory();
         MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
@@ -106,10 +106,17 @@ public class PrivateMinesCommand extends BaseCommand {
 
         if (targetPlayer != null) {
             if (mineStorage.hasMine(targetPlayer.getUniqueId())) {
-                player.sendMessage(ChatColor.RED + "That player already has a mine!");
+                if (player != null) {
+                    player.sendMessage(ChatColor.RED + "That player already has a mine!");
+                } else {
+                    privateMines.getLogger().info("That player already has a mine!");
+                }
             } else {
-                player.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a private mine!");
-                privateMines.getLogger().info("Giving the player a mine using the mine type of " + mineType.getName());
+                if (player != null) {
+                    player.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a private mine!");
+                } else {
+                    privateMines.getLogger().info("Giving the player a mine using the mine type of " + mineType.getName());
+                }
                 mineFactory.create(targetPlayer, location, mineType);
                 targetPlayer.sendMessage(Messages.msg("youHaveBeenGivenAMine"));
             }
@@ -119,13 +126,17 @@ public class PrivateMinesCommand extends BaseCommand {
     @Subcommand("delete")
     @CommandCompletion("@players")
     @CommandPermission("privatemines.delete")
-    public void delete(Player player, Player target) {
+    public void delete(@Optional Player player, Player target) {
         if (target != null) {
             if (!privateMines.getMineStorage().hasMine(target.getUniqueId())) {
                 getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_PLAYER_DOESNT_OWN_A_MINE);
             } else {
                 Mine mine = privateMines.getMineStorage().get(target.getUniqueId());
-                player.sendMessage(ChatColor.GREEN + "Deleting " + target.getName() + "'s private mine!");
+                if (player != null) {
+                    player.sendMessage(ChatColor.GREEN + "Deleting " + target.getName() + "'s private mine!");
+                } else {
+                    privateMines.getLogger().info("Deleting the mine owned by " + target.getName());
+                }
                 if (mine != null) {
                     mine.delete(target.getUniqueId());
                 }
@@ -148,6 +159,7 @@ public class PrivateMinesCommand extends BaseCommand {
     }
 
     @Subcommand("teleport")
+    @CommandCompletion("@players")
     @CommandPermission("privatemines.teleport")
     public void teleport(Player player) {
         String doesntOwnAMine = Messages.msg("youDontOwnAMine");
@@ -166,7 +178,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
     @Subcommand("reset")
     @CommandPermission("privatemines.reset")
-    public void reset(Player player) {
+    public void reset(@Optional Player player) {
         String noMine = Messages.msg("youDontOwnAMine");
         String mineReset = Messages.msg("yourMineHasBeenReset");
 
@@ -199,11 +211,11 @@ public class PrivateMinesCommand extends BaseCommand {
 
     @Subcommand("upgrade")
     @CommandPermission("privatemines.upgrade")
-    public void upgrade(Player player) {
-        if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
+    public void upgrade(@Optional Player player, Player target) {
+        if (!privateMines.getMineStorage().hasMine(target.getUniqueId())) {
             getCurrentCommandIssuer().sendInfo(LangKeys.INFO_PRIVATEMINE_PLAYER_DOESNT_OWN_A_MINE);
         } else {
-            Mine mine = privateMines.getMineStorage().get(player.getUniqueId());
+            Mine mine = privateMines.getMineStorage().get(target.getUniqueId());
             if (mine != null) {
                 mine.upgrade();
             }
@@ -237,6 +249,7 @@ public class PrivateMinesCommand extends BaseCommand {
     }
 
     @Subcommand("ban")
+    @CommandCompletion("@players")
     @CommandPermission("privatemines.ban")
     public void ban(Player player, Player target) {
         if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
@@ -250,6 +263,7 @@ public class PrivateMinesCommand extends BaseCommand {
     }
 
     @Subcommand("unban")
+    @CommandCompletion("@players")
     @CommandPermission("privatemines.unban")
     public void unban(Player player, Player target) {
         if (!privateMines.getMineStorage().hasMine(player.getUniqueId())) {
@@ -276,16 +290,11 @@ public class PrivateMinesCommand extends BaseCommand {
             if (inventoryName.length() <= 32) {
                 // if inventory name is less than or equals to 32 (max inventory size) add players name into gui else don't
                 InventoryGUI inventoryGUI = new InventoryGUI(9, name + "'s Mine");
-                ItemBuilder tax = new ItemBuilder(Material.PAPER)
-                        .setName(ChatColor.GREEN + "Tax")
-                        .setLore(ChatColor.GREEN + String.valueOf(mineData.getTax()) + "%");
+                ItemBuilder tax = new ItemBuilder(Material.PAPER).setName(ChatColor.GREEN + "Tax").setLore(ChatColor.GREEN + String.valueOf(mineData.getTax()) + "%");
                 ItemButton taxButton = ItemButton.create(tax, inventoryClickEvent -> {
                     // put click t hings here?
                 });
-                ItemBuilder askToReset = new ItemBuilder(Material.STONE_BUTTON)
-                        .setName(ChatColor.GREEN + "Request Mine Reset")
-                        .addLore(ChatColor.GRAY + "Click me to request")
-                        .addLore(ChatColor.GRAY + "the owner to reset the mine");
+                ItemBuilder askToReset = new ItemBuilder(Material.STONE_BUTTON).setName(ChatColor.GREEN + "Request Mine Reset").addLore(ChatColor.GRAY + "Click me to request").addLore(ChatColor.GRAY + "the owner to reset the mine");
                 ItemButton askToResetButton = ItemButton.create(askToReset, inventoryClickEvent -> {
                     OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(mineData.getMineOwner());
                     if (!offlinePlayer.isOnline()) return;
@@ -359,9 +368,7 @@ public class PrivateMinesCommand extends BaseCommand {
                 CompletableFuture.runAsync(() -> {
                     for (int i = 0; i < times; i++) {
                         mine.resetNoCheck();
-                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                                                    TextComponent.fromLegacyText(ChatColor.GREEN + "Finished Reset #" +
-                                                                                         atomicInteger.incrementAndGet()));
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatColor.GREEN + "Finished Reset #" + atomicInteger.incrementAndGet()));
                     }
                 }).thenRun(() -> {
                     Instant filled = Instant.now();
@@ -392,9 +399,7 @@ public class PrivateMinesCommand extends BaseCommand {
                 CompletableFuture.runAsync(() -> {
                     for (int i = 0; i < value; i++) {
                         mine.reset();
-                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                                                    TextComponent.fromLegacyText(ChatColor.GREEN + "Finished Reset #" +
-                                                                                         atomicInteger.incrementAndGet()));
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatColor.GREEN + "Finished Reset #" + atomicInteger.incrementAndGet()));
                     }
                 }).thenRun(() -> {
                     Instant filled = Instant.now();
@@ -420,9 +425,7 @@ public class PrivateMinesCommand extends BaseCommand {
         mineStorage.getMines().forEach((uuid, mine) -> {
             MineData mineData = mine.getMineData();
             UUID mineOwner = mineData.getMineOwner();
-            player.sendMessage(ChatColor.GREEN + "- "
-                                       + Bukkit.getOfflinePlayer(mineOwner).getName()
-                                       + ChatColor.GRAY + " (" + mineOwner + ")");
+            player.sendMessage(ChatColor.GREEN + "- " + Bukkit.getOfflinePlayer(mineOwner).getName() + ChatColor.GRAY + " (" + mineOwner + ")");
         });
     }
 
@@ -475,19 +478,10 @@ public class PrivateMinesCommand extends BaseCommand {
         String worldEditVersion = WorldEdit.getVersion();
         String isRunningFastAsyncWorldEdit = Bukkit.getServer().getPluginManager().isPluginEnabled("FastAsyncWorldEdit") ? "Yes" : "No";
 
-        String sb =
-                "Plugin Name: "       + pluginName +
-                "\n"                  +
-                "Plugin Version: "    + pluginVersion +
-                "\n"                  +
-                "WorldEdit Version: " + worldEditVersion +
-                "\n"                  +
-                "Is FastAsyncWorldEdit enabled? " + isRunningFastAsyncWorldEdit;
+        String sb = "Plugin Name: " + pluginName + "\n" + "Plugin Version: " + pluginVersion + "\n" + "WorldEdit Version: " + worldEditVersion + "\n" + "Is FastAsyncWorldEdit enabled? " + isRunningFastAsyncWorldEdit;
 
         final HttpClient httpClient = HttpClient.newHttpClient();
-        final HttpRequest httpRequest = HttpRequest.newBuilder(URI.create("https://www.toptal.com/developers/hastebin/documents"))
-                .POST(HttpRequest.BodyPublishers.ofString(sb))
-                .build();
+        final HttpRequest httpRequest = HttpRequest.newBuilder(URI.create("https://www.toptal.com/developers/hastebin/documents")).POST(HttpRequest.BodyPublishers.ofString(sb)).build();
         final CompletableFuture<HttpResponse<String>> responseFuture = httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
         try {
             String body = responseFuture.get().body();
@@ -502,11 +496,16 @@ public class PrivateMinesCommand extends BaseCommand {
             throw new RuntimeException(e);
         }
     }
+
     @Subcommand("reload")
     @CommandPermission("privatemines.reload")
-    public void reload(Player player) {
+    public void reload(@Optional Player sender) {
         ConfigManager configManager = privateMines.getConfigManager();
         configManager.reload();
-        player.sendMessage(ChatColor.GREEN + "Private Mines has been reloaded!");
+        if (sender == null) {
+            privateMines.getLogger().info("PrivateMines has been reloaded!");
+        } else {
+            sender.sendMessage(ChatColor.GREEN + "PrivateMines has been reloaded!");
+        }
     }
 }
