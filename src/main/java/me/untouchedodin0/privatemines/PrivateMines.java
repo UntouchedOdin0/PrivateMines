@@ -5,8 +5,6 @@ import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
-import me.untouchedodin0.privatemines.commands.PrivateMinesCommandDeprecated;
-import me.untouchedodin0.privatemines.commands.UsePlayerShop;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
@@ -169,14 +167,6 @@ public class PrivateMines extends JavaPlugin {
         getLogger().info(String.format("%s v%s has successfully been Disabled",
                                        getDescription().getName(),
                                        getDescription().getVersion()));
-    }
-
-    private void registerCommands() {
-        new CommandParser(getResource("commands.rdcml")).parse().register("privatemines",
-                                                                          new PrivateMinesCommand());
-//        paperCommandManager = new PaperCommandManager(this);
-//        paperCommandManager.registerCommand(new PrivateMinesCommandDeprecated(this));
-//        paperCommandManager.registerCommand(new UsePlayerShop(this, mineStorage));
     }
 
     public void setupSchematicUtils() {

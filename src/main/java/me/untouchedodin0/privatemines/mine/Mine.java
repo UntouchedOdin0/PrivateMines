@@ -312,7 +312,6 @@ public class Mine {
 
     public void cancelTask() {
         if (task.isCurrentlyRunning()) task.cancel();
-//        if (percentageTask.isCurrentlyRunning()) percentageTask.cancel();
     }
 
     public void startPercentageTask() {
