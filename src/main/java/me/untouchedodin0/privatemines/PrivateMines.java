@@ -4,7 +4,7 @@ import co.aikar.commands.PaperCommandManager;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
-import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
+import me.untouchedodin0.privatemines.commands.PrivateMinesCommandDeprecated;
 import me.untouchedodin0.privatemines.commands.UsePlayerShop;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MineConfig;
@@ -167,7 +167,7 @@ public class PrivateMines extends JavaPlugin {
 
     private void registerCommands() {
         paperCommandManager = new PaperCommandManager(this);
-        paperCommandManager.registerCommand(new PrivateMinesCommand(this));
+        paperCommandManager.registerCommand(new PrivateMinesCommandDeprecated(this));
         paperCommandManager.registerCommand(new UsePlayerShop(this, mineStorage));
     }
 
@@ -227,7 +227,7 @@ public class PrivateMines extends JavaPlugin {
                     mine.setMineData(mineData);
                     getMineStorage().addMine(owner, mine);
                     mine.startResetTask();
-                    mine.startPercentageTask();
+//                    mine.startPercentageTask();
                     getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
                 });
             } catch (IOException e) {

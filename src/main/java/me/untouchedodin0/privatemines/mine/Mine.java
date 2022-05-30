@@ -38,6 +38,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import io.papermc.lib.PaperLib;
+import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
@@ -108,7 +109,8 @@ public class Mine {
         }
     }
 
-    public void delete(UUID uuid) {
+    public void delete() {
+        UUID uuid = getMineData().getMineOwner();
         PrivateMineDeleteEvent privateMineDeleteEvent = new PrivateMineDeleteEvent(uuid, this);
         Bukkit.getPluginManager().callEvent(privateMineDeleteEvent);
 
@@ -144,7 +146,6 @@ public class Mine {
         Duration durationToFill = Duration.between(start, filled);
 
         long durationInMS = TimeUnit.NANOSECONDS.toMillis(durationToFill.toNanos());
-        cancelTask();
 
         privateMines.getLogger().info(String.format("It took %dms to reset the mine", durationInMS));
         privateMines.getMineStorage().removeMine(uuid);
@@ -297,13 +298,8 @@ public class Mine {
     }
 
     public void cancelTask() {
-        if (task != null) {
-            task.cancel();
-        }
-
-        if (percentageTask != null) {
-            percentageTask.cancel();
-        }
+        if (task.isCurrentlyRunning()) task.cancel();
+//        if (percentageTask.isCurrentlyRunning()) percentageTask.cancel();
     }
 
     public void startPercentageTask() {
@@ -533,11 +529,14 @@ public class Mine {
     public void upgrade() {
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineFactory mineFactory = privateMines.getMineFactory();
+        MineStorage mineStorage = privateMines.getMineStorage();
+
         MineData mineData = getMineData();
         UUID mineOwner = mineData.getMineOwner();
         Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
         MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
         MineType nextType = mineTypeManager.getNextMineType(currentType.getName());
+
         double upgradeCost = nextType.getUpgradeCost();
         PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this, currentType, nextType);
         Bukkit.getPluginManager().callEvent(privateMineUpgradeEvent);
@@ -550,8 +549,12 @@ public class Mine {
             } else {
                 if (upgradeCost == 0) {
                     Location mineLocation = mineData.getMineLocation();
-                    delete(mineOwner);
+                    delete();
                     mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
+                    Mine mine = mineStorage.get(mineOwner);
+                    if (mine != null) {
+                        mine.resetNoCheck();
+                    }
                 } else {
                     Economy economy = PrivateMines.getEconomy();
                     double balance = economy.getBalance(player);
@@ -559,8 +562,12 @@ public class Mine {
                         player.sendMessage(ChatColor.RED + "You don't have enough money to upgrade your mine!");
                     } else {
                         Location mineLocation = mineData.getMineLocation();
-                        delete(mineOwner);
+                        delete();
                         mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
+                        Mine mine = mineStorage.get(mineOwner);
+                        if (mine != null) {
+                            mine.resetNoCheck();
+                        }
                     }
                 }
             }
