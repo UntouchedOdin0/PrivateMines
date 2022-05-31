@@ -74,11 +74,9 @@ public class PrivateMines extends JavaPlugin {
     private ConfigManager configManager;
     private SlimeUtils slimeUtils;
     private static Economy econ = null;
-
     public static PrivateMines getPrivateMines() {
         return privateMines;
     }
-
     @Override
     public void onEnable() {
         Instant start = Instant.now();
