@@ -89,11 +89,9 @@ public class Mine {
     public MineData getMineData() {
         return mineData;
     }
-
     public void setMineData(MineData mineData) {
         this.mineData = mineData;
     }
-
     public void teleport(Player player) {
         if (getMineData().getSpawnLocation().getBlock().getType().isBlock()) {
             getMineData().getSpawnLocation().getBlock().setType(Material.AIR);

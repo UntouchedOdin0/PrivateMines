@@ -14,6 +14,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
+import redempt.redlib.commandmanager.Messages;
 
 @SuppressWarnings("unused")
 public class PrivateMinesCommand {
@@ -39,7 +40,7 @@ public class PrivateMinesCommand {
 
         if (target.getPlayer() != null) {
             if (mineStorage.hasMine(target.getUniqueId())) {
-                commandSender.sendMessage(ChatColor.RED + "That player already has a mine!");
+                commandSender.sendMessage(Messages.msg("playerAlreadyOwnsAMine"));
             } else {
                 mineFactory.create(target.getPlayer(), location, mineType);
                 commandSender.sendMessage(ChatColor.GREEN + "You gave " + target.getName() + " a private mine!");
@@ -49,7 +50,7 @@ public class PrivateMinesCommand {
     @CommandHook("delete")
     public void delete(CommandSender commandSender, OfflinePlayer target) {
         if (!mineStorage.hasMine(target.getUniqueId())) {
-            commandSender.sendMessage(ChatColor.RED + "That player does not have a mine!");
+            commandSender.sendMessage(Messages.msg("playerAlreadyOwnsAMine"));
         } else {
             Mine mine = mineStorage.get(target.getUniqueId());
             commandSender.sendMessage(ChatColor.GREEN + "You deleted " + target.getName() + "'s private mine!");
@@ -61,20 +62,20 @@ public class PrivateMinesCommand {
     @CommandHook("reset")
     public void reset(Player player) {
         if (!mineStorage.hasMine(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You do not have a mine!");
+            player.sendMessage(Messages.msg("youDontOwnAMine"));
         } else {
             Mine mine = mineStorage.get(player.getUniqueId());
             if (mine != null) {
                 mine.reset();
             }
-            player.sendMessage(ChatColor.GREEN + "You have reset your mine!");
+            player.sendMessage(Messages.msg("yourMineHasBeenReset"));
         }
     }
 
     @CommandHook("upgrade")
     public void upgrade(CommandSender commandSender, Player player) {
         if (!mineStorage.hasMine(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You do not have a mine!");
+            player.sendMessage(Messages.msg("youDontOwnAMine"));
         } else {
             Mine mine = mineStorage.get(player.getUniqueId());
             if (mine != null) {
@@ -86,7 +87,7 @@ public class PrivateMinesCommand {
     @CommandHook("expand")
     public void expand(Player player, Player target, int amount) {
         if (!mineStorage.hasMine(target.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "That player does not have a mine!");
+            player.sendMessage(Messages.msg("playerDoesntOwnAMine"));
         } else {
             Mine mine = mineStorage.get(target.getUniqueId());
             if (mine != null) {
@@ -102,10 +103,10 @@ public class PrivateMinesCommand {
     @CommandHook("teleport")
     public void teleport(Player player) {
         if (!mineStorage.hasMine(player.getUniqueId())) {
-            player.sendMessage(ChatColor.GREEN + "You don't own a mine!");
+            player.sendMessage(Messages.msg("youDontOwnAMine"));
         } else {
             Mine mine = mineStorage.get(player.getUniqueId());
-            player.sendMessage(ChatColor.GREEN + "You teleported to your mine!");
+            player.sendMessage(Messages.msg("youHaveBeenTeleportedToYourMine"));
             if (mine != null) {
                 mine.teleport(player);
             }
@@ -114,7 +115,7 @@ public class PrivateMinesCommand {
     @CommandHook("visit")
     public void visit(Player player, OfflinePlayer target) {
         if (!mineStorage.hasMine(target.getUniqueId())) {
-            player.sendMessage("That player does not have a mine!");
+            player.sendMessage(Messages.msg("playerDoesntOwnAMine"));
         } else {
             Mine mine = mineStorage.get(target.getUniqueId());
             if (mine != null) {

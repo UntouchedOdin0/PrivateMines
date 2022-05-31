@@ -1,6 +1,5 @@
 package me.untouchedodin0.privatemines;
 
-import co.aikar.commands.PaperCommandManager;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;

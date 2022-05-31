@@ -4,3 +4,5 @@ yourMineHasBeenReset:Your private mine has been reset.
 youHaveBeenTeleportedToYourMine:You have been teleported to your private mine.
 youDontOwnAMine:You don't own a private mine.
 youHaveGivenPlayerAMine:You have given {name} a private mine.
+playerAlreadyOwnsAMine:&cThe player already owns a private mine.
+playerDoesntOwnAMine:&cThe player doesn't own a private mine.
