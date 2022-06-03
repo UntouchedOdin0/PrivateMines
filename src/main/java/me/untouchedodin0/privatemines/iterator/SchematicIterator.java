@@ -101,12 +101,13 @@ public class SchematicIterator {
 
                 mineBlocks.spawnLocation = BlockVector3.at(spawn.getX(), spawn.getY(), spawn.getZ());
                 mineBlocks.npcLocation = BlockVector3.at(npc.getX(), npc.getY(), npc.getZ());
-
+                mineBlocks.quarryLocation = BlockVector3.at(quarry.getX(), quarry.getY(), quarry.getZ());
                 mineBlocks.corners[0] = BlockVector3.at(corner1.getX(), corner1.getY(), corner1.getZ());
                 mineBlocks.corners[1] = BlockVector3.at(corner2.getX(), corner2.getY(), corner2.getZ());
 
                 spawn = null;
                 npc = null;
+                quarry = null;
                 corner1 = null;
                 corner2 = null;
             } catch (IOException e) {
@@ -119,20 +120,21 @@ public class SchematicIterator {
     public static class MineBlocks {
         public BlockVector3 spawnLocation;
         public BlockVector3 npcLocation;
+        public BlockVector3 quarryLocation;
         public BlockVector3[] corners;
 
         public BlockVector3 getSpawnLocation() {
             return spawnLocation;
         }
-
         public BlockVector3 getNpcLocation() {
             return npcLocation;
         }
-
+        public BlockVector3 getQuarryLocation() {
+            return quarryLocation;
+        }
         public BlockVector3 getCorner1() {
             return corners[0];
         }
-
         public BlockVector3 getCorner2() {
             return corners[1];
         }
