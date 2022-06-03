@@ -67,6 +67,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
 import java.io.File;
@@ -146,11 +147,22 @@ public class MineFactory {
 
                     BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2().add(0, 0, 1));
                     BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1().add(0, 0, 1));
+                    BlockVector3 quarryV;
+                    if (mineBlocks.getQuarryLocation() != null) {
+                        quarryV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getQuarryLocation().add(0, 0, 1));
+                    } else {
+                        quarryV = null;
+                    }
 
                     Location spongeL = new Location(location.getWorld(), vector.getBlockX(), vector.getBlockY(), vector.getBlockZ() + 1);
-
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ());
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
+
+                    privateMines.getLogger().info("quarryV: " + quarryV);
+                    if (quarryV != null) {
+                        Location quarryL = new Location(location.getWorld(), quarryV.getBlockX(), quarryV.getBlockY(), quarryV.getBlockZ());
+                        privateMines.getLogger().info("Quarry Location : " + LocationUtils.toString(quarryL));
+                    }
 
                     localSession.setClipboard(clipboardHolder);
 

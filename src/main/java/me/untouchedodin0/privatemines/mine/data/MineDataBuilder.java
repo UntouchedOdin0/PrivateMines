@@ -25,6 +25,7 @@
 package me.untouchedodin0.privatemines.mine.data;
 
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.privatemines.mine.quarries.Quarry;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import org.bukkit.Location;
 import redempt.redlib.region.CuboidRegion;
@@ -42,6 +43,7 @@ public class MineDataBuilder {
     Location maximumFullRegion;
     CuboidRegion miningRegion;
     MineType mineType;
+    Quarry quarry;
     Shop shop = new Shop();
     boolean isOpen;
     double tax = 5;
@@ -106,6 +108,11 @@ public class MineDataBuilder {
         return this;
     }
 
+    public MineDataBuilder setQuarry(Quarry quarry) {
+        this.quarry = quarry;
+        return this;
+    }
+
     public MineData build() {
         // Create the mine data object and return it
         MineData mineData = new MineData();
@@ -119,6 +126,7 @@ public class MineDataBuilder {
         mineData.maximumFullRegion = maximumFullRegion;
         mineData.miningRegion = miningRegion;
         mineData.mineType = mineType;
+        mineData.quarry = quarry;
         mineData.isOpen = isOpen;
         mineData.tax = tax;
         mineData.shop = shop;

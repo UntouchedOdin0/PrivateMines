@@ -25,6 +25,7 @@
 package me.untouchedodin0.privatemines.mine.data;
 
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.privatemines.mine.quarries.Quarry;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,7 +45,7 @@ public class MineData {
     Location minimumFullRegion;
     Location maximumFullRegion;
     MineType mineType;
-
+    Quarry quarry;
     Shop shop;
     boolean isOpen;
     double tax = 5;
