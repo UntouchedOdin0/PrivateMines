@@ -47,6 +47,8 @@ public class Config {
     public static int mineYLevel = 50;
     @Comment("The delay until a player is teleported to the private mine")
     public static int teleportDelay = 5;
+    @Comment("The gap between the walls and the mine")
+    public static int wallsGap = 0;
     @Comment("Should we give players a mine when they first join?")
     public static boolean giveMineOnFirstJoin = false;
     @Comment("Should we only replace air blocks when the mine resets?")

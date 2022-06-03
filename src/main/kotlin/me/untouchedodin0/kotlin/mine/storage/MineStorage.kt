@@ -73,15 +73,12 @@ class MineStorage {
             print("distance: $distance")
         }
         for (entry in distances.entries) {
-
             if (min == null || min.value > entry.value) {
                 min = entry
                 if (min.value > 20) {
                     player.sendMessage(ChatColor.RED.toString() + "You're not in any mines!")
                     return null
                 }
-                privateMines.logger.info("min value: ${min.value}")
-                privateMines.logger.info("min key: ${min.key}")
             }
         }
         return min!!.key
@@ -103,7 +100,6 @@ class MineStorage {
             distances.putIfAbsent(mine, distance)
         }
         for (entry in distances.entries) {
-
             if (min == null || min.value > entry.value) {
                 min = entry
             }

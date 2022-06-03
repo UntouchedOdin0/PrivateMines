@@ -133,6 +133,7 @@ public class PrivateMines extends JavaPlugin {
             SQLite sqlite = new SQLite();
             sqlite.load();
 
+            getLogger().info("Walls gap: " + Config.wallsGap);
             loadMines();
             startAutoReset();
             PaperLib.suggestPaper(this);

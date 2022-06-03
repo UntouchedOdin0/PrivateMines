@@ -7,6 +7,7 @@ quarryMaterial: SHULKER_BOX
 mineDistance: 150
 mineYLevel: 50
 teleportDelay: 5
+wallsGap: 1
 giveMineOnFirstJoin: true
 onlyReplaceAir: true
 locale: en_US
