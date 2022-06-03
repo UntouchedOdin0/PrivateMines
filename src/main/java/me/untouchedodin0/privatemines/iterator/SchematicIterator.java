@@ -43,6 +43,7 @@ public class SchematicIterator {
     SchematicStorage schematicStorage;
     BlockVector3 spawn;
     BlockVector3 npc;
+    BlockVector3 quarry;
     BlockVector3 corner1;
     BlockVector3 corner2;
 
@@ -64,33 +65,43 @@ public class SchematicIterator {
                 Material cornerMaterial = Config.mineCorner;
                 Material spawnMaterial = Config.spawnPoint;
                 Material npcMaterial = Config.sellNpc;
+                Material quarryMaterial = Config.quarryMaterial;
 
                 BlockType cornerType = BlockType.REGISTRY.get(cornerMaterial.getKey().getKey());
                 BlockType spawnType = BlockType.REGISTRY.get(spawnMaterial.getKey().getKey());
                 BlockType npcType = BlockType.REGISTRY.get(npcMaterial.getKey().getKey());
+                BlockType quarryType = BlockType.REGISTRY.get(quarryMaterial.getKey().getKey());
 
                 clipboard.getRegion().forEach(blockVector3 -> {
                     BlockType blockType = clipboard.getBlock(blockVector3).getBlockType();
+                    int x = blockVector3.getX();
+                    int y = blockVector3.getY();
+                    int z = blockVector3.getZ();
 
                     if (blockType.equals(cornerType)) {
                         if (corner1 == null) {
-                            corner1 = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
+                            corner1 = BlockVector3.at(x, y, z);
                         } else if (corner2 == null) {
-                            corner2 = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
+                            corner2 = BlockVector3.at(x, y, z);
                         }
                     } else if (blockType.equals(spawnType)) {
                         if (spawn == null) {
-                            spawn = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
+                            spawn = BlockVector3.at(x, y, z);
                         }
                     } else if (blockType.equals(npcType)) {
                         if (npc == null) {
-                            npc = BlockVector3.at(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
+                            npc = BlockVector3.at(x, y, z);
+                        }
+                    } else if (blockType.equals(quarryType)) {
+                        if (quarry == null) {
+                            quarry = BlockVector3.at(x, y, z);
                         }
                     }
                 });
 
                 mineBlocks.spawnLocation = BlockVector3.at(spawn.getX(), spawn.getY(), spawn.getZ());
                 mineBlocks.npcLocation = BlockVector3.at(npc.getX(), npc.getY(), npc.getZ());
+
                 mineBlocks.corners[0] = BlockVector3.at(corner1.getX(), corner1.getY(), corner1.getZ());
                 mineBlocks.corners[1] = BlockVector3.at(corner2.getX(), corner2.getY(), corner2.getZ());
 

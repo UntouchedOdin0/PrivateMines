@@ -35,6 +35,10 @@ public class Config {
     public static Material mineCorner = Material.POWERED_RAIL;
     @Comment("The template material for the sell non player character")
     public static Material sellNpc = Material.WHITE_WOOL;
+    @Comment("The material to look for when expanding for upgrades")
+    public static Material upgradeMaterial = Material.OBSIDIAN;
+    @Comment("The template material for quarries")
+    public static Material quarryMaterial = Material.SHULKER_BOX;
     @Comment("Check for any spigot updates")
     public static boolean notifyForUpdates = true;
     @Comment("The distance between the private mines")
