@@ -100,8 +100,12 @@ public class SchematicIterator {
                 });
 
                 mineBlocks.spawnLocation = BlockVector3.at(spawn.getX(), spawn.getY(), spawn.getZ());
-                mineBlocks.npcLocation = BlockVector3.at(npc.getX(), npc.getY(), npc.getZ());
-                mineBlocks.quarryLocation = BlockVector3.at(quarry.getX(), quarry.getY(), quarry.getZ());
+                if (npc != null) {
+                    mineBlocks.npcLocation = BlockVector3.at(npc.getX(), npc.getY(), npc.getZ());
+                }
+                if (quarry != null) {
+                    mineBlocks.quarryLocation = BlockVector3.at(quarry.getX(), quarry.getY(), quarry.getZ());
+                }
                 mineBlocks.corners[0] = BlockVector3.at(corner1.getX(), corner1.getY(), corner1.getZ());
                 mineBlocks.corners[1] = BlockVector3.at(corner2.getX(), corner2.getY(), corner2.getZ());
 
