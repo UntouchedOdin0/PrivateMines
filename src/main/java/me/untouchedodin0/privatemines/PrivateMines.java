@@ -35,6 +35,7 @@ import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
+import redempt.redlib.sql.SQLHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +43,9 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -74,6 +78,7 @@ public class PrivateMines extends JavaPlugin {
     private ConfigManager configManager;
     private SlimeUtils slimeUtils;
     private static Economy econ = null;
+    private SQLite sqlite;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -132,8 +137,40 @@ public class PrivateMines extends JavaPlugin {
                 privateMines.getLogger().info("Loaded file: " + schematicFile);
             });
 
-            SQLite sqlite = new SQLite();
+            sqlite = new SQLite();
             sqlite.load();
+
+            Connection connection = sqlite.getSQLConnection();
+
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement("INSERT or IGNORE into privatemines (mineOwner, mineType, mineLocation," +
+                                                                                          " corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen)" +
+                                                                                          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+                preparedStatement.setString(1, "test");
+                preparedStatement.setString(2, "test");
+                preparedStatement.setString(3, "test");
+                preparedStatement.setString(4, "test");
+                preparedStatement.setString(5, "test");
+                preparedStatement.setString(6, "test");
+                preparedStatement.setString(7, "test");
+                preparedStatement.setString(8, "test");
+                preparedStatement.setString(9, "test");
+                preparedStatement.setString(10, "test");
+
+//                preparedStatement.setString(2, UUID.randomUUID().toString());
+//                preparedStatement.setString(3, UUID.randomUUID().toString());
+//                preparedStatement.setString(4, UUID.randomUUID().toString());
+//                preparedStatement.setString(5, UUID.randomUUID().toString());
+//                preparedStatement.setString(6, UUID.randomUUID().toString());
+//                preparedStatement.setString(7, UUID.randomUUID().toString());
+//                preparedStatement.setString(8, UUID.randomUUID().toString());
+//                preparedStatement.setDouble(9, 5.0);
+//                preparedStatement.setBoolean(10, true);
+                preparedStatement.executeUpdate();
+                SQLHelper sqlHelper = new SQLHelper(connection);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
 
             loadMines();
             startAutoReset();
@@ -292,6 +329,10 @@ public class PrivateMines extends JavaPlugin {
 
     public static Economy getEconomy() {
         return econ;
+    }
+
+    public SQLite getSqlite() {
+        return sqlite;
     }
 
     public void registerSellListener() {
