@@ -19,19 +19,15 @@ public class PrivateMinesAPI {
         if (!mineStorage.hasMine(uuid)) return null;
         return mineStorage.get(uuid);
     }
-
     public Mine getAtLocation(Location location) {
         return mineStorage.getClosest(location);
     }
-
     public Map<UUID, Mine> getMines() {
         return mineStorage.getMines();
     }
-
     public boolean hasMine(UUID uuid) {
         return mineStorage.hasMine(uuid);
     }
-
     public void createMine(UUID uuid, Location location, MineType mineType) {
         mineFactory.createUpgraded(uuid, location, mineType);
     }

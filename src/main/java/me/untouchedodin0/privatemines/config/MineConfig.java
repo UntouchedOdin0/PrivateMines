@@ -33,7 +33,6 @@ import java.util.Map;
 @ConfigMappable
 public class MineConfig {
     public static Map<String, MineType> mineTypes = new LinkedHashMap<>();
-
     public static Map<String, MineType> getMineTypes() {
         return mineTypes;
     }

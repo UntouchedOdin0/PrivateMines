@@ -40,7 +40,7 @@ public class SQLite extends Database{
             }
         }
         try {
-            if(connection!=null&&!connection.isClosed()){
+            if(connection != null && !connection.isClosed()){
                 return connection;
             }
             Class.forName("org.sqlite.JDBC");

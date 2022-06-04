@@ -73,6 +73,9 @@ import redempt.redlib.misc.Task;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -100,6 +103,7 @@ public class MineFactory {
         Mine mine = new Mine(privateMines);
         Map<String, Boolean> flags = mineType.getFlags();
         Map<Material, Double> prices = new HashMap<>();
+        Connection connection = privateMines.getSqlite().getSQLConnection();
 
         Map<Material, Double> materials = mineType.getMaterials();
         if (materials != null) {
@@ -246,6 +250,26 @@ public class MineFactory {
                                 .build();
                         mine.setMineData(mineData);
                         mine.saveMineData(player, mineData);
+
+                        try {
+                            PreparedStatement preparedStatement = connection
+                                    .prepareStatement("INSERT or IGNORE into privatemines (mineOwner, mineType, mineLocation," +
+                                                              " corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen)" +
+                                                              "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+                            preparedStatement.setString(1, uuid.toString());
+                            preparedStatement.setString(2, mineType.getName());
+                            preparedStatement.setString(3, LocationUtils.toString(location));
+                            preparedStatement.setString(4, LocationUtils.toString(lrailsL));
+                            preparedStatement.setString(5, LocationUtils.toString(urailsL));
+                            preparedStatement.setString(6, LocationUtils.toString(fullMin));
+                            preparedStatement.setString(7, LocationUtils.toString(fullMax));
+                            preparedStatement.setString(8, LocationUtils.toString(spongeL));
+                            preparedStatement.setDouble(9, mineData.getTax());
+                            preparedStatement.setBoolean(10, true);
+                            preparedStatement.executeUpdate();
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
                     } catch (IncompleteRegionException e) {
                         e.printStackTrace();
                     }
