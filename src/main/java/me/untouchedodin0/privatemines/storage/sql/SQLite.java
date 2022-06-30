@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-public class SQLite extends Database{
+public class SQLite extends Database {
 
     String databaseName = "privatemines";
 

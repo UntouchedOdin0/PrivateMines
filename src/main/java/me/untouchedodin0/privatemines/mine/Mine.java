@@ -35,7 +35,12 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
@@ -361,6 +366,7 @@ public class Mine {
     public void expand() {
         final World world = privateMines.getMineWorldManager().getMinesWorld();
         boolean canExpand = canExpand(1);
+        Map<String, Boolean> flags = mineData.getMineType().getFlags();
 
         if (!canExpand) {
             privateMines.getLogger().info("Failed to expand the mine due to the mine being too large");
@@ -401,6 +407,39 @@ public class Mine {
             mineData.setMaximumMining(BukkitAdapter.adapt(world, mine.getMaximumPoint()));
             mineData.setMinimumFullRegion(mineData.getMinimumFullRegion().subtract(1, 1, 1));
             mineData.setMaximumFullRegion(mineData.getMaximumFullRegion().add(1, 1, 1));
+            String mineRegionName = String.format("mine-%s", mineData.getMineOwner());
+
+            BlockVector3 minimum = mine.getMinimumPoint();
+            BlockVector3 maximum = mine.getMaximumPoint();
+
+            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+            RegionManager regionManager = container.get(BukkitAdapter.adapt(world));
+
+            if (regionManager != null) {
+                regionManager.removeRegion(mineRegionName);
+            }
+
+            ProtectedCuboidRegion protectedCuboidRegion = new ProtectedCuboidRegion(mineRegionName, minimum, maximum);
+
+            if (flags != null) {
+                flags.forEach((string, aBoolean) -> {
+                    Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), string);
+                    if (aBoolean) {
+                        try {
+                            Utils.setFlag(protectedCuboidRegion, flag, "allow");
+                        } catch (InvalidFlagFormat e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
+                        try {
+                            Utils.setFlag(protectedCuboidRegion, flag, "deny");
+                        } catch (InvalidFlagFormat e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+
             setMineData(mineData);
             privateMines.getMineStorage().replaceMineNoLog(mineData.getMineOwner(), this);
             reset();
