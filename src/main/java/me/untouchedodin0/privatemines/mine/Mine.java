@@ -419,7 +419,10 @@ public class Mine {
                 regionManager.removeRegion(mineRegionName);
             }
 
-            ProtectedCuboidRegion protectedCuboidRegion = new ProtectedCuboidRegion(mineRegionName, minimum, maximum);
+            ProtectedCuboidRegion protectedCuboidRegion = new ProtectedCuboidRegion(mineRegionName, mine.getMinimumPoint(), mine.getMaximumPoint());
+            if (regionManager != null) {
+                regionManager.addRegion(protectedCuboidRegion);
+            }
 
             if (flags != null) {
                 flags.forEach((string, aBoolean) -> {
