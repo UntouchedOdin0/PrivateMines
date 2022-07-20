@@ -33,7 +33,6 @@ dependencies {
     compileOnly 'com.fastasyncworldedit:FastAsyncWorldEdit-Core:2.2.0'
     compileOnly 'com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit:2.2.0'
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.7'
-    compileOnly 'org.projectlombok:lombok:1.18.24'
     compileOnly 'com.grinderwolf:slimeworldmanager-api:2.7.0-SNAPSHOT'
     compileOnly 'org.xerial:sqlite-jdbc:3.36.0.3'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
