@@ -23,6 +23,7 @@ import me.untouchedodin0.privatemines.utils.metrics.Metrics.SingleLineChart;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.milkbowl.vault.economy.Economy;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,6 +49,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -202,6 +204,21 @@ public class PrivateMines extends JavaPlugin {
         getLogger().info(String.format("%s v%s has successfully been Disabled",
                                        getDescription().getName(),
                                        getDescription().getVersion()));
+        Path directory = getMinesDirectory();
+        File directoryFile = directory.toFile();
+
+        try {
+            FileUtils.cleanDirectory(directoryFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        mineStorage.getMines().forEach((uuid, mine) -> {
+            MineData mineData = mine.getMineData();
+            getLogger().info("Saving mine: " + mine);
+            UUID owner = mineData.getMineOwner();
+            mine.saveMineData(Objects.requireNonNull(Bukkit.getOfflinePlayer(owner).getPlayer()), mineData);
+        });
     }
 
     public void setupSchematicUtils() {

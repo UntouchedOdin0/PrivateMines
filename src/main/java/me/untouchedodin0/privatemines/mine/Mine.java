@@ -168,7 +168,7 @@ public class Mine {
      * @Deprecated This isn't really used anymore.
      */
     @Deprecated
-    public void replace(UUID uuid, MineType newType) {
+    public void replace(UUID uuid) {
         MineData mineData = getMineData();
 
         Location cornerA = mineData.getMinimumFullRegion();
@@ -354,10 +354,17 @@ public class Mine {
         final var min = getMineData().getMinimumMining();
         final var max = getMineData().getMaximumMining();
         final var region = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
+        final boolean borderUpgrade = Config.borderUpgrade;
+
         region.expand(ExpansionUtils.expansionVectors(amount + 1));
         region.forEach(blockVector3 -> {
             Material type = Utils.toLocation(blockVector3, world).getBlock().getType();
-            if (type.equals(Material.OBSIDIAN)) canExpand = false;
+            if (type.equals(Material.OBSIDIAN)) {
+                canExpand = false;
+                if (borderUpgrade) {
+                    upgrade();
+                }
+            }
         });
         return canExpand;
     }
@@ -407,9 +414,6 @@ public class Mine {
             mineData.setMinimumFullRegion(mineData.getMinimumFullRegion().subtract(1, 1, 1));
             mineData.setMaximumFullRegion(mineData.getMaximumFullRegion().add(1, 1, 1));
             String mineRegionName = String.format("mine-%s", mineData.getMineOwner());
-
-            BlockVector3 minimum = mine.getMinimumPoint();
-            BlockVector3 maximum = mine.getMaximumPoint();
 
             RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionManager regionManager = container.get(BukkitAdapter.adapt(world));

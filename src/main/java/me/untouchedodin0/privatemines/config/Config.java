@@ -53,6 +53,8 @@ public class Config {
     public static boolean giveMineOnFirstJoin = false;
     @Comment("Should we only replace air blocks when the mine resets?")
     public static boolean onlyReplaceAir = true;
+    @Comment("Should we upgrade the mine upon reaching the outside border?")
+    public static boolean borderUpgrade = true;
     @Comment("Which locale should we use?")
     public static String locale = "en_US";
 }

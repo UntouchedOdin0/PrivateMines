@@ -10,6 +10,7 @@ teleportDelay: 5
 wallsGap: 1
 giveMineOnFirstJoin: true
 onlyReplaceAir: true
+borderUpgrade: true
 locale: en_US
 
 mineTypes:
