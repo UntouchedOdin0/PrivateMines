@@ -359,7 +359,7 @@ public class Mine {
         region.expand(ExpansionUtils.expansionVectors(amount + 1));
         region.forEach(blockVector3 -> {
             Material type = Utils.toLocation(blockVector3, world).getBlock().getType();
-            if (type.equals(Material.OBSIDIAN)) {
+            if (type.equals(Config.upgradeMaterial)) {
                 canExpand = false;
                 if (borderUpgrade) {
                     upgrade();

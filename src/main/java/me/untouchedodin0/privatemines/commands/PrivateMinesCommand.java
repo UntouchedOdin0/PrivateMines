@@ -75,6 +75,7 @@ public class PrivateMinesCommand {
     @CommandHook("upgrade")
     public void upgrade(CommandSender commandSender, Player player) {
         if (!mineStorage.hasMine(player.getUniqueId())) {
+            commandSender.sendMessage(ChatColor.RED + "That player doesn't own a mine!");
             player.sendMessage(Messages.msg("youDontOwnAMine"));
         } else {
             Mine mine = mineStorage.get(player.getUniqueId());
@@ -85,9 +86,9 @@ public class PrivateMinesCommand {
     }
 
     @CommandHook("expand")
-    public void expand(Player player, Player target, int amount) {
+    public void expand(CommandSender commandSender, Player target, int amount) {
         if (!mineStorage.hasMine(target.getUniqueId())) {
-            player.sendMessage(Messages.msg("playerDoesntOwnAMine"));
+            commandSender.sendMessage(ChatColor.RED + "That player doesn't own a mine!");
         } else {
             Mine mine = mineStorage.get(target.getUniqueId());
             if (mine != null) {
