@@ -516,11 +516,7 @@ public class Mine {
         boolean open = mineData.isOpen();
         List<UUID> bannedPlayers = mineData.getBannedPlayers();
 
-        if (file.exists()) {
-            boolean deleted = file.delete();
-            if (deleted) {
-                privateMines.getLogger().info("File " + file.getName() + " deleted successfully.");
-            }
+        if (!file.exists()) {
             try {
                 boolean createdNewFile = file.createNewFile();
                 if (createdNewFile) {
@@ -545,28 +541,6 @@ public class Mine {
                 yml.save(file);
             } catch (IOException e) {
                 throw new RuntimeException(e);
-            }
-        } else {
-            try {
-                if (file.createNewFile()) {
-                    privateMines.getLogger().info("Created new file: " + file.getPath());
-                    yml.set("mineOwner", owner.toString());
-                    yml.set("mineType", mineTypeName);
-                    yml.set("mineLocation", LocationUtils.toString(mineLocation));
-                    yml.set("corner1", LocationUtils.toString(corner1));
-                    yml.set("corner2", LocationUtils.toString(corner2));
-                    yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
-                    yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
-                    yml.set("spawn", LocationUtils.toString(spawn));
-
-                    try {
-                        yml.save(file);
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }
