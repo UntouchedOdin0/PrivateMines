@@ -207,11 +207,11 @@ public class PrivateMines extends JavaPlugin {
         Path directory = getMinesDirectory();
         File directoryFile = directory.toFile();
 
-        try {
-            FileUtils.cleanDirectory(directoryFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            FileUtils.cleanDirectory(directoryFile);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
         mineStorage.getMines().forEach((uuid, mine) -> {
             MineData mineData = mine.getMineData();

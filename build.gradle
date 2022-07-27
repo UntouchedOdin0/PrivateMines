@@ -54,6 +54,7 @@ dependencies {
     implementation 'com.flowpowered:flow-math:1.0.3'
     implementation 'io.papermc:paperlib:1.0.7'
     implementation 'com.github.unldenis:Hologram-Lib:master-SNAPSHOT'
+//    implementation 'com.github.UntouchedOdin0:TokensPlugin:master-SNAPSHOT'
 }
 
 shadowJar {
