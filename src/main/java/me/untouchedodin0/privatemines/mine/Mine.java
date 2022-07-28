@@ -587,6 +587,7 @@ public class Mine {
                         if (mine != null) {
                             mine.resetNoCheck();
                         }
+                        economy.withdrawPlayer(player, upgradeCost);
                     }
                 }
             }
