@@ -207,12 +207,12 @@ public class PrivateMines extends JavaPlugin {
         Path directory = getMinesDirectory();
         File directoryFile = directory.toFile();
 
-        mineStorage.getMines().forEach((uuid, mine) -> {
-            MineData mineData = mine.getMineData();
-            getLogger().info("Saving mine: " + mine);
-            UUID owner = mineData.getMineOwner();
-            mine.saveMineData(Objects.requireNonNull(Bukkit.getOfflinePlayer(owner).getPlayer()), mineData);
-        });
+//        mineStorage.getMines().forEach((uuid, mine) -> {
+//            MineData mineData = mine.getMineData();
+//            getLogger().info("Saving mine: " + mine);
+//            UUID owner = mineData.getMineOwner();
+//            mine.saveMineData(owner, mineData);
+//        });
     }
 
     public void setupSchematicUtils() {
@@ -272,6 +272,9 @@ public class PrivateMines extends JavaPlugin {
                     getMineStorage().addMine(owner, mine);
                     mine.startResetTask();
 //                    mine.startPercentageTask();
+
+                    getLogger().info("corner1: " + corner1);
+                    getLogger().info("corner2: " + corner2);
                     getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
                 });
             } catch (IOException e) {

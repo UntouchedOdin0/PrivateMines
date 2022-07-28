@@ -244,8 +244,8 @@ public class Mine {
         Player player = Bukkit.getPlayer(mineData.getMineOwner());
         if (player != null && player.isOnline()) {
             boolean isPlayerInRegion = fullRegion.contains(player.getLocation().getBlockX(),
-                                                           player.getLocation().getBlockY(),
-                                                           player.getLocation().getBlockZ());
+                    player.getLocation().getBlockY(),
+                    player.getLocation().getBlockZ());
             if (isPlayerInRegion) {
                 teleport(player);
             }
@@ -542,6 +542,15 @@ public class Mine {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        } else {
+            yml.set("corner1", LocationUtils.toString(mineData.getMinimumMining()));
+            yml.set("corner2", LocationUtils.toString(mineData.getMaximumMining()));
+
+            try {
+                yml.save(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -555,6 +564,7 @@ public class Mine {
         Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
         MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
         MineType nextType = mineTypeManager.getNextMineType(currentType.getName());
+        Economy economy = PrivateMines.getEconomy();
 
         double upgradeCost = nextType.getUpgradeCost();
         PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this, currentType, nextType);
@@ -575,7 +585,7 @@ public class Mine {
                         mine.resetNoCheck();
                     }
                 } else {
-                    Economy economy = PrivateMines.getEconomy();
+
                     double balance = economy.getBalance(player);
                     if (balance < upgradeCost) {
                         player.sendMessage(ChatColor.RED + "You don't have enough money to upgrade your mine!");
@@ -583,10 +593,8 @@ public class Mine {
                         Location mineLocation = mineData.getMineLocation();
                         delete();
                         mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
-                        Mine mine = mineStorage.get(mineOwner);
-                        if (mine != null) {
-                            mine.resetNoCheck();
-                        }
+
+                        player.sendMessage("upgrade cost: " + upgradeCost);
                         economy.withdrawPlayer(player, upgradeCost);
                     }
                 }

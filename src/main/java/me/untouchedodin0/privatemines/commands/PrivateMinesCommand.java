@@ -6,6 +6,7 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
+import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.inventory.MainMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.ChatColor;
@@ -97,6 +98,10 @@ public class PrivateMinesCommand {
                         mine.expand();
                     }
                 }
+                MineData mineData = mine.getMineData();
+                commandSender.sendMessage("" + mineData.getMinimumMining());
+                commandSender.sendMessage("" + mineData.getMaximumMining());
+                mine.saveMineData(target, mineData);
             }
         }
     }

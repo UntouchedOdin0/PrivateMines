@@ -178,7 +178,7 @@ public class MineFactory {
                     } catch (WorldEditException worldEditException) {
                         if (worldEditException.getCause() instanceof UnsupportedVersionEditException) {
                             privateMines.getLogger().warning("WorldEdit version " + WorldEdit.getVersion() + " is not supported," +
-                                                                     "if this issue persists, please try using FastAsyncWorldEdit.");
+                                    "if this issue persists, please try using FastAsyncWorldEdit.");
                             return;
                         }
                         worldEditException.printStackTrace();
@@ -254,8 +254,8 @@ public class MineFactory {
                         try {
                             PreparedStatement preparedStatement = connection
                                     .prepareStatement("INSERT or IGNORE into privatemines (mineOwner, mineType, mineLocation," +
-                                                              " corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen)" +
-                                                              "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+                                            " corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen)" +
+                                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
                             preparedStatement.setString(1, uuid.toString());
                             preparedStatement.setString(2, mineType.getName());
                             preparedStatement.setString(3, LocationUtils.toString(location));
@@ -491,4 +491,3 @@ public class MineFactory {
         }
     }
 }
-
