@@ -17,6 +17,8 @@ import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.Messages;
 
+import java.util.Objects;
+
 @SuppressWarnings("unused")
 public class PrivateMinesCommand {
 
@@ -33,17 +35,17 @@ public class PrivateMinesCommand {
     }
 
     @CommandHook("give")
-    public void give(CommandSender commandSender, OfflinePlayer target) {
+    public void give(CommandSender commandSender, OfflinePlayer target, MineType mineType) {
         MineFactory mineFactory = new MineFactory();
         MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
         Location location = mineWorldManager.getNextFreeLocation();
-        MineType mineType = mineTypeManager.getDefaultMineType();
+        MineType defaultMineType = mineTypeManager.getDefaultMineType();
 
         if (target.getPlayer() != null) {
             if (mineStorage.hasMine(target.getUniqueId())) {
                 commandSender.sendMessage(Messages.msg("playerAlreadyOwnsAMine"));
             } else {
-                mineFactory.create(target.getPlayer(), location, mineType);
+                mineFactory.create(target.getPlayer(), location, Objects.requireNonNullElse(mineType, defaultMineType));
                 commandSender.sendMessage(ChatColor.GREEN + "You gave " + target.getName() + " a private mine!");
             }
         }

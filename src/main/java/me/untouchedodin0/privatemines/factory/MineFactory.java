@@ -88,6 +88,8 @@ public class MineFactory {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
     EditSession editSession;
+    Location quarryL;
+
 
     /**
      * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
@@ -162,10 +164,8 @@ public class MineFactory {
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ());
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
 
-                    privateMines.getLogger().info("quarryV: " + quarryV);
                     if (quarryV != null) {
-                        Location quarryL = new Location(location.getWorld(), quarryV.getBlockX(), quarryV.getBlockY(), quarryV.getBlockZ());
-                        privateMines.getLogger().info("Quarry Location : " + LocationUtils.toString(quarryL));
+                        quarryL = new Location(location.getWorld(), quarryV.getBlockX(), quarryV.getBlockY(), quarryV.getBlockZ());
                     }
 
                     localSession.setClipboard(clipboardHolder);
@@ -297,6 +297,10 @@ public class MineFactory {
                     final long microseconds = TimeUnit.NANOSECONDS.toMillis(creationDuration.toNanos());
                     privateMines.getLogger().info("Mine creation time: " + microseconds + " milliseconds");
                     Task.syncDelayed(() -> {
+                        spongeL.getBlock().setType(Material.AIR, false);
+//                        if (quarryL != null) {
+//                            quarryL.getBlock().setType(Material.AIR, false);
+//                        }
                         player.teleport(spongeL);
                         Bukkit.getPluginManager().callEvent(privateMineCreationEvent);
                     });
@@ -328,8 +332,6 @@ public class MineFactory {
         BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         SchematicStorage storage = privateMines.getSchematicStorage();
         SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
-
-        privateMines.getLogger().info("MineBlocks: " + mineBlocks);
 
         Task.asyncDelayed(() -> {
             if (clipboardFormat != null) {
@@ -363,10 +365,6 @@ public class MineFactory {
 
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ());
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
-
-                    privateMines.getLogger().info("Schematic: " + schematicFile.getName());
-                    privateMines.getLogger().info("LRAILS: " + lrailsL);
-                    privateMines.getLogger().info("URAILS: " + urailsL);
 
                     localSession.setClipboard(clipboardHolder);
 
@@ -472,6 +470,8 @@ public class MineFactory {
                     final long microseconds = TimeUnit.NANOSECONDS.toMillis(creationDuration.toNanos());
                     privateMines.getLogger().info("Mine creation time: " + microseconds + " milliseconds");
                     Task.syncDelayed(() -> {
+                        spongeL.getBlock().setType(Material.AIR, false);
+
                         player.teleport(spongeL);
                         Bukkit.getPluginManager().callEvent(privateMineCreationEvent);
                     });

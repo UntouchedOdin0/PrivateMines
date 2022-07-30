@@ -31,6 +31,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
+import redempt.redlib.commandmanager.ArgType;
 import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.config.ConfigManager;
@@ -101,6 +102,7 @@ public class PrivateMines extends JavaPlugin {
             mineTypeManager = new MineTypeManager(this);
 
             new CommandParser(getResource("commands.rdcml"))
+                    .setArgTypes(ArgType.of("mineType", mineTypeManager.getMineTypes()))
                     .parse()
                     .register("privatemines",
                               new PrivateMinesCommand());

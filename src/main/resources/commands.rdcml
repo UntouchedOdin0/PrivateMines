@@ -1,7 +1,7 @@
 privatemine,privatemines,pmine,pmines {
     hook main
 
-    give player:target {
+    give player:target mineType:type? {
         hook give
         help Gives a private mine to a player
         permission privatemines.give
