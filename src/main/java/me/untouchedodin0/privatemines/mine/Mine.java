@@ -272,6 +272,8 @@ public class Mine {
         BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
 
         Map<Material, Double> materials = mineType.getMaterials();
+        Map<Material, Double> mineBlocks = mineData.getMaterials();
+
         final RandomPattern randomPattern = new RandomPattern();
 
         PrivateMineResetEvent privateMineResetEvent = new PrivateMineResetEvent(mineData.getMineOwner(), this);
@@ -279,12 +281,20 @@ public class Mine {
 
         if (privateMineResetEvent.isCancelled()) return;
 
-        if (materials != null) {
-            materials.forEach((material, chance) -> {
+        if (!mineBlocks.isEmpty()) {
+            mineBlocks.forEach((material, chance) -> {
                 Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
                 randomPattern.add(pattern, chance);
             });
+        } else {
+            if (materials != null) {
+                materials.forEach((material, chance) -> {
+                    Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+                    randomPattern.add(pattern, chance);
+                });
+            }
         }
+
 
         World world = location.getWorld();
 
@@ -515,6 +525,7 @@ public class Mine {
         double tax = mineData.getTax();
         boolean open = mineData.isOpen();
         List<UUID> bannedPlayers = mineData.getBannedPlayers();
+        Map<Material, Double> materials = mineData.getMaterials();
 
         if (!file.exists()) {
             try {
@@ -536,6 +547,7 @@ public class Mine {
             yml.set("tax", tax);
             yml.set("isOpen", open);
             yml.set("bannedPlayers", bannedPlayers.toString());
+            yml.set("materials", materials.toString());
 
             try {
                 yml.save(file);

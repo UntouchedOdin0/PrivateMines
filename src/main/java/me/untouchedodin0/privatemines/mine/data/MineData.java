@@ -124,6 +124,14 @@ public class MineData {
         this.tax = tax;
     }
 
+    public Map<Material, Double> getMaterials() {
+        return materials;
+    }
+
+    public void setMaterials(Map<Material, Double> materials) {
+        this.materials = materials;
+    }
+
     public void addWhitelistedPlayer(UUID uuid) {
         if (whitelistedPlayers.contains(uuid)) return;
         whitelistedPlayers.add(uuid);

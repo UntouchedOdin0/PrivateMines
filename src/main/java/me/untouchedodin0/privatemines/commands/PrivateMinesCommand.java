@@ -11,13 +11,14 @@ import me.untouchedodin0.privatemines.utils.inventory.MainMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.Messages;
 
-import java.util.Objects;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class PrivateMinesCommand {
@@ -130,6 +131,28 @@ public class PrivateMinesCommand {
                 mine.teleport(player);
                 player.sendMessage(ChatColor.GREEN + "You are now visiting " + target.getName() + "'s mine!");
             }
+        }
+    }
+
+    @CommandHook("setblocks")
+    public void setBlocks(Player player, Player target, Material[] materials) {
+        Mine mine = mineStorage.get(target.getUniqueId());
+        MineData mineData;
+        Map<Material, Double> map = new HashMap<>();
+
+        if (mine != null) {
+
+            for (Material material : materials) {
+                if (material.isSolid()) {
+                    map.put(material, 1.0);
+                }
+            }
+
+            mineData = mine.getMineData();
+            mineData.setMaterials(map);
+            mine.saveMineData(target, mineData);
+
+            privateMines.getLogger().info("map: " + map);
         }
     }
 }

@@ -102,7 +102,9 @@ public class PrivateMines extends JavaPlugin {
             mineTypeManager = new MineTypeManager(this);
 
             new CommandParser(getResource("commands.rdcml"))
-                    .setArgTypes(ArgType.of("mineType", mineTypeManager.getMineTypes()))
+                    .setArgTypes(
+                            ArgType.of("materials", Material.class),
+                            ArgType.of("mineType", mineTypeManager.getMineTypes()))
                     .parse()
                     .register("privatemines",
                               new PrivateMinesCommand());

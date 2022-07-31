@@ -42,4 +42,10 @@ privatemine,privatemines,pmine,pmines {
         hook visit
         help Teleport to another player's mine
     }
+
+     setblocks player:target materials[]:material {
+        hook setblocks
+        help Sets the blocks in the mine
+        permission privatemines.setblocks
+    }
 }
