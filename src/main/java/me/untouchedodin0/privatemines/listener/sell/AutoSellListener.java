@@ -47,6 +47,8 @@ public class AutoSellListener implements Listener {
         Player player = sellAllEvent.getPlayer();
         Location location = player.getLocation();
         Mine mine = mineStorage.getClosest(location);
+        if (mine == null) return;
+
         MineData mineData = mine.getMineData();
         Player owner = Bukkit.getOfflinePlayer(mineData.getMineOwner()).getPlayer();
         if (player.equals(owner)) return;
@@ -67,6 +69,8 @@ public class AutoSellListener implements Listener {
         Player player = autoSellEvent.getPlayer();
         Location location = player.getLocation();
         Mine mine = mineStorage.getClosest(location);
+        if (mine == null) return;
+
         MineData mineData = mine.getMineData();
         Player owner = Bukkit.getOfflinePlayer(mineData.getMineOwner()).getPlayer();
         if (player.equals(owner)) return;

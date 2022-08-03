@@ -31,7 +31,9 @@ public class PrivateMinesCommand {
     public void main(CommandSender sender) {
         if (sender instanceof Player player) {
             MainMenu mainMenu = new MainMenu(mineStorage);
-            mainMenu.openMainMenu(player);
+//            mainMenu.openMainMenu(player);
+            Mine mine = mineStorage.getClosest(player.getLocation());
+            player.sendMessage("mine: " + mine);
         }
     }
 
