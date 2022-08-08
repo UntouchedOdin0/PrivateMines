@@ -39,8 +39,8 @@ public class Config {
     public static Material upgradeMaterial = Material.OBSIDIAN;
     @Comment("The template material for quarries")
     public static Material quarryMaterial = Material.SHULKER_BOX;
-    @Comment("Check for any spigot updates")
-    public static boolean notifyForUpdates = true;
+//    @Comment("Check for any spigot updates")
+//    public static boolean notifyForUpdates = true;
     @Comment("The distance between the private mines")
     public static int mineDistance = 150;
     @Comment("The height of where the private mines are pasted")

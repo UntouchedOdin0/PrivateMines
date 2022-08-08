@@ -104,8 +104,6 @@ public class PrivateMinesCommand {
                     }
                 }
                 MineData mineData = mine.getMineData();
-                commandSender.sendMessage("" + mineData.getMinimumMining());
-                commandSender.sendMessage("" + mineData.getMaximumMining());
                 mine.saveMineData(target, mineData);
             }
         }

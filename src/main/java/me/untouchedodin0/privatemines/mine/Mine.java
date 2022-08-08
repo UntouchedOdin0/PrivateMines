@@ -251,6 +251,14 @@ public class Mine {
             }
         }
 
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            boolean isPlayerInRegion = fullRegion.contains(
+                    online.getLocation().getBlockX(),
+                    online.getLocation().getBlockY(),
+                    online.getLocation().getBlockZ());
+            if (isPlayerInRegion) teleport(online);
+        }
+
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
             Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
 
@@ -319,7 +327,10 @@ public class Mine {
     public void startPercentageTask() {
         this.percentageTask = Task.syncRepeating(() -> {
             double percentage = getPercentage();
-            if (percentage >= 50) {
+            MineType mineType = getMineData().getMineType();
+            double resetPercentage = mineType.getResetPercentage();
+
+            if (percentage >= resetPercentage) {
                 reset();
                 Bukkit.broadcastMessage(ChatColor.GREEN + Bukkit.getOfflinePlayer(mineData.getMineOwner()).getName() + "'s private mine has been reset!");
             }

@@ -275,10 +275,8 @@ public class PrivateMines extends JavaPlugin {
                     mine.setMineData(mineData);
                     getMineStorage().addMine(owner, mine);
                     mine.startResetTask();
-//                    mine.startPercentageTask();
+                    mine.startPercentageTask();
 
-                    getLogger().info("corner1: " + corner1);
-                    getLogger().info("corner2: " + corner2);
                     getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
                 });
             } catch (IOException e) {
