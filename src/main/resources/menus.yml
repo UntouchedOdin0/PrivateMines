@@ -1,0 +1,12 @@
+menus:
+  mainMenu:
+    title: Inventory Title
+    rows: 3
+    items:
+      TestItem:
+        slot: 0
+        name: Test Item
+        lore:
+          - Lore line 1
+          - Lore line 2
+        action: resetMine

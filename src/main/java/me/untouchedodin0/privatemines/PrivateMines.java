@@ -5,6 +5,7 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.config.Config;
+import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
@@ -23,7 +24,6 @@ import me.untouchedodin0.privatemines.utils.metrics.Metrics.SingleLineChart;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.milkbowl.vault.economy.Economy;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -50,7 +50,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -92,6 +91,7 @@ public class PrivateMines extends JavaPlugin {
         Instant start = Instant.now();
         getLogger().info("Loading Private Mines v" + getDescription().getVersion());
         saveDefaultConfig();
+        saveResource("menus.yml", false);
         privateMines = this;
         if (RedLib.MID_VERSION < 13) {
             Utils.complain();
@@ -127,6 +127,29 @@ public class PrivateMines extends JavaPlugin {
                     .target(MineConfig.class)
                     .saveDefaults()
                     .load();
+            //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
+            ConfigManager menuConfig = ConfigManager.create(this, "menus.yml")
+                    .addConverter(Material.class, Material::valueOf, Material::toString)
+                    .target(MenuConfig.class)
+                    .load();
+
+            getLogger().info("" + MenuConfig.menus);
+            MenuConfig.menus.forEach((s, menu) -> {
+                getLogger().info("s: " + s);
+                getLogger().info("menu: " + menu);
+                getLogger().info("name: " + menu.getName());
+                getLogger().info("rows: " + menu.getRows());
+                getLogger().info("items: " + menu.getItems());
+
+                menu.getItems().forEach((s1, menuItem) -> {
+                    getLogger().info("s1: " + s1);
+                    getLogger().info("menu item name: " + menuItem.getItemName());
+                    getLogger().info("menu item slot: " + menuItem.getSlot());
+                    getLogger().info("menu item display name: " + menuItem.getName());
+                    getLogger().info("menu item lore " + menuItem.getLore());
+                    getLogger().info("menu item action: " + menuItem.getAction());
+                });
+            });
 
             this.Y_LEVEL = Config.mineYLevel;
             this.MINE_DISTANCE = Config.mineDistance;
@@ -178,6 +201,7 @@ public class PrivateMines extends JavaPlugin {
                 throw new RuntimeException(e);
             }
 
+            loadMenus();
             loadMines();
             startAutoReset();
             PaperLib.suggestPaper(this);
@@ -300,6 +324,11 @@ public class PrivateMines extends JavaPlugin {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    public void loadMenus() {
+        getLogger().info("Loading Menus...");
+//        saveResource("menus.yml", false);
     }
 
     public void startAutoReset() {
