@@ -1,8 +1,10 @@
 package me.untouchedodin0.privatemines.commands;
 
+import me.untouchedodin0.kotlin.menu.Menu;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
@@ -30,8 +32,10 @@ public class PrivateMinesCommand {
     @CommandHook("main")
     public void main(CommandSender sender) {
         if (sender instanceof Player player) {
-            MainMenu mainMenu = new MainMenu(mineStorage);
-            mainMenu.openMainMenu(player);
+            Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
+            player.sendMessage("" + mainMenu);
+//            MainMenu mainMenu = new MainMenu(mineStorage);
+//            mainMenu.openMainMenu(player);
         }
     }
 

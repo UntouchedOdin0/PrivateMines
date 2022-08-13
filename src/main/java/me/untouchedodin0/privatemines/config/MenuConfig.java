@@ -10,4 +10,8 @@ import java.util.Map;
 public class MenuConfig {
 
     public static Map<String, Menu> menus = new LinkedHashMap<>();
+
+    public static Map<String, Menu> getMenus() {
+        return menus;
+    }
 }

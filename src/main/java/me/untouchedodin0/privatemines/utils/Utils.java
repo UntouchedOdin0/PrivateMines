@@ -219,4 +219,14 @@ public class Utils {
     public static void sendActionBar(Player player, String message) {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent((message)));
     }
+
+    public static int getInventorySize(int max) {
+        if (max <= 0) return 9;
+        int quotient =  (int) Math.ceil(max / 9.0);
+        return quotient > 5 ? 54: quotient * 9;
+    }
+
+    public static int rowsToSlots(int rows) {
+        return rows * 9;
+    }
 }

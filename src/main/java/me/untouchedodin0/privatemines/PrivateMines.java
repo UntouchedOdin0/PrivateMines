@@ -35,6 +35,7 @@ import redempt.redlib.commandmanager.ArgType;
 import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.config.ConfigManager;
+import redempt.redlib.inventorygui.InventoryGUI;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
@@ -132,24 +133,6 @@ public class PrivateMines extends JavaPlugin {
                     .addConverter(Material.class, Material::valueOf, Material::toString)
                     .target(MenuConfig.class)
                     .load();
-
-            getLogger().info("" + MenuConfig.menus);
-            MenuConfig.menus.forEach((s, menu) -> {
-                getLogger().info("s: " + s);
-                getLogger().info("menu: " + menu);
-                getLogger().info("name: " + menu.getName());
-                getLogger().info("rows: " + menu.getRows());
-                getLogger().info("items: " + menu.getItems());
-
-                menu.getItems().forEach((s1, menuItem) -> {
-                    getLogger().info("s1: " + s1);
-                    getLogger().info("menu item name: " + menuItem.getItemName());
-                    getLogger().info("menu item slot: " + menuItem.getSlot());
-                    getLogger().info("menu item display name: " + menuItem.getName());
-                    getLogger().info("menu item lore " + menuItem.getLore());
-                    getLogger().info("menu item action: " + menuItem.getAction());
-                });
-            });
 
             this.Y_LEVEL = Config.mineYLevel;
             this.MINE_DISTANCE = Config.mineDistance;
@@ -328,6 +311,28 @@ public class PrivateMines extends JavaPlugin {
 
     public void loadMenus() {
         getLogger().info("Loading Menus...");
+
+        getLogger().info("" + MenuConfig.menus);
+        MenuConfig.menus.forEach((s, menu) -> {
+            getLogger().info("s: " + s);
+            getLogger().info("menu: " + menu);
+            getLogger().info("name: " + menu.getName());
+            getLogger().info("rows: " + menu.getRows());
+            getLogger().info("items: " + menu.getItems());
+
+            InventoryGUI inventoryGUI = new InventoryGUI(Utils.getInventorySize(Utils.rowsToSlots(1)), menu.getName());
+
+            getLogger().info("inventoryGUI: " + inventoryGUI);
+
+            menu.getItems().forEach((s1, menuItem) -> {
+                getLogger().info("s1: " + s1);
+                getLogger().info("menu item name: " + menuItem.getItemName());
+                getLogger().info("menu item slot: " + menuItem.getSlot());
+                getLogger().info("menu item display name: " + menuItem.getName());
+                getLogger().info("menu item lore " + menuItem.getLore());
+                getLogger().info("menu item action: " + menuItem.getAction());
+            });
+        });
 //        saveResource("menus.yml", false);
     }
 
