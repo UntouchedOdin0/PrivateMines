@@ -186,7 +186,7 @@ public class PrivateMines extends JavaPlugin {
 
             loadMenus();
             loadMines();
-            startAutoReset();
+//            startAutoReset();
             PaperLib.suggestPaper(this);
 
             if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
@@ -281,8 +281,8 @@ public class PrivateMines extends JavaPlugin {
                             .build();
                     mine.setMineData(mineData);
                     getMineStorage().addMine(owner, mine);
-                    mine.startResetTask();
-                    mine.startPercentageTask();
+//                    mine.startResetTask();
+//                    mine.startPercentageTask();
 
                     getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
                 });
