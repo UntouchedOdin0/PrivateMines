@@ -11,6 +11,7 @@ wallsGap: 1
 giveMineOnFirstJoin: true
 onlyReplaceAir: true
 borderUpgrade: true
+shouldWallsGoUp: false
 locale: en_US
 
 mineTypes:

@@ -409,9 +409,9 @@ public class Mine {
             if (fillType == null || wallType == null) return;
 
             mine.expand(ExpansionUtils.expansionVectors(1));
-            walls.expand(ExpansionUtils.expansionVectors(1));
-            walls.expand(BlockVector3.UNIT_X, BlockVector3.UNIT_Y, BlockVector3.UNIT_Z, BlockVector3.UNIT_MINUS_X, BlockVector3.UNIT_MINUS_Y, BlockVector3.UNIT_MINUS_Z);
+            walls.expand(ExpansionUtils.expansionVectors2(2));
             fillAir.expand(BlockVector3.UNIT_X, BlockVector3.UNIT_Y, BlockVector3.UNIT_Z, BlockVector3.UNIT_MINUS_X, BlockVector3.UNIT_MINUS_Z);
+
             Map<Material, Double> materials = mineData.getMineType().getMaterials();
             final RandomPattern randomPattern = new RandomPattern();
             if (materials != null) {
@@ -429,6 +429,7 @@ public class Mine {
                 editSession.setBlocks(walls, BukkitAdapter.adapt(Material.BEDROCK.createBlockData()));
                 editSession.setBlocks(fillAir, BukkitAdapter.adapt(Material.AIR.createBlockData()));
             }
+
 
             mineData.setMinimumMining(BukkitAdapter.adapt(world, mine.getMinimumPoint()));
             mineData.setMaximumMining(BukkitAdapter.adapt(world, mine.getMaximumPoint()));

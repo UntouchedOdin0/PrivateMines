@@ -55,6 +55,8 @@ public class Config {
     public static boolean onlyReplaceAir = true;
     @Comment("Should we upgrade the mine upon reaching the outside border?")
     public static boolean borderUpgrade = true;
+    @Comment("Does the walls go up by one?")
+    public static boolean shouldWallsGoUp = false;
     @Comment("Which locale should we use?")
     public static String locale = "en_US";
 }
