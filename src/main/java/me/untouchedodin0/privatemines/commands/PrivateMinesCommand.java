@@ -19,6 +19,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.Messages;
+import redempt.redlib.inventorygui.InventoryGUI;
+import redempt.redlib.inventorygui.ItemButton;
+import redempt.redlib.itemutils.ItemBuilder;
 
 import java.util.*;
 
@@ -33,7 +36,7 @@ public class PrivateMinesCommand {
     public void main(CommandSender sender) {
         if (sender instanceof Player player) {
             Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
-            player.sendMessage("" + mainMenu);
+            mainMenu.open(player);
 //            MainMenu mainMenu = new MainMenu(mineStorage);
 //            mainMenu.openMainMenu(player);
         }
