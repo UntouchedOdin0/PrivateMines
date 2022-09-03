@@ -45,8 +45,10 @@ import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import de.themoep.minedown.MineDown;
 import me.untouchedodin0.privatemines.PrivateMines;
 import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -228,5 +230,13 @@ public class Utils {
 
     public static int rowsToSlots(int rows) {
         return rows * 9;
+    }
+
+    public static BaseComponent[] colorComponent(String string) {
+        return new MineDown(string).toComponent();
+    }
+
+    public static String color(String string) {
+        return BaseComponent.toLegacyText(colorComponent(string));
     }
 }

@@ -82,7 +82,6 @@ public class PrivateMines extends JavaPlugin {
     private SlimeUtils slimeUtils;
     private static Economy econ = null;
     private SQLite sqlite;
-
     public static PrivateMines getPrivateMines() {
         return privateMines;
     }
@@ -210,20 +209,9 @@ public class PrivateMines extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        getLogger().info("Shutting down translation service...");
-        getLogger().info("Translation service shut down.");
         getLogger().info(String.format("%s v%s has successfully been Disabled",
                                        getDescription().getName(),
                                        getDescription().getVersion()));
-        Path directory = getMinesDirectory();
-        File directoryFile = directory.toFile();
-
-//        mineStorage.getMines().forEach((uuid, mine) -> {
-//            MineData mineData = mine.getMineData();
-//            getLogger().info("Saving mine: " + mine);
-//            UUID owner = mineData.getMineOwner();
-//            mine.saveMineData(owner, mineData);
-//        });
     }
 
     public void setupSchematicUtils() {

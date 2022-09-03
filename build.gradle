@@ -24,6 +24,7 @@ repositories {
     maven { url = 'https://jitpack.io' }
     maven { url = 'https://libraries.minecraft.net/' }
     maven { url = 'https://repo.convallyria.com/releases' }
+    maven { url = 'https://repo.minebench.de/' }
 }
 
 dependencies {
@@ -42,6 +43,8 @@ dependencies {
     compileOnly("net.dv8tion:JDA:5.0.0-alpha.12") {
         exclude module: 'opus-java'
     }
+    compileOnly 'net.kyori:adventure-text-minimessage:4.11.0'
+
 
     compileOnly files('libs/UltraPrisonCore-1.12.0-RELEASE.jar')
     compileOnly files('libs/AutoSellAPI-1.2.0.jar')
@@ -54,7 +57,7 @@ dependencies {
     implementation 'com.flowpowered:flow-math:1.0.3'
     implementation 'io.papermc:paperlib:1.0.7'
     implementation 'com.github.unldenis:Hologram-Lib:master-SNAPSHOT'
-    implementation "net.kyori:adventure-text-minimessage:4.11.0"
+    implementation 'de.themoep:minedown:1.7.1-SNAPSHOT'
 //    implementation 'com.github.UntouchedOdin0:OdinLib:0.0.1'
     implementation 'com.github.UntouchedOdin0:OdinLib:master-SNAPSHOT'
 
@@ -67,6 +70,7 @@ shadowJar {
     relocate 'org.codemc.worldguardwrapper', 'me.untouchedodin0.privatemines.worldguardwrapper'
     relocate 'com.google.gson', 'me.untouchedodin0.privatemines.gson'
     relocate "io.papermc.lib", "me.untouchedodin0.privatemines.paperlib"
+    relocate 'de.themoep.minedown', 'me.untouchedodin0.privatemines.minedown'
 }
 
 task copyTo_DevServerOld(type: Copy) {

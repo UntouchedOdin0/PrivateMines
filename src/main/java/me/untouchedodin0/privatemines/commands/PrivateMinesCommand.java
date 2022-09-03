@@ -9,7 +9,6 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
-import me.untouchedodin0.privatemines.utils.inventory.MainMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -19,11 +18,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.Messages;
-import redempt.redlib.inventorygui.InventoryGUI;
-import redempt.redlib.inventorygui.ItemButton;
-import redempt.redlib.itemutils.ItemBuilder;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @SuppressWarnings("unused")
 public class PrivateMinesCommand {
@@ -37,8 +35,6 @@ public class PrivateMinesCommand {
         if (sender instanceof Player player) {
             Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
             mainMenu.open(player);
-//            MainMenu mainMenu = new MainMenu(mineStorage);
-//            mainMenu.openMainMenu(player);
         }
     }
 
