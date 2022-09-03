@@ -25,7 +25,6 @@ class Menu {
         val inventoryGUI = InventoryGUI(9, Utils.color(title))
 
         items.forEach {
-            it.value.itemName
             val material = it.value.material
             val slot = it.value.slot
             val name = it.value.name
