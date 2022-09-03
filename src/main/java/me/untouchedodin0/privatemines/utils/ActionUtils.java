@@ -15,6 +15,8 @@ public class ActionUtils {
             switch (action.toLowerCase()) {
                 case "reset" -> mine.reset();
                 case "teleport" -> mine.teleport(player);
+                case "expand" -> mine.expand();
+                case "upgrade" -> mine.upgrade();
             }
         }
     }
