@@ -239,4 +239,8 @@ public class Utils {
     public static String color(String string) {
         return BaseComponent.toLegacyText(colorComponent(string));
     }
+
+    public static String colorBukkit(String string) {
+        return ChatColor.translateAlternateColorCodes('&', string);
+    }
 }

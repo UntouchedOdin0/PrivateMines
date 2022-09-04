@@ -41,6 +41,7 @@ privatemine,privatemines,pmine,pmines {
     visit player:target {
         hook visit
         help Teleport to another player's mine
+        permission privatmeines.visit
     }
 
      setblocks player:target materials[]:material {

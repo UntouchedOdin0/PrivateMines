@@ -17,12 +17,11 @@ class Menu {
     val name: String? = null
     private val title: String? = null
     val rows: Int = 1
-
     var items: Map<String, MenuItem> = LinkedHashMap()
 
     fun open(player: Player) {
-
-        val inventoryGUI = InventoryGUI(9, Utils.color(title))
+        val slots = rows * 9
+        val inventoryGUI = InventoryGUI(slots, Utils.colorBukkit(title))
 
         items.forEach {
             val material = it.value.material
@@ -37,7 +36,7 @@ class Menu {
             ) { event: InventoryClickEvent? ->
                 run {
                     event?.isCancelled = true
-                    ActionUtils.handleAction(player, action)
+                    ActionUtils.handleClick(player, action)
                 }
             }
             if (slot != null) {
