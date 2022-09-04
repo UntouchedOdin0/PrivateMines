@@ -58,11 +58,7 @@ dependencies {
     implementation 'io.papermc:paperlib:1.0.7'
     implementation 'com.github.unldenis:Hologram-Lib:master-SNAPSHOT'
     implementation 'de.themoep:minedown:1.7.1-SNAPSHOT'
-//    implementation 'com.github.UntouchedOdin0:OdinLib:0.0.1'
     implementation 'com.github.UntouchedOdin0:OdinLib:master-SNAPSHOT'
-
-
-//    implementation 'com.github.UntouchedOdin0:TokensPlugin:master-SNAPSHOT'
 }
 
 shadowJar {
