@@ -1,18 +1,18 @@
 /**
  * MIT License
- *
+ * <p>
  * Copyright (c) 2021 - 2022 Kyle Hicks
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -62,12 +62,10 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class Utils {
-    private final PrivateMines privateMines;
     public static final String TABLE_NAME = "privatemines";
     public static final Pattern pastePattern = Pattern.compile("[a-z]{10}");
 
     public Utils(PrivateMines privateMines) {
-        this.privateMines = privateMines;
     }
 
     public static Location getRelative(Region region, int x, int y, int z) {
@@ -155,7 +153,7 @@ public class Utils {
     /**
      * Utility method to set a flag.
      * <p>
-     * Borrowed from https://github.com/EngineHub/WorldGuard/blob/bc63119373d4603e5b040460c41e712275a4d062/worldguard-core/src/main/java/com/sk89q/worldguard/commands/region/RegionCommandsBase.java#L414-L427
+     * Borrowed from <a href="https://github.com/EngineHub/WorldGuard/blob/bc63119373d4603e5b040460c41e712275a4d062/worldguard-core/src/main/java/com/sk89q/worldguard/commands/region/RegionCommandsBase.java#L414-L427">...</a>
      *
      * @param region the region
      * @param flag   the flag

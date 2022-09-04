@@ -156,4 +156,11 @@ public class PrivateMinesCommand {
             privateMines.getLogger().info("map: " + map);
         }
     }
+
+    @CommandHook("reload")
+    public void reload(Player player) {
+        privateMines.getConfigManager().reload();
+        privateMines.getConfigManager().load();
+        player.sendMessage("reload test");
+    }
 }

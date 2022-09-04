@@ -49,4 +49,8 @@ privatemine,privatemines,pmine,pmines {
         help Sets the blocks in the mine
         permission privatemines.setblocks
     }
+
+    reload {
+        hook reload
+    }
 }
