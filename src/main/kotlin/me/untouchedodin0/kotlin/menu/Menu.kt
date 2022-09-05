@@ -35,7 +35,10 @@ class Menu {
             mineStorage.mines.forEach { (uuid, mine) ->
                 run {
                     val name = Bukkit.getOfflinePlayer(uuid).name + "'s Mine"
-                    val itemButton = ItemButton.create(ItemBuilder(Material.BEACON).setName(name).addLore(ChatColor.GRAY.toString() + "Click to teleport")
+                    val tax = mine.mineData.tax
+                    val itemButton = ItemButton.create(ItemBuilder(Material.BEACON).setName(name)
+                        .addLore(ChatColor.GRAY.toString() + "Click to teleport")
+                        .addLore(ChatColor.GRAY.toString() + "Tax $tax%")
                     ) { event: InventoryClickEvent? ->
                         run {
                             event?.isCancelled = true

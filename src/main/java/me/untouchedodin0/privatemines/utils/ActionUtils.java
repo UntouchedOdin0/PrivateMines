@@ -18,7 +18,7 @@ public class ActionUtils {
 
         if (mine != null && actionType != null) {
             switch (actionType) {
-                case RESET -> mine.reset();
+                case RESET -> mine.resetNoCheck();
                 case RESET_TELEPORT -> {
                     mine.reset();
                     mine.teleport(player);
@@ -28,9 +28,7 @@ public class ActionUtils {
                     player.closeInventory();
                     ownMine.open(player);
                 }
-                case PUBLICMINES -> {
-                    publicMines.open(player);
-                }
+                case PUBLICMINES -> publicMines.open(player);
             }
         }
     }

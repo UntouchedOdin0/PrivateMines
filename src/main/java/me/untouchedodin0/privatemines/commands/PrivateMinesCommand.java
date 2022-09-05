@@ -3,6 +3,7 @@ package me.untouchedodin0.privatemines.commands;
 import me.untouchedodin0.kotlin.menu.Menu;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.kotlin.utils.AudienceUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
@@ -10,6 +11,10 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,6 +40,12 @@ public class PrivateMinesCommand {
         if (sender instanceof Player player) {
             Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
             mainMenu.open(player);
+            MiniMessage miniMessage = MiniMessage.miniMessage();
+            BukkitAudiences audiences = privateMines.getAdventure();
+            Component parsed = miniMessage.deserialize("Hello <rainbow>world</rainbow>, isn't <underlined>MiniMessage</underlined> fun?");
+            Audience audience = audiences.player(player);
+            AudienceUtils audienceUtils = new AudienceUtils();
+            audienceUtils.sendMessage(player, "Hello <rainbow>world</rainbow>, isn't <underlined>MiniMessage</underlined> fun?");
         }
     }
 
@@ -155,6 +166,12 @@ public class PrivateMinesCommand {
 
             privateMines.getLogger().info("map: " + map);
         }
+    }
+
+    @CommandHook("tax")
+    public void tax(Player player, double tax) {
+        player.sendMessage("" + player);
+        player.sendMessage(Double.toString(tax));
     }
 
     @CommandHook("reload")

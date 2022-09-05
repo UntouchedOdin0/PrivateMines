@@ -59,6 +59,7 @@ dependencies {
     implementation 'com.github.unldenis:Hologram-Lib:master-SNAPSHOT'
     implementation 'de.themoep:minedown:1.7.1-SNAPSHOT'
     implementation 'com.github.UntouchedOdin0:OdinLib:master-SNAPSHOT'
+    implementation "net.kyori:adventure-platform-bukkit:4.1.1"
 }
 
 shadowJar {

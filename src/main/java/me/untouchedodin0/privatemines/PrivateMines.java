@@ -6,6 +6,7 @@ import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MenuConfig;
+import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
@@ -23,6 +24,7 @@ import me.untouchedodin0.privatemines.utils.metrics.Metrics;
 import me.untouchedodin0.privatemines.utils.metrics.Metrics.SingleLineChart;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -82,6 +84,8 @@ public class PrivateMines extends JavaPlugin {
     private SlimeUtils slimeUtils;
     private static Economy econ = null;
     private SQLite sqlite;
+    private BukkitAudiences adventure;
+
     public static PrivateMines getPrivateMines() {
         return privateMines;
     }
@@ -100,6 +104,7 @@ public class PrivateMines extends JavaPlugin {
             mineStorage = new MineStorage();
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
+            this.adventure = BukkitAudiences.create(this);
 
             new CommandParser(getResource("commands.rdcml"))
                     .setArgTypes(
@@ -131,6 +136,11 @@ public class PrivateMines extends JavaPlugin {
             ConfigManager menuConfig = ConfigManager.create(this, "menus.yml")
                     .addConverter(Material.class, Material::valueOf, Material::toString)
                     .target(MenuConfig.class)
+                    .load();
+            //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
+            ConfigManager messagesConfig = ConfigManager.create(this, "messages.yml")
+                    .target(MessagesConfig.class)
+                    .saveDefaults()
                     .load();
 
             this.Y_LEVEL = Config.mineYLevel;
@@ -183,7 +193,7 @@ public class PrivateMines extends JavaPlugin {
                 throw new RuntimeException(e);
             }
 
-            loadMenus();
+//            loadMenus();
             loadMines();
 //            startAutoReset();
             PaperLib.suggestPaper(this);
@@ -209,6 +219,12 @@ public class PrivateMines extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        getLogger().info(String.format("Disabling adventure for %s", getDescription().getName()));
+        if (this.adventure != null) {
+            adventure.close();
+            this.adventure = null;
+        }
+        getLogger().info(String.format("Disabled adventure for %s", getDescription().getName()));
         getLogger().info(String.format("%s v%s has successfully been Disabled",
                                        getDescription().getName(),
                                        getDescription().getVersion()));
@@ -384,5 +400,12 @@ public class PrivateMines extends JavaPlugin {
             return;
         }
         getLogger().info("Using the internal sell system!");
+    }
+
+    public BukkitAudiences getAdventure() {
+        if (this.adventure == null) {
+            throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
+        }
+        return adventure;
     }
 }

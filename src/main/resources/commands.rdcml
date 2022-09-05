@@ -38,6 +38,13 @@ privatemine,privatemines,pmine,pmines {
         user player
     }
 
+    tax double:tax {
+        hook tax
+        help Set tax amount for your mine
+        permission privatemines.tax
+        user player
+    }
+
     visit player:target {
         hook visit
         help Teleport to another player's mine
