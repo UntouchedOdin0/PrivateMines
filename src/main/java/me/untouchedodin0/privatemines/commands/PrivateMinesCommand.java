@@ -10,6 +10,7 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
+import me.untouchedodin0.privatemines.utils.inventory.PublicMinesMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -23,6 +24,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.Messages;
+import redempt.redlib.inventorygui.InventoryGUI;
+import redempt.redlib.inventorygui.ItemButton;
+import redempt.redlib.inventorygui.PaginationPanel;
+import redempt.redlib.itemutils.ItemBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -174,6 +179,13 @@ public class PrivateMinesCommand {
         player.sendMessage(Double.toString(tax));
     }
 
+    @CommandHook("debug")
+    public void debug(Player player) {
+
+        PublicMinesMenu menu = new PublicMinesMenu();
+        menu.open(player);
+        player.sendMessage("debug.");
+    }
     @CommandHook("reload")
     public void reload(Player player) {
         privateMines.getConfigManager().reload();
