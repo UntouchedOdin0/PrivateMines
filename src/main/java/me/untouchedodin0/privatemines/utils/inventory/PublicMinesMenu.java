@@ -40,13 +40,14 @@ public class PublicMinesMenu {
 
         ItemButton previousPage = ItemButton.create(new ItemBuilder(Material.PAPER).setName("Previous Page"), event -> {
             paginationPanel.prevPage();
-            player.sendMessage("previous page ");
+            player.sendMessage("prev page ");
+            player.sendMessage("" + paginationPanel.getPage());
         });
 
         ItemButton nextPage = ItemButton.create(new ItemBuilder(Material.PAPER).setName("Next Page"), event -> {
             paginationPanel.nextPage();
             player.sendMessage("next page ");
-            player.sendMessage("" + currentPage);
+            player.sendMessage("" + paginationPanel.getPage());
         });
 
         ItemButton pageNumber = ItemButton.create(new ItemBuilder(Material.PAPER).setName("Current Page: " + currentPage), event -> event.setCancelled(true));
