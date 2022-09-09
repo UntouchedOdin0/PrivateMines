@@ -13,6 +13,7 @@ onlyReplaceAir: true
 borderUpgrade: true
 shouldWallsGoUp: false
 locale: en_US
+useAdventure: true
 
 mineTypes:
   Test:

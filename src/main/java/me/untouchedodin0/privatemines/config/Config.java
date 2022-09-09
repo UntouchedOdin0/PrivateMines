@@ -59,4 +59,6 @@ public class Config {
     public static boolean shouldWallsGoUp = false;
     @Comment("Which locale should we use?")
     public static String locale = "en_US";
+    @Comment("Should we support adventure?")
+    public static boolean useAdventure = true;
 }

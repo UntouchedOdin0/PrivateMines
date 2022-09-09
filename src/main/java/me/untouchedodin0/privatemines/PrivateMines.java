@@ -104,7 +104,10 @@ public class PrivateMines extends JavaPlugin {
             mineStorage = new MineStorage();
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
-            this.adventure = BukkitAudiences.create(this);
+            if (Config.useAdventure) {
+                getLogger().info("Loading adventure hook...");
+                this.adventure = BukkitAudiences.create(this);
+            }
 
             new CommandParser(getResource("commands.rdcml"))
                     .setArgTypes(
