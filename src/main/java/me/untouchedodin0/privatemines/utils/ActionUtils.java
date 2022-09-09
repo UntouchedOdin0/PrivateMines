@@ -29,6 +29,7 @@ public class ActionUtils {
                     ownMine.open(player);
                 }
                 case PUBLICMINES -> publicMines.open(player);
+                case EXPAND -> mine.expand();
             }
         }
     }
