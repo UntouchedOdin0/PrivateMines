@@ -3,7 +3,6 @@ package me.untouchedodin0.privatemines.commands;
 import me.untouchedodin0.kotlin.menu.Menu;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
-import me.untouchedodin0.kotlin.utils.AudienceUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
@@ -12,10 +11,6 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.inventory.PublicMinesMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,10 +19,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.Messages;
-import redempt.redlib.inventorygui.InventoryGUI;
-import redempt.redlib.inventorygui.ItemButton;
-import redempt.redlib.inventorygui.PaginationPanel;
-import redempt.redlib.itemutils.ItemBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,12 +36,6 @@ public class PrivateMinesCommand {
         if (sender instanceof Player player) {
             Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
             mainMenu.open(player);
-            MiniMessage miniMessage = MiniMessage.miniMessage();
-            BukkitAudiences audiences = privateMines.getAdventure();
-            Component parsed = miniMessage.deserialize("Hello <rainbow>world</rainbow>, isn't <underlined>MiniMessage</underlined> fun?");
-            Audience audience = audiences.player(player);
-            AudienceUtils audienceUtils = new AudienceUtils();
-            audienceUtils.sendMessage(player, "Hello <rainbow>world</rainbow>, isn't <underlined>MiniMessage</underlined> fun?");
         }
     }
 
@@ -181,7 +166,6 @@ public class PrivateMinesCommand {
 
     @CommandHook("debug")
     public void debug(Player player) {
-
         PublicMinesMenu menu = new PublicMinesMenu();
         menu.open(player);
         player.sendMessage("debug.");

@@ -2,53 +2,42 @@
 
 menus:
   mainMenu:
-    title: Hi 12
-    rows: 2
+    title: Private Mines
+    rows: 1
     items:
-      TestItem:
-        material: CHEST
-        slot: 0
-        name: "[Reset your Mine](rainbow)"
-        lore:
-          - Lore line 1
-          - Lore line 2
-        action: resetteleport
-      TestItem2:
-        material: DIRT
-        slot: 1
-        name: "[Teleport to your Mine](rainbow)"
-        lore:
-          - Lore line 1
-          - Lore line 2
-        action: teleport
       TestItem3:
         material: DIRT
-        slot: 2
+        slot: 3
         name: "[Own Mine](rainbow)"
         lore:
-          - Lore line 1
-          - Lore line 2
+          - Click to open
+          - Your Mine
         action: ownmine
       TestItem4:
         material: DIRT
-        slot: 3
+        slot: 5
         name: "[Public Mines](rainbow)"
         lore:
-          - Click to list public mines!
+          - "&7Click to list public mines!"
         action: publicmines
   personalMenu:
     title: Personal Mine
     rows: 3
     items:
-      TestItem:
+      ResetMine:
         material: CHEST
         slot: 0
-        name: "[Reset your own Mine test test](rainbow)"
+        name: "[Reset your own Mine](rainbow)"
         lore:
-          - Lore line 1
-          - Lore line 2
-          - this is a lore test
+          - &7Click to reset your mine
         action: reset
+      TeleportToMine:
+        material: CHEST
+        slot: 1
+        name: "[Teleport](rainbow)"
+        lore:
+          - &7Click to teleport to your mine
+        action: teleport
   publicMines:
     title: Public Mines
     rows: 3

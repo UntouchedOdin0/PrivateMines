@@ -50,16 +50,18 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Utils {
     public static final String TABLE_NAME = "privatemines";
@@ -238,7 +240,17 @@ public class Utils {
         return BaseComponent.toLegacyText(colorComponent(string));
     }
 
+    public static List<String> color(List<String> list) {
+        List<String> stringList = new ArrayList<>();
+        list.forEach(string -> stringList.add(color(string)));
+        return stringList;
+    }
+
     public static String colorBukkit(String string) {
         return ChatColor.translateAlternateColorCodes('&', string);
+    }
+
+    public static String format(Material material) {
+        return WordUtils.capitalize(material.name().toLowerCase().replaceAll("_", " "));
     }
 }
