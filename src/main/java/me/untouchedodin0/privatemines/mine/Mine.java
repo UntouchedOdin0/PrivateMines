@@ -542,7 +542,6 @@ public class Mine {
         List<UUID> bannedPlayers = mineData.getBannedPlayers();
         List<String> test = new ArrayList<>();
 
-        bannedPlayers.forEach(uuid -> test.add(uuid.toString()));
         Map<Material, Double> materials = mineData.getMaterials();
 
         if (!file.exists()) {
@@ -564,7 +563,7 @@ public class Mine {
             yml.set("spawn", LocationUtils.toString(spawn));
             yml.set("tax", tax);
             yml.set("isOpen", open);
-            yml.set("bannedPlayers", test);
+            yml.set("bannedPlayers", bannedPlayers);
             yml.set("materials", materials.toString());
 
             try {
@@ -577,7 +576,7 @@ public class Mine {
             yml.set("corner2", LocationUtils.toString(mineData.getMaximumMining()));
             yml.set("tax", tax);
             yml.set("isOpen", open);
-            yml.set("bannedPlayers", bannedPlayers.toString());
+            yml.set("bannedPlayers", bannedPlayers);
             yml.set("materials", materials.toString());
 
             try {

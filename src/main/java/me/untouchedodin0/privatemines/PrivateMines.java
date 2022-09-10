@@ -271,8 +271,6 @@ public class PrivateMines extends JavaPlugin {
                     Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
                     boolean isOpen = yml.getBoolean("isOpen");
                     double tax = yml.getDouble("tax");
-                    List<String> bannedPlayersString = yml.getStringList("bannedPlayers");
-                    List<UUID> bannedPlayers = new ArrayList<>();
 
                     MineData mineData = new MineDataBuilder()
                             .setOwner(owner)
