@@ -57,6 +57,24 @@ privatemine,privatemines,pmine,pmines {
         permission privatemines.setblocks
     }
 
+    //     upgrade player:target {
+           //        hook upgrade
+           //        help Upgrades your private mine
+           //        permission privatemines.upgrade
+           //    }
+
+    ban player:target {
+        hook ban
+        help Bans a player from your mine
+        permission privatemines.ban
+    }
+
+    unban player:target {
+        hook unban
+        help Unbans a player from your mine
+        permission privatemines.unban
+    }
+
     debug {
         hook debug
     }

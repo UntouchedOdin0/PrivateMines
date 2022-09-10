@@ -14,6 +14,7 @@ borderUpgrade: true
 shouldWallsGoUp: false
 locale: en_US
 useAdventure: true
+enableMenu: true
 
 mineTypes:
   Test:

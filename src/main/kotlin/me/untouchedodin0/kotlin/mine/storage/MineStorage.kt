@@ -48,8 +48,16 @@ class MineStorage {
         return mines.containsKey(uuid)
     }
 
+    fun hasMine(player: Player): Boolean {
+        return hasMine(player.uniqueId)
+    }
+
     operator fun get(uuid: UUID): Mine? {
         return mines[uuid]
+    }
+
+    operator fun get(player: Player): Mine? {
+        return get(player.uniqueId)
     }
 
     fun getTotalMines(): Int {

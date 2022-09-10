@@ -60,6 +60,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import redempt.redlib.itemutils.ItemBuilder;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
@@ -71,6 +72,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Mine {
     private final PrivateMines privateMines;
@@ -79,6 +81,7 @@ public class Mine {
     private boolean canExpand = true;
     private Task task;
     private Task percentageTask;
+    private AtomicInteger test = new AtomicInteger(0);
 
     public Mine(PrivateMines privateMines) {
         this.privateMines = privateMines;
@@ -334,7 +337,6 @@ public class Mine {
 
             if (percentage >= resetPercentage) {
                 reset();
-//                Bukkit.broadcastMessage(ChatColor.GREEN + Bukkit.getOfflinePlayer(mineData.getMineOwner()).getName() + "'s private mine has been reset!");
             }
         }, 0L, 20L);
     }
@@ -538,6 +540,9 @@ public class Mine {
         double tax = mineData.getTax();
         boolean open = mineData.isOpen();
         List<UUID> bannedPlayers = mineData.getBannedPlayers();
+        List<String> test = new ArrayList<>();
+
+        bannedPlayers.forEach(uuid -> test.add(uuid.toString()));
         Map<Material, Double> materials = mineData.getMaterials();
 
         if (!file.exists()) {
@@ -559,7 +564,7 @@ public class Mine {
             yml.set("spawn", LocationUtils.toString(spawn));
             yml.set("tax", tax);
             yml.set("isOpen", open);
-            yml.set("bannedPlayers", bannedPlayers.toString());
+            yml.set("bannedPlayers", test);
             yml.set("materials", materials.toString());
 
             try {
@@ -570,6 +575,10 @@ public class Mine {
         } else {
             yml.set("corner1", LocationUtils.toString(mineData.getMinimumMining()));
             yml.set("corner2", LocationUtils.toString(mineData.getMaximumMining()));
+            yml.set("tax", tax);
+            yml.set("isOpen", open);
+            yml.set("bannedPlayers", bannedPlayers.toString());
+            yml.set("materials", materials.toString());
 
             try {
                 yml.save(file);

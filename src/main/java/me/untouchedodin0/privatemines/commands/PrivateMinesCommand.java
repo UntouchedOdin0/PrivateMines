@@ -4,6 +4,7 @@ import me.untouchedodin0.kotlin.menu.Menu;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
@@ -23,6 +24,7 @@ import redempt.redlib.commandmanager.Messages;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public class PrivateMinesCommand {
@@ -34,8 +36,10 @@ public class PrivateMinesCommand {
     @CommandHook("main")
     public void main(CommandSender sender) {
         if (sender instanceof Player player) {
-            Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
-            mainMenu.open(player);
+            if (Config.enableMenu) {
+                Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
+                mainMenu.open(player);
+            }
         }
     }
 
@@ -69,10 +73,10 @@ public class PrivateMinesCommand {
     }
     @CommandHook("reset")
     public void reset(Player player) {
-        if (!mineStorage.hasMine(player.getUniqueId())) {
+        if (!mineStorage.hasMine(player)) {
             player.sendMessage(Messages.msg("youDontOwnAMine"));
         } else {
-            Mine mine = mineStorage.get(player.getUniqueId());
+            Mine mine = mineStorage.get(player);
             if (mine != null) {
                 mine.reset();
             }
@@ -82,11 +86,11 @@ public class PrivateMinesCommand {
 
     @CommandHook("upgrade")
     public void upgrade(CommandSender commandSender, Player player) {
-        if (!mineStorage.hasMine(player.getUniqueId())) {
+        if (!mineStorage.hasMine(player)) {
             commandSender.sendMessage(ChatColor.RED + "That player doesn't own a mine!");
             player.sendMessage(Messages.msg("youDontOwnAMine"));
         } else {
-            Mine mine = mineStorage.get(player.getUniqueId());
+            Mine mine = mineStorage.get(player);
             if (mine != null) {
                 mine.upgrade();
             }
@@ -95,10 +99,10 @@ public class PrivateMinesCommand {
 
     @CommandHook("expand")
     public void expand(CommandSender commandSender, Player target, int amount) {
-        if (!mineStorage.hasMine(target.getUniqueId())) {
+        if (!mineStorage.hasMine(target)) {
             commandSender.sendMessage(ChatColor.RED + "That player doesn't own a mine!");
         } else {
-            Mine mine = mineStorage.get(target.getUniqueId());
+            Mine mine = mineStorage.get(target);
             if (mine != null) {
                 if (mine.canExpand(amount)) {
                     for (int i = 0; i < amount; i++) {
@@ -138,7 +142,7 @@ public class PrivateMinesCommand {
 
     @CommandHook("setblocks")
     public void setBlocks(Player player, Player target, Material[] materials) {
-        Mine mine = mineStorage.get(target.getUniqueId());
+        Mine mine = mineStorage.get(target);
         MineData mineData;
         Map<Material, Double> map = new HashMap<>();
 
@@ -153,15 +157,56 @@ public class PrivateMinesCommand {
             mineData = mine.getMineData();
             mineData.setMaterials(map);
             mine.saveMineData(target, mineData);
-
-            privateMines.getLogger().info("map: " + map);
         }
     }
 
     @CommandHook("tax")
     public void tax(Player player, double tax) {
-        player.sendMessage("" + player);
-        player.sendMessage(Double.toString(tax));
+        Mine mine = mineStorage.get(player);
+        MineData mineData;
+        if (mine != null) {
+            mineData = mine.getMineData();
+            mineData.setTax(tax);
+            mine.setMineData(mineData);
+            mine.saveMineData(player, mineData);
+            player.sendMessage(ChatColor.GREEN + "Successfully set your tax to " + tax + "%");
+        }
+    }
+
+    @CommandHook("ban")
+    public void ban(Player player, Player target) {
+        Mine mine = mineStorage.get(player);
+        if (mine != null) {
+            MineData mineData = mine.getMineData();
+            UUID uuid = target.getUniqueId();
+
+            if (mineData.getBannedPlayers().contains(uuid)) {
+                player.sendMessage(ChatColor.RED + "Target is already banned!");
+            } else {
+                mineData.addBannedPlayer(uuid);
+                mine.setMineData(mineData);
+                mine.saveMineData(player, mineData);
+                player.sendMessage(ChatColor.GREEN + "Successfully banned " + target.getName());
+            }
+        }
+    }
+
+    @CommandHook("unban")
+    public void unban(Player player, Player target) {
+        Mine mine = mineStorage.get(player);
+        if (mine != null) {
+            MineData mineData = mine.getMineData();
+            UUID uuid = target.getUniqueId();
+
+            if (!mineData.getBannedPlayers().contains(uuid)) {
+                player.sendMessage(ChatColor.RED + "Target isn't banned!");
+            } else {
+                mineData.removeBannedPlayer(uuid);
+                mine.setMineData(mineData);
+                mine.saveMineData(player, mineData);
+                player.sendMessage(ChatColor.GREEN + "Successfully unbanned " + target.getName());
+            }
+        }
     }
 
     @CommandHook("debug")

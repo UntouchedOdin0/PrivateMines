@@ -61,4 +61,6 @@ public class Config {
     public static String locale = "en_US";
     @Comment("Should we support adventure?")
     public static boolean useAdventure = true;
+    @Comment("Should the menu be enabled?")
+    public static boolean enableMenu = true;
 }

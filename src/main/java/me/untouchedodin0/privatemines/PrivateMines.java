@@ -53,9 +53,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -273,6 +271,8 @@ public class PrivateMines extends JavaPlugin {
                     Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
                     boolean isOpen = yml.getBoolean("isOpen");
                     double tax = yml.getDouble("tax");
+                    List<String> bannedPlayersString = yml.getStringList("bannedPlayers");
+                    List<UUID> bannedPlayers = new ArrayList<>();
 
                     MineData mineData = new MineDataBuilder()
                             .setOwner(owner)
