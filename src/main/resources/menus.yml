@@ -12,7 +12,7 @@ menus:
     title: Private Mines
     rows: 1
     items:
-      TestItem3:
+      OwnMine:
         material: DIRT
         slot: 3
         name: "[Own Mine](rainbow)"
@@ -20,7 +20,7 @@ menus:
           - Click to open
           - Your Mine
         action: ownmine
-      TestItem4:
+      PublicMines:
         material: DIRT
         slot: 5
         name: "[Public Mines](rainbow)"
