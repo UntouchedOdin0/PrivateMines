@@ -120,7 +120,10 @@ public class PrivateMines extends JavaPlugin {
                 e.printStackTrace();
             }
 
-            configManager = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(Config.class).load();
+            configManager = ConfigManager.create(this)
+                    .addConverter(Material.class, Material::valueOf, Material::toString)
+                    .target(Config.class)
+                    .load();
             //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
             ConfigManager mineConfig = ConfigManager.create(this)
                     .addConverter(Material.class, Material::valueOf, Material::toString)
