@@ -40,7 +40,6 @@ import redempt.redlib.config.ConfigManager;
 import redempt.redlib.inventorygui.InventoryGUI;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
-import redempt.redlib.sql.SQLHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,12 +47,11 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -102,10 +100,6 @@ public class PrivateMines extends JavaPlugin {
             mineStorage = new MineStorage();
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
-            if (Config.useAdventure) {
-                getLogger().info("Loading adventure hook...");
-                this.adventure = BukkitAudiences.create(this);
-            }
 
             new CommandParser(getResource("commands.rdcml"))
                     .setArgTypes(
@@ -144,6 +138,11 @@ public class PrivateMines extends JavaPlugin {
                     .saveDefaults()
                     .load();
 
+            if (Config.useAdventure) {
+                getLogger().info("Loading adventure hook...");
+                this.adventure = BukkitAudiences.create(this);
+            }
+
             this.Y_LEVEL = Config.mineYLevel;
             this.MINE_DISTANCE = Config.mineDistance;
 
@@ -162,41 +161,7 @@ public class PrivateMines extends JavaPlugin {
             sqlite = new SQLite();
             sqlite.load();
 
-            Connection connection = sqlite.getSQLConnection();
-
-            try {
-                PreparedStatement preparedStatement = connection.prepareStatement("INSERT or IGNORE into privatemines (mineOwner, mineType, mineLocation," +
-                                                                                          " corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen)" +
-                                                                                          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
-                preparedStatement.setString(1, "test");
-                preparedStatement.setString(2, "test");
-                preparedStatement.setString(3, "test");
-                preparedStatement.setString(4, "test");
-                preparedStatement.setString(5, "test");
-                preparedStatement.setString(6, "test");
-                preparedStatement.setString(7, "test");
-                preparedStatement.setString(8, "test");
-                preparedStatement.setString(9, "test");
-                preparedStatement.setString(10, "test");
-
-//                preparedStatement.setString(2, UUID.randomUUID().toString());
-//                preparedStatement.setString(3, UUID.randomUUID().toString());
-//                preparedStatement.setString(4, UUID.randomUUID().toString());
-//                preparedStatement.setString(5, UUID.randomUUID().toString());
-//                preparedStatement.setString(6, UUID.randomUUID().toString());
-//                preparedStatement.setString(7, UUID.randomUUID().toString());
-//                preparedStatement.setString(8, UUID.randomUUID().toString());
-//                preparedStatement.setDouble(9, 5.0);
-//                preparedStatement.setBoolean(10, true);
-                preparedStatement.executeUpdate();
-                SQLHelper sqlHelper = new SQLHelper(connection);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-
-//            loadMenus();
             loadMines();
-//            startAutoReset();
             PaperLib.suggestPaper(this);
 
             if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
