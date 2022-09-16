@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'me.untouchedodin0.privatemines'
-version '4.1.5-SNAPSHOT'
+version '4.1.6-SNAPSHOT'
 
 repositories {
     mavenLocal()
@@ -58,7 +58,7 @@ dependencies {
     implementation 'com.github.unldenis:Hologram-Lib:master-SNAPSHOT'
     implementation 'de.themoep:minedown:1.7.1-SNAPSHOT'
     implementation 'com.github.UntouchedOdin0:OdinLib:master-SNAPSHOT'
-    implementation 'net.kyori:adventure-text-minimessage:4.2.0-SNAPSHOT'
+    implementation 'net.kyori:adventure-text-minimessage:4.11.0'
     implementation 'net.kyori:adventure-platform-bukkit:4.1.2'
     implementation 'org.bstats:bstats-bukkit:3.0.0'
 }

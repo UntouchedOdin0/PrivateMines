@@ -414,7 +414,12 @@ public class Mine {
 
             mine.expand(ExpansionUtils.expansionVectors(1));
             walls.expand(ExpansionUtils.expansionVectors(1));
-            walls.expand(BlockVector3.UNIT_X, BlockVector3.UNIT_Y, BlockVector3.UNIT_Z, BlockVector3.UNIT_MINUS_X, BlockVector3.UNIT_MINUS_Y, BlockVector3.UNIT_MINUS_Z);
+
+            if (Config.shouldWallsGoUp) {
+                walls.expand(BlockVector3.UNIT_X, BlockVector3.UNIT_Y, BlockVector3.UNIT_Z, BlockVector3.UNIT_MINUS_X, BlockVector3.UNIT_MINUS_Y, BlockVector3.UNIT_MINUS_Z);
+            } else {
+                walls.expand(BlockVector3.UNIT_X, BlockVector3.UNIT_Z, BlockVector3.UNIT_MINUS_X, BlockVector3.UNIT_MINUS_Y, BlockVector3.UNIT_MINUS_Z);
+            }
             fillAir.expand(BlockVector3.UNIT_X, BlockVector3.UNIT_Y, BlockVector3.UNIT_Z, BlockVector3.UNIT_MINUS_X, BlockVector3.UNIT_MINUS_Z);
             Map<Material, Double> materials = mineData.getMineType().getMaterials();
             final RandomPattern randomPattern = new RandomPattern();
