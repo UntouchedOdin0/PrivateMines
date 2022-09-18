@@ -59,6 +59,7 @@ public class PrivateMinesCommand {
             }
         }
     }
+
     @CommandHook("delete")
     public void delete(CommandSender commandSender, OfflinePlayer target) {
         if (!mineStorage.hasMine(target.getUniqueId())) {
@@ -71,6 +72,7 @@ public class PrivateMinesCommand {
             }
         }
     }
+
     @CommandHook("reset")
     public void reset(Player player) {
         if (!mineStorage.hasMine(player)) {
@@ -127,6 +129,7 @@ public class PrivateMinesCommand {
             }
         }
     }
+
     @CommandHook("visit")
     public void visit(Player player, OfflinePlayer target) {
         if (!mineStorage.hasMine(target.getUniqueId())) {
@@ -146,17 +149,20 @@ public class PrivateMinesCommand {
         MineData mineData;
         Map<Material, Double> map = new HashMap<>();
 
+        player.sendMessage("" + mine);
         if (mine != null) {
-
             for (Material material : materials) {
-                if (material.isSolid()) {
-                    map.put(material, 1.0);
-                }
+                map.put(material, 1.0);
             }
+
+            player.sendMessage("map: " + map);
 
             mineData = mine.getMineData();
             mineData.setMaterials(map);
+            mine.setMineData(mineData);
             mine.saveMineData(target, mineData);
+            mineStorage.replaceMine(target.getUniqueId(), mine);
+            mine.reset();
         }
     }
 
@@ -215,6 +221,7 @@ public class PrivateMinesCommand {
         menu.open(player);
         player.sendMessage("debug.");
     }
+
     @CommandHook("reload")
     public void reload(Player player) {
         privateMines.getConfigManager().reload();

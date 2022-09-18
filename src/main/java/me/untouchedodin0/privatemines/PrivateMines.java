@@ -4,10 +4,7 @@ import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
-import me.untouchedodin0.privatemines.config.Config;
-import me.untouchedodin0.privatemines.config.MenuConfig;
-import me.untouchedodin0.privatemines.config.MessagesConfig;
-import me.untouchedodin0.privatemines.config.MineConfig;
+import me.untouchedodin0.privatemines.config.*;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.listener.PlayerJoinListener;
@@ -31,6 +28,7 @@ import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -51,10 +49,10 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
@@ -109,7 +107,7 @@ public class PrivateMines extends JavaPlugin {
                             ArgType.of("mineType", mineTypeManager.getMineTypes()))
                     .parse()
                     .register("privatemines",
-                              new PrivateMinesCommand());
+                            new PrivateMinesCommand());
 
             registerSellListener();
             setupSchematicUtils();
@@ -197,8 +195,8 @@ public class PrivateMines extends JavaPlugin {
         }
         getLogger().info(String.format("Disabled adventure for %s", getDescription().getName()));
         getLogger().info(String.format("%s v%s has successfully been Disabled",
-                                       getDescription().getName(),
-                                       getDescription().getVersion()));
+                getDescription().getName(),
+                getDescription().getVersion()));
     }
 
     public void setupSchematicUtils() {
@@ -222,14 +220,25 @@ public class PrivateMines extends JavaPlugin {
         final PathMatcher jsonMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
         Path path = getMinesDirectory();
 
+        Bukkit.getLogger().info("TEST 1");
+
         CompletableFuture.runAsync(() -> {
+            Bukkit.getLogger().info("TEST 1 2");
+
             try (Stream<Path> paths = Files.walk(path).filter(jsonMatcher::matches)) {
+                Bukkit.getLogger().info("TEST 1 2 3");
                 paths.forEach(streamPath -> {
+                    Bukkit.getLogger().info("TEST 1 2 3 4");
                     File file = streamPath.toFile();
                     Mine mine = new Mine(privateMines);
+
+                    Bukkit.getLogger().info("file " + file);
+                    getLogger().info("mine: " + mine);
+
                     getLogger().info("Loading file " + file.getName() + "....");
                     YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
 
+                    Bukkit.getLogger().info("TEST 1 2 3 4 5");
                     UUID owner = UUID.fromString(Objects.requireNonNull(yml.getString("mineOwner")));
                     String mineTypeName = yml.getString("mineType");
                     MineType mineType = mineTypeManager.getMineType(mineTypeName);
@@ -241,6 +250,53 @@ public class PrivateMines extends JavaPlugin {
                     Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
                     boolean isOpen = yml.getBoolean("isOpen");
                     double tax = yml.getDouble("tax");
+                    Map<Material, Double> materials = new HashMap<>();
+
+                    String materialsString = yml.getString("materials");
+                    getLogger().info("materials string: " + materialsString);
+
+                    if (materialsString != null) {
+                        materialsString = materialsString.substring(1, materialsString.length() -1);
+
+                        String[] pairs = materialsString.split(",");
+                        getLogger().info("materials string: " + materialsString);
+                        getLogger().info("pairs: " + Arrays.toString(pairs));
+                        Pattern materialRegex = Pattern.compile("[a-zA-Z]+");
+                        Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
+
+                        for (String string : pairs) {
+                            Matcher materialMatcher = materialRegex.matcher(string);
+                            Matcher percentMatcher = percentRegex.matcher(string);
+
+                            String materialS;
+                            String percentS;
+
+                            if (materialMatcher.find()) {
+                                materialS = materialMatcher.group();
+                                getLogger().info("materialS: " + materialS);
+                            }
+                            if (percentMatcher.find()) {
+                                percentS = percentMatcher.group();
+                                getLogger().info("percentS: " + percentS);
+                            }
+                        }
+                    }
+
+                    List<Map<?, ?>> test2 = yml.getMapList("materials");
+                    getLogger().info("test2: " + test2);
+                    ConfigurationSection section = yml.getConfigurationSection("materials");
+
+                    if (section != null) {
+                        Map<String, Object> test = section.getValues(true);
+                        getLogger().info("test: " + test);
+                        test.forEach((string, object) -> {
+                            Material material = Material.valueOf(string);
+                            double percent = Double.parseDouble(object.toString());
+
+                            getLogger().info("material: " + material);
+                            getLogger().info("percent: " + percent);
+                        });
+                    }
 
                     MineData mineData = new MineDataBuilder()
                             .setOwner(owner)

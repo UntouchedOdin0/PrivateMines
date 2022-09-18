@@ -29,3 +29,5 @@ mineTypes:
       COBBLESTONE: 0.1
     flags:
       block-break: true
+    fullFlags:
+      block-place: false

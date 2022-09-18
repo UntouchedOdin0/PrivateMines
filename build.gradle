@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'me.untouchedodin0.privatemines'
-version '4.1.6-SNAPSHOT'
+version '4.1.7-SNAPSHOT'
 
 repositories {
     mavenLocal()

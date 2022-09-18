@@ -45,6 +45,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
@@ -104,6 +105,7 @@ public class MineFactory {
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
         Mine mine = new Mine(privateMines);
         Map<String, Boolean> flags = mineType.getFlags();
+        Map<String, Boolean> fullFlags = mineType.getFullFlags();
         Map<Material, Double> prices = new HashMap<>();
         Connection connection = privateMines.getSqlite().getSQLConnection();
 
@@ -217,9 +219,11 @@ public class MineFactory {
                          @see com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent
                          */
                         Task.syncDelayed(() -> {
+                            FlagRegistry flagRegistry = WorldGuard.getInstance().getFlagRegistry();
+
                             if (flags != null) {
                                 flags.forEach((s, aBoolean) -> {
-                                    Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), s);
+                                    Flag<?> flag = Flags.fuzzyMatchFlag(flagRegistry, s);
                                     if (aBoolean) {
                                         try {
                                             Utils.setFlag(miningWorldGuardRegion, flag, "allow");
@@ -231,6 +235,25 @@ public class MineFactory {
                                             Utils.setFlag(miningWorldGuardRegion, flag, "deny");
                                         } catch (InvalidFlagFormat e) {
                                             e.printStackTrace();
+                                        }
+                                    }
+                                });
+                            }
+                            if (fullFlags != null) {
+                                fullFlags.forEach((string, aBoolean) -> {
+                                    Flag<?> flag = Flags.fuzzyMatchFlag(flagRegistry, string);
+                                    privateMines.getLogger().info("full flag: " + flag);
+                                    if (aBoolean) {
+                                        try {
+                                            Utils.setFlag(fullWorldGuardRegion, flag, "allow");
+                                        } catch (InvalidFlagFormat e) {
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+                                        try {
+                                            Utils.setFlag(fullWorldGuardRegion, flag, "deny");
+                                        } catch (InvalidFlagFormat e) {
+                                            throw new RuntimeException(e);
                                         }
                                     }
                                 });
