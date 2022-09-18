@@ -4,7 +4,10 @@ import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
-import me.untouchedodin0.privatemines.config.*;
+import me.untouchedodin0.privatemines.config.Config;
+import me.untouchedodin0.privatemines.config.MenuConfig;
+import me.untouchedodin0.privatemines.config.MessagesConfig;
+import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.listener.PlayerJoinListener;
@@ -17,8 +20,6 @@ import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
-//import me.untouchedodin0.privatemines.utils.metrics.Metrics;
-//import me.untouchedodin0.privatemines.utils.metrics.Metrics.SingleLineChart;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -28,7 +29,6 @@ import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -81,6 +81,9 @@ public class PrivateMines extends JavaPlugin {
     private static Economy econ = null;
     private SQLite sqlite;
     private BukkitAudiences adventure;
+    String matString;
+    double percent;
+
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -219,26 +222,17 @@ public class PrivateMines extends JavaPlugin {
     public void loadMines() {
         final PathMatcher jsonMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
         Path path = getMinesDirectory();
-
-        Bukkit.getLogger().info("TEST 1");
+        Map<Material, Double> materialMap = new HashMap<>();
 
         CompletableFuture.runAsync(() -> {
-            Bukkit.getLogger().info("TEST 1 2");
-
             try (Stream<Path> paths = Files.walk(path).filter(jsonMatcher::matches)) {
-                Bukkit.getLogger().info("TEST 1 2 3");
                 paths.forEach(streamPath -> {
-                    Bukkit.getLogger().info("TEST 1 2 3 4");
                     File file = streamPath.toFile();
                     Mine mine = new Mine(privateMines);
-
-                    Bukkit.getLogger().info("file " + file);
-                    getLogger().info("mine: " + mine);
 
                     getLogger().info("Loading file " + file.getName() + "....");
                     YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
 
-                    Bukkit.getLogger().info("TEST 1 2 3 4 5");
                     UUID owner = UUID.fromString(Objects.requireNonNull(yml.getString("mineOwner")));
                     String mineTypeName = yml.getString("mineType");
                     MineType mineType = mineTypeManager.getMineType(mineTypeName);
@@ -250,53 +244,8 @@ public class PrivateMines extends JavaPlugin {
                     Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
                     boolean isOpen = yml.getBoolean("isOpen");
                     double tax = yml.getDouble("tax");
-                    Map<Material, Double> materials = new HashMap<>();
 
                     String materialsString = yml.getString("materials");
-                    getLogger().info("materials string: " + materialsString);
-
-                    if (materialsString != null) {
-                        materialsString = materialsString.substring(1, materialsString.length() -1);
-
-                        String[] pairs = materialsString.split(",");
-                        getLogger().info("materials string: " + materialsString);
-                        getLogger().info("pairs: " + Arrays.toString(pairs));
-                        Pattern materialRegex = Pattern.compile("[a-zA-Z]+");
-                        Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
-
-                        for (String string : pairs) {
-                            Matcher materialMatcher = materialRegex.matcher(string);
-                            Matcher percentMatcher = percentRegex.matcher(string);
-
-                            String materialS;
-                            String percentS;
-
-                            if (materialMatcher.find()) {
-                                materialS = materialMatcher.group();
-                                getLogger().info("materialS: " + materialS);
-                            }
-                            if (percentMatcher.find()) {
-                                percentS = percentMatcher.group();
-                                getLogger().info("percentS: " + percentS);
-                            }
-                        }
-                    }
-
-                    List<Map<?, ?>> test2 = yml.getMapList("materials");
-                    getLogger().info("test2: " + test2);
-                    ConfigurationSection section = yml.getConfigurationSection("materials");
-
-                    if (section != null) {
-                        Map<String, Object> test = section.getValues(true);
-                        getLogger().info("test: " + test);
-                        test.forEach((string, object) -> {
-                            Material material = Material.valueOf(string);
-                            double percent = Double.parseDouble(object.toString());
-
-                            getLogger().info("material: " + material);
-                            getLogger().info("percent: " + percent);
-                        });
-                    }
 
                     MineData mineData = new MineDataBuilder()
                             .setOwner(owner)
@@ -310,11 +259,36 @@ public class PrivateMines extends JavaPlugin {
                             .setOpen(isOpen)
                             .setTax(tax)
                             .build();
+
+                    if (materialsString != null) {
+                        materialsString = materialsString.substring(1, materialsString.length() - 1);
+
+                        String[] pairs = materialsString.split(",");
+                        Pattern materialRegex = Pattern.compile("[a-zA-Z]+");
+                        Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
+
+                        for (String string : pairs) {
+                            Matcher materialMatcher = materialRegex.matcher(string);
+                            Matcher percentMatcher = percentRegex.matcher(string);
+
+                            if (materialMatcher.find()) {
+                                matString = materialMatcher.group();
+                            }
+
+                            if (percentMatcher.find()) {
+                                percent = Double.parseDouble(percentMatcher.group());
+                            }
+
+                            Material material = Material.valueOf(matString);
+                            materialMap.put(material, percent);
+                        }
+                    }
+
+                    mineData.setMaterials(materialMap);
                     mine.setMineData(mineData);
                     getMineStorage().addMine(owner, mine);
 //                    mine.startResetTask();
 //                    mine.startPercentageTask();
-
                     getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
                 });
             } catch (IOException e) {

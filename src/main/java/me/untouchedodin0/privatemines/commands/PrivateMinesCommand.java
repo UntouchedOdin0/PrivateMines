@@ -149,13 +149,10 @@ public class PrivateMinesCommand {
         MineData mineData;
         Map<Material, Double> map = new HashMap<>();
 
-        player.sendMessage("" + mine);
         if (mine != null) {
             for (Material material : materials) {
                 map.put(material, 1.0);
             }
-
-            player.sendMessage("map: " + map);
 
             mineData = mine.getMineData();
             mineData.setMaterials(map);

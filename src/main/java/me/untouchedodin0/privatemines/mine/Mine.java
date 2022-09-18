@@ -236,10 +236,7 @@ public class Mine {
         if (privateMineResetEvent.isCancelled()) return;
 
         if (!customMaterials.isEmpty()) {
-            Bukkit.broadcastMessage("custom mats: " + customMaterials);
             customMaterials.forEach((material, chance) -> {
-                Bukkit.broadcastMessage("material: " + material);
-                Bukkit.broadcastMessage("chance: " + chance);
                 Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
                 randomPattern.add(pattern, chance);
             });
@@ -265,7 +262,6 @@ public class Mine {
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
                 Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
-                Bukkit.broadcastMessage("random pattern: " + randomPattern);
 
                 if (Config.onlyReplaceAir) {
                     if (BlockTypes.AIR != null) {
@@ -304,7 +300,6 @@ public class Mine {
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
                 Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
-                Bukkit.broadcastMessage("random pattern: " + randomPattern);
 
                 if (Config.onlyReplaceAir) {
                     if (BlockTypes.AIR != null) {
