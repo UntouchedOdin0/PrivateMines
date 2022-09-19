@@ -241,8 +241,6 @@ public class Mine {
                 randomPattern.add(pattern, chance);
             });
 
-            Bukkit.broadcastMessage("" + customMaterials);
-
             World world = location.getWorld();
             Player player = Bukkit.getPlayer(mineData.getMineOwner());
             if (player != null && player.isOnline()) {

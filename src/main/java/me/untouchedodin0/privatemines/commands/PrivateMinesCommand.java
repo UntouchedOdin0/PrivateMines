@@ -153,6 +153,8 @@ public class PrivateMinesCommand {
             for (Material material : materials) {
                 if (material.isBlock()) {
                     map.put(material, 1.0);
+                } else {
+                    player.sendMessage(ChatColor.RED + "Could not add " + material.name() + " as it wasn't a solid block!");
                 }
             }
 
