@@ -617,7 +617,9 @@ public class Mine {
             yml.set("tax", tax);
             yml.set("isOpen", open);
             yml.set("bannedPlayers", bannedPlayers);
-            yml.set("materials", materials.toString());
+            if (materials != null) {
+                yml.set("materials", materials.toString());
+            }
 
             try {
                 yml.save(file);
