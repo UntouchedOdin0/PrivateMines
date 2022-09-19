@@ -241,6 +241,8 @@ public class Mine {
                 randomPattern.add(pattern, chance);
             });
 
+            Bukkit.broadcastMessage("" + customMaterials);
+
             World world = location.getWorld();
             Player player = Bukkit.getPlayer(mineData.getMineOwner());
             if (player != null && player.isOnline()) {
@@ -329,7 +331,7 @@ public class Mine {
 
         if (privateMineResetEvent.isCancelled()) return;
 
-        if (!mineBlocks.isEmpty()) {
+        if (mineBlocks != null && !mineBlocks.isEmpty()) {
             mineBlocks.forEach((material, chance) -> {
                 Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
                 randomPattern.add(pattern, chance);

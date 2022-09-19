@@ -28,8 +28,10 @@ import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.mine.quarries.Quarry;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import redempt.redlib.region.CuboidRegion;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class MineDataBuilder {
@@ -47,6 +49,7 @@ public class MineDataBuilder {
     Shop shop = new Shop();
     boolean isOpen;
     double tax = 5;
+    Map<Material, Double> materials;
 
     public MineDataBuilder setOwner(UUID uuid) {
         this.mineOwner = uuid;
@@ -103,6 +106,11 @@ public class MineDataBuilder {
         return this;
     }
 
+    public MineDataBuilder setMaterials(Map<Material, Double> materials) {
+        this.materials = materials;
+        return this;
+    }
+
     public MineDataBuilder setShop(Shop shop) {
         this.shop = shop;
         return this;
@@ -129,6 +137,7 @@ public class MineDataBuilder {
         mineData.quarry = quarry;
         mineData.isOpen = isOpen;
         mineData.tax = tax;
+        mineData.materials = materials;
         mineData.shop = shop;
         return mineData;
     }

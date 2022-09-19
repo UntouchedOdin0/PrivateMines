@@ -80,7 +80,7 @@ public class PrivateMinesCommand {
         } else {
             Mine mine = mineStorage.get(player);
             if (mine != null) {
-                mine.reset();
+                mine.resetNoCheck();
             }
             player.sendMessage(Messages.msg("yourMineHasBeenReset"));
         }
@@ -151,7 +151,9 @@ public class PrivateMinesCommand {
 
         if (mine != null) {
             for (Material material : materials) {
-                map.put(material, 1.0);
+                if (material.isBlock()) {
+                    map.put(material, 1.0);
+                }
             }
 
             mineData = mine.getMineData();
