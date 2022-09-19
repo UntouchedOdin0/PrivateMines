@@ -15,6 +15,7 @@ shouldWallsGoUp: false
 locale: en_US
 useAdventure: true
 enableMenu: true
+enableTax: true
 
 mineTypes:
   Test:

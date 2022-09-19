@@ -63,4 +63,6 @@ public class Config {
     public static boolean useAdventure = false;
     @Comment("Should the menu be enabled?")
     public static boolean enableMenu = true;
+    @Comment("Should the tax feature be enabled?")
+    public static boolean enableTax = true;
 }

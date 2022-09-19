@@ -112,7 +112,9 @@ public class PrivateMines extends JavaPlugin {
                     .register("privatemines",
                             new PrivateMinesCommand());
 
-            registerSellListener();
+            if (Config.enableTax) {
+                registerSellListener();
+            }
             setupSchematicUtils();
             Messages.load(this);
 
@@ -245,18 +247,14 @@ public class PrivateMines extends JavaPlugin {
                     Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
                     boolean isOpen = yml.getBoolean("isOpen");
                     double tax = yml.getDouble("tax");
-                    getLogger().info("HI?!");
 
                     String materialsString = yml.getString("materials");
-                    getLogger().info("materialsString " + materialsString);
-                    getLogger().info("HI?!");
 
                     if (materialsString != null) {
                         materialsString = materialsString.substring(1, materialsString.length() - 1);
                         String[] pairs = materialsString.split(",");
                         Pattern materialRegex = Pattern.compile("[a-zA-Z]+");
                         Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
-                        getLogger().info("HI?!");
 
                         for (String string : pairs) {
                             Matcher materialMatcher = materialRegex.matcher(string);
@@ -275,7 +273,6 @@ public class PrivateMines extends JavaPlugin {
 
                             Material material = Material.valueOf(matString);
                             customMaterials.put(material, percent);
-                            getLogger().info("customMaterials " + customMaterials);
 
                             MineData mineData = new MineDataBuilder()
                                     .setOwner(owner)
@@ -344,8 +341,6 @@ public class PrivateMines extends JavaPlugin {
                     mine.startPercentageTask();
                     getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
                 });
-
-                getLogger().info("mine: " + this);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
