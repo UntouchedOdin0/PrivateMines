@@ -57,12 +57,6 @@ privatemine,privatemines,pmine,pmines {
         permission privatemines.setblocks
     }
 
-    //     upgrade player:target {
-           //        hook upgrade
-           //        help Upgrades your private mine
-           //        permission privatemines.upgrade
-           //    }
-
     ban player:target {
         hook ban
         help Bans a player from your mine
@@ -73,6 +67,12 @@ privatemine,privatemines,pmine,pmines {
         hook unban
         help Unbans a player from your mine
         permission privatemines.unban
+    }
+
+    pregen {
+        hook pregen
+        help Toggles the pre-gen mode.
+        permission privatemines.pregen
     }
 
     debug {

@@ -83,7 +83,7 @@ public class PrivateMines extends JavaPlugin {
     private BukkitAudiences adventure;
     String matString;
     double percent;
-
+    boolean pregenMode;
 
     public static PrivateMines getPrivateMines() {
         return privateMines;
@@ -458,5 +458,13 @@ public class PrivateMines extends JavaPlugin {
             throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
         }
         return adventure;
+    }
+
+    public boolean isPregenMode() {
+        return pregenMode;
+    }
+
+    public void setPregenMode(boolean pregenMode) {
+        this.pregenMode = pregenMode;
     }
 }

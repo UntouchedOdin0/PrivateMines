@@ -513,7 +513,7 @@ public class Mine {
 
             setMineData(mineData);
             privateMines.getMineStorage().replaceMineNoLog(mineData.getMineOwner(), this);
-            reset();
+            resetNoCheck();
         }
         this.canExpand = true;
     }

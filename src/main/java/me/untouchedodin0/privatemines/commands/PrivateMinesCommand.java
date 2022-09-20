@@ -10,21 +10,19 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.mine.data.MineData;
+import me.untouchedodin0.privatemines.utils.LangUtils;
 import me.untouchedodin0.privatemines.utils.inventory.PublicMinesMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.apache.commons.lang.WordUtils;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.Messages;
+import redempt.redlib.misc.ChatPrompt;
+import redempt.redlib.misc.Task;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class PrivateMinesCommand {
@@ -221,6 +219,39 @@ public class PrivateMinesCommand {
         PublicMinesMenu menu = new PublicMinesMenu();
         menu.open(player);
         player.sendMessage("debug.");
+    }
+
+    @CommandHook("pregen")
+    public void pregen(Player player) {
+
+        List<String> YES = LangUtils.YES;
+        List<String> NO = LangUtils.NO;
+
+        if (privateMines.isPregenMode()) {
+            player.sendMessage("" + LangUtils.YES);
+
+            ChatPrompt.prompt(player, ChatColor.YELLOW + "Would you like to disable pregen mode?", response -> {
+                if (LangUtils.YES.contains(WordUtils.capitalize(response))) {
+                    player.sendMessage(ChatColor.GREEN + "Disabling pregen mode!");
+                    privateMines.setPregenMode(false);
+                } else if (LangUtils.NO.contains(WordUtils.capitalize(response))) {
+                    player.sendMessage(ChatColor.GREEN + "Pregen mode will be kept on!");
+                }
+            });
+        } else {
+            ChatPrompt.prompt(player, ChatColor.YELLOW + "Would you like to enable pregen mode?", response -> {
+                if (LangUtils.YES.contains(WordUtils.capitalize(response))) {
+                    player.sendMessage(ChatColor.GREEN + "Enabling pregen mode!");
+                    privateMines.setPregenMode(true);
+                } else if (LangUtils.NO.contains(WordUtils.capitalize(response))) {
+                    player.sendMessage(ChatColor.GREEN + "Pregen mode will be turned off!");
+                    privateMines.setPregenMode(false);
+                }
+            });
+//            player.sendMessage(ChatColor.GREEN + "Enabling pregen mode...");
+//            privateMines.setPregenMode(true);
+        }
+//        player.sendMessage("pregen mode: " + privateMines.isPregenMode());
     }
 
     @CommandHook("reload")
