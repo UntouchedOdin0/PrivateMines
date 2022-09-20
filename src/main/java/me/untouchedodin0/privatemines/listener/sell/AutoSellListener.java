@@ -28,6 +28,7 @@ import me.clip.autosell.events.AutoSellEvent;
 import me.clip.autosell.events.SellAllEvent;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import net.milkbowl.vault.economy.Economy;
@@ -47,7 +48,6 @@ public class AutoSellListener implements Listener {
         Player player = sellAllEvent.getPlayer();
         Location location = player.getLocation();
         Mine mine = mineStorage.getClosest(location);
-        if (mine == null) return;
 
         MineData mineData = mine.getMineData();
         Player owner = Bukkit.getOfflinePlayer(mineData.getMineOwner()).getPlayer();
@@ -58,8 +58,11 @@ public class AutoSellListener implements Listener {
         double afterTax = sellPrice - tax;
         sellAllEvent.setTotalCost(afterTax);
         economy.depositPlayer(owner, tax);
-        if (owner != null) {
-            owner.sendMessage(ChatColor.GREEN + "You've received $" + tax + " in taxes from " + player.getDisplayName() + ChatColor.GREEN + "!");
+
+        if (Config.sendTaxMessages) {
+            if (owner != null) {
+                owner.sendMessage(ChatColor.GREEN + "You've received $" + tax + " in taxes from " + player.getDisplayName() + ChatColor.GREEN + "!");
+            }
         }
     }
 
@@ -80,8 +83,11 @@ public class AutoSellListener implements Listener {
         double afterTax = sellPrice - tax;
         autoSellEvent.setMultiplier(afterTax);
         economy.depositPlayer(owner, tax);
-        if (owner != null) {
-            owner.sendMessage(ChatColor.GREEN + "You've received $" + tax + " in taxes from " + player.getDisplayName() + ChatColor.GREEN + "!");
+
+        if (Config.sendTaxMessages) {
+            if (owner != null) {
+                owner.sendMessage(ChatColor.GREEN + "You've received $" + tax + " in taxes from " + player.getDisplayName() + ChatColor.GREEN + "!");
+            }
         }
     }
 }

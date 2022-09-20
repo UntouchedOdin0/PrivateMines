@@ -518,46 +518,6 @@ public class Mine {
         this.canExpand = true;
     }
 
-    public void expandMine() {
-        final World world = privateMines.getMineWorldManager().getMinesWorld();
-
-        final var fillType = BlockTypes.DIAMOND_BLOCK;
-        final var wallType = BlockTypes.BEDROCK;
-        final var min = getMineData().getMinimumMining();
-        final var max = getMineData().getMaximumMining();
-        final Region mine = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
-        final Region fillAir = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
-
-        if (fillType == null || wallType == null) return;
-
-        mine.expand(BlockVector3.UNIT_X, BlockVector3.UNIT_Y, BlockVector3.UNIT_Z, BlockVector3.UNIT_MINUS_X, BlockVector3.UNIT_MINUS_Y, BlockVector3.UNIT_MINUS_Z);
-        Map<Material, Double> materials = mineData.getMineType().getMaterials();
-        final RandomPattern randomPattern = new RandomPattern();
-        if (materials != null) {
-            materials.forEach((material, chance) -> {
-                Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
-                randomPattern.add(pattern, chance);
-            });
-        }
-
-        PrivateMineExpandEvent privateMineExpandEvent = new PrivateMineExpandEvent(mineData.getMineOwner(), this, mine.getWidth(), mine.getHeight(), mine.getLength());
-        Task.syncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineExpandEvent));
-        if (privateMineExpandEvent.isCancelled()) return;
-
-        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
-            editSession.setBlocks(mine, BukkitAdapter.adapt(Material.DIRT.createBlockData()));
-            editSession.setBlocks(fillAir, BukkitAdapter.adapt(Material.AIR.createBlockData()));
-        }
-
-        mineData.setMinimumMining(BukkitAdapter.adapt(world, mine.getMinimumPoint()));
-        mineData.setMaximumMining(BukkitAdapter.adapt(world, mine.getMaximumPoint()));
-        mineData.setMinimumFullRegion(mineData.getMinimumFullRegion().subtract(1, 1, 1));
-        mineData.setMaximumFullRegion(mineData.getMaximumFullRegion().add(1, 1, 1));
-        setMineData(mineData);
-        privateMines.getMineStorage().replaceMine(mineData.getMineOwner(), this);
-        reset();
-    }
-
     public void saveMineData(Player player, MineData mineData) {
         String fileName = String.format("/%s.yml", player.getUniqueId());
 
@@ -580,7 +540,6 @@ public class Mine {
         double tax = mineData.getTax();
         boolean open = mineData.isOpen();
         List<UUID> bannedPlayers = mineData.getBannedPlayers();
-        List<String> test = new ArrayList<>();
 
         Map<Material, Double> materials = mineData.getMaterials();
 

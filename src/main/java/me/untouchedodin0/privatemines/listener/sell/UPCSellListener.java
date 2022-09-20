@@ -29,6 +29,7 @@ import dev.drawethree.ultraprisoncore.autosell.api.events.UltraPrisonSellAllEven
 import dev.drawethree.ultraprisoncore.autosell.model.AutoSellItemStack;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.data.MineData;
 import net.milkbowl.vault.economy.Economy;
@@ -42,7 +43,6 @@ import org.bukkit.event.Listener;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 public class UPCSellListener implements Listener {
@@ -73,10 +73,12 @@ public class UPCSellListener implements Listener {
         sellAllEvent.setItemsToSell(itemsToSell);
         economy.depositPlayer(offlinePlayer, taxForOwner);
 
-        player.sendMessage(ChatColor.GREEN + String.format(ChatColor.GREEN + "Deducted $%f for the owner of the mine!", taxForOwner));
-        if (offlinePlayer.getPlayer() != null) {
-            offlinePlayer.getPlayer().sendMessage(ChatColor.GREEN + String.format(ChatColor.GREEN + "You've received $%f from %s"
-                    + ChatColor.GREEN + "!", taxForOwner, sellerName));
+        if (Config.sendTaxMessages) {
+            player.sendMessage(ChatColor.GREEN + String.format(ChatColor.GREEN + "Deducted $%f for the owner of the mine!", taxForOwner));
+            if (offlinePlayer.getPlayer() != null) {
+                offlinePlayer.getPlayer().sendMessage(ChatColor.GREEN + String.format(ChatColor.GREEN + "You've received $%f from %s"
+                        + ChatColor.GREEN + "!", taxForOwner, sellerName));
+            }
         }
         taxForOwner = 0;
     }
@@ -103,9 +105,13 @@ public class UPCSellListener implements Listener {
         });
         autoSellEvent.setItemsToSell(itemsToSell);
         economy.depositPlayer(offlinePlayer, taxForOwner);
-        player.sendMessage(ChatColor.GREEN + String.format(ChatColor.GREEN + "Deducted $%f for the owner of the mine!", taxForOwner));
-        Objects.requireNonNull(offlinePlayer.getPlayer()).
-                sendMessage(ChatColor.GREEN + String.format(ChatColor.GREEN + "You've received $%f from %s" + ChatColor.GREEN + "!", taxForOwner, sellerName));
+        if (Config.sendTaxMessages) {
+            player.sendMessage(ChatColor.GREEN + String.format(ChatColor.GREEN + "Deducted $%f for the owner of the mine!", taxForOwner));
+            if (offlinePlayer.getPlayer() != null) {
+                offlinePlayer.getPlayer().sendMessage(ChatColor.GREEN + String.format(ChatColor.GREEN + "You've received $%f from %s"
+                        + ChatColor.GREEN + "!", taxForOwner, sellerName));
+            }
+        }
         taxForOwner = 0;
     }
 }

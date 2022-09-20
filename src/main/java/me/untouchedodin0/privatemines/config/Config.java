@@ -65,4 +65,6 @@ public class Config {
     public static boolean enableMenu = true;
     @Comment("Should the tax feature be enabled?")
     public static boolean enableTax = true;
+    @Comment("Should we send tax messages to the owner of the mine?")
+    public static boolean sendTaxMessages = true;
 }

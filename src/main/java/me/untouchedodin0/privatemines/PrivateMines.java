@@ -292,50 +292,6 @@ public class PrivateMines extends JavaPlugin {
                         }
                     }
 
-//                    MineData mineData = new MineDataBuilder()
-//                            .setOwner(owner)
-//                            .setMinimumMining(corner1)
-//                            .setMaximumMining(corner2)
-//                            .setMinimumFullRegion(fullRegionMin)
-//                            .setMaximumFullRegion(fullRegionMax)
-//                            .setSpawnLocation(spawn)
-//                            .setMineLocation(mineLocation)
-//                            .setMineType(mineType)
-//                            .setOpen(isOpen)
-//                            .setTax(tax)
-//                            .setMaterials(customMaterials)
-//                            .build();
-//                    mine.setMineData(mineData);
-//                        mineStorage.addMine(owner, mine);
-
-//                    if (materialsString != null) {
-//                        materialsString = materialsString.substring(1, materialsString.length() - 1);
-//
-//                        String[] pairs = materialsString.split(",");
-//                        Pattern materialRegex = Pattern.compile("[a-zA-Z]+");
-//                        Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
-//
-//                        for (String string : pairs) {
-//                            Matcher materialMatcher = materialRegex.matcher(string);
-//                            Matcher percentMatcher = percentRegex.matcher(string);
-//
-//                            if (materialMatcher.find()) {
-//                                matString = materialMatcher.group();
-//                            }
-//
-//                            if (percentMatcher.find()) {
-//                                percent = Double.parseDouble(percentMatcher.group());
-//                            }
-//
-//                            Material material = Material.valueOf(matString);
-//                            materialMap.put(material, percent);
-//                        }
-//                        mineData.setMaterials(materialMap);
-//                        mine.setMineData(mineData);
-//
-//                        getLogger().info("mine: " + mine);
-//                    }
-
                     mineStorage.addMine(owner, mine);
                     mine.startResetTask();
                     mine.startPercentageTask();

@@ -14,13 +14,15 @@ import me.untouchedodin0.privatemines.utils.LangUtils;
 import me.untouchedodin0.privatemines.utils.inventory.PublicMinesMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.apache.commons.lang.WordUtils;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.misc.ChatPrompt;
-import redempt.redlib.misc.Task;
 
 import java.util.*;
 
@@ -248,10 +250,7 @@ public class PrivateMinesCommand {
                     privateMines.setPregenMode(false);
                 }
             });
-//            player.sendMessage(ChatColor.GREEN + "Enabling pregen mode...");
-//            privateMines.setPregenMode(true);
         }
-//        player.sendMessage("pregen mode: " + privateMines.isPregenMode());
     }
 
     @CommandHook("reload")
