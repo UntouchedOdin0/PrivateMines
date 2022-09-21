@@ -16,6 +16,7 @@ locale: en_US
 useAdventure: true
 enableMenu: true
 enableTax: true
+sendTaxMessages: true
 
 mineTypes:
   Test:

@@ -248,6 +248,7 @@ public class PrivateMines extends JavaPlugin {
                     boolean isOpen = yml.getBoolean("isOpen");
                     double tax = yml.getDouble("tax");
 
+                    getLogger().info("spawn: " + spawn);
                     String materialsString = yml.getString("materials");
 
                     if (materialsString != null) {
@@ -280,7 +281,6 @@ public class PrivateMines extends JavaPlugin {
                                     .setMaximumMining(corner2)
                                     .setMinimumFullRegion(fullRegionMin)
                                     .setMaximumFullRegion(fullRegionMax)
-                                    .setSpawnLocation(spawn)
                                     .setMineLocation(mineLocation)
                                     .setMineType(mineType)
                                     .setOpen(isOpen)
@@ -288,13 +288,32 @@ public class PrivateMines extends JavaPlugin {
                                     .setMaterials(customMaterials)
                                     .build();
                             mine.setMineData(mineData);
+
+                            Bukkit.broadcastMessage("spawn " + spawn);
+                            mine.setSpawnLocation(spawn);
                             mineStorage.addMine(owner, mine);
+                            mine.startResetTask();
+                            mine.startPercentageTask();
                         }
+                    } else {
+                        MineData mineData = new MineDataBuilder()
+                                .setOwner(owner)
+                                .setMinimumMining(corner1)
+                                .setMaximumMining(corner2)
+                                .setMinimumFullRegion(fullRegionMin)
+                                .setMaximumFullRegion(fullRegionMax)
+                                .setMineLocation(mineLocation)
+                                .setMineType(mineType)
+                                .setOpen(isOpen)
+                                .setTax(tax)
+                                .build();
+                        mine.setMineData(mineData);
+                        mine.setSpawnLocation(spawn);
+                        mineStorage.addMine(owner, mine);
+                        mine.startResetTask();
+                        mine.startPercentageTask();
                     }
 
-                    mineStorage.addMine(owner, mine);
-                    mine.startResetTask();
-                    mine.startPercentageTask();
                     getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
                 });
             } catch (IOException e) {
