@@ -44,10 +44,6 @@ public class MineData {
     CuboidRegion miningRegion;
     Location minimumFullRegion;
     Location maximumFullRegion;
-
-    Location minimumWalls;
-    Location maximumWalls;
-    CuboidRegion wallsRegion;
     MineType mineType;
     Quarry quarry;
     Shop shop;
@@ -98,30 +94,6 @@ public class MineData {
 
     public void setMaximumFullRegion(Location maximumFullRegion) {
         this.maximumFullRegion = maximumFullRegion;
-    }
-
-    public CuboidRegion getWallsRegion() {
-        return wallsRegion;
-    }
-
-    public void setWallsRegion(CuboidRegion wallsRegion) {
-        this.wallsRegion = wallsRegion;
-    }
-
-    public Location getMinimumWalls() {
-        return minimumWalls;
-    }
-
-    public void setMinimumWalls(Location minimumWalls) {
-        this.minimumWalls = minimumWalls;
-    }
-
-    public Location getMaximumWalls() {
-        return maximumWalls;
-    }
-
-    public void setMaximumWalls(Location maximumWalls) {
-        this.maximumWalls = maximumWalls;
     }
 
     public MineType getMineType() {
