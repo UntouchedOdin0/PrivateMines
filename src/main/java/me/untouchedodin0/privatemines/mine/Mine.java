@@ -349,9 +349,51 @@ public class Mine {
 
 
         World world = location.getWorld();
-
+        Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
+        if (Config.addWallGap) {
+            region.contract(ExpansionUtils.expansionVectors(Config.wallsGap));
+        }
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
-            Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
+            editSession.setBlocks(region, randomPattern);
+            editSession.flushQueue();
+        }
+    }
+
+    public void resetIgnoreWallCheck() {
+        MineData mineData = getMineData();
+        MineType mineType = mineData.getMineType();
+        Location location = mineData.getMinimumMining();
+        BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
+        BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
+
+        Map<Material, Double> materials = mineType.getMaterials();
+        Map<Material, Double> mineBlocks = mineData.getMaterials();
+
+        final RandomPattern randomPattern = new RandomPattern();
+
+        PrivateMineResetEvent privateMineResetEvent = new PrivateMineResetEvent(mineData.getMineOwner(), this);
+        Task.syncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineResetEvent));
+
+        if (privateMineResetEvent.isCancelled()) return;
+
+        if (mineBlocks != null && !mineBlocks.isEmpty()) {
+            mineBlocks.forEach((material, chance) -> {
+                Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+                randomPattern.add(pattern, chance);
+            });
+        } else {
+            if (materials != null) {
+                materials.forEach((material, chance) -> {
+                    Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+                    randomPattern.add(pattern, chance);
+                });
+            }
+        }
+
+
+        World world = location.getWorld();
+        Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
+        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
             editSession.setBlocks(region, randomPattern);
             editSession.flushQueue();
         }
@@ -539,6 +581,7 @@ public class Mine {
         Location corner2 = mineData.getMaximumMining();
         Location fullRegionMin = mineData.getMinimumFullRegion();
         Location fullRegionMax = mineData.getMaximumFullRegion();
+
 
         Location spawn = mineData.getSpawnLocation();
         double tax = mineData.getTax();

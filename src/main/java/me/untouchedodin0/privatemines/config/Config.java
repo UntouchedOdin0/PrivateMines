@@ -47,16 +47,19 @@ public class Config {
     public static int mineYLevel = 50;
     @Comment("The delay until a player is teleported to the private mine")
     public static int teleportDelay = 5;
+    @Comment("Should there be a gap between the wall and the mine?")
+    public static boolean addWallGap = true;
     @Comment("The gap between the walls and the mine")
     public static int wallsGap = 0;
+    @Comment("Does the walls go up by one?")
+    public static boolean shouldWallsGoUp = false;
     @Comment("Should we give players a mine when they first join?")
     public static boolean giveMineOnFirstJoin = false;
     @Comment("Should we only replace air blocks when the mine resets?")
     public static boolean onlyReplaceAir = true;
     @Comment("Should we upgrade the mine upon reaching the outside border?")
     public static boolean borderUpgrade = true;
-    @Comment("Does the walls go up by one?")
-    public static boolean shouldWallsGoUp = false;
+
     @Comment("Which locale should we use?")
     public static String locale = "en_US";
     @Comment("Should we support adventure?")

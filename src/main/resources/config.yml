@@ -7,11 +7,12 @@ quarryMaterial: SHULKER_BOX
 mineDistance: 150
 mineYLevel: 50
 teleportDelay: 5
+addWallGap: true
 wallsGap: 1
+shouldWallsGoUp: false
 giveMineOnFirstJoin: true
 onlyReplaceAir: true
 borderUpgrade: true
-shouldWallsGoUp: false
 locale: en_US
 useAdventure: true
 enableMenu: true

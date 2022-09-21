@@ -38,6 +38,10 @@ public class ExpansionUtils {
         return EXPANSION_VECTORS.stream().map(it -> it.multiply(amount)).toArray(BlockVector3[]::new);
     }
 
+    public static BlockVector3[] contractVectors(final int amount) {
+        return EXPANSION_VECTORS.stream().map(it -> it.divide(amount)).toArray(BlockVector3[]::new);
+    }
+
     public static BlockVector3[] expansionVectors2(final int amount) {
         return EXPANSION_VECTORS.stream().map(it -> it.multiply(amount)).toArray(BlockVector3[]::new);
     }

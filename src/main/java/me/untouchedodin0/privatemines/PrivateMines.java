@@ -234,7 +234,6 @@ public class PrivateMines extends JavaPlugin {
 
                     getLogger().info("Loading file " + file.getName() + "....");
                     YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
-                    Bukkit.getLogger().info("test tewst");
 
                     UUID owner = UUID.fromString(Objects.requireNonNull(yml.getString("mineOwner")));
                     String mineTypeName = yml.getString("mineType");
@@ -248,7 +247,6 @@ public class PrivateMines extends JavaPlugin {
                     boolean isOpen = yml.getBoolean("isOpen");
                     double tax = yml.getDouble("tax");
 
-                    getLogger().info("spawn: " + spawn);
                     String materialsString = yml.getString("materials");
 
                     if (materialsString != null) {
@@ -274,48 +272,97 @@ public class PrivateMines extends JavaPlugin {
 
                             Material material = Material.valueOf(matString);
                             customMaterials.put(material, percent);
-
-                            MineData mineData = new MineDataBuilder()
-                                    .setOwner(owner)
-                                    .setMinimumMining(corner1)
-                                    .setMaximumMining(corner2)
-                                    .setMinimumFullRegion(fullRegionMin)
-                                    .setMaximumFullRegion(fullRegionMax)
-                                    .setMineLocation(mineLocation)
-                                    .setMineType(mineType)
-                                    .setOpen(isOpen)
-                                    .setTax(tax)
-                                    .setMaterials(customMaterials)
-                                    .build();
-                            mine.setMineData(mineData);
-
-                            Bukkit.broadcastMessage("spawn " + spawn);
-                            mine.setSpawnLocation(spawn);
-                            mineStorage.addMine(owner, mine);
-                            mine.startResetTask();
-                            mine.startPercentageTask();
                         }
-                    } else {
-                        MineData mineData = new MineDataBuilder()
-                                .setOwner(owner)
-                                .setMinimumMining(corner1)
-                                .setMaximumMining(corner2)
-                                .setMinimumFullRegion(fullRegionMin)
-                                .setMaximumFullRegion(fullRegionMax)
-                                .setMineLocation(mineLocation)
-                                .setMineType(mineType)
-                                .setOpen(isOpen)
-                                .setTax(tax)
-                                .build();
-                        mine.setMineData(mineData);
-                        mine.setSpawnLocation(spawn);
-                        mineStorage.addMine(owner, mine);
-                        mine.startResetTask();
-                        mine.startPercentageTask();
                     }
 
-                    getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
+                    MineData mineData = new MineDataBuilder()
+                            .setOwner(owner)
+                            .setMinimumMining(corner1)
+                            .setMaximumMining(corner2)
+                            .setMinimumFullRegion(fullRegionMin)
+                            .setMaximumFullRegion(fullRegionMax)
+                            .setMineLocation(mineLocation)
+                            .setMineType(mineType)
+                            .setOpen(isOpen)
+                            .setTax(tax)
+                            .build();
+                    if (!customMaterials.isEmpty()) {
+                        mineData.setMaterials(customMaterials);
+                    }
+                    mine.setMineData(mineData);
+                    mine.setSpawnLocation(spawn);
+//                    mineStorage.addMine(owner, mine);
+//                    mine.startResetTask();
+//                    mine.startPercentageTask();
+                    mineStorage.addMine(owner, mine);
+
+                    Bukkit.broadcastMessage("" + mineStorage.getMines());
                 });
+
+//                    if (materialsString != null) {
+//                        materialsString = materialsString.substring(1, materialsString.length() - 1);
+//                        String[] pairs = materialsString.split(",");
+//                        Pattern materialRegex = Pattern.compile("[a-zA-Z]+");
+//                        Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
+//
+//                        for (String string : pairs) {
+//                            Matcher materialMatcher = materialRegex.matcher(string);
+//                            Matcher percentPatcher = percentRegex.matcher(string);
+//
+//                            if (materialMatcher.find()) {
+//                                matString = materialMatcher.group();
+//                            }
+//
+//                            if (percentPatcher.find()) {
+//                                percent = Double.parseDouble(percentPatcher.group());
+//                            }
+//
+//                            matString = matString.replace("DIAMOND", "DIAMOND_BLOCK");
+//                            matString = matString.replace("EMERALD", "EMERALD_BLOCk");
+//
+//                            Material material = Material.valueOf(matString);
+//                            customMaterials.put(material, percent);
+//
+//                            MineData mineData = new MineDataBuilder()
+//                                    .setOwner(owner)
+//                                    .setMinimumMining(corner1)
+//                                    .setMaximumMining(corner2)
+//                                    .setMinimumFullRegion(fullRegionMin)
+//                                    .setMaximumFullRegion(fullRegionMax)
+//                                    .setMineLocation(mineLocation)
+//                                    .setMineType(mineType)
+//                                    .setOpen(isOpen)
+//                                    .setTax(tax)
+//                                    .setMaterials(customMaterials)
+//                                    .build();
+//                            mine.setMineData(mineData);
+//
+//                            Bukkit.broadcastMessage("spawn " + spawn);
+//                            mine.setSpawnLocation(spawn);
+//                            mineStorage.addMine(owner, mine);
+//                            mine.startResetTask();
+//                            mine.startPercentageTask();
+//                        }
+//                    } else {
+//                        MineData mineData = new MineDataBuilder()
+//                                .setOwner(owner)
+//                                .setMinimumMining(corner1)
+//                                .setMaximumMining(corner2)
+//                                .setMinimumFullRegion(fullRegionMin)
+//                                .setMaximumFullRegion(fullRegionMax)
+//                                .setMineLocation(mineLocation)
+//                                .setMineType(mineType)
+//                                .setOpen(isOpen)
+//                                .setTax(tax)
+//                                .build();
+//                        mine.setMineData(mineData);
+//                        mine.setSpawnLocation(spawn);
+//                        mineStorage.addMine(owner, mine);
+//                        mine.startResetTask();
+//                        mine.startPercentageTask();
+//                    }
+
+//                getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
