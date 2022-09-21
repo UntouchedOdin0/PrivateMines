@@ -32,8 +32,8 @@ public class ExpansionUtils {
 
     public static final List<BlockVector3> EXPANSION_VECTORS = List.of(BlockVector3.UNIT_X, BlockVector3.UNIT_MINUS_X,
                                                                        BlockVector3.UNIT_Z, BlockVector3.UNIT_MINUS_Z);
-    public static final List<BlockVector3> EXPANSION_VECTORS2 = List.of(BlockVector3.UNIT_X, BlockVector3.UNIT_MINUS_X,
-            BlockVector3.UNIT_Z, BlockVector3.UNIT_MINUS_Z);
+    public static final List<BlockVector3> EXPANSION_VECTORS2 = List.of(BlockVector3.at(2, 0, 0), BlockVector3.at(-2, 0, 0),
+            BlockVector3.at(0, 0, 2), BlockVector3.at(0, 0, -2));
     public static BlockVector3[] expansionVectors(final int amount) {
         return EXPANSION_VECTORS.stream().map(it -> it.multiply(amount)).toArray(BlockVector3[]::new);
     }

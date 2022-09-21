@@ -129,6 +129,8 @@ public class Mine {
         Location corner1 = mineData.getMinimumFullRegion();
         BlockVector3 corner1BV3 = BukkitAdapter.asBlockVector(mineData.getMinimumFullRegion());
         BlockVector3 corner2BV3 = BukkitAdapter.asBlockVector(mineData.getMaximumFullRegion());
+        BlockVector3 minWalls = BukkitAdapter.asBlockVector(mineData.getMinimumWalls());
+        BlockVector3 maxWalls = BukkitAdapter.asBlockVector(mineData.getMaximumWalls());
 
         Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
         String regionName = String.format("mine-%s", Objects.requireNonNull(player).getUniqueId());
@@ -147,7 +149,9 @@ public class Mine {
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
             Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1BV3, corner2BV3);
+            Region walls = new CuboidRegion(BukkitAdapter.adapt(world), minWalls, maxWalls);
             editSession.setBlocks(region, randomPattern);
+            editSession.setBlocks(walls, randomPattern);
         }
 
         Instant filled = Instant.now();
@@ -361,7 +365,7 @@ public class Mine {
         MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
         MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
         int resetTime = mineType.getResetTime();
-        this.task = Task.syncRepeating(this::reset, 0L, resetTime * 20 * 60L);
+        this.task = Task.syncRepeating(this::resetNoCheck, 0L, resetTime * 20 * 60L);
     }
 
     public void cancelTask() {
@@ -452,7 +456,7 @@ public class Mine {
             if (fillType == null || wallType == null) return;
 
             mine.expand(ExpansionUtils.expansionVectors(1));
-            walls.expand(ExpansionUtils.expansionVectors(1));
+            walls.expand(ExpansionUtils.expansionVectors2(1));
 
             if (Config.shouldWallsGoUp) {
                 walls.expand(BlockVector3.UNIT_X, BlockVector3.UNIT_Y, BlockVector3.UNIT_Z, BlockVector3.UNIT_MINUS_X, BlockVector3.UNIT_MINUS_Y, BlockVector3.UNIT_MINUS_Z);
@@ -478,10 +482,20 @@ public class Mine {
                 editSession.setBlocks(fillAir, BukkitAdapter.adapt(Material.AIR.createBlockData()));
             }
 
+            Location bukkitWallsMin = BukkitAdapter.adapt(world, walls.getMinimumPoint());
+            Location bukkitWallsMax = BukkitAdapter.adapt(world, walls.getMaximumPoint());
+            redempt.redlib.region.CuboidRegion wallsRegion = new redempt.redlib.region.CuboidRegion(bukkitWallsMin, bukkitWallsMax);
+
             mineData.setMinimumMining(BukkitAdapter.adapt(world, mine.getMinimumPoint()));
             mineData.setMaximumMining(BukkitAdapter.adapt(world, mine.getMaximumPoint()));
             mineData.setMinimumFullRegion(mineData.getMinimumFullRegion().subtract(1, 1, 1));
             mineData.setMaximumFullRegion(mineData.getMaximumFullRegion().add(1, 1, 1));
+            mineData.setMinimumWalls(BukkitAdapter.adapt(world, walls.getMinimumPoint()));
+            mineData.setMaximumWalls(BukkitAdapter.adapt(world, walls.getMaximumPoint()));
+
+            Bukkit.broadcastMessage("walls min: " + walls.getMinimumPoint());
+            Bukkit.broadcastMessage("walls max: " + walls.getMaximumPoint());
+
             String mineRegionName = String.format("mine-%s", mineData.getMineOwner());
 
             RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
@@ -518,6 +532,7 @@ public class Mine {
             setMineData(mineData);
             privateMines.getMineStorage().replaceMineNoLog(mineData.getMineOwner(), this);
             resetNoCheck();
+            saveMineData(Objects.requireNonNull(Bukkit.getPlayer(mineData.getMineOwner())), mineData);
         }
         this.canExpand = true;
     }
@@ -539,8 +554,12 @@ public class Mine {
         Location corner2 = mineData.getMaximumMining();
         Location fullRegionMin = mineData.getMinimumFullRegion();
         Location fullRegionMax = mineData.getMaximumFullRegion();
+        Location wallsMin = mineData.getMinimumWalls();
+        Location wallsMax = mineData.getMaximumWalls();
 
-        Location spawn = mineData.getSpawnLocation();
+        Location spawn = getSpawnLocation();
+
+        Bukkit.broadcastMessage("spawn: " + spawn);
         double tax = mineData.getTax();
         boolean open = mineData.isOpen();
         List<UUID> bannedPlayers = mineData.getBannedPlayers();
@@ -556,6 +575,29 @@ public class Mine {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
+            yml.set("mineOwner", owner.toString());
+            yml.set("mineType", mineTypeName);
+            yml.set("mineLocation", LocationUtils.toString(mineLocation));
+            yml.set("corner1", LocationUtils.toString(mineData.getMinimumMining()));
+            yml.set("corner2", LocationUtils.toString(mineData.getMaximumMining()));
+            yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
+            yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
+            yml.set("wallsMin", LocationUtils.toString(wallsMin));
+            yml.set("wallsMax", LocationUtils.toString(wallsMax));
+            yml.set("tax", tax);
+            yml.set("isOpen", open);
+            yml.set("bannedPlayers", bannedPlayers);
+            if (materials != null) {
+                yml.set("materials", materials.toString());
+            }
+
+            try {
+                yml.save(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
             yml.set("mineOwner", owner.toString());
             yml.set("mineType", mineTypeName);
             yml.set("mineLocation", LocationUtils.toString(mineLocation));
@@ -567,21 +609,9 @@ public class Mine {
             yml.set("tax", tax);
             yml.set("isOpen", open);
             yml.set("bannedPlayers", bannedPlayers);
-            yml.set("materials", materials);
 
-            try {
-                yml.save(file);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            yml.set("corner1", LocationUtils.toString(mineData.getMinimumMining()));
-            yml.set("corner2", LocationUtils.toString(mineData.getMaximumMining()));
-            yml.set("tax", tax);
-            yml.set("isOpen", open);
-            yml.set("bannedPlayers", bannedPlayers);
             if (materials != null) {
-                yml.set("materials", materials.toString());
+                yml.set("materials", materials);
             }
 
             try {
