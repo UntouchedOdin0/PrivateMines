@@ -102,16 +102,18 @@ public class Mine {
     public MineData getMineData() {
         return mineData;
     }
+
     public void setMineData(MineData mineData) {
         this.mineData = mineData;
     }
+
     public void teleport(Player player) {
         if (getSpawnLocation().getBlock().getType().isBlock()) {
             getSpawnLocation().getBlock().setType(Material.AIR, false);
-                if (PaperLib.isPaper()) {
-                    PaperLib.teleportAsync(player, getSpawnLocation());
-                    player.sendMessage(ChatColor.GREEN + "You've been teleported to your mine!");
-                }
+            if (PaperLib.isPaper()) {
+                PaperLib.teleportAsync(player, getSpawnLocation());
+                player.sendMessage(ChatColor.GREEN + "You've been teleported to your mine!");
+            }
         }
     }
 
@@ -239,40 +241,42 @@ public class Mine {
 
         if (privateMineResetEvent.isCancelled()) return;
 
-        if (!customMaterials.isEmpty()) {
-            customMaterials.forEach((material, chance) -> {
-                Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
-                randomPattern.add(pattern, chance);
-            });
+        if (customMaterials != null) {
+            if (!customMaterials.isEmpty()) {
+                customMaterials.forEach((material, chance) -> {
+                    Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+                    randomPattern.add(pattern, chance);
+                });
 
-            World world = location.getWorld();
-            Player player = Bukkit.getPlayer(mineData.getMineOwner());
-            if (player != null && player.isOnline()) {
-                boolean isPlayerInRegion = fullRegion.contains(player.getLocation().getBlockX(),
-                        player.getLocation().getBlockY(),
-                        player.getLocation().getBlockZ());
-                if (isPlayerInRegion) {
-                    teleport(player);
-                }
-            }
-
-            for (Player online : Bukkit.getOnlinePlayers()) {
-                boolean isPlayerInRegion = fullRegion.contains(
-                        online.getLocation().getBlockX(),
-                        online.getLocation().getBlockY(),
-                        online.getLocation().getBlockZ());
-                if (isPlayerInRegion) teleport(online);
-            }
-
-            try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
-                Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
-
-                if (Config.onlyReplaceAir) {
-                    if (BlockTypes.AIR != null) {
-                        editSession.replaceBlocks(region, Collections.singleton(BlockTypes.AIR.getDefaultState().toBaseBlock()), randomPattern);
+                World world = location.getWorld();
+                Player player = Bukkit.getPlayer(mineData.getMineOwner());
+                if (player != null && player.isOnline()) {
+                    boolean isPlayerInRegion = fullRegion.contains(player.getLocation().getBlockX(),
+                            player.getLocation().getBlockY(),
+                            player.getLocation().getBlockZ());
+                    if (isPlayerInRegion) {
+                        teleport(player);
                     }
-                } else {
-                    editSession.setBlocks(region, randomPattern);
+                }
+
+                for (Player online : Bukkit.getOnlinePlayers()) {
+                    boolean isPlayerInRegion = fullRegion.contains(
+                            online.getLocation().getBlockX(),
+                            online.getLocation().getBlockY(),
+                            online.getLocation().getBlockZ());
+                    if (isPlayerInRegion) teleport(online);
+                }
+
+                try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
+                    Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
+
+                    if (Config.onlyReplaceAir) {
+                        if (BlockTypes.AIR != null) {
+                            editSession.replaceBlocks(region, Collections.singleton(BlockTypes.AIR.getDefaultState().toBaseBlock()), randomPattern);
+                        }
+                    } else {
+                        editSession.setBlocks(region, randomPattern);
+                    }
                 }
             }
         } else {
