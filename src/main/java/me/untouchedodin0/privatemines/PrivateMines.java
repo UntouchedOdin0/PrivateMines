@@ -30,6 +30,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
@@ -198,6 +199,13 @@ public class PrivateMines extends JavaPlugin {
             adventure.close();
             this.adventure = null;
         }
+
+        mineStorage.getMines().forEach((uuid, mine) -> {
+            Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
+            MineData mineData = mine.getMineData();
+            assert player != null;
+            mine.saveMineData(player, mineData);
+        });
         getLogger().info(String.format("Disabled adventure for %s", getDescription().getName()));
         getLogger().info(String.format("%s v%s has successfully been Disabled",
                 getDescription().getName(),
@@ -268,7 +276,7 @@ public class PrivateMines extends JavaPlugin {
                             }
 
                             matString = matString.replace("DIAMOND", "DIAMOND_BLOCK");
-                            matString = matString.replace("EMERALD", "EMERALD_BLOCk");
+                            matString = matString.replace("EMERALD", "EMERALD_BLOCK");
 
                             Material material = Material.valueOf(matString);
                             customMaterials.put(material, percent);
@@ -295,8 +303,8 @@ public class PrivateMines extends JavaPlugin {
 //                    mine.startResetTask();
 //                    mine.startPercentageTask();
                     mineStorage.addMine(owner, mine);
-
-                    Bukkit.broadcastMessage("" + mineStorage.getMines());
+                    mine.startResetTask();
+                    mine.startPercentageTask();
                 });
 
 //                    if (materialsString != null) {
