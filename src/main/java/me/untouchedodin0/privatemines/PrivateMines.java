@@ -3,6 +3,7 @@ package me.untouchedodin0.privatemines;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import io.papermc.lib.PaperLib;
+import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
@@ -17,8 +18,6 @@ import me.untouchedodin0.privatemines.listener.sell.AutoSellListener;
 import me.untouchedodin0.privatemines.listener.sell.UPCSellListener;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
-import me.untouchedodin0.privatemines.mine.data.MineData;
-import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
@@ -297,23 +296,27 @@ public class PrivateMines extends JavaPlugin {
                         }
                     }
 
-                    MineData mineData = new MineDataBuilder()
-                            .setOwner(owner)
-                            .setMinimumMining(corner1)
-                            .setMaximumMining(corner2)
-                            .setMinimumFullRegion(fullRegionMin)
-                            .setMaximumFullRegion(fullRegionMax)
-                            .setMineLocation(mineLocation)
-                            .setSpawnLocation(spawn)
-                            .setMineType(mineType)
-                            .setOpen(isOpen)
-                            .setTax(tax)
-                            .build();
+
+                    MineData mineData = new MineData(
+                            owner,
+                            corner1,
+                            corner2,
+                            fullRegionMin,
+                            fullRegionMax,
+                            mineLocation,
+                            mineType,
+                            isOpen,
+                            tax
+                    );
+
                     if (!customMaterials.isEmpty()) {
                         mineData.setMaterials(customMaterials);
                     }
                     mine.setMineData(mineData);
                     mine.setSpawnLocation(spawn);
+//                    mineStorage.addMine(owner, mine);
+//                    mine.startResetTask();
+//                    mine.startPercentageTask();
                     mineStorage.addMine(owner, mine);
                     mine.startResetTask();
                     mine.startPercentageTask();
