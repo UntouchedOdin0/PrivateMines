@@ -1,8 +1,8 @@
 package me.untouchedodin0.privatemines.utils.inventory;
 
+import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
