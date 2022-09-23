@@ -1,5 +1,7 @@
 package me.untouchedodin0.privatemines;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
@@ -82,6 +84,7 @@ public class PrivateMines extends JavaPlugin {
     private static Economy econ = null;
     private SQLite sqlite;
     private BukkitAudiences adventure;
+    private ProtocolManager protocolManager;
     String matString;
     double percent;
     boolean pregenMode;
@@ -104,6 +107,14 @@ public class PrivateMines extends JavaPlugin {
             mineStorage = new MineStorage();
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
+
+            getLogger().info("protocolManager " + protocolManager);
+
+            if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
+                getLogger().info("protocolManager " + protocolManager);
+                protocolManager = ProtocolLibrary.getProtocolManager();
+                getLogger().info("protocolManager " + protocolManager);
+            }
 
             new CommandParser(getResource("commands.rdcml"))
                     .setArgTypes(
@@ -260,7 +271,7 @@ public class PrivateMines extends JavaPlugin {
                     if (materialsString != null) {
                         materialsString = materialsString.substring(1, materialsString.length() - 1);
                         String[] pairs = materialsString.split(",");
-                        Pattern materialRegex = Pattern.compile("[a-zA-Z]+");
+                        Pattern materialRegex = Pattern.compile("[a-zA-Z]+_[a-zA-Z]+");
                         Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
 
                         for (String string : pairs) {
@@ -275,6 +286,7 @@ public class PrivateMines extends JavaPlugin {
                                 percent = Double.parseDouble(percentPatcher.group());
                             }
 
+                            getLogger().info("mat string: " + matString);
                             matString = matString.replace("DIAMOND", "DIAMOND_BLOCK");
                             matString = matString.replace("EMERALD", "EMERALD_BLOCK");
 
@@ -377,7 +389,6 @@ public class PrivateMines extends JavaPlugin {
         });
     }
 
-    @SuppressWarnings("unused")
     public void loadAddons() {
         final PathMatcher jarMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
         Path path = getAddonsDirectory();
@@ -496,5 +507,9 @@ public class PrivateMines extends JavaPlugin {
 
     public void setPregenMode(boolean pregenMode) {
         this.pregenMode = pregenMode;
+    }
+
+    public ProtocolManager getProtocolManager() {
+        return protocolManager;
     }
 }

@@ -25,6 +25,7 @@ repositories {
     maven { url = 'https://libraries.minecraft.net/' }
     maven { url = 'https://repo.convallyria.com/releases' }
     maven { url = 'https://repo.minebench.de/' }
+    maven { url = 'https://repo.dmulloy2.net/repository/public/' }
 }
 
 dependencies {
@@ -44,6 +45,7 @@ dependencies {
         exclude module: 'opus-java'
     }
     compileOnly 'net.kyori:adventure-text-minimessage:4.11.0'
+    compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
 
     compileOnly files('libs/UltraPrisonCore-1.12.0-RELEASE.jar')
     compileOnly files('libs/AutoSellAPI-1.2.0.jar')
