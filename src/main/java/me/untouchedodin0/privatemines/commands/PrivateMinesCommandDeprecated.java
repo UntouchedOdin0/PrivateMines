@@ -28,6 +28,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import com.sk89q.worldedit.WorldEdit;
+import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -35,7 +36,6 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.messages.LangKeys;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
-import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.inventory.LocaleInventory;
 import me.untouchedodin0.privatemines.utils.inventory.MainMenu;
@@ -510,7 +510,6 @@ public class PrivateMinesCommandDeprecated extends BaseCommand {
         World world = Bukkit.getWorld(name);
         if (world == null) {
             player.sendMessage("World is null");
-            return;
         } else {
             Location location = world.getSpawnLocation();
             player.teleport(location);

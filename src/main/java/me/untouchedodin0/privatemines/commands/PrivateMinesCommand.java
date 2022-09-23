@@ -1,6 +1,7 @@
 package me.untouchedodin0.privatemines.commands;
 
 import me.untouchedodin0.kotlin.menu.Menu;
+import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -10,7 +11,6 @@ import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
-import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.LangUtils;
 import me.untouchedodin0.privatemines.utils.inventory.PublicMinesMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -217,7 +217,7 @@ public class PrivateMinesCommand {
             if (mineData.getBannedPlayers().contains(uuid)) {
                 player.sendMessage(ChatColor.RED + "Target is already banned!");
             } else {
-                mineData.addBannedPlayer(uuid);
+                mineData.getBannedPlayers().add(uuid);
                 mine.setMineData(mineData);
                 mine.saveMineData(player, mineData);
                 player.sendMessage(ChatColor.GREEN + "Successfully banned " + target.getName());
@@ -235,7 +235,7 @@ public class PrivateMinesCommand {
             if (!mineData.getBannedPlayers().contains(uuid)) {
                 player.sendMessage(ChatColor.RED + "Target isn't banned!");
             } else {
-                mineData.removeBannedPlayer(uuid);
+                mineData.getBannedPlayers().remove(uuid);
                 mine.setMineData(mineData);
                 mine.saveMineData(player, mineData);
                 player.sendMessage(ChatColor.GREEN + "Successfully unbanned " + target.getName());
