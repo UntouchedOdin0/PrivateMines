@@ -49,14 +49,13 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.events.PrivateMineCreationEvent;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
-import me.untouchedodin0.privatemines.mine.data.MineData;
-import me.untouchedodin0.privatemines.mine.data.MineDataBuilder;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
@@ -252,17 +251,19 @@ public class MineFactory {
                             }
                         });
 
-                        MineData mineData = new MineDataBuilder()
-                                .setOwner(uuid)
-                                .setMinimumMining(lrailsL)
-                                .setMaximumMining(urailsL)
-                                .setMinimumFullRegion(fullMin)
-                                .setMaximumFullRegion(fullMax)
-                                .setSpawnLocation(spongeL)
-                                .setMineLocation(location)
-                                .setMineType(mineType)
-                                .setShop(shop)
-                                .build();
+                        MineData mineData = new MineData(
+                                uuid,
+                                urailsL,
+                                lrailsL,
+                                fullMin,
+                                fullMax,
+                                spongeL,
+                                location,
+                                mineType,
+                                shop
+                        );
+
+
                         mine.setMineData(mineData);
                         mine.saveMineData(player, mineData);
                     } catch (IncompleteRegionException e) {
@@ -426,17 +427,18 @@ public class MineFactory {
                             }
                         });
 
-                        MineData mineData = new MineDataBuilder()
-                                .setOwner(uuid)
-                                .setMinimumMining(lrailsL)
-                                .setMaximumMining(urailsL)
-                                .setMinimumFullRegion(fullMin)
-                                .setMaximumFullRegion(fullMax)
-                                .setSpawnLocation(spongeL)
-                                .setMineLocation(location)
-                                .setMineType(mineType)
-                                .setShop(shop)
-                                .build();
+                        MineData mineData = new MineData(
+                                uuid,
+                                urailsL,
+                                lrailsL,
+                                fullMin,
+                                fullMax,
+                                spongeL,
+                                location,
+                                mineType,
+                                shop
+                        );
+
                         mine.setMineData(mineData);
                         mine.saveMineData(player, mineData);
                     } catch (IncompleteRegionException e) {
