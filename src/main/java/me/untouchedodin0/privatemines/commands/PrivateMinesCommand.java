@@ -42,14 +42,14 @@ public class PrivateMinesCommand {
             Location location = player.getLocation();
             double size = 5;
 
-//            player.sendMessage("worldBorderUtils: " + worldBorderUtils);
+            player.sendMessage("worldBorderUtils: " + worldBorderUtils);
 
-//            worldBorderUtils.clearBorder(player);
-//            if (worldBorderUtils.isSetBorder()) {
-//                worldBorderUtils.clearBorder(player);
-//            } else {
-//                worldBorderUtils.sendWorldBorder(server, player, location, size);
-//            }
+            worldBorderUtils.clearBorder(player);
+            if (worldBorderUtils.isSetBorder()) {
+                worldBorderUtils.clearBorder(player);
+            } else {
+                worldBorderUtils.sendWorldBorder(server, player, location, size);
+            }
 
 //
 //            PacketContainer fakeExplosion = new PacketContainer(PacketType.Play.Server.EXPLOSION);
