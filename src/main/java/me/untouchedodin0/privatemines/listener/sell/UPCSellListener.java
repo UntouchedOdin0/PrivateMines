@@ -27,11 +27,11 @@ package me.untouchedodin0.privatemines.listener.sell;
 import dev.drawethree.ultraprisoncore.autosell.api.events.UltraPrisonAutoSellEvent;
 import dev.drawethree.ultraprisoncore.autosell.api.events.UltraPrisonSellAllEvent;
 import dev.drawethree.ultraprisoncore.autosell.model.AutoSellItemStack;
+import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.mine.Mine;
-import me.untouchedodin0.privatemines.mine.data.MineData;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -42,7 +42,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class UPCSellListener implements Listener {
