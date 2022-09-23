@@ -75,6 +75,14 @@ privatemine,privatemines,pmine,pmines {
         permission privatemines.pregen
     }
 
+    setborder player:target int:size {
+        hook setborder
+    }
+
+    clearborder player:target {
+        hook clearborder
+    }
+
     debug {
         hook debug
     }

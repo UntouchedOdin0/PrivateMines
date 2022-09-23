@@ -4,6 +4,7 @@ import me.untouchedodin0.kotlin.menu.Menu;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.WorldBorderUtils;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
@@ -33,10 +34,44 @@ public class PrivateMinesCommand {
     @CommandHook("main")
     public void main(CommandSender sender) {
         if (sender instanceof Player player) {
-            if (Config.enableMenu) {
-                Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
-                //mainMenu.open(player);
-            }
+
+            player.sendMessage("" + Config.spawnPoint);
+            player.sendMessage("" + Config.mineCorner);
+            player.sendMessage("" + Config.sellNpc);
+            player.sendMessage("" + Config.upgradeMaterial);
+            player.sendMessage("" + Config.quarryMaterial);
+            player.sendMessage("" + Config.mineDistance);
+            player.sendMessage("" + Config.mineYLevel);
+            player.sendMessage("" + Config.teleportDelay);
+            player.sendMessage("" + Config.addWallGap);
+            player.sendMessage("" + Config.shouldWallsGoUp);
+            player.sendMessage("" + Config.giveMineOnFirstJoin);
+            player.sendMessage("" + Config.onlyReplaceAir);
+            player.sendMessage("" + Config.borderUpgrade);
+            player.sendMessage("" + Config.locale);
+            player.sendMessage("" + Config.useAdventure);
+            player.sendMessage("" + Config.enableMenu);
+            player.sendMessage("" + Config.enableTax);
+            player.sendMessage("" + Config.sendTaxMessages);
+
+
+            Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
+            mainMenu.open(player);
+
+            WorldBorderUtils worldBorderUtils = new WorldBorderUtils();
+            Server server = Bukkit.getServer();
+            Location location = player.getLocation();
+            double size = 5;
+
+            player.sendMessage("worldBorderUtils: " + worldBorderUtils);
+
+//            worldBorderUtils.clearBorder(player);
+//            if (worldBorderUtils.isSetBorder()) {
+//                worldBorderUtils.clearBorder(player);
+//            } else {
+//                worldBorderUtils.sendWorldBorder(server, player, location, size);
+//            }
+
 //
 //            PacketContainer fakeExplosion = new PacketContainer(PacketType.Play.Server.EXPLOSION);
 //            fakeExplosion.getDoubles()
@@ -271,5 +306,22 @@ public class PrivateMinesCommand {
         privateMines.getConfigManager().reload();
         privateMines.getConfigManager().load();
         player.sendMessage("reload test");
+    }
+
+    @CommandHook("setborder")
+    public void setBorder(Player player, Player target, int size) {
+        WorldBorderUtils worldBorderUtils = privateMines.getWorldBorderUtils();
+        Server server = Bukkit.getServer();
+        Location location = player.getLocation();
+
+        player.sendMessage("worldBorderUtils: " + worldBorderUtils);
+        worldBorderUtils.sendWorldBorder(server, player, location, size);
+    }
+
+    @CommandHook("clearborder")
+    public void clearborder(Player player, Player target) {
+        WorldBorderUtils worldBorderUtils = privateMines.getWorldBorderUtils();
+        WorldBorder worldBorder = worldBorderUtils.getWorldBorder(player);
+        worldBorderUtils.clearBorder(player);
     }
 }

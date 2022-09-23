@@ -85,6 +85,7 @@ public class PrivateMines extends JavaPlugin {
     private SQLite sqlite;
     private BukkitAudiences adventure;
     private ProtocolManager protocolManager;
+    private WorldBorderUtils worldBorderUtils;
     String matString;
     double percent;
     boolean pregenMode;
@@ -107,6 +108,7 @@ public class PrivateMines extends JavaPlugin {
             mineStorage = new MineStorage();
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
+            worldBorderUtils = new WorldBorderUtils();
 
             getLogger().info("protocolManager " + protocolManager);
 
@@ -137,7 +139,7 @@ public class PrivateMines extends JavaPlugin {
                 e.printStackTrace();
             }
 
-            configManager = ConfigManager.create(this)
+            ConfigManager configManager = ConfigManager.create(this)
                     .addConverter(Material.class, Material::valueOf, Material::toString)
                     .target(Config.class)
                     .load();
@@ -302,6 +304,7 @@ public class PrivateMines extends JavaPlugin {
                             .setMinimumFullRegion(fullRegionMin)
                             .setMaximumFullRegion(fullRegionMax)
                             .setMineLocation(mineLocation)
+                            .setSpawnLocation(spawn)
                             .setMineType(mineType)
                             .setOpen(isOpen)
                             .setTax(tax)
@@ -311,9 +314,6 @@ public class PrivateMines extends JavaPlugin {
                     }
                     mine.setMineData(mineData);
                     mine.setSpawnLocation(spawn);
-//                    mineStorage.addMine(owner, mine);
-//                    mine.startResetTask();
-//                    mine.startPercentageTask();
                     mineStorage.addMine(owner, mine);
                     mine.startResetTask();
                     mine.startPercentageTask();
@@ -511,5 +511,9 @@ public class PrivateMines extends JavaPlugin {
 
     public ProtocolManager getProtocolManager() {
         return protocolManager;
+    }
+
+    public WorldBorderUtils getWorldBorderUtils() {
+        return worldBorderUtils;
     }
 }
