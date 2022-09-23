@@ -1,5 +1,6 @@
 package me.untouchedodin0.kotlin.menu
 
+import me.untouchedodin0.kotlin.utils.BuilderUtils
 import me.untouchedodin0.privatemines.PrivateMines
 import me.untouchedodin0.privatemines.utils.ActionUtils
 import me.untouchedodin0.privatemines.utils.Utils
@@ -13,7 +14,6 @@ import redempt.redlib.config.annotations.ConfigPath
 import redempt.redlib.inventorygui.InventoryGUI
 import redempt.redlib.inventorygui.ItemButton
 import redempt.redlib.itemutils.ItemBuilder
-import java.util.concurrent.atomic.AtomicInteger
 
 @ConfigMappable
 class Menu {
@@ -29,23 +29,27 @@ class Menu {
         val slots = rows * 9
         val inventoryGUI = InventoryGUI(slots, Utils.colorBukkit(title))
         val mineStorage = privateMines.mineStorage
-        val atomicSlot = AtomicInteger()
+        var buttonSlot = 0
 
         if (name.equals("publicMines", true)) {
             mineStorage.mines.forEach { (uuid, mine) ->
                 run {
-                    val name = Bukkit.getOfflinePlayer(uuid).name + "'s Mine"
+                    val name = "${Bukkit.getOfflinePlayer(uuid).name}'s Mine"
                     val tax = mine.mineData.tax
-                    val itemButton = ItemButton.create(ItemBuilder(Material.BEACON).setName(name)
-                        .addLore(ChatColor.GRAY.toString() + "Click to teleport")
-                        .addLore(ChatColor.GRAY.toString() + "Tax $tax%")
+
+                    val itemButton = ItemButton.create(
+                        BuilderUtils().itemBuilder(Material.BEACON) {
+                            setName(name)
+                            addLore("${ChatColor.GRAY}Click to teleport")
+                            addLore("${ChatColor.GRAY}Tax $tax%")
+                        }
                     ) { event: InventoryClickEvent? ->
                         run {
                             event?.isCancelled = true
                             mine.teleport(player)
                         }
                     }
-                    inventoryGUI.addButton(atomicSlot.getAndIncrement(), itemButton)
+                    inventoryGUI.addButton(buttonSlot++, itemButton)
                 }
             }
             inventoryGUI.open(player)
@@ -67,8 +71,8 @@ class Menu {
                         ActionUtils.handleClick(player, action)
                     }
                 }
-                if (slot != null) {
-                    inventoryGUI.addButton(slot, itemButton)
+                slot?.let {
+                    inventoryGUI.addButton(slot,itemButton)
                 }
             }
             inventoryGUI.open(player)

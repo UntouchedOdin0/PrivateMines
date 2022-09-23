@@ -10,39 +10,19 @@ import java.util.*
 class MineStorage {
     var mines: MutableMap<UUID, Mine> = HashMap()
     var privateMines: PrivateMines = PrivateMines.getPrivateMines()
+    private val logger = privateMines.logger
 
-    fun addMine(uuid: UUID, mine: Mine) {
-        if (mines.containsKey(uuid)) {
-            privateMines.logger.info(String.format("Player %s already has a mine!!", uuid.toString()))
-        } else {
-            mines[uuid] = mine
-        }
-    }
+    fun addMine(uuid: UUID, mine: Mine) = mines.computeIfAbsent(uuid) { mine }
 
-    fun removeMine(uuid: UUID) {
-        if (!mines.containsKey(uuid)) {
-            privateMines.logger.warning(String.format("Player %s doesn't have a mine!!", uuid.toString()))
-        } else {
-            mines.remove(uuid)
-        }
-    }
+    fun removeMine(uuid: UUID) = mines.remove(uuid) ?: logger.warning("Player $uuid doesn't have a mine!!")
 
     fun replaceMine(uuid: UUID, mine: Mine) {
-        if (!mines.containsKey(uuid)) {
-            privateMines.logger.warning(String.format("Player %s doesn't have a mine!!", uuid.toString()))
-        } else {
-            mines.replace(uuid, mine)
-            privateMines.logger.info(String.format("Successfully replaced %s's mine!", uuid.toString()))
-        }
+        mines.replace(uuid,mine).also {
+            logger.info("Successfully replaced $uuid's mine!")
+        } ?: logger.warning("Player $uuid doesn't have a mine!!")
     }
 
-    fun replaceMineNoLog(uuid: UUID, mine: Mine) {
-        if (!mines.containsKey(uuid)) {
-            privateMines.logger.warning(String.format("Player %s doesn't have a mine!", uuid.toString()))
-        } else {
-            mines.replace(uuid, mine)
-        }
-    }
+    fun replaceMineNoLog(uuid: UUID, mine: Mine) = mines.replace(uuid,mine) ?: logger.warning("Player $uuid doesn't have a mine!!")
 
     fun hasMine(uuid: UUID): Boolean {
         return mines.containsKey(uuid)
@@ -60,58 +40,47 @@ class MineStorage {
         return get(player.uniqueId)
     }
 
-    fun getTotalMines(): Int {
-        return mines.size
-    }
+    val totalMines
+    get() = mines.size
 
     fun getClosest(player: Player, location: Location): Mine? {
         // Make a distances value and make an empty map for the distances
         val distances: MutableMap<Mine, Double> = HashMap()
-        var min: Map.Entry<Mine, Double>? = null
 
         // Iterate over all the mines calculating the distance
         // from the location then add the mine, and it's distance
         // into the map.
 
-        mines.forEach { (_: UUID?, mine: Mine) ->
-            val mineData = mine.mineData
-            val mineLocation = mineData.mineLocation
+        mines.forEach {
+            val mineLocation = it.value.mineData.mineLocation
             val distance = location.distance(mineLocation)
-            distances.putIfAbsent(mine, distance)
-            print("distance: $distance")
+            distances.putIfAbsent(it.value, distance)
+            println("distance: $distance")
         }
-        for (entry in distances.entries) {
-            if (min == null || min.value > entry.value) {
-                min = entry
-                if (min.value > 20) {
-                    player.sendMessage(ChatColor.RED.toString() + "You're not in any mines!")
-                    return null
-                }
-            }
+        val min = distances.entries.minByOrNull { it.value } ?: return null
+
+        if (min.value > 20) {
+            player.sendMessage("${ChatColor.RED}You're not in any mines!")
+            return null
         }
-        return min!!.key
+
+        return min.key
     }
 
-    fun getClosest(location: Location): Mine {
+    fun getClosest(location: Location): Mine? {
         // Make a distances value and make an empty map for the distances
         val distances: MutableMap<Mine, Double> = HashMap()
-        var min: Map.Entry<Mine, Double>? = null
 
         // Iterate over all the mines calculating the distance
         // from the location then add the mine, and it's distance
         // into the map.
-
-        mines.forEach { (_: UUID?, mine: Mine) ->
-            val mineData = mine.mineData
-            val mineLocation = mineData.mineLocation
+        mines.forEach {
+            val mineLocation = it.value.mineData.mineLocation
             val distance = location.distance(mineLocation)
-            distances.putIfAbsent(mine, distance)
+            distances.putIfAbsent(it.value, distance)
         }
-        for (entry in distances.entries) {
-            if (min == null || min.value > entry.value) {
-                min = entry
-            }
-        }
-        return min!!.key
+        return distances.entries.minByOrNull {
+            it.value
+        }?.key
     }
 }
