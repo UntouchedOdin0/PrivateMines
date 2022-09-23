@@ -34,27 +34,6 @@ public class PrivateMinesCommand {
     @CommandHook("main")
     public void main(CommandSender sender) {
         if (sender instanceof Player player) {
-
-            player.sendMessage("" + Config.spawnPoint);
-            player.sendMessage("" + Config.mineCorner);
-            player.sendMessage("" + Config.sellNpc);
-            player.sendMessage("" + Config.upgradeMaterial);
-            player.sendMessage("" + Config.quarryMaterial);
-            player.sendMessage("" + Config.mineDistance);
-            player.sendMessage("" + Config.mineYLevel);
-            player.sendMessage("" + Config.teleportDelay);
-            player.sendMessage("" + Config.addWallGap);
-            player.sendMessage("" + Config.shouldWallsGoUp);
-            player.sendMessage("" + Config.giveMineOnFirstJoin);
-            player.sendMessage("" + Config.onlyReplaceAir);
-            player.sendMessage("" + Config.borderUpgrade);
-            player.sendMessage("" + Config.locale);
-            player.sendMessage("" + Config.useAdventure);
-            player.sendMessage("" + Config.enableMenu);
-            player.sendMessage("" + Config.enableTax);
-            player.sendMessage("" + Config.sendTaxMessages);
-
-
             Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
             mainMenu.open(player);
 
@@ -63,7 +42,7 @@ public class PrivateMinesCommand {
             Location location = player.getLocation();
             double size = 5;
 
-            player.sendMessage("worldBorderUtils: " + worldBorderUtils);
+//            player.sendMessage("worldBorderUtils: " + worldBorderUtils);
 
 //            worldBorderUtils.clearBorder(player);
 //            if (worldBorderUtils.isSetBorder()) {
