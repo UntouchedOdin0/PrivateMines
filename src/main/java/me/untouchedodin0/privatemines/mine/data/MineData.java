@@ -33,6 +33,11 @@ import redempt.redlib.region.CuboidRegion;
 
 import java.util.*;
 
+/**
+ * {@code @Depreciate}
+ * @see me.untouchedodin0.kotlin.mine.data.MineData
+ */
+@Deprecated
 public class MineData {
     UUID mineOwner;
     UUID coOwner;
