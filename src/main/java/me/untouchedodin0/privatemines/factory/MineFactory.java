@@ -68,15 +68,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -84,13 +80,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
 public class MineFactory {
-
     PrivateMines privateMines = PrivateMines.getPrivateMines();
     EditSession editSession;
     Location quarryL;
-
 
     /**
      * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
@@ -107,7 +100,6 @@ public class MineFactory {
         Map<String, Boolean> flags = mineType.getFlags();
         Map<String, Boolean> fullFlags = mineType.getFullFlags();
         Map<Material, Double> prices = new HashMap<>();
-        Connection connection = privateMines.getSqlite().getSQLConnection();
 
         Map<Material, Double> materials = mineType.getMaterials();
         if (materials != null) {
@@ -273,26 +265,6 @@ public class MineFactory {
                                 .build();
                         mine.setMineData(mineData);
                         mine.saveMineData(player, mineData);
-
-                        try {
-                            PreparedStatement preparedStatement = connection
-                                    .prepareStatement("INSERT or IGNORE into privatemines (mineOwner, mineType, mineLocation," +
-                                            " corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen)" +
-                                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
-                            preparedStatement.setString(1, uuid.toString());
-                            preparedStatement.setString(2, mineType.getName());
-                            preparedStatement.setString(3, LocationUtils.toString(location));
-                            preparedStatement.setString(4, LocationUtils.toString(lrailsL));
-                            preparedStatement.setString(5, LocationUtils.toString(urailsL));
-                            preparedStatement.setString(6, LocationUtils.toString(fullMin));
-                            preparedStatement.setString(7, LocationUtils.toString(fullMax));
-                            preparedStatement.setString(8, LocationUtils.toString(spongeL));
-                            preparedStatement.setDouble(9, mineData.getTax());
-                            preparedStatement.setBoolean(10, true);
-                            preparedStatement.executeUpdate();
-                        } catch (SQLException e) {
-                            throw new RuntimeException(e);
-                        }
                     } catch (IncompleteRegionException e) {
                         e.printStackTrace();
                     }

@@ -108,10 +108,12 @@ public class Mine {
     }
 
     public void teleport(Player player) {
+        Location spawn = Objects.requireNonNullElse(getSpawnLocation(), getMineData().getSpawnLocation());
+
         if (getSpawnLocation().getBlock().getType().isBlock()) {
             getSpawnLocation().getBlock().setType(Material.AIR, false);
             if (PaperLib.isPaper()) {
-                PaperLib.teleportAsync(player, getSpawnLocation());
+                PaperLib.teleportAsync(player, spawn);
                 player.sendMessage(ChatColor.GREEN + "You've been teleported to your mine!");
             }
         }

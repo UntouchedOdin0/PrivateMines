@@ -11,3 +11,4 @@ depend:
 softdepend:
   - AutoSell
   - UltraPrisonCore
+  - ProtocolLib

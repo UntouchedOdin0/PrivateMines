@@ -25,6 +25,7 @@ repositories {
     maven { url = 'https://libraries.minecraft.net/' }
     maven { url = 'https://repo.convallyria.com/releases' }
     maven { url = 'https://repo.minebench.de/' }
+    maven { url = 'https://repo.dmulloy2.net/repository/public/' }
 }
 
 dependencies {
@@ -44,12 +45,13 @@ dependencies {
         exclude module: 'opus-java'
     }
     compileOnly 'net.kyori:adventure-text-minimessage:4.11.0'
+    compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
 
     compileOnly files('libs/UltraPrisonCore-1.12.0-RELEASE.jar')
     compileOnly files('libs/AutoSellAPI-1.2.0.jar')
 
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-    implementation 'com.github.Redempt:RedLib:6.5.3.2'
+    implementation 'com.github.Redempt:RedLib:6.5.7'
     implementation 'com.github.Redempt:Crunch:1.1.2'
     implementation "com.convallyria.languagy:api:3.0.0"
     implementation 'com.google.code.gson:gson:2.9.0'
@@ -61,6 +63,8 @@ dependencies {
     implementation 'net.kyori:adventure-text-minimessage:4.11.0'
     implementation 'net.kyori:adventure-platform-bukkit:4.1.2'
     implementation 'org.bstats:bstats-bukkit:3.0.0'
+
+    implementation project(':WorldBorder')
 }
 
 shadowJar {
@@ -81,6 +85,12 @@ task copyTo_DevServer(type: Copy) {
     from shadowJar
     into "E:/Coding/Spigot Test Servers/1.18.2 Privates Mines (Paper)/plugins"
 }
+
+task copyTo_DevServer1_19(type: Copy) {
+    from shadowJar
+    into "E:/Coding/Spigot Test Servers/1.19.2 Privates Mines (Paper)/plugins"
+}
+
 
 task copyTo_SWM(type: Copy) {
     from shadowJar
