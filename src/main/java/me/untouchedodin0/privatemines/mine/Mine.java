@@ -550,6 +550,8 @@ public class Mine {
 
         Map<Material, Double> materials = mineData.getMaterials();
 
+        Bukkit.broadcastMessage("materials map " + mineData.getMaterials());
+
         if (!file.exists()) {
             try {
                 boolean createdNewFile = file.createNewFile();

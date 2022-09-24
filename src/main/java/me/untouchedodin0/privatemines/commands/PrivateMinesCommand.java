@@ -88,6 +88,7 @@ public class PrivateMinesCommand {
 
     @CommandHook("reset")
     public void reset(Player player) {
+
         if (!mineStorage.hasMine(player)) {
             player.sendMessage(Messages.msg("youDontOwnAMine"));
         } else {

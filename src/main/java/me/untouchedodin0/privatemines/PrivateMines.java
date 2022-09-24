@@ -190,7 +190,7 @@ public class PrivateMines extends JavaPlugin {
                 Task.asyncDelayed(() -> slimeUtils.setupSlimeWorld(UUID.randomUUID()));
             }
 
-            getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+//            getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
             if (!setupEconomy()) {
                 privateMines.getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
                 getServer().getPluginManager().disablePlugin(this);
@@ -207,17 +207,17 @@ public class PrivateMines extends JavaPlugin {
     @Override
     public void onDisable() {
 
-        getLogger().info("hi?");
-        mineStorage.getMines().forEach((uuid, mine) -> {
-            getLogger().info("     ");
-            getLogger().info("     ");
-            getLogger().info("SAVING MINE: " + mine);
-            MineData mineData = mine.getMineData();
-            Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
-            if (player != null) {
-                mine.saveMineData(player, mineData);
-            }
-        });
+        Bukkit.broadcastMessage("Disable.");
+//        mineStorage.getMines().forEach((uuid, mine) -> {
+//            getLogger().info("     ");
+//            getLogger().info("     ");
+//            getLogger().info("SAVING MINE: " + mine);
+//            MineData mineData = mine.getMineData();
+//            Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
+//            if (player != null) {
+//                mine.saveMineData(player, mineData);
+//            }
+//        });
         getLogger().info(String.format("Disabling adventure for %s", getDescription().getName()));
         if (this.adventure != null) {
             adventure.close();
@@ -260,6 +260,9 @@ public class PrivateMines extends JavaPlugin {
         final PathMatcher jsonMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
         Path path = getMinesDirectory();
         Map<Material, Double> customMaterials = new HashMap<>();
+        var ref = new Object() {
+            Material material;
+        };
 
         CompletableFuture.runAsync(() -> {
             try (Stream<Path> paths = Files.walk(path).filter(jsonMatcher::matches)) {
@@ -281,36 +284,89 @@ public class PrivateMines extends JavaPlugin {
                     Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
                     boolean isOpen = yml.getBoolean("isOpen");
                     double tax = yml.getDouble("tax");
-
                     String materialsString = yml.getString("materials");
+
+                    getLogger().info("-----------");
+                    getLogger().info("owner " + owner);
+                    getLogger().info("mine type name: " + mineTypeName);
+                    getLogger().info("mine type: " + mineType);
+                    getLogger().info("corner 1 " + corner1);
+                    getLogger().info("corner 2 " + corner2);
+                    getLogger().info("fullRegionMin " + fullRegionMin);
+                    getLogger().info("fullRegionMax " + fullRegionMax);
+                    getLogger().info("spawn " + spawn);
+                    getLogger().info("mine location " + mineLocation);
+                    getLogger().info("is open: " + isOpen);
+                    getLogger().info("tax " + tax);
+                    getLogger().info("material string " + materialsString);
+                    getLogger().info("-----------");
+
 
                     if (materialsString != null) {
                         getLogger().info("materialsString " +  materialsString);
                         materialsString = materialsString.substring(1, materialsString.length() - 1);
+                        getLogger().info("materialsString " +  materialsString);
                         String[] pairs = materialsString.split(",");
+
                         Pattern materialRegex = Pattern.compile("[a-zA-Z]+_[a-zA-Z]+");
+                        Pattern singleMaterialRegex = Pattern.compile("[a-zA-Z]+");
                         Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
-
+//
                         getLogger().info("Pairs: " + Arrays.toString(pairs));
-                        for (String string : pairs) {
-                            Matcher materialMatcher = materialRegex.matcher(string);
-                            Matcher percentPatcher = percentRegex.matcher(string);
 
-                            if (materialMatcher.find()) {
-                                matString = materialMatcher.group();
+                        for (String string : pairs) {
+                            boolean containsUnderscore = string.contains("_");
+                            Matcher materialMatcher = materialRegex.matcher(string);
+                            Matcher singleMaterialMatcher = singleMaterialRegex.matcher(string);
+                            Matcher percentPatcher = percentRegex.matcher(string);
+                            getLogger().info("contains _? " + containsUnderscore);
+                            if (containsUnderscore) {
+                                if (materialMatcher.find()) {
+                                    matString = materialMatcher.group();
+                                    ref.material = Material.valueOf(matString);
+                                }
+                            } else {
+                                if (singleMaterialMatcher.find()) {
+                                    matString = singleMaterialMatcher.group();
+                                    ref.material = Material.valueOf(matString);
+                                }
                             }
 
                             if (percentPatcher.find()) {
                                 percent = Double.parseDouble(percentPatcher.group());
                             }
 
-                            getLogger().info("mat string: " + matString);
-                            matString = matString.replace("DIAMOND", "DIAMOND_BLOCK");
-                            matString = matString.replace("EMERALD", "EMERALD_BLOCK");
+                            getLogger().info("percent? " + percent);
+                            getLogger().info("matString? " + matString);
 
-                            Material material = Material.valueOf(matString);
-                            customMaterials.put(material, percent);
+//                            getLogger().info("mat string: " + matString);
+
+//                            matString = matString.replace("DIAMOND", "DIAMOND_BLOCK");
+//                            matString = matString.replace("EMERALD", "EMERALD_BLOCK");
+
+//                            getLogger().info("mat string 2: " + matString);
+
+
+                            getLogger().info("material.ref: " + ref.material);
+                            customMaterials.put(ref.material, percent);
                         }
+
+                        MineData mineData = new MineData(
+                                owner,
+                                corner1,
+                                corner2,
+                                fullRegionMin,
+                                fullRegionMax,
+                                mineLocation,
+                                spawn,
+                                mineType,
+                                isOpen,
+                                tax
+                        );
+                        mine.setMineData(mineData);
+                        mineStorage.addMine(owner, mine);
+                    } else {
+
                     }
 
 
@@ -327,18 +383,21 @@ public class PrivateMines extends JavaPlugin {
                             tax
                     );
 
-                    getLogger().info("custom materials: " + customMaterials);
-                    if (!customMaterials.isEmpty()) {
-                        mineData.setMaterials(customMaterials);
-                    }
+//                    if (!customMaterials.isEmpty()) {
+//                        mineData.setMaterials(customMaterials);
+//                    }
                     mine.setMineData(mineData);
-                    mine.saveMineData(Objects.requireNonNull(Bukkit.getOfflinePlayer(owner).getPlayer()), mineData);
+                    //mine.saveMineData(Objects.requireNonNull(Bukkit.getOfflinePlayer(owner).getPlayer()), mineData);
+
 //                    mineStorage.addMine(owner, mine);
 //                    mine.startResetTask();
 //                    mine.startPercentageTask();
+//                    Bukkit.getLogger().info("mine: " + mine);
                     mineStorage.addMine(owner, mine);
                     mine.startResetTask();
                     mine.startPercentageTask();
+
+                    getLogger().info("mine storage: " + mineStorage.getMines());
                 });
 
 //                    if (materialsString != null) {
