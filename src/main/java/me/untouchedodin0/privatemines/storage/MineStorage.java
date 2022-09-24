@@ -1,8 +1,8 @@
 package me.untouchedodin0.privatemines.storage;
 
+import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
-import me.untouchedodin0.privatemines.mine.data.MineData;
 import org.bukkit.Location;
 
 import java.util.HashMap;

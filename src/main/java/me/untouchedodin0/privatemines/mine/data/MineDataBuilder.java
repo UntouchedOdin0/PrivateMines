@@ -34,6 +34,11 @@ import redempt.redlib.region.CuboidRegion;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * {@code @Depreciate}
+ * @see me.untouchedodin0.kotlin.mine.data.MineData
+ */
+@Deprecated
 public class MineDataBuilder {
     UUID mineOwner;
     Location mineLocation;

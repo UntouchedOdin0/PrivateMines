@@ -42,6 +42,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import io.papermc.lib.PaperLib;
+import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -51,7 +52,6 @@ import me.untouchedodin0.privatemines.events.PrivateMineExpandEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineResetEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineUpgradeEvent;
 import me.untouchedodin0.privatemines.factory.MineFactory;
-import me.untouchedodin0.privatemines.mine.data.MineData;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import net.milkbowl.vault.economy.Economy;
@@ -73,7 +73,6 @@ import java.util.concurrent.TimeUnit;
 public class Mine {
     private final PrivateMines privateMines;
     private BlockVector3 location;
-    private Location spawnLocation;
     private MineData mineData;
     private boolean canExpand = true;
     private Task task;
@@ -92,11 +91,7 @@ public class Mine {
     }
 
     public Location getSpawnLocation() {
-        return spawnLocation;
-    }
-
-    public void setSpawnLocation(Location spawnLocation) {
-        this.spawnLocation = spawnLocation;
+        return mineData.getSpawnLocation();
     }
 
     public MineData getMineData() {
@@ -108,12 +103,11 @@ public class Mine {
     }
 
     public void teleport(Player player) {
-        Location spawn = Objects.requireNonNullElse(getSpawnLocation(), getMineData().getSpawnLocation());
 
         if (getSpawnLocation().getBlock().getType().isBlock()) {
             getSpawnLocation().getBlock().setType(Material.AIR, false);
             if (PaperLib.isPaper()) {
-                PaperLib.teleportAsync(player, spawn);
+                PaperLib.teleportAsync(player, getSpawnLocation());
                 player.sendMessage(ChatColor.GREEN + "You've been teleported to your mine!");
             }
         }
@@ -243,51 +237,11 @@ public class Mine {
 
         if (privateMineResetEvent.isCancelled()) return;
 
-        if (customMaterials != null) {
-            if (!customMaterials.isEmpty()) {
-                customMaterials.forEach((material, chance) -> {
-                    Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
-                    randomPattern.add(pattern, chance);
-                });
-
-                World world = location.getWorld();
-                Player player = Bukkit.getPlayer(mineData.getMineOwner());
-                if (player != null && player.isOnline()) {
-                    boolean isPlayerInRegion = fullRegion.contains(player.getLocation().getBlockX(),
-                            player.getLocation().getBlockY(),
-                            player.getLocation().getBlockZ());
-                    if (isPlayerInRegion) {
-                        teleport(player);
-                    }
-                }
-
-                for (Player online : Bukkit.getOnlinePlayers()) {
-                    boolean isPlayerInRegion = fullRegion.contains(
-                            online.getLocation().getBlockX(),
-                            online.getLocation().getBlockY(),
-                            online.getLocation().getBlockZ());
-                    if (isPlayerInRegion) teleport(online);
-                }
-
-                try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
-                    Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
-
-                    if (Config.onlyReplaceAir) {
-                        if (BlockTypes.AIR != null) {
-                            editSession.replaceBlocks(region, Collections.singleton(BlockTypes.AIR.getDefaultState().toBaseBlock()), randomPattern);
-                        }
-                    } else {
-                        editSession.setBlocks(region, randomPattern);
-                    }
-                }
-            }
-        } else {
-            if (materials != null) {
-                materials.forEach((material, chance) -> {
-                    Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
-                    randomPattern.add(pattern, chance);
-                });
-            }
+        if (!customMaterials.isEmpty()) {
+            customMaterials.forEach((material, chance) -> {
+                Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+                randomPattern.add(pattern, chance);
+            });
 
             World world = location.getWorld();
             Player player = Bukkit.getPlayer(mineData.getMineOwner());
@@ -339,7 +293,7 @@ public class Mine {
 
         if (privateMineResetEvent.isCancelled()) return;
 
-        if (mineBlocks != null && !mineBlocks.isEmpty()) {
+        if (!mineBlocks.isEmpty()) {
             mineBlocks.forEach((material, chance) -> {
                 Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
                 randomPattern.add(pattern, chance);
@@ -382,7 +336,7 @@ public class Mine {
 
         if (privateMineResetEvent.isCancelled()) return;
 
-        if (mineBlocks != null && !mineBlocks.isEmpty()) {
+        if (!mineBlocks.isEmpty()) {
             mineBlocks.forEach((material, chance) -> {
                 Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
                 randomPattern.add(pattern, chance);
@@ -448,7 +402,7 @@ public class Mine {
         Player owner = Bukkit.getPlayer(mineData.getMineOwner());
         if (player.equals(owner)) return;
         player.sendMessage(ChatColor.RED + "You've been banned from " + Objects.requireNonNull(owner).getName() + "'s mine!");
-        mineData.addBannedPlayer(player.getUniqueId());
+        mineData.getBannedPlayers().add(player.getUniqueId());
         setMineData(mineData);
         saveMineData(Objects.requireNonNull(owner), mineData);
     }
@@ -456,7 +410,7 @@ public class Mine {
     public void unban(Player player) {
         Player owner = Bukkit.getPlayer(mineData.getMineOwner());
         player.sendMessage(ChatColor.RED + "You've been unbanned from " + Objects.requireNonNull(owner).getName() + "'s mine!");
-        mineData.removeBannedPlayer(player.getUniqueId());
+        mineData.getBannedPlayers().remove(player.getUniqueId());
         setMineData(mineData);
         saveMineData(Objects.requireNonNull(owner), mineData);
     }
@@ -629,9 +583,7 @@ public class Mine {
             yml.set("tax", tax);
             yml.set("isOpen", open);
             yml.set("bannedPlayers", bannedPlayers);
-            if (materials != null) {
-                yml.set("materials", materials.toString());
-            }
+            yml.set("materials", materials.toString());
 
             try {
                 yml.save(file);
