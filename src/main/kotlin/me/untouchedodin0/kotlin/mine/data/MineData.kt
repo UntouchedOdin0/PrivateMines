@@ -14,12 +14,12 @@ data class MineData(
     var minimumFullRegion: Location,
     var maximumFullRegion: Location,
     val mineLocation: Location,
+    var spawnLocation: Location,
     val mineType: MineType,
     var isOpen: Boolean = false,
     var tax: Double = 5.0,
 ) {
     var shop: Shop? = null
-    var spawnLocation: Location? = null
 
     var bannedPlayers: MutableList<UUID> = mutableListOf()
     var materials: Map<Material, Double> = EnumMap(Material::class.java)
@@ -41,9 +41,9 @@ data class MineData(
         minimumFullRegion,
         maximumFullRegion,
         mineLocation,
+        spawnLocation,
         mineType
     ) {
-        this.spawnLocation = spawnLocation
         this.shop = shop
     }
 }

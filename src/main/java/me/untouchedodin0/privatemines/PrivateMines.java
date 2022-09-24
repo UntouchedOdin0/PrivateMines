@@ -304,6 +304,7 @@ public class PrivateMines extends JavaPlugin {
                             fullRegionMin,
                             fullRegionMax,
                             mineLocation,
+                            spawn,
                             mineType,
                             isOpen,
                             tax
@@ -313,7 +314,6 @@ public class PrivateMines extends JavaPlugin {
                         mineData.setMaterials(customMaterials);
                     }
                     mine.setMineData(mineData);
-                    mine.setSpawnLocation(spawn);
 //                    mineStorage.addMine(owner, mine);
 //                    mine.startResetTask();
 //                    mine.startPercentageTask();

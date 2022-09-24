@@ -257,8 +257,8 @@ public class MineFactory {
                                 lrailsL,
                                 fullMin,
                                 fullMax,
-                                spongeL,
                                 location,
+                                spongeL,
                                 mineType,
                                 shop
                         );
@@ -433,8 +433,8 @@ public class MineFactory {
                                 lrailsL,
                                 fullMin,
                                 fullMax,
-                                spongeL,
                                 location,
+                                spongeL,
                                 mineType,
                                 shop
                         );

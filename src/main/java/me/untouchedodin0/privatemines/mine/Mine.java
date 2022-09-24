@@ -73,7 +73,6 @@ import java.util.concurrent.TimeUnit;
 public class Mine {
     private final PrivateMines privateMines;
     private BlockVector3 location;
-    private Location spawnLocation;
     private MineData mineData;
     private boolean canExpand = true;
     private Task task;
@@ -92,11 +91,7 @@ public class Mine {
     }
 
     public Location getSpawnLocation() {
-        return spawnLocation;
-    }
-
-    public void setSpawnLocation(Location spawnLocation) {
-        this.spawnLocation = spawnLocation;
+        return mineData.getSpawnLocation();
     }
 
     public MineData getMineData() {
@@ -108,12 +103,11 @@ public class Mine {
     }
 
     public void teleport(Player player) {
-        Location spawn = Objects.requireNonNullElse(getSpawnLocation(), getMineData().getSpawnLocation());
 
         if (getSpawnLocation().getBlock().getType().isBlock()) {
             getSpawnLocation().getBlock().setType(Material.AIR, false);
             if (PaperLib.isPaper()) {
-                PaperLib.teleportAsync(player, spawn);
+                PaperLib.teleportAsync(player, getSpawnLocation());
                 player.sendMessage(ChatColor.GREEN + "You've been teleported to your mine!");
             }
         }
