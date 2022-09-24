@@ -18,6 +18,7 @@ import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.misc.ChatPrompt;
@@ -37,36 +38,21 @@ public class PrivateMinesCommand {
             Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
             mainMenu.open(player);
 
-            WorldBorderUtils worldBorderUtils = new WorldBorderUtils();
-            Server server = Bukkit.getServer();
-            Location location = player.getLocation();
-            double size = 5;
+            if (RedLib.MID_VERSION > 1) {
+                WorldBorderUtils worldBorderUtils = new WorldBorderUtils();
+                Server server = Bukkit.getServer();
+                Location location = player.getLocation();
+                double size = 5;
 
-            player.sendMessage("worldBorderUtils: " + worldBorderUtils);
+                player.sendMessage("worldBorderUtils: " + worldBorderUtils);
 
-            worldBorderUtils.clearBorder(player);
-            if (worldBorderUtils.isSetBorder()) {
                 worldBorderUtils.clearBorder(player);
-            } else {
-                worldBorderUtils.sendWorldBorder(server, player, location, size);
+                if (worldBorderUtils.isSetBorder()) {
+                    worldBorderUtils.clearBorder(player);
+                } else {
+                    worldBorderUtils.sendWorldBorder(server, player, location, size);
+                }
             }
-
-//
-//            PacketContainer fakeExplosion = new PacketContainer(PacketType.Play.Server.EXPLOSION);
-//            fakeExplosion.getDoubles()
-//                    .write(0, player.getLocation().getX())
-//                    .write(1, player.getLocation().getY())
-//                    .write(2, player.getLocation().getZ());
-//            fakeExplosion.getFloat().write(0, 3.0F);
-//            fakeExplosion.getBlockPositionCollectionModifier().write(0, new ArrayList<>());
-//
-//            player.sendMessage("packetContainer " + fakeExplosion);
-//
-//            try {
-//                protocolManager.sendServerPacket(player, fakeExplosion);
-//            } catch (InvocationTargetException e) {
-//                throw new RuntimeException(e);
-//            }
         }
     }
 

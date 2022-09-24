@@ -206,19 +206,33 @@ public class PrivateMines extends JavaPlugin {
 
     @Override
     public void onDisable() {
+
+        getLogger().info("hi?");
+        mineStorage.getMines().forEach((uuid, mine) -> {
+            getLogger().info("     ");
+            getLogger().info("     ");
+            getLogger().info("SAVING MINE: " + mine);
+            MineData mineData = mine.getMineData();
+            Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
+            if (player != null) {
+                mine.saveMineData(player, mineData);
+            }
+        });
         getLogger().info(String.format("Disabling adventure for %s", getDescription().getName()));
         if (this.adventure != null) {
             adventure.close();
             this.adventure = null;
         }
 
-        mineStorage.getMines().forEach((uuid, mine) -> {
-            Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
-            MineData mineData = mine.getMineData();
-            if (player != null) {
-                mine.saveMineData(player, mineData);
-            }
-        });
+//        mineStorage.getMines().forEach((uuid, mine) -> {
+//            getLogger().info("saving mine: " + mine);
+//
+//            Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
+//            MineData mineData = mine.getMineData();
+//            if (player != null) {
+//                mine.saveMineData(player, mineData);
+//            }
+//        });
         getLogger().info(String.format("Disabled adventure for %s", getDescription().getName()));
         getLogger().info(String.format("%s v%s has successfully been Disabled",
                 getDescription().getName(),
@@ -271,11 +285,13 @@ public class PrivateMines extends JavaPlugin {
                     String materialsString = yml.getString("materials");
 
                     if (materialsString != null) {
+                        getLogger().info("materialsString " +  materialsString);
                         materialsString = materialsString.substring(1, materialsString.length() - 1);
                         String[] pairs = materialsString.split(",");
                         Pattern materialRegex = Pattern.compile("[a-zA-Z]+_[a-zA-Z]+");
                         Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
 
+                        getLogger().info("Pairs: " + Arrays.toString(pairs));
                         for (String string : pairs) {
                             Matcher materialMatcher = materialRegex.matcher(string);
                             Matcher percentPatcher = percentRegex.matcher(string);
@@ -311,10 +327,12 @@ public class PrivateMines extends JavaPlugin {
                             tax
                     );
 
+                    getLogger().info("custom materials: " + customMaterials);
                     if (!customMaterials.isEmpty()) {
                         mineData.setMaterials(customMaterials);
                     }
                     mine.setMineData(mineData);
+                    mine.saveMineData(Objects.requireNonNull(Bukkit.getOfflinePlayer(owner).getPlayer()), mineData);
 //                    mineStorage.addMine(owner, mine);
 //                    mine.startResetTask();
 //                    mine.startPercentageTask();

@@ -572,6 +572,7 @@ public class Mine {
             yml.set("bannedPlayers", bannedPlayers);
             yml.set("materials", materials);
 
+            privateMines.getLogger().info("disable materials 1: " + materials);
             try {
                 yml.save(file);
             } catch (IOException e) {
@@ -584,6 +585,8 @@ public class Mine {
             yml.set("isOpen", open);
             yml.set("bannedPlayers", bannedPlayers);
             yml.set("materials", materials.toString());
+
+            privateMines.getLogger().info("disable materials 2: " + materials);
 
             try {
                 yml.save(file);
