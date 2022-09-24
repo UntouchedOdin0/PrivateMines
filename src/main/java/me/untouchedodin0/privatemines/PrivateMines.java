@@ -203,8 +203,9 @@ public class PrivateMines extends JavaPlugin {
         mineStorage.getMines().forEach((uuid, mine) -> {
             Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
             MineData mineData = mine.getMineData();
-            assert player != null;
-            mine.saveMineData(player, mineData);
+            if (player != null) {
+                mine.saveMineData(player, mineData);
+            }
         });
         getLogger().info(String.format("Disabled adventure for %s", getDescription().getName()));
         getLogger().info(String.format("%s v%s has successfully been Disabled",
