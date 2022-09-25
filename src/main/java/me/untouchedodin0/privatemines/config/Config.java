@@ -55,6 +55,8 @@ public class Config {
     public static boolean shouldWallsGoUp = false;
     @Comment("Should we give players a mine when they first join?")
     public static boolean giveMineOnFirstJoin = false;
+    @Comment("Used for giving mines before the server has released")
+    public static boolean preLoginGiveMine = false;
     @Comment("Should we only replace air blocks when the mine resets?")
     public static boolean onlyReplaceAir = true;
     @Comment("Should we upgrade the mine upon reaching the outside border?")

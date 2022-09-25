@@ -31,11 +31,12 @@ import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class PlayerJoinListener implements Listener {
@@ -44,17 +45,19 @@ public class PlayerJoinListener implements Listener {
     MineFactory mineFactory = privateMines.getMineFactory();
     MineStorage mineStorage = privateMines.getMineStorage();
     MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
-    @EventHandler
+
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent playerJoinEvent) {
         Player player = playerJoinEvent.getPlayer();
         MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
         Location location = mineWorldManager.getNextFreeLocation();
         MineType mineType = mineTypeManager.getDefaultMineType();
 
-        if (Config.giveMineOnFirstJoin) {
-            if (!mineStorage.hasMine(player.getUniqueId())) {
-                mineFactory.create(player, location, mineType);
+
+        if (Config.preLoginGiveMine) {
+//            if (!player.hasPermission("privatemines.register.bypass")) {
+                player.kickPlayer(ChatColor.GREEN + "Thank you for registering you mine!" +
+                        "\nYour mine will be ready when the server releases!");
             }
         }
     }
-}

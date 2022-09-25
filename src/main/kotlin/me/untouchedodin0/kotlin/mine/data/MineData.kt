@@ -42,7 +42,7 @@ data class MineData(
         maximumFullRegion,
         mineLocation,
         spawnLocation,
-        mineType
+        mineType,
     ) {
         this.shop = shop
     }

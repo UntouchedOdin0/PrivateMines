@@ -51,7 +51,10 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -190,6 +193,7 @@ public class PrivateMines extends JavaPlugin {
                 Task.asyncDelayed(() -> slimeUtils.setupSlimeWorld(UUID.randomUUID()));
             }
 
+            getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
 //            getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
             if (!setupEconomy()) {
                 privateMines.getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
@@ -206,37 +210,22 @@ public class PrivateMines extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
-        Bukkit.broadcastMessage("Disable.");
-//        mineStorage.getMines().forEach((uuid, mine) -> {
-//            getLogger().info("     ");
-//            getLogger().info("     ");
-//            getLogger().info("SAVING MINE: " + mine);
-//            MineData mineData = mine.getMineData();
-//            Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
-//            if (player != null) {
-//                mine.saveMineData(player, mineData);
-//            }
-//        });
         getLogger().info(String.format("Disabling adventure for %s", getDescription().getName()));
         if (this.adventure != null) {
             adventure.close();
             this.adventure = null;
         }
 
-//        mineStorage.getMines().forEach((uuid, mine) -> {
-//            getLogger().info("saving mine: " + mine);
-//
-//            Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
-//            MineData mineData = mine.getMineData();
-//            if (player != null) {
-//                mine.saveMineData(player, mineData);
-//            }
-//        });
         getLogger().info(String.format("Disabled adventure for %s", getDescription().getName()));
         getLogger().info(String.format("%s v%s has successfully been Disabled",
                 getDescription().getName(),
                 getDescription().getVersion()));
+        getMineStorage().getMines().forEach((uuid, mine) -> {
+            Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
+            if (player != null) {
+                mine.saveMineData(player, mine.getMineData());
+            }
+        });
     }
 
     public void setupSchematicUtils() {
@@ -286,40 +275,19 @@ public class PrivateMines extends JavaPlugin {
                     double tax = yml.getDouble("tax");
                     String materialsString = yml.getString("materials");
 
-                    getLogger().info("-----------");
-                    getLogger().info("owner " + owner);
-                    getLogger().info("mine type name: " + mineTypeName);
-                    getLogger().info("mine type: " + mineType);
-                    getLogger().info("corner 1 " + corner1);
-                    getLogger().info("corner 2 " + corner2);
-                    getLogger().info("fullRegionMin " + fullRegionMin);
-                    getLogger().info("fullRegionMax " + fullRegionMax);
-                    getLogger().info("spawn " + spawn);
-                    getLogger().info("mine location " + mineLocation);
-                    getLogger().info("is open: " + isOpen);
-                    getLogger().info("tax " + tax);
-                    getLogger().info("material string " + materialsString);
-                    getLogger().info("-----------");
-
-
                     if (materialsString != null) {
-                        getLogger().info("materialsString " +  materialsString);
                         materialsString = materialsString.substring(1, materialsString.length() - 1);
-                        getLogger().info("materialsString " +  materialsString);
                         String[] pairs = materialsString.split(",");
 
                         Pattern materialRegex = Pattern.compile("[a-zA-Z]+_[a-zA-Z]+");
                         Pattern singleMaterialRegex = Pattern.compile("[a-zA-Z]+");
                         Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
-//
-                        getLogger().info("Pairs: " + Arrays.toString(pairs));
 
                         for (String string : pairs) {
                             boolean containsUnderscore = string.contains("_");
                             Matcher materialMatcher = materialRegex.matcher(string);
                             Matcher singleMaterialMatcher = singleMaterialRegex.matcher(string);
                             Matcher percentPatcher = percentRegex.matcher(string);
-                            getLogger().info("contains _? " + containsUnderscore);
                             if (containsUnderscore) {
                                 if (materialMatcher.find()) {
                                     matString = materialMatcher.group();
@@ -335,19 +303,6 @@ public class PrivateMines extends JavaPlugin {
                             if (percentPatcher.find()) {
                                 percent = Double.parseDouble(percentPatcher.group());
                             }
-
-                            getLogger().info("percent? " + percent);
-                            getLogger().info("matString? " + matString);
-
-//                            getLogger().info("mat string: " + matString);
-
-//                            matString = matString.replace("DIAMOND", "DIAMOND_BLOCK");
-//                            matString = matString.replace("EMERALD", "EMERALD_BLOCK");
-
-//                            getLogger().info("mat string 2: " + matString);
-
-
-                            getLogger().info("material.ref: " + ref.material);
                             customMaterials.put(ref.material, percent);
                         }
 
@@ -363,41 +318,42 @@ public class PrivateMines extends JavaPlugin {
                                 isOpen,
                                 tax
                         );
+
+                        mineData.setMaterials(customMaterials);
                         mine.setMineData(mineData);
                         mineStorage.addMine(owner, mine);
                     } else {
-
+                        MineData mineData = new MineData(
+                                owner,
+                                corner1,
+                                corner2,
+                                fullRegionMin,
+                                fullRegionMax,
+                                mineLocation,
+                                spawn,
+                                mineType,
+                                isOpen,
+                                tax
+                        );
+                        mine.setMineData(mineData);
+                        mineStorage.addMine(owner, mine);
                     }
 
 
-                    MineData mineData = new MineData(
-                            owner,
-                            corner1,
-                            corner2,
-                            fullRegionMin,
-                            fullRegionMax,
-                            mineLocation,
-                            spawn,
-                            mineType,
-                            isOpen,
-                            tax
-                    );
+
 
 //                    if (!customMaterials.isEmpty()) {
 //                        mineData.setMaterials(customMaterials);
 //                    }
-                    mine.setMineData(mineData);
                     //mine.saveMineData(Objects.requireNonNull(Bukkit.getOfflinePlayer(owner).getPlayer()), mineData);
 
 //                    mineStorage.addMine(owner, mine);
 //                    mine.startResetTask();
 //                    mine.startPercentageTask();
 //                    Bukkit.getLogger().info("mine: " + mine);
-                    mineStorage.addMine(owner, mine);
+//                    mineStorage.addMine(owner, mine);
                     mine.startResetTask();
                     mine.startPercentageTask();
-
-                    getLogger().info("mine storage: " + mineStorage.getMines());
                 });
 
 //                    if (materialsString != null) {

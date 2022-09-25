@@ -93,8 +93,9 @@ public class PrivateMinesCommand {
             player.sendMessage(Messages.msg("youDontOwnAMine"));
         } else {
             Mine mine = mineStorage.get(player);
+            Bukkit.broadcastMessage("mine " + mine);
             if (mine != null) {
-                mine.resetNoCheck();
+                mine.reset();
             }
             player.sendMessage(Messages.msg("yourMineHasBeenReset"));
         }

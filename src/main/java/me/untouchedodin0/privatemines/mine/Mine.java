@@ -242,6 +242,22 @@ public class Mine {
                 Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
                 randomPattern.add(pattern, chance);
             });
+            Bukkit.broadcastMessage("Custom Materials: " + customMaterials);
+        } else {
+            Bukkit.broadcastMessage("Materials: " + materials);
+            if (materials != null && !materials.isEmpty()) {
+                materials.forEach((material, chance) -> {
+                    Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+                    randomPattern.add(pattern, chance);
+                });
+            }
+        }
+//        if (!customMaterials.isEmpty()) {
+//            customMaterials.forEach((material, chance) -> {
+//                Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+//                randomPattern.add(pattern, chance);
+//                Bukkit.broadcastMessage("material " + material);
+//            });
 
             World world = location.getWorld();
             Player player = Bukkit.getPlayer(mineData.getMineOwner());
@@ -274,7 +290,6 @@ public class Mine {
                 }
             }
         }
-    }
 
     public void resetNoCheck() {
         MineData mineData = getMineData();
@@ -285,6 +300,8 @@ public class Mine {
 
         Map<Material, Double> materials = mineType.getMaterials();
         Map<Material, Double> mineBlocks = mineData.getMaterials();
+
+        Bukkit.broadcastMessage("mine blocks " + mineBlocks);
 
         final RandomPattern randomPattern = new RandomPattern();
 
@@ -596,6 +613,10 @@ public class Mine {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public void saveMineData(UUID uuid, MineData mineData) {
+        saveMineData(Objects.requireNonNull(Bukkit.getOfflinePlayer(uuid).getPlayer()), mineData);
     }
 
     public void upgrade() {

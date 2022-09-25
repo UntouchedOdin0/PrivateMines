@@ -11,6 +11,7 @@ addWallGap: true
 wallsGap: 1
 shouldWallsGoUp: false
 giveMineOnFirstJoin: true
+preLoginGiveMine: true
 onlyReplaceAir: true
 borderUpgrade: true
 locale: en_US
