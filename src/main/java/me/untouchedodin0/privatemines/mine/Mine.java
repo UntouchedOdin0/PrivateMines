@@ -242,9 +242,7 @@ public class Mine {
                 Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
                 randomPattern.add(pattern, chance);
             });
-            Bukkit.broadcastMessage("Custom Materials: " + customMaterials);
         } else {
-            Bukkit.broadcastMessage("Materials: " + materials);
             if (materials != null && !materials.isEmpty()) {
                 materials.forEach((material, chance) -> {
                     Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
