@@ -69,7 +69,7 @@ privatemine,privatemines,pmine,pmines {
         permission privatemines.unban
     }
 
-    pregen {
+    pregen int:amount {
         hook pregen
         help Toggles the pre-gen mode.
         permission privatemines.pregen

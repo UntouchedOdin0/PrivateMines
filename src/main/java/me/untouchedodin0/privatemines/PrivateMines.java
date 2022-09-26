@@ -112,12 +112,8 @@ public class PrivateMines extends JavaPlugin {
             mineTypeManager = new MineTypeManager(this);
             worldBorderUtils = new WorldBorderUtils();
 
-            getLogger().info("protocolManager " + protocolManager);
-
             if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
-                getLogger().info("protocolManager " + protocolManager);
                 protocolManager = ProtocolLibrary.getProtocolManager();
-                getLogger().info("protocolManager " + protocolManager);
             }
 
             new CommandParser(getResource("commands.rdcml"))
@@ -194,7 +190,6 @@ public class PrivateMines extends JavaPlugin {
             }
 
             getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
-//            getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
             if (!setupEconomy()) {
                 privateMines.getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
                 getServer().getPluginManager().disablePlugin(this);
