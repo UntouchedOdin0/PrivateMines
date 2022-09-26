@@ -156,6 +156,7 @@ public class MineFactory {
                     Location spongeL = new Location(location.getWorld(), vector.getBlockX(), vector.getBlockY(), vector.getBlockZ() + 1);
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ());
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
+                    Location spawnL  = spongeL.add(0.5, 0.5, 0.5);
 
                     if (quarryV != null) {
                         quarryL = new Location(location.getWorld(), quarryV.getBlockX(), quarryV.getBlockY(), quarryV.getBlockZ());
@@ -258,7 +259,7 @@ public class MineFactory {
                                 fullMin,
                                 fullMax,
                                 location,
-                                spongeL,
+                                spawnL,
                                 mineType,
                                 shop
                         );
