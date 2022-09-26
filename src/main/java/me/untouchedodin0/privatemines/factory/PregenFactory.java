@@ -15,11 +15,11 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
+import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
-import me.untouchedodin0.privatemines.pregen.PregenMineDeprecated;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
@@ -40,6 +40,8 @@ public class PregenFactory {
     EditSession editSession;
     MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
     MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
+    PregenStorage pregenStorage = privateMines.getPregenStorage();
+
     List<Location> generatedLocations = new ArrayList<>();
 
     public void generateLocations(int amount) {
@@ -105,6 +107,9 @@ public class PregenFactory {
                         pregenMine.setLowerRails(lrailsL);
                         pregenMine.setUpperRails(urailsL);
 
+                        Bukkit.broadcastMessage("pregen mines: " + pregenStorage.getMines());
+                        pregenStorage.addMine(pregenMine);
+
                         Bukkit.broadcastMessage("" + spongeL);
                         Bukkit.broadcastMessage("" + lrailsL);
                         Bukkit.broadcastMessage("" + urailsL);
@@ -112,6 +117,7 @@ public class PregenFactory {
                         Bukkit.broadcastMessage("" + pregenMine.getSpawnLocation());
                         Bukkit.broadcastMessage("" + pregenMine.getLowerRails());
                         Bukkit.broadcastMessage("" + pregenMine.getUpperRails());
+                        Bukkit.broadcastMessage("pregen mines: " + pregenStorage.getMines());
 
                         localSession.setClipboard(clipboardHolder);
 
@@ -128,6 +134,7 @@ public class PregenFactory {
                     }
                 }
             });
+
 
 //           if (clipboardFormat != null) {
 //               try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(schematicFile))) {

@@ -5,6 +5,7 @@ import com.comphenix.protocol.ProtocolManager;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
+import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.config.Config;
@@ -79,6 +80,7 @@ public class PrivateMines extends JavaPlugin {
     private SchematicIterator schematicIterator;
     private MineFactory mineFactory;
     private MineStorage mineStorage;
+    private PregenStorage pregenStorage;
     private MineWorldManager mineWorldManager;
     private MineTypeManager mineTypeManager;
     private ConfigManager configManager;
@@ -108,6 +110,7 @@ public class PrivateMines extends JavaPlugin {
         } else {
             mineFactory = new MineFactory();
             mineStorage = new MineStorage();
+            pregenStorage = new PregenStorage();
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
             worldBorderUtils = new WorldBorderUtils();
@@ -479,6 +482,10 @@ public class PrivateMines extends JavaPlugin {
 
     public MineStorage getMineStorage() {
         return mineStorage;
+    }
+
+    public PregenStorage getPregenStorage() {
+        return pregenStorage;
     }
 
     public MineWorldManager getMineWorldManager() {
