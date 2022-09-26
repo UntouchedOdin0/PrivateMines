@@ -243,8 +243,8 @@ public class PrivateMinesCommand {
 
         PregenFactory pregenFactory = new PregenFactory();
 
-        player.sendMessage("pregen factory: " + pregenFactory);
-        player.sendMessage("amount " + amount);
+//        player.sendMessage("pregen factory: " + pregenFactory);
+//        player.sendMessage("amount " + amount);
         pregenFactory.generate(player, amount);
 
 //        List<String> YES = LangUtils.YES;
