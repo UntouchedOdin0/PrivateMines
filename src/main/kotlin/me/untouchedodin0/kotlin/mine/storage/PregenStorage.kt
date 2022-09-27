@@ -13,4 +13,12 @@ class PregenStorage {
     fun getMines(): MutableList<PregenMine> {
         return pregenMines
     }
+
+    fun getAndRemove(): PregenMine? {
+        return pregenMines.removeFirstOrNull()
+    }
+
+    fun isAllRedeemed(): Boolean {
+        return pregenMines.isEmpty()
+    }
 }

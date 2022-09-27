@@ -113,6 +113,8 @@ public class PregenFactory {
                         Bukkit.broadcastMessage("" + spongeL);
                         Bukkit.broadcastMessage("" + lrailsL);
                         Bukkit.broadcastMessage("" + urailsL);
+                        Bukkit.broadcastMessage("vector: " + vector);
+
                         Bukkit.broadcastMessage("---- kotlin ----");
                         Bukkit.broadcastMessage("" + pregenMine.getSpawnLocation());
                         Bukkit.broadcastMessage("" + pregenMine.getLowerRails());

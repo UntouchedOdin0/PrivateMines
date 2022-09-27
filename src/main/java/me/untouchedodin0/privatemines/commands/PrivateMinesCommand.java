@@ -2,29 +2,30 @@ package me.untouchedodin0.privatemines.commands;
 
 import me.untouchedodin0.kotlin.menu.Menu;
 import me.untouchedodin0.kotlin.mine.data.MineData;
+import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
+import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.WorldBorderUtils;
-import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.factory.PregenFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
-import me.untouchedodin0.privatemines.utils.LangUtils;
 import me.untouchedodin0.privatemines.utils.inventory.PublicMinesMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.Messages;
-import redempt.redlib.misc.ChatPrompt;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public class PrivateMinesCommand {
@@ -240,38 +241,26 @@ public class PrivateMinesCommand {
 
     @CommandHook("pregen")
     public void pregen(Player player, int amount) {
-
         PregenFactory pregenFactory = new PregenFactory();
-
-//        player.sendMessage("pregen factory: " + pregenFactory);
-//        player.sendMessage("amount " + amount);
         pregenFactory.generate(player, amount);
+    }
 
-//        List<String> YES = LangUtils.YES;
-//        List<String> NO = LangUtils.NO;
-//
-//        if (privateMines.isPregenMode()) {
-//            player.sendMessage("" + LangUtils.YES);
-//
-//            ChatPrompt.prompt(player, ChatColor.YELLOW + "Would you like to disable pregen mode?", response -> {
-//                if (LangUtils.YES.contains(WordUtils.capitalize(response))) {
-//                    player.sendMessage(ChatColor.GREEN + "Disabling pregen mode!");
-//                    privateMines.setPregenMode(false);
-//                } else if (LangUtils.NO.contains(WordUtils.capitalize(response))) {
-//                    player.sendMessage(ChatColor.GREEN + "Pregen mode will be kept on!");
-//                }
-//            });
-//        } else {
-//            ChatPrompt.prompt(player, ChatColor.YELLOW + "Would you like to enable pregen mode?", response -> {
-//                if (LangUtils.YES.contains(WordUtils.capitalize(response))) {
-//                    player.sendMessage(ChatColor.GREEN + "Enabling pregen mode!");
-//                    privateMines.setPregenMode(true);
-//                } else if (LangUtils.NO.contains(WordUtils.capitalize(response))) {
-//                    player.sendMessage(ChatColor.GREEN + "Pregen mode will be turned off!");
-//                    privateMines.setPregenMode(false);
-//                }
-//            });
-//        }
+    @CommandHook("claim")
+    public void claim(Player player) {
+        PregenStorage pregenStorage = privateMines.getPregenStorage();
+        boolean isAllRedeemed = pregenStorage.isAllRedeemed();
+
+        if (isAllRedeemed) {
+            player.sendMessage(ChatColor.RED + "All the mines have been redeemed, please contact an");
+            player.sendMessage(ChatColor.RED + "admin and ask them to redeem some more mines!");
+        } else {
+            PregenMine pregenMine = pregenStorage.getAndRemove();
+
+            player.sendMessage(ChatColor.GREEN + "Claiming you a Mine...");
+            player.sendMessage("Pregen Storage " + pregenStorage);
+            player.sendMessage("pregen mines " + pregenStorage.getMines());
+            player.sendMessage("pregen mine: " + pregenMine);
+        }
     }
 
     @CommandHook("reload")

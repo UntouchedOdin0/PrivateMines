@@ -75,6 +75,12 @@ privatemine,privatemines,pmine,pmines {
         permission privatemines.pregen
     }
 
+    claim {
+        hook claim
+        help Claims a generated private mine
+        permission privatemines.claim
+    }
+
     setborder player:target int:size {
         hook setborder
     }
