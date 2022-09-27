@@ -113,7 +113,9 @@ public class PrivateMines extends JavaPlugin {
             pregenStorage = new PregenStorage();
             mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
-            worldBorderUtils = new WorldBorderUtils();
+            if (RedLib.MID_VERSION >= 19) {
+                worldBorderUtils = new WorldBorderUtils();
+            }
 
             if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
                 protocolManager = ProtocolLibrary.getProtocolManager();

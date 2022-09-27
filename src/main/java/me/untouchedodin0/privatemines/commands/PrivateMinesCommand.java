@@ -37,10 +37,10 @@ public class PrivateMinesCommand {
     @CommandHook("main")
     public void main(CommandSender sender) {
         if (sender instanceof Player player) {
-            Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
-            mainMenu.open(player);
-
-            if (RedLib.MID_VERSION > 1) {
+            if (RedLib.MID_VERSION < 19) {
+                Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
+                mainMenu.open(player);
+            } else {
                 WorldBorderUtils worldBorderUtils = new WorldBorderUtils();
                 Server server = Bukkit.getServer();
                 Location location = player.getLocation();
@@ -160,7 +160,7 @@ public class PrivateMinesCommand {
     }
 
     @CommandHook("setblocks")
-    public void setBlocks(Player player, Player target, Material[] materials) {
+    public void setBlocks(CommandSender commandSender, Player target, Material[] materials) {
         Mine mine = mineStorage.get(target);
         MineData mineData;
         Map<Material, Double> map = new HashMap<>();
@@ -170,7 +170,7 @@ public class PrivateMinesCommand {
                 if (material.isBlock()) {
                     map.put(material, 1.0);
                 } else {
-                    player.sendMessage(ChatColor.RED + "Could not add " + material.name() + " as it wasn't a solid block!");
+                    commandSender.sendMessage(ChatColor.RED + "Could not add " + material.name() + " as it wasn't a solid block!");
                 }
             }
 
@@ -256,10 +256,9 @@ public class PrivateMinesCommand {
         } else {
             PregenMine pregenMine = pregenStorage.getAndRemove();
 
-            player.sendMessage(ChatColor.GREEN + "Claiming you a Mine...");
-            player.sendMessage("Pregen Storage " + pregenStorage);
-            player.sendMessage("pregen mines " + pregenStorage.getMines());
-            player.sendMessage("pregen mine: " + pregenMine);
+            if (pregenMine != null) {
+                pregenMine.teleport(player);
+            }
         }
     }
 
@@ -267,7 +266,6 @@ public class PrivateMinesCommand {
     public void reload(Player player) {
         privateMines.getConfigManager().reload();
         privateMines.getConfigManager().load();
-        player.sendMessage("reload test");
     }
 
     @CommandHook("setborder")

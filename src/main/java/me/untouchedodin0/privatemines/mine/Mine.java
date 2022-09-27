@@ -250,12 +250,6 @@ public class Mine {
                 });
             }
         }
-//        if (!customMaterials.isEmpty()) {
-//            customMaterials.forEach((material, chance) -> {
-//                Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
-//                randomPattern.add(pattern, chance);
-//                Bukkit.broadcastMessage("material " + material);
-//            });
 
             World world = location.getWorld();
             Player player = Bukkit.getPlayer(mineData.getMineOwner());
@@ -298,8 +292,6 @@ public class Mine {
 
         Map<Material, Double> materials = mineType.getMaterials();
         Map<Material, Double> mineBlocks = mineData.getMaterials();
-
-        Bukkit.broadcastMessage("mine blocks " + mineBlocks);
 
         final RandomPattern randomPattern = new RandomPattern();
 
@@ -565,8 +557,6 @@ public class Mine {
 
         Map<Material, Double> materials = mineData.getMaterials();
 
-        Bukkit.broadcastMessage("materials map " + mineData.getMaterials());
-
         if (!file.exists()) {
             try {
                 boolean createdNewFile = file.createNewFile();
@@ -589,7 +579,6 @@ public class Mine {
             yml.set("bannedPlayers", bannedPlayers);
             yml.set("materials", materials);
 
-            privateMines.getLogger().info("disable materials 1: " + materials);
             try {
                 yml.save(file);
             } catch (IOException e) {
@@ -602,8 +591,6 @@ public class Mine {
             yml.set("isOpen", open);
             yml.set("bannedPlayers", bannedPlayers);
             yml.set("materials", materials.toString());
-
-            privateMines.getLogger().info("disable materials 2: " + materials);
 
             try {
                 yml.save(file);
