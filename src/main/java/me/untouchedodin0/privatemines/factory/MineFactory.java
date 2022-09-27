@@ -99,6 +99,7 @@ public class MineFactory {
         Map<String, Boolean> flags = mineType.getFlags();
         Map<String, Boolean> fullFlags = mineType.getFullFlags();
         Map<Material, Double> prices = new HashMap<>();
+        int maxPlayers = mineType.getMaxPlayers();
 
         Map<Material, Double> materials = mineType.getMaterials();
         if (materials != null) {
@@ -263,7 +264,9 @@ public class MineFactory {
                                 mineType,
                                 shop
                         );
+                        mineData.setMaxPlayers(maxPlayers);
 
+                        Bukkit.broadcastMessage("max players: " + maxPlayers);
 
                         mine.setMineData(mineData);
                         mine.saveMineData(player, mineData);
@@ -316,6 +319,7 @@ public class MineFactory {
         Mine mine = new Mine(privateMines);
         Map<String, Boolean> flags = mineType.getFlags();
         Map<Material, Double> prices = new HashMap<>();
+        int maxPlayers = mineType.getMaxPlayers();
 
         Map<Material, Double> materials = mineType.getMaterials();
         if (materials != null) {
@@ -440,6 +444,7 @@ public class MineFactory {
                                 shop
                         );
 
+                        mineData.setMaxPlayers(maxPlayers);
                         mine.setMineData(mineData);
                         mine.saveMineData(player, mineData);
                     } catch (IncompleteRegionException e) {

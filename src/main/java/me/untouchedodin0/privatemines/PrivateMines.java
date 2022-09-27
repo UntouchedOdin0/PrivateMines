@@ -14,6 +14,7 @@ import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
+import me.untouchedodin0.privatemines.listener.MaxPlayersListener;
 import me.untouchedodin0.privatemines.listener.PlayerJoinListener;
 import me.untouchedodin0.privatemines.listener.sell.AutoSellListener;
 import me.untouchedodin0.privatemines.listener.sell.UPCSellListener;
@@ -132,6 +133,7 @@ public class PrivateMines extends JavaPlugin {
             if (Config.enableTax) {
                 registerSellListener();
             }
+            registerListeners();
             setupSchematicUtils();
             Messages.load(this);
 
@@ -207,6 +209,8 @@ public class PrivateMines extends JavaPlugin {
             getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
         }
     }
+
+
 
     @Override
     public void onDisable() {
@@ -533,6 +537,10 @@ public class PrivateMines extends JavaPlugin {
             return;
         }
         getLogger().info("Using the internal sell system!");
+    }
+
+    private void registerListeners() {
+        getServer().getPluginManager().registerEvents(new MaxPlayersListener(), this);
     }
 
     public BukkitAudiences getAdventure() {

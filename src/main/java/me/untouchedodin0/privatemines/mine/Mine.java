@@ -109,6 +109,7 @@ public class Mine {
             if (PaperLib.isPaper()) {
                 PaperLib.teleportAsync(player, getSpawnLocation());
                 player.sendMessage(ChatColor.GREEN + "You've been teleported to your mine!");
+                player.sendMessage("max players: " + mineData.getMaxPlayers());
             }
         }
     }
@@ -549,10 +550,10 @@ public class Mine {
         Location fullRegionMin = mineData.getMinimumFullRegion();
         Location fullRegionMax = mineData.getMaximumFullRegion();
 
-
         Location spawn = mineData.getSpawnLocation();
         double tax = mineData.getTax();
         boolean open = mineData.isOpen();
+        int maxPlayers = mineData.getMaxPlayers();
         List<UUID> bannedPlayers = mineData.getBannedPlayers();
 
         Map<Material, Double> materials = mineData.getMaterials();
@@ -576,6 +577,7 @@ public class Mine {
             yml.set("spawn", LocationUtils.toString(spawn));
             yml.set("tax", tax);
             yml.set("isOpen", open);
+            yml.set("maxPlayers", maxPlayers);
             yml.set("bannedPlayers", bannedPlayers);
             yml.set("materials", materials);
 
@@ -589,6 +591,7 @@ public class Mine {
             yml.set("corner2", LocationUtils.toString(mineData.getMaximumMining()));
             yml.set("tax", tax);
             yml.set("isOpen", open);
+            yml.set("maxPlayers", maxPlayers);
             yml.set("bannedPlayers", bannedPlayers);
             yml.set("materials", materials.toString());
 

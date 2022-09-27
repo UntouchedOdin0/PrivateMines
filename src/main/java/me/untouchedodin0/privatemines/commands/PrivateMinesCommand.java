@@ -96,7 +96,7 @@ public class PrivateMinesCommand {
         } else {
             Mine mine = mineStorage.get(player);
             if (mine != null) {
-                mine.reset();
+                mine.resetNoCheck();
             }
             player.sendMessage(Messages.msg("yourMineHasBeenReset"));
         }

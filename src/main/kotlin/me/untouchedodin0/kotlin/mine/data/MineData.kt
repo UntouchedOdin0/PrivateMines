@@ -4,8 +4,7 @@ import me.untouchedodin0.kotlin.mine.type.MineType
 import me.untouchedodin0.privatemines.playershops.Shop
 import org.bukkit.Location
 import org.bukkit.Material
-import java.util.EnumMap
-import java.util.UUID
+import java.util.*
 
 data class MineData(
     val mineOwner: UUID,
@@ -23,6 +22,7 @@ data class MineData(
 
     var bannedPlayers: MutableList<UUID> = mutableListOf()
     var materials: Map<Material, Double> = EnumMap(Material::class.java)
+    var maxPlayers: Int = 0
 
     constructor(
         mineOwner: UUID,
@@ -33,7 +33,7 @@ data class MineData(
         spawnLocation: Location,
         mineLocation: Location,
         mineType: MineType,
-        shop: Shop
+        shop: Shop,
     ) : this(
         mineOwner,
         maximumMining,
@@ -42,7 +42,7 @@ data class MineData(
         maximumFullRegion,
         mineLocation,
         spawnLocation,
-        mineType,
+        mineType
     ) {
         this.shop = shop
     }

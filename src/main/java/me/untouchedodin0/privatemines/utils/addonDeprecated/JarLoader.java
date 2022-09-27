@@ -15,7 +15,7 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  **/
 
-package me.untouchedodin0.privatemines.utils.addon;
+package me.untouchedodin0.privatemines.utils.addonDeprecated;
 
 import java.io.File;
 import java.io.IOException;
