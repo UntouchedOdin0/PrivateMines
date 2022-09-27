@@ -10,18 +10,11 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.jetbrains.annotations.NotNull
 
-
 object ProtectionUtils {
     fun canBuild(@NotNull player: Player?, @NotNull location: Location?): Boolean {
         val localPlayer = WorldGuardPlugin.inst().wrapPlayer(player)
         val query = WorldGuard.getInstance().platform.regionContainer.createQuery()
         return query.testState(BukkitAdapter.adapt(location), localPlayer, Flags.BLOCK_BREAK)
-    }
-
-    fun getProtectedRegion(@NotNull location: Location?): ApplicableRegionSet {
-        val regionContainer = WorldGuard.getInstance().platform.regionContainer
-        val query = regionContainer.createQuery()
-        return query.getApplicableRegions(BukkitAdapter.adapt(location))
     }
 
     fun getFirstRegion(@NotNull location: Location?): ProtectedRegion? {
@@ -38,5 +31,11 @@ object ProtectionUtils {
 
     fun isMine(protectedRegion: ProtectedRegion): Boolean {
         return protectedRegion.id.startsWith("mine-")
+    }
+
+    private fun getProtectedRegion(@NotNull location: Location?): ApplicableRegionSet {
+        val regionContainer = WorldGuard.getInstance().platform.regionContainer
+        val query = regionContainer.createQuery()
+        return query.getApplicableRegions(BukkitAdapter.adapt(location))
     }
 }

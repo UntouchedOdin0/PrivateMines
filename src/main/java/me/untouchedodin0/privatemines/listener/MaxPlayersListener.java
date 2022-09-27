@@ -1,20 +1,23 @@
 package me.untouchedodin0.privatemines.listener;
 
-import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
+import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.kotlin.utils.ProtectionUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MaxPlayersListener implements Listener {
 
@@ -25,24 +28,31 @@ public class MaxPlayersListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         Location location = event.getBlock().getLocation();
-
-        player.sendMessage("private mines " + privateMines);
-        player.sendMessage("storage: " + mineStorage);
+        AtomicInteger count = new AtomicInteger();
 
         Mine mine = mineStorage.getClosest(location);
         if (mine != null) {
-            ApplicableRegionSet set = Objects
-                    .requireNonNull(WorldGuard.getInstance()
-                            .getPlatform()
-                            .getRegionContainer()
-                            .get(new BukkitWorld(location.getWorld())))
-                    .getApplicableRegions(BlockVector3.at(location.getX(),location.getY(),location.getZ()));
+
+            ProtectedRegion protectedRegion = ProtectionUtils.INSTANCE.getFirstRegion(location);
+
+            if (protectedRegion != null) {
+                for (Player player1 : Bukkit.getOnlinePlayers()) {
+                    BlockVector3 blockVector3 = BukkitAdapter.asBlockVector(player1.getLocation());
+                    if (protectedRegion.contains(blockVector3)) {
+                        count.incrementAndGet();
+                    }
+                }
+            }
 
             MineData mineData = mine.getMineData();
-            int maxPlayers = mineData.getMaxPlayers();
+            MineType mineType = mineData.getMineType();
 
-            player.sendMessage("mine: " + mine);
-            player.sendMessage("mine data: " + mineData);
+            int maxPlayers = mineType.getMaxPlayers();
+
+            if (count.get() > maxPlayers) {
+                player.sendMessage(ChatColor.RED + "I'm sorry, this mine is full!");
+                event.setCancelled(true);
+            }
         }
     }
 }
