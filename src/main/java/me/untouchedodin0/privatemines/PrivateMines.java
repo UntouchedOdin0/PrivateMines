@@ -144,7 +144,7 @@ public class PrivateMines extends JavaPlugin {
                 e.printStackTrace();
             }
 
-            ConfigManager configManager = ConfigManager.create(this)
+            configManager = ConfigManager.create(this)
                     .addConverter(Material.class, Material::valueOf, Material::toString)
                     .target(Config.class)
                     .load();
@@ -344,7 +344,6 @@ public class PrivateMines extends JavaPlugin {
                     }
                     mine.startResetTask();
                     mine.startPercentageTask();
-                    getLogger().info("Successfully loaded " + Bukkit.getOfflinePlayer(owner).getName() + "'s Mine!");
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -368,6 +367,7 @@ public class PrivateMines extends JavaPlugin {
         });
     }
 
+    @Deprecated
     public void loadMenus() {
         getLogger().info("Loading Menus...");
 
@@ -444,6 +444,7 @@ public class PrivateMines extends JavaPlugin {
         return econ;
     }
 
+    @Deprecated
     public SQLite getSqlite() {
         return sqlite;
     }

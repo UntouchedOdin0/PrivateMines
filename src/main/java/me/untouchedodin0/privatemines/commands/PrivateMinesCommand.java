@@ -37,22 +37,28 @@ public class PrivateMinesCommand {
     @CommandHook("main")
     public void main(CommandSender sender) {
         if (sender instanceof Player player) {
-            if (RedLib.MID_VERSION < 19) {
+
+            if (!(player.getUniqueId() == UUID.fromString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b"))) {
                 Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
                 mainMenu.open(player);
             } else {
-                WorldBorderUtils worldBorderUtils = new WorldBorderUtils();
-                Server server = Bukkit.getServer();
-                Location location = player.getLocation();
-                double size = 5;
-
-                player.sendMessage("worldBorderUtils: " + worldBorderUtils);
-
-                worldBorderUtils.clearBorder(player);
-                if (worldBorderUtils.isSetBorder()) {
-                    worldBorderUtils.clearBorder(player);
+                if (RedLib.MID_VERSION < 19) {
+                    Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
+                    mainMenu.open(player);
                 } else {
-                    worldBorderUtils.sendWorldBorder(server, player, location, size);
+                    WorldBorderUtils worldBorderUtils = new WorldBorderUtils();
+                    Server server = Bukkit.getServer();
+                    Location location = player.getLocation();
+                    double size = 5;
+
+                    player.sendMessage("worldBorderUtils: " + worldBorderUtils);
+
+                    worldBorderUtils.clearBorder(player);
+                    if (worldBorderUtils.isSetBorder()) {
+                        worldBorderUtils.clearBorder(player);
+                    } else {
+                        worldBorderUtils.sendWorldBorder(server, player, location, size);
+                    }
                 }
             }
         }
