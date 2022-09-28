@@ -463,7 +463,7 @@ public class MineFactory {
                         privateMines.getMineStorage().addMine(uuid, mine);
                     }
 
-                    mine.resetNoCheck();
+                    mine.reset();
                     TextComponent teleportMessage = new TextComponent(ChatColor.GREEN + "Click me to teleport to your mine!");
                     teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));
                     PrivateMineCreationEvent privateMineCreationEvent = new PrivateMineCreationEvent(uuid, mine);

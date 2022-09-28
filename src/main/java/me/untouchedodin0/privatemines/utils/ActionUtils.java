@@ -18,7 +18,7 @@ public class ActionUtils {
 
         if (mine != null && actionType != null) {
             switch (actionType) {
-                case RESET -> mine.resetNoCheck();
+                case RESET -> mine.reset();
                 case RESET_TELEPORT -> {
                     mine.reset();
                     mine.teleport(player);

@@ -103,13 +103,11 @@ public class Mine {
     }
 
     public void teleport(Player player) {
-
         if (getSpawnLocation().getBlock().getType().isBlock()) {
             getSpawnLocation().getBlock().setType(Material.AIR, false);
             if (PaperLib.isPaper()) {
                 PaperLib.teleportAsync(player, getSpawnLocation());
                 player.sendMessage(ChatColor.GREEN + "You've been teleported to your mine!");
-                player.sendMessage("max players: " + mineData.getMaxPlayers());
             }
         }
     }
@@ -219,7 +217,8 @@ public class Mine {
         }
     }
 
-    public void reset() {
+    @Deprecated
+    public void resetOld() {
         MineData mineData = getMineData();
         MineType mineType = mineData.getMineType();
         Location location = mineData.getMinimumMining();
@@ -284,7 +283,7 @@ public class Mine {
             }
         }
 
-    public void resetNoCheck() {
+    public void reset() {
         MineData mineData = getMineData();
         MineType mineType = mineData.getMineType();
         Location location = mineData.getMinimumMining();
@@ -383,8 +382,17 @@ public class Mine {
             double percentage = getPercentage();
             MineType mineType = getMineData().getMineType();
             double resetPercentage = mineType.getResetPercentage();
+            redempt.redlib.region.CuboidRegion cuboidRegion =
+                    new redempt.redlib.region.CuboidRegion
+                    (mineData.getMinimumMining(), mineData.getMaximumMining());
 
             if (percentage >= resetPercentage) {
+
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (cuboidRegion.contains(player.getLocation())) {
+                        player.teleport(getSpawnLocation());
+                    }
+                }
                 reset();
             }
         }, 0L, 20L);
@@ -527,7 +535,7 @@ public class Mine {
 
             setMineData(mineData);
             privateMines.getMineStorage().replaceMineNoLog(mineData.getMineOwner(), this);
-            resetNoCheck();
+            reset();
         }
         this.canExpand = true;
     }
@@ -635,7 +643,7 @@ public class Mine {
                     mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
                     Mine mine = mineStorage.get(mineOwner);
                     if (mine != null) {
-                        mine.resetNoCheck();
+                        mine.reset();
                     }
                 } else {
 

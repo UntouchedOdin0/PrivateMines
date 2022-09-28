@@ -417,7 +417,7 @@ public class PrivateMinesCommandDeprecated extends BaseCommand {
 
                 CompletableFuture.runAsync(() -> {
                     for (int i = 0; i < times; i++) {
-                        mine.resetNoCheck();
+                        mine.reset();
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatColor.GREEN + "Finished Reset #" + atomicInteger.incrementAndGet()));
                     }
                 }).thenRun(() -> {

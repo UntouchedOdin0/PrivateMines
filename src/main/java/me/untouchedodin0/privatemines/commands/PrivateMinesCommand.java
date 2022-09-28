@@ -78,7 +78,7 @@ public class PrivateMinesCommand {
     @CommandHook("delete")
     public void delete(CommandSender commandSender, OfflinePlayer target) {
         if (!mineStorage.hasMine(target.getUniqueId())) {
-            commandSender.sendMessage(Messages.msg("playerAlreadyOwnsAMine"));
+            commandSender.sendMessage(ChatColor.RED + "Player doesn't own a mine!");
         } else {
             Mine mine = mineStorage.get(target.getUniqueId());
             commandSender.sendMessage(ChatColor.GREEN + "You deleted " + target.getName() + "'s private mine!");
@@ -96,7 +96,7 @@ public class PrivateMinesCommand {
         } else {
             Mine mine = mineStorage.get(player);
             if (mine != null) {
-                mine.resetNoCheck();
+                mine.reset();
             }
             player.sendMessage(Messages.msg("yourMineHasBeenReset"));
         }
