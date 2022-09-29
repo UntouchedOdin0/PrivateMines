@@ -12,6 +12,8 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
@@ -23,6 +25,7 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import redempt.redlib.misc.Task;
@@ -33,6 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PregenFactory {
 
@@ -55,6 +59,7 @@ public class PregenFactory {
         generateLocations(amount);
         MineType defaultType = mineTypeManager.getDefaultMineType();
         File schematicFile = new File("plugins/PrivateMines/schematics/" + defaultType.getFile());
+        AtomicInteger generated = new AtomicInteger();
 
         if (!schematicFile.exists()) {
             privateMines.getLogger().warning("Schematic file does not exist: " + schematicFile.getName());
@@ -96,30 +101,30 @@ public class PregenFactory {
                         BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2().add(0, 0, 1));
                         BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1().add(0, 0, 1));
 
+                        BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+                        Region region = clipboard.getRegion();
+
+                        Vector3 min = vector.toVector3().add(clipboardHolder.getTransform().apply(clipboardOffset.toVector3()));
+                        Vector3 max = min.add(clipboardHolder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
+
                         Location spongeL = new Location(location.getWorld(), vector.getBlockX(), vector.getBlockY(), vector.getBlockZ() + 1);
 
                         Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ());
                         Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
 
+                        Location fullMinL = new Location(location.getWorld(), min.getBlockX(), min.getBlockY(), min.getBlockZ());
+                        Location fullMaxL = new Location(location.getWorld(), max.getBlockX(), max.getBlockY(), max.getBlockZ());
+
                         PregenMine pregenMine = new PregenMine();
 
+                        pregenMine.setLocation(location);
                         pregenMine.setSpawnLocation(spongeL);
                         pregenMine.setLowerRails(lrailsL);
                         pregenMine.setUpperRails(urailsL);
+                        pregenMine.setFullMin(fullMinL);
+                        pregenMine.setFullMax(fullMaxL);
 
-                        Bukkit.broadcastMessage("pregen mines: " + pregenStorage.getMines());
                         pregenStorage.addMine(pregenMine);
-
-                        Bukkit.broadcastMessage("" + spongeL);
-                        Bukkit.broadcastMessage("" + lrailsL);
-                        Bukkit.broadcastMessage("" + urailsL);
-                        Bukkit.broadcastMessage("vector: " + vector);
-
-                        Bukkit.broadcastMessage("---- kotlin ----");
-                        Bukkit.broadcastMessage("" + pregenMine.getSpawnLocation());
-                        Bukkit.broadcastMessage("" + pregenMine.getLowerRails());
-                        Bukkit.broadcastMessage("" + pregenMine.getUpperRails());
-                        Bukkit.broadcastMessage("pregen mines: " + pregenStorage.getMines());
 
                         localSession.setClipboard(clipboardHolder);
 
@@ -131,70 +136,20 @@ public class PregenFactory {
                         } catch (WorldEditException worldEditException) {
                             worldEditException.printStackTrace();
                         }
+                        generated.incrementAndGet();
+                        player.sendMessage(ChatColor.GREEN + "Finished Generating Mine #" + generated.get());
+                        if (generated.get() == amount) {
+                            player.sendMessage(ChatColor.GREEN + "Finished Generating all " + amount + " Mines!");
+                        }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 }
             });
+        }
 
-
-//           if (clipboardFormat != null) {
-//               try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(schematicFile))) {
-//                   World world = BukkitAdapter.adapt(mineWorldManager.getMinesWorld());
-//
-//                   if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
-//                       editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world).fastMode(true).build();
-//                   } else {
-//                       editSession = WorldEdit.getInstance().newEditSession(world);
-//                   }
-//
-//                   Clipboard clipboard = clipboardReader.read();
-//                   ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
-//
-////                   player.sendMessage("clipboard reader: " + clipboardReader);
-////                   player.sendMessage("world: " + world);
-////                   player.sendMessage("edit session: " + editSession);
-////                   player.sendMessage("clipboard: " + clipboard);
-////                   player.sendMessage("clipboard holder " + clipboardHolder);
-////                   player.sendMessage("mine blocks: " + mineBlocks);
-//
-//                   for (Location location : generatedLocations) {
-//
-//                       BlockVector3 spawn = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-//
-//                       Bukkit.broadcastMessage("clipboard " + clipboard);
-//                       Bukkit.broadcastMessage("clipboard holder " + clipboardHolder);
-//                       Bukkit.broadcastMessage("format " + clipboardFormat);
-//
-//                       Bukkit.broadcastMessage(" " + spawn);
-//                       BlockVector3 upperRails = spawn.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner1()).add(0, 0, 1);
-//                       BlockVector3 lowerRails = spawn.subtract(mineBlocks.getSpawnLocation()).add(mineBlocks.getCorner2().add(0, 0, 1));
-//
-//                       Location spawnLoc = new Location(location.getWorld(), spawn.getBlockX(), spawn.getBlockY(), spawn.getZ() + 1);
-////                       player.sendMessage("bv3 " + spawn);
-////                       player.sendMessage("upper rails: " + upperRails);
-////                       player.sendMessage("lower rails: " + lowerRails);
-//                       player.sendMessage("spawn loc: " + LocationUtils.toString(spawnLoc));
-//
-//                       Operation operation = clipboardHolder
-//                               .createPaste(editSession)
-//                               .to(spawn)
-//                               .ignoreAirBlocks(true)
-//                               .build();
-//                       Operations.completeLegacy(operation);
-//
-//                       player.sendMessage("operation: " + operation);
-//                   }
-//               } catch (IOException e) {
-//                   throw new RuntimeException(e);
-//               }
-//           }
-
-//        player.sendMessage("default type: " + defaultType);
-//        player.sendMessage("file: " + schematicFile);
-//        player.sendMessage("format: " + clipboardFormat);
-//
-//        player.sendMessage(ChatColor.GREEN + "Finished generating the mines.");
+        if (generated.get() == amount) {
+            player.sendMessage(ChatColor.GREEN + "Finished generating the mines.");
         }
     }
 }

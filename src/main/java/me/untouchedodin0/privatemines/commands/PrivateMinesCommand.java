@@ -255,7 +255,13 @@ public class PrivateMinesCommand {
 
     @CommandHook("close")
     public void close(Player player) {
+        Mine mine = mineStorage.get(player);
 
+        if (mine != null) {
+            MineData mineData = mine.getMineData();
+            mineData.setOpen(false);
+            mine.saveMineData(player, mineData);
+        }
     }
 
     @CommandHook("debug")
@@ -283,16 +289,18 @@ public class PrivateMinesCommand {
             PregenMine pregenMine = pregenStorage.getAndRemove();
 
             if (pregenMine != null) {
-                Location location = Objects.requireNonNull(pregenMine.getLocation());
-                Location spawnLocation = Objects.requireNonNull(pregenMine.getSpawnLocation());
-                Location lowerRails = Objects.requireNonNull(pregenMine.getLowerRails());
-                Location upperRails = Objects.requireNonNull(pregenMine.getUpperRails());
-                Location fullMin = Objects.requireNonNull(pregenMine.getFullMin());
-                Location fullMax = Objects.requireNonNull(pregenMine.getFullMax());
+                Location location = pregenMine.getLocation();
+                Location spawnLocation = pregenMine.getSpawnLocation();
+                Location lowerRails = pregenMine.getLowerRails();
+                Location upperRails = pregenMine.getUpperRails();
+                Location fullMin = pregenMine.getFullMin();
+                Location fullMax = pregenMine.getFullMax();
 
                 UUID uuid = player.getUniqueId();
 
-                spawnLocation.getBlock().setType(Material.AIR);
+                if (spawnLocation != null) {
+                    spawnLocation.getBlock().setType(Material.AIR);
+                }
 
                 MineType mineType = mineTypeManager.getDefaultMineType();
 
@@ -304,6 +312,13 @@ public class PrivateMinesCommand {
                 Shop shop = new ShopBuilder().setOwner(uuid).setPrices(prices).build();
 
                 Mine mine = new Mine(privateMines);
+                assert upperRails != null;
+                assert lowerRails != null;
+                assert fullMin != null;
+                assert fullMax != null;
+                assert location != null;
+                assert spawnLocation != null;
+
                 MineData mineData = new MineData(
                         uuid,
                         upperRails,
@@ -316,10 +331,9 @@ public class PrivateMinesCommand {
                         shop
                 );
 
-                Bukkit.broadcastMessage("" + mineData.getMineOwner());
-                Bukkit.broadcastMessage(LocationUtils.toString(mineData.getMaximumMining()));
-                Bukkit.broadcastMessage(LocationUtils.toString(mineData.getMinimumMining()));
-
+                mine.setMineData(mineData);
+                mine.saveMineData(player, mineData);
+                mineStorage.addMine(player.getUniqueId(), mine);
 
                 Task.syncDelayed(() -> pregenMine.teleport(player), 20L);
             }
