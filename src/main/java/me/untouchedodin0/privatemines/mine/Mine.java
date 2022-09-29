@@ -91,7 +91,8 @@ public class Mine {
     }
 
     public Location getSpawnLocation() {
-        return mineData.getSpawnLocation();
+        return mineData.getSpawnLocation().add(0.5, 0.5, 0.5);
+//        return mineData.getSpawnLocation();
     }
 
     public MineData getMineData() {
