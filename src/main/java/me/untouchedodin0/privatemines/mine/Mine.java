@@ -373,10 +373,6 @@ public class Mine {
         this.task = Task.syncRepeating(this::reset, 0L, resetTime * 20 * 60L);
     }
 
-    public void cancelTask() {
-        if (task.isCurrentlyRunning()) task.cancel();
-    }
-
     public void startPercentageTask() {
         this.percentageTask = Task.syncRepeating(() -> {
             double percentage = getPercentage();
