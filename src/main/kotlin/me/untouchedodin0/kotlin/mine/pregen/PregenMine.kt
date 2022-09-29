@@ -5,9 +5,12 @@ import org.bukkit.entity.Player
 
 class PregenMine {
 
+    var location: Location? = null
     var spawnLocation: Location? = null
     var lowerRails: Location? = null
     var upperRails: Location? = null
+    var fullMin: Location? = null
+    var fullMax: Location? = null
 
     fun teleport(player: Player) {
         spawnLocation?.let {

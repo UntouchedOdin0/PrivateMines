@@ -23,6 +23,7 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -137,6 +138,13 @@ public class PrivateMines extends JavaPlugin {
             setupSchematicUtils();
             Messages.load(this);
 
+            if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                boolean registered = new PrivateMinesExpansion(this).register();
+                if (registered) {
+                    privateMines.getLogger().info("Registered the PlaceholderAPI expansion!");
+                }
+            }
+
             try {
                 Files.createDirectories(minesDirectory);
                 Files.createDirectories(schematicsDirectory);
@@ -147,6 +155,7 @@ public class PrivateMines extends JavaPlugin {
             configManager = ConfigManager.create(this)
                     .addConverter(Material.class, Material::valueOf, Material::toString)
                     .target(Config.class)
+                    .saveDefaults()
                     .load();
             //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
             ConfigManager mineConfig = ConfigManager.create(this)
@@ -209,7 +218,6 @@ public class PrivateMines extends JavaPlugin {
             getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
         }
     }
-
 
 
     @Override
@@ -323,7 +331,9 @@ public class PrivateMines extends JavaPlugin {
                                 tax
                         );
 
-                        mineData.setMaterials(customMaterials);
+                        if (!customMaterials.isEmpty()) {
+                            mineData.setMaterials(customMaterials);
+                        }
                         mine.setMineData(mineData);
                         mineStorage.addMine(owner, mine);
                     } else {

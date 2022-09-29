@@ -13,6 +13,8 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.factory.PregenFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
+import me.untouchedodin0.privatemines.playershops.Shop;
+import me.untouchedodin0.privatemines.playershops.ShopBuilder;
 import me.untouchedodin0.privatemines.utils.inventory.PublicMinesMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.*;
@@ -21,6 +23,8 @@ import org.bukkit.entity.Player;
 import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.Messages;
+import redempt.redlib.misc.LocationUtils;
+import redempt.redlib.misc.Task;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -238,6 +242,22 @@ public class PrivateMinesCommand {
         }
     }
 
+    @CommandHook("open")
+    public void open(Player player) {
+        Mine mine = mineStorage.get(player);
+
+        if (mine != null) {
+            MineData mineData = mine.getMineData();
+            mineData.setOpen(true);
+            mine.saveMineData(player, mineData);
+        }
+    }
+
+    @CommandHook("close")
+    public void close(Player player) {
+
+    }
+
     @CommandHook("debug")
     public void debug(Player player) {
         PublicMinesMenu menu = new PublicMinesMenu();
@@ -263,7 +283,45 @@ public class PrivateMinesCommand {
             PregenMine pregenMine = pregenStorage.getAndRemove();
 
             if (pregenMine != null) {
-                pregenMine.teleport(player);
+                Location location = Objects.requireNonNull(pregenMine.getLocation());
+                Location spawnLocation = Objects.requireNonNull(pregenMine.getSpawnLocation());
+                Location lowerRails = Objects.requireNonNull(pregenMine.getLowerRails());
+                Location upperRails = Objects.requireNonNull(pregenMine.getUpperRails());
+                Location fullMin = Objects.requireNonNull(pregenMine.getFullMin());
+                Location fullMax = Objects.requireNonNull(pregenMine.getFullMax());
+
+                UUID uuid = player.getUniqueId();
+
+                spawnLocation.getBlock().setType(Material.AIR);
+
+                MineType mineType = mineTypeManager.getDefaultMineType();
+
+                Map<Material, Double> prices = new HashMap<>();
+                Map<Material, Double> materials = mineType.getMaterials();
+                if (materials != null) {
+                    prices.putAll(materials);
+                }
+                Shop shop = new ShopBuilder().setOwner(uuid).setPrices(prices).build();
+
+                Mine mine = new Mine(privateMines);
+                MineData mineData = new MineData(
+                        uuid,
+                        upperRails,
+                        lowerRails,
+                        fullMin,
+                        fullMax,
+                        location,
+                        spawnLocation,
+                        mineType,
+                        shop
+                );
+
+                Bukkit.broadcastMessage("" + mineData.getMineOwner());
+                Bukkit.broadcastMessage(LocationUtils.toString(mineData.getMaximumMining()));
+                Bukkit.broadcastMessage(LocationUtils.toString(mineData.getMinimumMining()));
+
+
+                Task.syncDelayed(() -> pregenMine.teleport(player), 20L);
             }
         }
     }

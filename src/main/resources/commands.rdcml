@@ -69,9 +69,21 @@ privatemine,privatemines,pmine,pmines {
         permission privatemines.unban
     }
 
+    open {
+        hook open
+        help Opens your mine so people can teleport to your mine
+        permission privatemines.open
+    }
+
+    close {
+        hook close
+        help Closes your mine so people can't teleport to your mine
+        permission privatemines.close
+    }
+
     pregen int:amount {
         hook pregen
-        help Toggles the pre-gen mode.
+        help Pregerates a certain amount of mine schematics.
         permission privatemines.pregen
     }
 

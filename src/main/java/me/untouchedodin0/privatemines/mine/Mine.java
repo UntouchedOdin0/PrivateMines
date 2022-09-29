@@ -587,7 +587,9 @@ public class Mine {
             yml.set("isOpen", open);
             yml.set("maxPlayers", maxPlayers);
             yml.set("bannedPlayers", bannedPlayers);
-            yml.set("materials", materials);
+            if (!materials.isEmpty()) {
+                yml.set("materials", materials.toString());
+            }
 
             try {
                 yml.save(file);
@@ -601,8 +603,9 @@ public class Mine {
             yml.set("isOpen", open);
             yml.set("maxPlayers", maxPlayers);
             yml.set("bannedPlayers", bannedPlayers);
-            yml.set("materials", materials.toString());
-
+            if (!materials.isEmpty()) {
+                yml.set("materials", materials.toString());
+            }
             try {
                 yml.save(file);
             } catch (IOException e) {
