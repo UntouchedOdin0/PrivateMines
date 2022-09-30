@@ -23,6 +23,7 @@ data class MineData(
     var bannedPlayers: MutableList<UUID> = mutableListOf()
     var materials: Map<Material, Double> = EnumMap(Material::class.java)
     var maxPlayers: Int = 0
+    var maxMineSize: Int = 0
 
     constructor(
         mineOwner: UUID,

@@ -334,6 +334,7 @@ public class PrivateMines extends JavaPlugin {
                         if (!customMaterials.isEmpty()) {
                             mineData.setMaterials(customMaterials);
                         }
+                        mineData.setMaxMineSize(mineType.getMaxMineSize());
                         mine.setMineData(mineData);
                         mineStorage.addMine(owner, mine);
                     } else {
@@ -349,6 +350,7 @@ public class PrivateMines extends JavaPlugin {
                                 isOpen,
                                 tax
                         );
+                        mineData.setMaxMineSize(mineType.getMaxMineSize());
                         mine.setMineData(mineData);
                         mineStorage.addMine(owner, mine);
                     }

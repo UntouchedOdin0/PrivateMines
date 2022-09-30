@@ -39,7 +39,9 @@ public class MaxPlayersListener implements Listener {
                 for (Player player1 : Bukkit.getOnlinePlayers()) {
                     BlockVector3 blockVector3 = BukkitAdapter.asBlockVector(player1.getLocation());
                     if (protectedRegion.contains(blockVector3)) {
-                        count.incrementAndGet();
+                        if (player.getUniqueId() != mine.getMineData().getMineOwner()) {
+                            count.incrementAndGet();
+                        }
                     }
                 }
             }
@@ -51,6 +53,7 @@ public class MaxPlayersListener implements Listener {
 
             if (count.get() > maxPlayers) {
                 player.sendMessage(ChatColor.RED + "I'm sorry, this mine is full!");
+                player.performCommand("spawn");
                 event.setCancelled(true);
             }
         }

@@ -334,8 +334,9 @@ public class PrivateMinesCommand {
                 mine.setMineData(mineData);
                 mine.saveMineData(player, mineData);
                 mineStorage.addMine(player.getUniqueId(), mine);
+                mine.reset();
 
-                Task.syncDelayed(() -> pregenMine.teleport(player), 20L);
+                Task.syncDelayed(() -> pregenMine.teleport(player), 5L);
             }
         }
     }

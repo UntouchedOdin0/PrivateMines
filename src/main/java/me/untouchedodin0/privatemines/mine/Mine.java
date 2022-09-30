@@ -451,6 +451,7 @@ public class Mine {
         final World world = privateMines.getMineWorldManager().getMinesWorld();
         boolean canExpand = canExpand(1);
         Map<String, Boolean> flags = mineData.getMineType().getFlags();
+        final MineType mineType = getMineData().getMineType();
 
         if (!canExpand) {
             privateMines.getLogger().info("Failed to expand the mine due to the mine being too large");
@@ -462,6 +463,7 @@ public class Mine {
             final Region mine = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
             final Region fillAir = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
             final Region walls = new CuboidRegion(BukkitAdapter.asBlockVector(min), BukkitAdapter.asBlockVector(max));
+            final var maxMineSize = mineType.getMaxMineSize();
 
             if (fillType == null || wallType == null) return;
 
@@ -558,6 +560,8 @@ public class Mine {
         double tax = mineData.getTax();
         boolean open = mineData.isOpen();
         int maxPlayers = mineData.getMaxPlayers();
+        int maxMineSize = mineData.getMaxMineSize();
+
         List<UUID> bannedPlayers = mineData.getBannedPlayers();
 
         Map<Material, Double> materials = mineData.getMaterials();
@@ -582,6 +586,7 @@ public class Mine {
             yml.set("tax", tax);
             yml.set("isOpen", open);
             yml.set("maxPlayers", maxPlayers);
+            yml.set("maxMineSize", maxMineSize);
             yml.set("bannedPlayers", bannedPlayers);
             if (!materials.isEmpty()) {
                 yml.set("materials", materials.toString());
@@ -598,6 +603,7 @@ public class Mine {
             yml.set("tax", tax);
             yml.set("isOpen", open);
             yml.set("maxPlayers", maxPlayers);
+            yml.set("maxMineSize", maxMineSize);
             yml.set("bannedPlayers", bannedPlayers);
             if (!materials.isEmpty()) {
                 yml.set("materials", materials.toString());

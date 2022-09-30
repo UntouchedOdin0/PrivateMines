@@ -17,6 +17,7 @@ class MineType {
     val upgradeCurrency: String? = null
     val materials: Map<Material, Double>? = null
     val maxPlayers: Int = 0
+    val maxMineSize: Int = 0
     val flags: Map<String, Boolean>? = null
     val fullFlags: Map<String, Boolean>? = null
 }
