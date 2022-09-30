@@ -660,7 +660,6 @@ public class Mine {
                         delete();
                         mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
 
-                        player.sendMessage("upgrade cost: " + upgradeCost);
                         economy.withdrawPlayer(player, upgradeCost);
                     }
                 }

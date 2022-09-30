@@ -23,7 +23,6 @@ import org.bukkit.entity.Player;
 import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.Messages;
-import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
 import java.util.HashMap;
@@ -250,6 +249,7 @@ public class PrivateMinesCommand {
             MineData mineData = mine.getMineData();
             mineData.setOpen(true);
             mine.saveMineData(player, mineData);
+            player.sendMessage(ChatColor.GREEN + "Your mine's now open!");
         }
     }
 
@@ -261,6 +261,7 @@ public class PrivateMinesCommand {
             MineData mineData = mine.getMineData();
             mineData.setOpen(false);
             mine.saveMineData(player, mineData);
+            player.sendMessage(ChatColor.RED + "Your mine's now closed!");
         }
     }
 

@@ -50,7 +50,6 @@ public class PrivateMinesExpansion extends PlaceholderExpansion {
         Mine mine = mineStorage.get(Objects.requireNonNull(player.getPlayer()).getUniqueId());
         MineData mineData;
 
-        Bukkit.broadcastMessage("mine " + mine);
 
         if (params.equalsIgnoreCase("size")) {
             if (mine != null) {
@@ -58,7 +57,9 @@ public class PrivateMinesExpansion extends PlaceholderExpansion {
                 Location minimum = mineData.getMinimumMining();
                 Location maximum = mineData.getMaximumMining();
                 double distance = maximum.distance(minimum);
-                return Double.toString(distance);
+                int distanceInt = (int) distance;
+
+                return Integer.toString(distanceInt);
             }
             return "";
         }

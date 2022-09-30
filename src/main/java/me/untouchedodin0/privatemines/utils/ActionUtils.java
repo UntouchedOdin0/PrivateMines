@@ -5,6 +5,7 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.mine.Mine;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class ActionUtils {
@@ -16,7 +17,10 @@ public class ActionUtils {
         Menu ownMine = MenuConfig.getMenus().get("personalMenu");
         Menu publicMines = MenuConfig.getMenus().get("publicMines");
 
-        if (mine != null && actionType != null) {
+        if (mine == null) {
+            player.sendMessage(ChatColor.RED + "You don't own a mine!");
+            player.closeInventory();
+        } else if (actionType != null) {
             switch (actionType) {
                 case RESET -> mine.reset();
                 case RESET_TELEPORT -> {

@@ -9,6 +9,7 @@ import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.ProtectionUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
+import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -17,18 +18,22 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MaxPlayersListener implements Listener {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
     MineStorage mineStorage = privateMines.getMineStorage();
+    MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         Location location = event.getBlock().getLocation();
         AtomicInteger count = new AtomicInteger();
+
+        if (!Objects.equals(location.getWorld(), mineWorldManager.getMinesWorld())) return;
 
         Mine mine = mineStorage.getClosest(location);
         if (mine != null) {

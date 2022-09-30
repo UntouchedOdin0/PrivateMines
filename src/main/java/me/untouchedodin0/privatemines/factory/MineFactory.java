@@ -265,8 +265,7 @@ public class MineFactory {
                                 shop
                         );
                         mineData.setMaxPlayers(maxPlayers);
-
-                        Bukkit.broadcastMessage("max players: " + maxPlayers);
+                        mineData.setOpen(false);
 
                         mine.setMineData(mineData);
                         mine.saveMineData(player, mineData);

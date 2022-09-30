@@ -47,6 +47,7 @@ public class PregenFactory {
     PregenStorage pregenStorage = privateMines.getPregenStorage();
 
     List<Location> generatedLocations = new ArrayList<>();
+    AtomicInteger generated = new AtomicInteger(1);
 
     public void generateLocations(int amount) {
         for (int i = 0; i < amount; i++) {
@@ -55,11 +56,12 @@ public class PregenFactory {
     }
 
     public void generate(Player player, int amount) {
+        long start = System.currentTimeMillis();
+
         player.sendMessage("Generating mines...");
         generateLocations(amount);
         MineType defaultType = mineTypeManager.getDefaultMineType();
         File schematicFile = new File("plugins/PrivateMines/schematics/" + defaultType.getFile());
-        AtomicInteger generated = new AtomicInteger();
 
         if (!schematicFile.exists()) {
             privateMines.getLogger().warning("Schematic file does not exist: " + schematicFile.getName());
@@ -136,22 +138,33 @@ public class PregenFactory {
                         } catch (WorldEditException worldEditException) {
                             worldEditException.printStackTrace();
                         }
-                        generated.incrementAndGet();
-                        player.sendMessage(ChatColor.GREEN + "Finished Generating Mine #" + generated.get());
-                        if (generated.get() == amount) {
-                            player.sendMessage(ChatColor.GREEN + "Finished Generating all " + amount + " Mines!");
-                        }
+
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 }
             });
-        }
 
-        if (generated.get() == amount) {
-            player.sendMessage(ChatColor.GREEN + "Finished generating the mines.");
+            player.sendMessage(ChatColor.GREEN + "Finished Generating Mine #" + generated.getAndIncrement());
+
+            if (generated.get() == amount) {
+                long finished = System.currentTimeMillis();
+                long time = finished - start;
+
+                long millis = time % 1000;
+                long second = (time / 1000) % 60;
+                long minute = (time / (1000 * 60)) % 60;
+                long hour = (time / (1000 * 60 * 60)) % 24;
+                String formatted = String.format("%02d:%02d:%02d.%d", hour, minute, second, millis);
+
+
+                player.sendMessage("Start: " + start);
+                player.sendMessage("Finished: " + finished);
+                player.sendMessage("Time: " + time);
+                player.sendMessage(formatted);
+            }
         }
     }
 }
-;
+
 

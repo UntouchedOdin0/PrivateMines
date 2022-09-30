@@ -23,6 +23,8 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.addons.AddonDescriptionFile;
+import me.untouchedodin0.privatemines.utils.addons.JarLoader;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -198,6 +200,8 @@ public class PrivateMines extends JavaPlugin {
             sqlite.load();
 
             loadMines();
+            Task.asyncDelayed(this::loadAddons);
+
             PaperLib.suggestPaper(this);
 
             if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
@@ -372,6 +376,12 @@ public class PrivateMines extends JavaPlugin {
                 paths.forEach(streamPath -> {
                     File file = streamPath.toFile();
                     getLogger().info("Loading addon file " + file.getName() + "....");
+                    JarLoader jarLoader = new JarLoader();
+                    AddonDescriptionFile addonDescriptionFile = jarLoader.getAddonDescription(file);
+                    getLogger().info("jar loader " + jarLoader);
+                    getLogger().info("addon description file: " + addonDescriptionFile);
+
+
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);
