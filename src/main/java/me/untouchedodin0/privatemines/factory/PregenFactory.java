@@ -161,9 +161,18 @@ public class PregenFactory {
                 player.sendMessage("Start: " + start);
                 player.sendMessage("Finished: " + finished);
                 player.sendMessage("Time: " + time);
-                player.sendMessage(formatted);
+
+                player.sendMessage(ChatColor.GREEN + String.format("Finished generating %d mines in %s!", amount, formatted));
             }
         }
+    }
+
+    public void purge() {
+        pregenStorage.getMines().clear();
+    }
+
+    public List<Location> getGeneratedLocations() {
+        return generatedLocations;
     }
 }
 

@@ -13,8 +13,6 @@ class PregenMine {
     var fullMax: Location? = null
 
     fun teleport(player: Player) {
-        spawnLocation?.let {
-            player.teleport(spawnLocation!!)
-        }
+        spawnLocation?.let(player::teleport)
     }
 }

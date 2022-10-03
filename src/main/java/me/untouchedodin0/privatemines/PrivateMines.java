@@ -2,8 +2,10 @@ package me.untouchedodin0.privatemines;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import com.google.gson.Gson;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.data.MineData;
+import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
@@ -23,6 +25,7 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.adapter.PregenMineAdapter;
 import me.untouchedodin0.privatemines.utils.addons.AddonDescriptionFile;
 import me.untouchedodin0.privatemines.utils.addons.JarLoader;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
@@ -50,6 +53,7 @@ import redempt.redlib.misc.Task;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,7 +83,7 @@ public class PrivateMines extends JavaPlugin {
     private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
     private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
     private final Path addonsDirectory = getDataFolder().toPath().resolve("addons");
-
+    private final Path pregenMines = getDataFolder().toPath().resolve("pregen");
     private SchematicStorage schematicStorage;
     private SchematicIterator schematicIterator;
     private MineFactory mineFactory;
@@ -150,6 +154,7 @@ public class PrivateMines extends JavaPlugin {
             try {
                 Files.createDirectories(minesDirectory);
                 Files.createDirectories(schematicsDirectory);
+                Files.createDirectories(pregenMines);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -200,6 +205,7 @@ public class PrivateMines extends JavaPlugin {
             sqlite.load();
 
             loadMines();
+            loadPregenMines();
             Task.asyncDelayed(this::loadAddons);
 
             PaperLib.suggestPaper(this);
@@ -223,7 +229,6 @@ public class PrivateMines extends JavaPlugin {
         }
     }
 
-
     @Override
     public void onDisable() {
         getLogger().info(String.format("Disabling adventure for %s", getDescription().getName()));
@@ -236,12 +241,8 @@ public class PrivateMines extends JavaPlugin {
         getLogger().info(String.format("%s v%s has successfully been Disabled",
                 getDescription().getName(),
                 getDescription().getVersion()));
-        getMineStorage().getMines().forEach((uuid, mine) -> {
-            Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
-            if (player != null) {
-                mine.saveMineData(player, mine.getMineData());
-            }
-        });
+        saveMines();
+//        savePregenMines();
     }
 
     public void setupSchematicUtils() {
@@ -367,6 +368,72 @@ public class PrivateMines extends JavaPlugin {
         });
     }
 
+    public void loadPregenMines() {
+        final PathMatcher jsonMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.json"); // Credits to Brister Mitten
+        Path path = getPregenMines();
+        Gson gson = new Gson();
+
+
+        CompletableFuture.runAsync(() -> {
+           try (Stream<Path> paths = Files.walk(path).filter(jsonMatcher::matches)) {
+               paths.forEach(streamPath -> {
+                   File file = streamPath.toFile();
+                   getLogger().info("Loading pregen mine file: " + file);
+
+                   try {
+                       Reader reader = Files.newBufferedReader(file.toPath());
+                       getLogger().info("reader: " + reader);
+                       PregenMine pregenMine = gson.fromJson(reader, PregenMine.class);
+
+
+                       getLogger().info("test???? " + pregenMine);
+
+//                       JsonReader jsonReader = new JsonReader(new FileReader(file));
+//                       getLogger().info("json reader " + jsonReader);
+
+
+//                       PregenMine pregenMine = gson.fromJson(jsonReader, PregenMine.class);
+
+                   } catch (IOException e) {
+                       throw new RuntimeException(e);
+                   }
+               });
+           } catch (IOException e) {
+               throw new RuntimeException(e);
+           }
+        });
+    }
+
+    public void saveMines() {
+        getMineStorage().getMines().forEach((uuid, mine) -> {
+            Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
+            if (player != null) {
+                mine.saveMineData(player, mine.getMineData());
+            }
+        });
+    }
+
+//    public void savePregenMines() {
+//
+//        GsonBuilder gsonBuilder = new GsonBuilder();
+//        gsonBuilder.registerTypeAdapter(PregenMine.class, new PregenMineAdapter());
+//        gsonBuilder.setPrettyPrinting();
+//        Gson gson = gsonBuilder.create();
+//
+//        getPregenStorage().getMines().forEach(pregenMine -> {
+//            String json = gson.toJson(pregenMine);
+//
+//            File file = new File(pregenMines + "/" + Utils.getRandom(15) + ".json");
+//            try {
+//                try (FileWriter fileWriter = new FileWriter(file)) {
+//                    fileWriter.write(json);
+//                }
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
+//    }
+
     public void loadAddons() {
         final PathMatcher jarMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
         Path path = getAddonsDirectory();
@@ -448,6 +515,10 @@ public class PrivateMines extends JavaPlugin {
 
     public Path getAddonsDirectory() {
         return addonsDirectory;
+    }
+
+    public Path getPregenMines() {
+        return pregenMines;
     }
 
     public ConfigManager getConfigManager() {

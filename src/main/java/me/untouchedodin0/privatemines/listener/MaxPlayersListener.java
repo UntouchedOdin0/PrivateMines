@@ -37,6 +37,10 @@ public class MaxPlayersListener implements Listener {
 
         Mine mine = mineStorage.getClosest(location);
         if (mine != null) {
+            MineData mineData = mine.getMineData();
+            MineType mineType = mineData.getMineType();
+
+            if (mineData.getMineOwner().equals(player.getUniqueId())) return;
 
             ProtectedRegion protectedRegion = ProtectionUtils.INSTANCE.getFirstRegion(location);
 
@@ -50,9 +54,6 @@ public class MaxPlayersListener implements Listener {
                     }
                 }
             }
-
-            MineData mineData = mine.getMineData();
-            MineType mineType = mineData.getMineType();
 
             int maxPlayers = mineType.getMaxPlayers();
 

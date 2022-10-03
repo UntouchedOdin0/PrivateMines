@@ -7,7 +7,14 @@ plugins {
 }
 
 group 'me.untouchedodin0.privatemines'
-version '4.1.8-SNAPSHOT'
+//version '4.1.8-SNAPSHOT'
+version '4.1.8'
+
+def devBuild = true
+
+if (devBuild) {
+    version = version + "-DEV"
+}
 
 repositories {
     mavenLocal()

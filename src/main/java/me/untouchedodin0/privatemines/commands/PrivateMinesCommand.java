@@ -280,6 +280,11 @@ public class PrivateMinesCommand {
 
     @CommandHook("claim")
     public void claim(Player player) {
+
+        if (mineStorage.hasMine(player)) {
+            player.sendMessage(ChatColor.RED + "You already own a mine!");
+            return;
+        }
         PregenStorage pregenStorage = privateMines.getPregenStorage();
         boolean isAllRedeemed = pregenStorage.isAllRedeemed();
 

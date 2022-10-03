@@ -253,4 +253,16 @@ public class Utils {
     public static String format(Material material) {
         return WordUtils.capitalize(material.name().toLowerCase().replaceAll("_", " "));
     }
+
+    public static String getRandom(int digits)
+    {
+        Random rand = new Random(); //instance of random class
+        String total_characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String randomString = "";
+        for (int i = 0; i < digits; i++) {
+            int index = rand.nextInt(total_characters.length()-1);
+            randomString += total_characters.charAt(index);
+        }
+        return randomString;
+    }
 }
