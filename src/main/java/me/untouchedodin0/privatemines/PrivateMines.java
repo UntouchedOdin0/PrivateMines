@@ -25,7 +25,6 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
-import me.untouchedodin0.privatemines.utils.adapter.PregenMineAdapter;
 import me.untouchedodin0.privatemines.utils.addons.AddonDescriptionFile;
 import me.untouchedodin0.privatemines.utils.addons.JarLoader;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
@@ -50,6 +49,7 @@ import redempt.redlib.config.ConfigManager;
 import redempt.redlib.inventorygui.InventoryGUI;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
+import redempt.redlib.sql.SQLHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -202,7 +202,35 @@ public class PrivateMines extends JavaPlugin {
             });
 
             sqlite = new SQLite();
-            sqlite.load();
+
+            getLogger().info("sqlLite: " + sqlite);
+
+            SQLHelper sqlHelper = new SQLHelper(sqlite.getSQLConnection());
+            getLogger().info("sqlHelper: " + sqlHelper);
+            sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
+                    "`mineOwner` TEXT," +
+                    "`mineType` TEXT," +
+                    "`mineLocation` TEXT," +
+                    "`corner1` TEXT," +
+                    "`corner2` TEXT," +
+                    "`fullRegionMin` TEXT," +
+                    "`fullRegionMax` TEXT," +
+                    "`spawn` TEXT," +
+                    "`tax` DOUBLE," +
+                    "`isOpen` BOOLEAN," +
+                    "`maxPlayers` INT," +
+                    "`maxMineSize` INT," +
+                    "`materials` TEXT" +
+                    ");");
+
+//            try {
+//                sqlite.getSQLConnection().prepareStatement("INSERT INTO privatemines (mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) VALUES(mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials);");
+//            } catch (SQLException e) {
+//                throw new RuntimeException(e);
+//            }
+//            sqlHelper.execute("INSERT INTO privatemines(mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) VALUES(mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials);");
+//            sqlite.load();
+
 
             loadMines();
             loadPregenMines();
@@ -375,18 +403,18 @@ public class PrivateMines extends JavaPlugin {
 
 
         CompletableFuture.runAsync(() -> {
-           try (Stream<Path> paths = Files.walk(path).filter(jsonMatcher::matches)) {
-               paths.forEach(streamPath -> {
-                   File file = streamPath.toFile();
-                   getLogger().info("Loading pregen mine file: " + file);
+            try (Stream<Path> paths = Files.walk(path).filter(jsonMatcher::matches)) {
+                paths.forEach(streamPath -> {
+                    File file = streamPath.toFile();
+                    getLogger().info("Loading pregen mine file: " + file);
 
-                   try {
-                       Reader reader = Files.newBufferedReader(file.toPath());
-                       getLogger().info("reader: " + reader);
-                       PregenMine pregenMine = gson.fromJson(reader, PregenMine.class);
+                    try {
+                        Reader reader = Files.newBufferedReader(file.toPath());
+                        getLogger().info("reader: " + reader);
+                        PregenMine pregenMine = gson.fromJson(reader, PregenMine.class);
 
 
-                       getLogger().info("test???? " + pregenMine);
+                        getLogger().info("test???? " + pregenMine);
 
 //                       JsonReader jsonReader = new JsonReader(new FileReader(file));
 //                       getLogger().info("json reader " + jsonReader);
@@ -394,13 +422,13 @@ public class PrivateMines extends JavaPlugin {
 
 //                       PregenMine pregenMine = gson.fromJson(jsonReader, PregenMine.class);
 
-                   } catch (IOException e) {
-                       throw new RuntimeException(e);
-                   }
-               });
-           } catch (IOException e) {
-               throw new RuntimeException(e);
-           }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 

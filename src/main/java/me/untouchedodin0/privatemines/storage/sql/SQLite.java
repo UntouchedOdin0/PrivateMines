@@ -14,19 +14,19 @@ public class SQLite extends Database {
 
     String databaseName = "privatemines";
 
-    public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS " + databaseName + " (" + // make sure to put your table name in here too.
-            "`mineOwner` text NOT NULL," + // This creates the different colums you will save data too. varchar(32) Is a string, int = integer
-            "`mineType` text NOT NULL," +
-            "`mineLocation` text NOT NULL," +
-            "`corner1` text NOT NULL," +
-            "`corner2` text NOT NULL," +
-            "`fullRegionMin` text NOT NULL," +
-            "`fullRegionMax` text NOT NULL," +
-            "`spawn` text NOT NULL," +
-            "`tax` double NOT NULL," +
-            "`isOpen` boolean NOT NULL," +
-            "PRIMARY KEY (`mineOwner`)" +  // This is creating 3 colums Player, Kills, Total. Primary key is what you are going to use as your indexer. Here we want to use player so
-            ");"; // we can search by player, and get kills and total. If you some how were searching kills it would provide total and player.
+//    public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS " + databaseName + " (" + // make sure to put your table name in here too.
+//            "`mineOwner` text NOT NULL," + // This creates the different colums you will save data too. varchar(32) Is a string, int = integer
+//            "`mineType` text NOT NULL," +
+//            "`mineLocation` text NOT NULL," +
+//            "`corner1` text NOT NULL," +
+//            "`corner2` text NOT NULL," +
+//            "`fullRegionMin` text NOT NULL," +
+//            "`fullRegionMax` text NOT NULL," +
+//            "`spawn` text NOT NULL," +
+//            "`tax` double NOT NULL," +
+//            "`isOpen` boolean NOT NULL," +
+//            "PRIMARY KEY (`mineOwner`)" +  // This is creating 3 colums Player, Kills, Total. Primary key is what you are going to use as your indexer. Here we want to use player so
+//            ");"; // we can search by player, and get kills and total. If you some how were searching kills it would provide total and player.
 
 
     // SQL creation stuff, You can leave the blow stuff untouched.
@@ -59,7 +59,7 @@ public class SQLite extends Database {
         connection = getSQLConnection();
         try {
             Statement s = connection.createStatement();
-            s.executeUpdate(SQLiteCreateTokensTable);
+//            s.executeUpdate(SQLiteCreateTokensTable);
             s.close();
         } catch (SQLException e) {
             e.printStackTrace();
