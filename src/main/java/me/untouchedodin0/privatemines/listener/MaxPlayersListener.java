@@ -57,7 +57,7 @@ public class MaxPlayersListener implements Listener {
 
             int maxPlayers = mineType.getMaxPlayers();
 
-            if (count.get() > maxPlayers) {
+            if (count.get() > maxPlayers && !player.getUniqueId().equals(mine.getMineData().getMineOwner())) {
                 player.sendMessage(ChatColor.RED + "I'm sorry, this mine is full!");
                 player.performCommand("spawn");
                 event.setCancelled(true);

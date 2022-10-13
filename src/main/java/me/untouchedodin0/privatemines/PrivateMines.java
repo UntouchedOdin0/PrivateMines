@@ -3,6 +3,7 @@ package me.untouchedodin0.privatemines;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
@@ -25,6 +26,9 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
+import me.untouchedodin0.privatemines.utils.adapter.PregenMineAdapter;
+import me.untouchedodin0.privatemines.utils.adapter.WorldAdapter;
 import me.untouchedodin0.privatemines.utils.addons.AddonDescriptionFile;
 import me.untouchedodin0.privatemines.utils.addons.JarLoader;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
@@ -37,6 +41,7 @@ import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -58,6 +63,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.sql.Connection;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -203,12 +209,9 @@ public class PrivateMines extends JavaPlugin {
 
             sqlite = new SQLite();
 
-            getLogger().info("sqlLite: " + sqlite);
-
             SQLHelper sqlHelper = new SQLHelper(sqlite.getSQLConnection());
-            getLogger().info("sqlHelper: " + sqlHelper);
             sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
-                    "`mineOwner` TEXT," +
+                    "`mineOwner` UUID," +
                     "`mineType` TEXT," +
                     "`mineLocation` TEXT," +
                     "`corner1` TEXT," +
@@ -270,6 +273,7 @@ public class PrivateMines extends JavaPlugin {
                 getDescription().getName(),
                 getDescription().getVersion()));
         saveMines();
+//        saveSQLMines();
 //        savePregenMines();
     }
 
@@ -396,25 +400,70 @@ public class PrivateMines extends JavaPlugin {
         });
     }
 
+    public void loadSQLMines() {
+        Connection connection = sqlite.getSQLConnection();
+
+        SQLHelper sqlHelper = new SQLHelper(connection);
+    }
+
+    public void saveSQLMines() {
+        Connection connection = sqlite.getSQLConnection();
+        SQLHelper sqlHelper = new SQLHelper(connection);
+
+        sqlHelper.executeUpdate("UPDATE privatemines SET mineOwner=?;", UUID.randomUUID());
+        sqlHelper.commit();
+
+        mineStorage.getMines().forEach((uuid, mine) -> {
+            privateMines.getLogger().info("saving mine: " + mine);
+            MineData mineData = mine.getMineData();
+            UUID owner = mineData.getMineOwner();
+
+//            String command = String.format("INSERT INTO privatemines(mineOwner) VALUES(%s);", String.valueOf(owner));
+
+//            sqlHelper.execute("UPDATE privatemines SET mineOwner=?;", owner);
+        });
+
+        privateMines.getLogger().info("save sql mines connection: " + connection);
+        privateMines.getLogger().info("save sql mines sqlHelper: " + sqlHelper);
+    }
+
     public void loadPregenMines() {
         final PathMatcher jsonMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.json"); // Credits to Brister Mitten
         Path path = getPregenMines();
-        Gson gson = new Gson();
-
+//        GsonBuilder builder = new GsonBuilder();
+//        builder.registerTypeAdapter(PregenMine.class, new PregenMineAdapter());
+        Gson gson = new GsonBuilder()
+                .enableComplexMapKeySerialization()
+                .setPrettyPrinting()
+                .registerTypeAdapter(World.class, new WorldAdapter())
+                .registerTypeAdapter(Location.class, new LocationAdapter())
+                .create();
 
         CompletableFuture.runAsync(() -> {
             try (Stream<Path> paths = Files.walk(path).filter(jsonMatcher::matches)) {
                 paths.forEach(streamPath -> {
                     File file = streamPath.toFile();
+                    Reader reader;
                     getLogger().info("Loading pregen mine file: " + file);
 
                     try {
-                        Reader reader = Files.newBufferedReader(file.toPath());
-                        getLogger().info("reader: " + reader);
+                        reader = Files.newBufferedReader(file.toPath());
                         PregenMine pregenMine = gson.fromJson(reader, PregenMine.class);
 
+                        getLogger().info("reader: " + reader);
+                        getLogger().info("pregenMine: " + pregenMine);
 
-                        getLogger().info("test???? " + pregenMine);
+                        getLogger().info("location: " + pregenMine.getLocation());
+                        getLogger().info("spawnLocation: " + pregenMine.getSpawnLocation());
+                        getLogger().info("lowerRails: " + pregenMine.getLowerRails());
+                        getLogger().info("upperRails: " + pregenMine.getUpperRails());
+                        getLogger().info("fullMin: " + pregenMine.getFullMin());
+                        getLogger().info("fullMax: " + pregenMine.getFullMax());
+
+//                        PregenMine pregenMine = gson.fromJson(reader, PregenMine.class);
+//                        getLogger().info("pregen mine " + pregenMine);
+//
+//                        getLogger().info("test???? ");
 
 //                       JsonReader jsonReader = new JsonReader(new FileReader(file));
 //                       getLogger().info("json reader " + jsonReader);
@@ -425,6 +474,11 @@ public class PrivateMines extends JavaPlugin {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+
+                    getLogger().info("after load test");
+//                    getLogger().info("pregen mine " + pregenMine);
+//
+//                    getLogger().info("test???? ");
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);
