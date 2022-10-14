@@ -93,12 +93,20 @@ privatemine,privatemines,pmine,pmines {
         permission privatemines.claim
     }
 
+    convert {
+        hook convert
+        help Transfers all the mines to SQL.
+        permission privatemines.convert
+    }
+
     setborder player:target int:size {
         hook setborder
+        permission privatemines.setborder
     }
 
     clearborder player:target {
         hook clearborder
+        permission privatemines.clearborder
     }
 
     debug {
@@ -107,5 +115,6 @@ privatemine,privatemines,pmine,pmines {
 
     reload {
         hook reload
+        permission privatemines.reload
     }
 }

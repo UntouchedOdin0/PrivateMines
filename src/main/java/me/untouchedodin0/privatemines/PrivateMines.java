@@ -27,10 +27,10 @@ import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
-import me.untouchedodin0.privatemines.utils.adapter.PregenMineAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.WorldAdapter;
 import me.untouchedodin0.privatemines.utils.addons.AddonDescriptionFile;
 import me.untouchedodin0.privatemines.utils.addons.JarLoader;
+import me.untouchedodin0.privatemines.utils.conversion.ConversionUtils;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -101,6 +101,7 @@ public class PrivateMines extends JavaPlugin {
     private SlimeUtils slimeUtils;
     private static Economy econ = null;
     private SQLite sqlite;
+    private SQLHelper sqlHelper;
     private BukkitAudiences adventure;
     private ProtocolManager protocolManager;
     private WorldBorderUtils worldBorderUtils;
@@ -187,10 +188,12 @@ public class PrivateMines extends JavaPlugin {
                     .saveDefaults()
                     .load();
 
-            if (Config.useAdventure) {
-                getLogger().info("Loading adventure hook...");
-                this.adventure = BukkitAudiences.create(this);
-            }
+            this.adventure = BukkitAudiences.create(this);
+
+//            if (Config.useAdventure) {
+//                getLogger().info("Loading adventure hook...");
+//                this.adventure = BukkitAudiences.create(this);
+//            }
 
             this.Y_LEVEL = Config.mineYLevel;
             this.MINE_DISTANCE = Config.mineDistance;
@@ -209,7 +212,8 @@ public class PrivateMines extends JavaPlugin {
 
             sqlite = new SQLite();
 
-            SQLHelper sqlHelper = new SQLHelper(sqlite.getSQLConnection());
+            sqlHelper = new SQLHelper(sqlite.getSQLConnection());
+            sqlHelper.setAutoCommit(false);
             sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
                     "`mineOwner` UUID," +
                     "`mineType` TEXT," +
@@ -427,6 +431,11 @@ public class PrivateMines extends JavaPlugin {
         privateMines.getLogger().info("save sql mines sqlHelper: " + sqlHelper);
     }
 
+    public void convertToSQL(Player player) {
+        player.sendMessage("mine directory: " + minesDirectory);
+        ConversionUtils.convertToSQL(minesDirectory);
+    }
+
     public void loadPregenMines() {
         final PathMatcher jsonMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.json"); // Credits to Brister Mitten
         Path path = getPregenMines();
@@ -619,7 +628,6 @@ public class PrivateMines extends JavaPlugin {
         return econ;
     }
 
-    @Deprecated
     public SQLite getSqlite() {
         return sqlite;
     }
@@ -641,9 +649,14 @@ public class PrivateMines extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MaxPlayersListener(), this);
     }
 
+    public SQLHelper getSqlHelper() {
+        return sqlHelper;
+    }
+
     public BukkitAudiences getAdventure() {
         if (this.adventure == null) {
-            throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
+            throw new IllegalStateException("Adventure was not initialized!");
+//            throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
         }
         return adventure;
     }

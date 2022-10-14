@@ -8,12 +8,12 @@ class AudienceUtils {
 
     var privateMines: PrivateMines = PrivateMines.getPrivateMines()
 
-
     fun sendMessage(player: Player, message: String) {
         val miniMessage = MiniMessage.miniMessage()
         val audiences = privateMines.adventure
-        val parsed = miniMessage.deserialize("Hello <rainbow>world</rainbow>, isn't <underlined>MiniMessage</underlined> fun?")
+        val parsed = miniMessage.deserialize(message)
         val audience = audiences.player(player)
+
         audience.sendMessage(parsed)
     }
 }

@@ -6,6 +6,7 @@ import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.kotlin.utils.AudienceUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.WorldBorderUtils;
 import me.untouchedodin0.privatemines.config.MenuConfig;
@@ -15,15 +16,20 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopBuilder;
+import me.untouchedodin0.privatemines.utils.MessageUtils;
 import me.untouchedodin0.privatemines.utils.inventory.PublicMinesMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.Messages;
+import redempt.redlib.misc.ChatPrompt;
 import redempt.redlib.misc.Task;
+import redempt.redlib.sql.SQLHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +46,12 @@ public class PrivateMinesCommand {
     @CommandHook("main")
     public void main(CommandSender sender) {
         if (sender instanceof Player player) {
+
+            AudienceUtils audienceUtils = new AudienceUtils();
+            audienceUtils.sendMessage(player, "test");
+            audienceUtils.sendMessage(player, "Hello <rainbow>world</rainbow>, isn't <blue><u><click:open_url:'https://docs.adventure.kyori.net/minimessage'>MiniMessage</click></u></blue> fun?");
+//            MessageUtils messageUtils = new MessageUtils();
+//            TextComponent textComponent = Component.text("Test text command!");
 
             if (!(player.getUniqueId() == UUID.fromString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b"))) {
                 Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
@@ -345,6 +357,26 @@ public class PrivateMinesCommand {
                 Task.syncDelayed(() -> pregenMine.teleport(player), 5L);
             }
         }
+    }
+
+    @CommandHook("convert")
+    public void convert(Player player) {
+        ChatPrompt.prompt(player, ChatColor.YELLOW + "Are you sure you want to convert the mines to SQL? Type Yes to carry on the process " +
+                "or No to cancel the process.", str -> {
+            if (str.equalsIgnoreCase("Yes")) {
+                player.sendMessage(ChatColor.GREEN + "Starting conversion...");
+                SQLHelper sqlHelper = privateMines.getSqlHelper();
+                sqlHelper.executeUpdate("UPDATE privatemines SET mineOwner=? mineType=? mineLocation=? corner1=? corner2=? fullRegionMin=? fullRegionMax=? spawn=? tax=? isOpen=? maxPlayers=? maxMineSize=? materials=?", "owner", "type", "minelocation", "corner1", "corner2", "fullmin", "fullmax", "spawn", 5.0, false, 1, 1, "materials");
+                sqlHelper.commit();
+
+                player.sendMessage("" + sqlHelper);
+//                sqlHelper.execute("INSERT INTO privatemines (mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) VALUES(mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials);");
+
+//                privateMines.convertToSQL(player);
+            } else {
+                player.sendMessage(ChatColor.RED + "Cancelled the process.");
+            }
+        });
     }
 
     @CommandHook("reload")
