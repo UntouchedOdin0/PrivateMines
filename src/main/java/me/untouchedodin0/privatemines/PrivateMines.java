@@ -64,6 +64,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -212,7 +213,7 @@ public class PrivateMines extends JavaPlugin {
 
             sqlite = new SQLite();
 
-            sqlHelper = new SQLHelper(sqlite.getSQLConnection());
+            this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
             sqlHelper.setAutoCommit(false);
             sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
                     "`mineOwner` UUID," +
@@ -433,7 +434,7 @@ public class PrivateMines extends JavaPlugin {
 
     public void convertToSQL(Player player) {
         player.sendMessage("mine directory: " + minesDirectory);
-        ConversionUtils.convertToSQL(minesDirectory);
+        ConversionUtils.convertSQLDirectory(minesDirectory);
     }
 
     public void loadPregenMines() {

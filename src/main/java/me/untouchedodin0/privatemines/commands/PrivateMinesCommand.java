@@ -31,6 +31,9 @@ import redempt.redlib.misc.ChatPrompt;
 import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -366,10 +369,50 @@ public class PrivateMinesCommand {
             if (str.equalsIgnoreCase("Yes")) {
                 player.sendMessage(ChatColor.GREEN + "Starting conversion...");
                 SQLHelper sqlHelper = privateMines.getSqlHelper();
-                sqlHelper.executeUpdate("UPDATE privatemines SET mineOwner=? mineType=? mineLocation=? corner1=? corner2=? fullRegionMin=? fullRegionMax=? spawn=? tax=? isOpen=? maxPlayers=? maxMineSize=? materials=?", "owner", "type", "minelocation", "corner1", "corner2", "fullmin", "fullmax", "spawn", 5.0, false, 1, 1, "materials");
-                sqlHelper.commit();
+                Connection connection = sqlHelper.getConnection();
+                String query = "INSERT INTO privatemines values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-                player.sendMessage("" + sqlHelper);
+                // 13
+
+                try {
+                    PreparedStatement preparedStatement = connection.prepareStatement(query);
+                    preparedStatement.setString(1, "1");
+                    preparedStatement.setString(2, "2");
+                    preparedStatement.setString(3, "3");
+                    preparedStatement.setString(4, "4");
+                    preparedStatement.setString(5, "5");
+                    preparedStatement.setString(6, "6");
+                    preparedStatement.setString(7, "7");
+                    preparedStatement.setString(8, "8");
+                    preparedStatement.setString(9, "9");
+                    preparedStatement.setString(10, "10");
+                    preparedStatement.setString(11, "11");
+                    preparedStatement.setString(12, "12");
+                    preparedStatement.setString(13, "13");
+
+                    int res = preparedStatement.executeUpdate();
+
+//                    connection.commit();
+//                    connection.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+
+                player.sendMessage("connection " + connection);
+
+                try {
+                    connection.commit();
+                    connection.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+
+
+
+//                sqlHelper.executeUpdate("UPDATE privatemines SET mineOwner=? mineType=? mineLocation=? corner1=? corner2=? fullRegionMin=? fullRegionMax=? spawn=? tax=? isOpen=? maxPlayers=? maxMineSize=? materials=?", "owner", "type", "minelocation", "corner1", "corner2", "fullmin", "fullmax", "spawn", 5.0, false, 1, 1, "materials");
+//                sqlHelper.commit();
+//
+//                player.sendMessage("" + sqlHelper);
 //                sqlHelper.execute("INSERT INTO privatemines (mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) VALUES(mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials);");
 
 //                privateMines.convertToSQL(player);
