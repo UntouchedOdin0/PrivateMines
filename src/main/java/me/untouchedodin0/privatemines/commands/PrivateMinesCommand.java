@@ -296,6 +296,8 @@ public class PrivateMinesCommand {
     @CommandHook("claim")
     public void claim(Player player) {
 
+        AudienceUtils audienceUtils = new AudienceUtils();
+
         if (mineStorage.hasMine(player)) {
             player.sendMessage(ChatColor.RED + "You already own a mine!");
             return;
@@ -358,6 +360,7 @@ public class PrivateMinesCommand {
                 mine.reset();
 
                 Task.syncDelayed(() -> pregenMine.teleport(player), 5L);
+                audienceUtils.sendMessage(player, "<rainbow>You have been teleported to your mine!</rainbow>!");
             }
         }
     }

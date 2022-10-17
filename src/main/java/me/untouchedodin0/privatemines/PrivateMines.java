@@ -64,7 +64,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -190,12 +189,6 @@ public class PrivateMines extends JavaPlugin {
                     .load();
 
             this.adventure = BukkitAudiences.create(this);
-
-//            if (Config.useAdventure) {
-//                getLogger().info("Loading adventure hook...");
-//                this.adventure = BukkitAudiences.create(this);
-//            }
-
             this.Y_LEVEL = Config.mineYLevel;
             this.MINE_DISTANCE = Config.mineDistance;
 
@@ -231,17 +224,8 @@ public class PrivateMines extends JavaPlugin {
                     "`materials` TEXT" +
                     ");");
 
-//            try {
-//                sqlite.getSQLConnection().prepareStatement("INSERT INTO privatemines (mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) VALUES(mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials);");
-//            } catch (SQLException e) {
-//                throw new RuntimeException(e);
-//            }
-//            sqlHelper.execute("INSERT INTO privatemines(mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) VALUES(mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials);");
-//            sqlite.load();
-
-
-            loadMines();
-            loadPregenMines();
+            Task.asyncDelayed(this::loadMines);
+            Task.asyncDelayed(this::loadPregenMines);
             Task.asyncDelayed(this::loadAddons);
 
             PaperLib.suggestPaper(this);
@@ -278,8 +262,6 @@ public class PrivateMines extends JavaPlugin {
                 getDescription().getName(),
                 getDescription().getVersion()));
         saveMines();
-//        saveSQLMines();
-//        savePregenMines();
     }
 
     public void setupSchematicUtils() {
@@ -440,8 +422,6 @@ public class PrivateMines extends JavaPlugin {
     public void loadPregenMines() {
         final PathMatcher jsonMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.json"); // Credits to Brister Mitten
         Path path = getPregenMines();
-//        GsonBuilder builder = new GsonBuilder();
-//        builder.registerTypeAdapter(PregenMine.class, new PregenMineAdapter());
         Gson gson = new GsonBuilder()
                 .enableComplexMapKeySerialization()
                 .setPrettyPrinting()
@@ -459,36 +439,10 @@ public class PrivateMines extends JavaPlugin {
                     try {
                         reader = Files.newBufferedReader(file.toPath());
                         PregenMine pregenMine = gson.fromJson(reader, PregenMine.class);
-
-                        getLogger().info("reader: " + reader);
-                        getLogger().info("pregenMine: " + pregenMine);
-
-                        getLogger().info("location: " + pregenMine.getLocation());
-                        getLogger().info("spawnLocation: " + pregenMine.getSpawnLocation());
-                        getLogger().info("lowerRails: " + pregenMine.getLowerRails());
-                        getLogger().info("upperRails: " + pregenMine.getUpperRails());
-                        getLogger().info("fullMin: " + pregenMine.getFullMin());
-                        getLogger().info("fullMax: " + pregenMine.getFullMax());
-
-//                        PregenMine pregenMine = gson.fromJson(reader, PregenMine.class);
-//                        getLogger().info("pregen mine " + pregenMine);
-//
-//                        getLogger().info("test???? ");
-
-//                       JsonReader jsonReader = new JsonReader(new FileReader(file));
-//                       getLogger().info("json reader " + jsonReader);
-
-
-//                       PregenMine pregenMine = gson.fromJson(jsonReader, PregenMine.class);
-
+                        pregenStorage.addMine(pregenMine);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-
-                    getLogger().info("after load test");
-//                    getLogger().info("pregen mine " + pregenMine);
-//
-//                    getLogger().info("test???? ");
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -504,27 +458,6 @@ public class PrivateMines extends JavaPlugin {
             }
         });
     }
-
-//    public void savePregenMines() {
-//
-//        GsonBuilder gsonBuilder = new GsonBuilder();
-//        gsonBuilder.registerTypeAdapter(PregenMine.class, new PregenMineAdapter());
-//        gsonBuilder.setPrettyPrinting();
-//        Gson gson = gsonBuilder.create();
-//
-//        getPregenStorage().getMines().forEach(pregenMine -> {
-//            String json = gson.toJson(pregenMine);
-//
-//            File file = new File(pregenMines + "/" + Utils.getRandom(15) + ".json");
-//            try {
-//                try (FileWriter fileWriter = new FileWriter(file)) {
-//                    fileWriter.write(json);
-//                }
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        });
-//    }
 
     public void loadAddons() {
         final PathMatcher jarMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
@@ -657,7 +590,6 @@ public class PrivateMines extends JavaPlugin {
     public BukkitAudiences getAdventure() {
         if (this.adventure == null) {
             throw new IllegalStateException("Adventure was not initialized!");
-//            throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
         }
         return adventure;
     }

@@ -55,7 +55,6 @@ class MineStorage {
             val mineLocation = it.value.mineData.mineLocation
             val distance = location.distance(mineLocation)
             distances.putIfAbsent(it.value, distance)
-            println("distance: $distance")
         }
         val min = distances.entries.minByOrNull { it.value } ?: return null
 

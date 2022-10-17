@@ -251,6 +251,8 @@ public class Mine {
             }
         }
 
+        //todo Move this code into the new teleportation method.
+
             World world = location.getWorld();
             Player player = Bukkit.getPlayer(mineData.getMineOwner());
             if (player != null && player.isOnline()) {
