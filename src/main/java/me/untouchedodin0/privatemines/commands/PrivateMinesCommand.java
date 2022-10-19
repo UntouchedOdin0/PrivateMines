@@ -29,6 +29,9 @@ import redempt.redlib.misc.ChatPrompt;
 import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -186,8 +189,12 @@ public class PrivateMinesCommand {
         } else {
             Mine mine = mineStorage.get(target.getUniqueId());
             if (mine != null) {
-                mine.teleport(player);
-                audienceUtils.sendMessage(player, target, MessagesConfig.visitingMine);
+                if (mine.getMineData().isOpen()) {
+                    mine.teleport(player);
+                    audienceUtils.sendMessage(player, target, MessagesConfig.visitingMine);
+                } else {
+                    player.sendMessage(ChatColor.RED + "Mine closed!");
+                }
             }
         }
     }
@@ -300,6 +307,7 @@ public class PrivateMinesCommand {
     public void pregen(Player player, int amount) {
         PregenFactory pregenFactory = new PregenFactory();
         pregenFactory.generate(player, amount);
+        privateMines.savePregenMines();
     }
 
     @CommandHook("claim")
@@ -327,6 +335,7 @@ public class PrivateMinesCommand {
                 Location upperRails = pregenMine.getUpperRails();
                 Location fullMin = pregenMine.getFullMin();
                 Location fullMax = pregenMine.getFullMax();
+                File file = pregenMine.getFile();
 
                 UUID uuid = player.getUniqueId();
 
@@ -367,6 +376,13 @@ public class PrivateMinesCommand {
                 mine.saveMineData(player, mineData);
                 mineStorage.addMine(player.getUniqueId(), mine);
                 mine.reset();
+                try {
+                    if (file != null) {
+                        Files.delete(file.toPath());
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
                 Task.syncDelayed(() -> pregenMine.teleport(player), 5L);
                 audienceUtils.sendMessage(player, MessagesConfig.teleportedToOwnMine);

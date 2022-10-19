@@ -1,1 +1,16 @@
-mineReset: "Your mine has been reset"
+mineReset: <green>Your mine has been reset!
+dontOwnMine: <red>You don't own a mine!
+playerDoesntOwnMine: <red>That player doesn't own a mine!
+playerAlreadyOwnsAMine: <red>That player already owns a mine!
+deletedPlayersMine: <green>You have deleted {name}'s mine!
+gavePlayerMine: <green>You have given {name} a mine!
+mineUpgraded: <green>Your mine has been upgraded!
+playerMineExpanded: <green>{names}s mine has been expanded by {amount}!
+ownMineExpanded: <green>Your mine has been expanded by {amount}!
+teleportedToOwnMine: <green>You have been teleported to your mine!
+visitingMine: <green>You are now visiting {name}'s mine!
+setTax: <green>Successfully set your tax to {tax}%!
+targetAlreadyBanned: <green>The target player is already banned!
+successfullyBannedPlayer: <green>{name} Has been banned from your mine!
+targetIsNotBanned: <red>{name} isn't banned!
+unbannedPlayer: <green>{name} Has been unbanned from your mine!

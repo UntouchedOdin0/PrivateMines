@@ -258,11 +258,11 @@ public class Utils {
     {
         Random rand = new Random(); //instance of random class
         String total_characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String randomString = "";
+        StringBuilder randomString = new StringBuilder();
         for (int i = 0; i < digits; i++) {
             int index = rand.nextInt(total_characters.length()-1);
-            randomString += total_characters.charAt(index);
+            randomString.append(total_characters.charAt(index));
         }
-        return randomString;
+        return randomString.toString();
     }
 }

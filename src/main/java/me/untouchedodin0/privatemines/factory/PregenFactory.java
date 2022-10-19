@@ -5,6 +5,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.adapter.UnsupportedVersionEditException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
@@ -133,11 +134,15 @@ public class PregenFactory {
 
                         try {
                             Operations.complete(operation);
-                            editSession.flushQueue();
+                            editSession.close();
                         } catch (WorldEditException worldEditException) {
+                            if (worldEditException.getCause() instanceof UnsupportedVersionEditException) {
+                                privateMines.getLogger().warning("WorldEdit version " + WorldEdit.getVersion() + " is not supported," +
+                                        "if this issue persists, please try using FastAsyncWorldEdit.");
+                                return;
+                            }
                             worldEditException.printStackTrace();
                         }
-
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

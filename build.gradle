@@ -8,9 +8,9 @@ plugins {
 
 group 'me.untouchedodin0.privatemines'
 //version '4.1.8-SNAPSHOT'
-version '4.1.8'
+version '5.0.0'
 
-def devBuild = true
+def devBuild = false
 
 if (devBuild) {
     version = version + "-DEV"

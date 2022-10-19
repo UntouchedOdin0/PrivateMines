@@ -119,6 +119,8 @@ public class PrivateMines extends JavaPlugin {
         getLogger().info("Loading Private Mines v" + getDescription().getVersion());
         saveDefaultConfig();
         saveResource("menus.yml", false);
+        saveResource("messages.yml", false);
+
         privateMines = this;
         if (RedLib.MID_VERSION < 13) {
             Utils.complain();
@@ -188,7 +190,10 @@ public class PrivateMines extends JavaPlugin {
                     .saveDefaults()
                     .load();
 
-            this.adventure = BukkitAudiences.create(this);
+            if (Config.useAdventure) {
+                this.adventure = BukkitAudiences.create(this);
+
+            }
             this.Y_LEVEL = Config.mineYLevel;
             this.MINE_DISTANCE = Config.mineDistance;
 
@@ -225,7 +230,7 @@ public class PrivateMines extends JavaPlugin {
                     ");");
 
             Task.asyncDelayed(this::loadMines);
-            Task.asyncDelayed(this::loadPregenMines);
+            Task.syncDelayed(this::loadPregenMines);
             Task.asyncDelayed(this::loadAddons);
 
             PaperLib.suggestPaper(this);
@@ -262,6 +267,7 @@ public class PrivateMines extends JavaPlugin {
                 getDescription().getName(),
                 getDescription().getVersion()));
         saveMines();
+//        savePregenMines();
     }
 
     public void setupSchematicUtils() {
@@ -420,14 +426,14 @@ public class PrivateMines extends JavaPlugin {
     }
 
     public void loadPregenMines() {
-        final PathMatcher jsonMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.json"); // Credits to Brister Mitten
+        final PathMatcher jsonMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
         Path path = getPregenMines();
-        Gson gson = new GsonBuilder()
-                .enableComplexMapKeySerialization()
-                .setPrettyPrinting()
-                .registerTypeAdapter(World.class, new WorldAdapter())
-                .registerTypeAdapter(Location.class, new LocationAdapter())
-                .create();
+//        Gson gson = new GsonBuilder()
+//                .enableComplexMapKeySerialization()
+//                .setPrettyPrinting()
+//                .registerTypeAdapter(World.class, new WorldAdapter())
+//                .registerTypeAdapter(Location.class, new LocationAdapter())
+//                .create();
 
         CompletableFuture.runAsync(() -> {
             try (Stream<Path> paths = Files.walk(path).filter(jsonMatcher::matches)) {
@@ -435,14 +441,39 @@ public class PrivateMines extends JavaPlugin {
                     File file = streamPath.toFile();
                     Reader reader;
                     getLogger().info("Loading pregen mine file: " + file);
+                    YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
 
-                    try {
-                        reader = Files.newBufferedReader(file.toPath());
-                        PregenMine pregenMine = gson.fromJson(reader, PregenMine.class);
-                        pregenStorage.addMine(pregenMine);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    Location location = LocationUtils.fromString(yml.getString("location"));
+                    Location spawnLocation = LocationUtils.fromString(yml.getString("spawnLocation"));
+                    Location lowerRails = LocationUtils.fromString(yml.getString("lowerRails"));
+                    Location upperRails = LocationUtils.fromString(yml.getString("upperRails"));
+                    Location fullMin = LocationUtils.fromString(yml.getString("fullMin"));
+                    Location fullMax = LocationUtils.fromString(yml.getString("fullMax"));
+
+                    PregenMine pregenMine = new PregenMine();
+                    pregenMine.setLocation(location);
+                    pregenMine.setSpawnLocation(spawnLocation);
+                    pregenMine.setLowerRails(lowerRails);
+                    pregenMine.setUpperRails(upperRails);
+                    pregenMine.setFullMin(fullMin);
+                    pregenMine.setFullMax(fullMax);
+                    pregenStorage.addMine(pregenMine);
+
+
+                    privateMines.getLogger().info("location " + location);
+                    privateMines.getLogger().info("spawnLocation " + spawnLocation);
+                    privateMines.getLogger().info("lowerRails " + lowerRails);
+                    privateMines.getLogger().info("upperRails " + upperRails);
+                    privateMines.getLogger().info("fullMin " + fullMin);
+                    privateMines.getLogger().info("fullMax " + fullMax);
+
+//                    try {
+//                        reader = Files.newBufferedReader(file.toPath());
+//                        PregenMine pregenMine = gson.fromJson(reader, PregenMine.class);
+//                        pregenStorage.addMine(pregenMine);
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -457,6 +488,10 @@ public class PrivateMines extends JavaPlugin {
                 mine.saveMineData(player, mine.getMineData());
             }
         });
+    }
+
+    public void savePregenMines() {
+        getPregenStorage().getMines().forEach(PregenMine::save);
     }
 
     public void loadAddons() {
