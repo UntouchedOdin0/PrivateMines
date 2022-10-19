@@ -33,4 +33,12 @@ class AudienceUtils {
         val audience = audiences.player(player)
         audience.sendMessage(parsed)
     }
+
+    fun sendMessage(player: Player, message: String, int: Int) {
+        val miniMessage = MiniMessage.miniMessage()
+        val audiences = privateMines.adventure
+        val parsed = miniMessage.deserialize(message.replace("{amount}", int.toString()))
+        val audience = audiences.player(player)
+        audience.sendMessage(parsed)
+    }
 }

@@ -48,10 +48,6 @@ public class PrivateMinesCommand {
     @CommandHook("main")
     public void main(CommandSender sender) {
         if (sender instanceof Player player) {
-//            AudienceUtils audienceUtils = new AudienceUtils();
-            audienceUtils.sendMessage(player, "test");
-            audienceUtils.sendMessage(player, "Hello <rainbow>world</rainbow>, isn't <blue><u><click:open_url:'https://docs.adventure.kyori.net/minimessage'>MiniMessage</click></u></blue> fun?");
-
             if (!(player.getUniqueId() == UUID.fromString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b"))) {
                 Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
                 mainMenu.open(player);
@@ -93,7 +89,7 @@ public class PrivateMinesCommand {
             } else {
                 mineFactory.create(target.getPlayer(), location, Objects.requireNonNullElse(mineType, defaultMineType));
                 if (commandSender instanceof  Player player) {
-                    audienceUtils.sendMessage(player, MessagesConfig.gavePlayerMine.replace("%name%", Objects.requireNonNull(target.getName())));
+                    audienceUtils.sendMessage(player, target, MessagesConfig.gavePlayerMine);
                 }
             }
         }
@@ -111,7 +107,7 @@ public class PrivateMinesCommand {
             if (mine != null) {
                 mine.delete();
                 if (commandSender instanceof Player player) {
-                    audienceUtils.sendMessage(player, MessagesConfig.deletedPlayersMine.replace("{name}", Objects.requireNonNull(target.getName())));
+                    audienceUtils.sendMessage(player, target, MessagesConfig.deletedPlayersMine);
                 }
             }
         }
@@ -163,8 +159,8 @@ public class PrivateMinesCommand {
                 MineData mineData = mine.getMineData();
                 mine.saveMineData(target, mineData);
                 if (commandSender instanceof Player player) {
-                    audienceUtils.sendMessage(player, MessagesConfig.playerMineExpanded.replace("{amount}", String.valueOf(amount)));
-                    audienceUtils.sendMessage(target, MessagesConfig.ownMineExpanded.replace("{amount}", String.valueOf(amount)));
+                    audienceUtils.sendMessage(player, MessagesConfig.playerMineExpanded, amount);
+                    audienceUtils.sendMessage(target, MessagesConfig.ownMineExpanded, amount);
                 }
             }
         }
