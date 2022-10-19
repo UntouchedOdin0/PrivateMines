@@ -315,9 +315,27 @@ public class Mine {
             }
         }
 
-
         World world = location.getWorld();
         Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
+
+        Player player = Bukkit.getPlayer(mineData.getMineOwner());
+        if (player != null && player.isOnline()) {
+            boolean isPlayerInRegion = region.contains(player.getLocation().getBlockX(),
+                    player.getLocation().getBlockY(),
+                    player.getLocation().getBlockZ());
+            if (isPlayerInRegion) {
+                teleport(player);
+            }
+        }
+
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            boolean isPlayerInRegion = region.contains(
+                    online.getLocation().getBlockX(),
+                    online.getLocation().getBlockY(),
+                    online.getLocation().getBlockZ());
+            if (isPlayerInRegion) teleport(online);
+        }
+
         if (Config.addWallGap) {
             region.contract(ExpansionUtils.expansionVectors(Config.wallsGap));
         }
