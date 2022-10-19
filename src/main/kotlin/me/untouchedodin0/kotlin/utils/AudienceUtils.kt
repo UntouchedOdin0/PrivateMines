@@ -32,7 +32,7 @@ class AudienceUtils {
     fun sendMessage(player: Player, target: OfflinePlayer, message: String) {
         val miniMessage = MiniMessage.miniMessage()
         val audiences = privateMines.adventure
-        val placeholderAPI = PlaceholderAPI.setPlaceholders(target, message)
+        val placeholderAPI = PlaceholderAPI.setPlaceholders(target, message.replace("{name}", target.name!!))
         val parsed = miniMessage.deserialize(placeholderAPI)
         val audience = audiences.player(player)
         audience.sendMessage(parsed)

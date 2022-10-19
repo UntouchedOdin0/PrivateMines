@@ -182,7 +182,6 @@ public class PrivateMinesCommand {
     @CommandHook("visit")
     public void visit(Player player, OfflinePlayer target) {
         if (!mineStorage.hasMine(target.getUniqueId())) {
-            player.sendMessage(Messages.msg("playerDoesntOwnAMine"));
             audienceUtils.sendMessage(player, MessagesConfig.playerDoesntOwnMine);
         } else {
             Mine mine = mineStorage.get(target.getUniqueId());
@@ -370,13 +369,14 @@ public class PrivateMinesCommand {
                 mine.reset();
 
                 Task.syncDelayed(() -> pregenMine.teleport(player), 5L);
-                audienceUtils.sendMessage(player, "<rainbow>You have been teleported to your mine!</rainbow>!");
+                audienceUtils.sendMessage(player, MessagesConfig.teleportedToOwnMine);
             }
         }
     }
 
     @CommandHook("convert")
     public void convert(Player player) {
+        player.sendMessage("" + ChatColor.RED + ChatColor.BOLD + "NOT WORKING YET!");
         ChatPrompt.prompt(player, ChatColor.YELLOW + "Are you sure you want to convert the mines to SQL? Type Yes to carry on the process " +
                 "or No to cancel the process.", str -> {
             if (str.equalsIgnoreCase("Yes")) {

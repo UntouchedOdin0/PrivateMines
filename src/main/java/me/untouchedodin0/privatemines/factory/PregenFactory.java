@@ -58,7 +58,6 @@ public class PregenFactory {
     public void generate(Player player, int amount) {
         long start = System.currentTimeMillis();
 
-        player.sendMessage("Generating mines...");
         generateLocations(amount);
         MineType defaultType = mineTypeManager.getDefaultMineType();
         File schematicFile = new File("plugins/PrivateMines/schematics/" + defaultType.getFile());
@@ -134,7 +133,7 @@ public class PregenFactory {
 
                         try {
                             Operations.complete(operation);
-                            editSession.close();
+                            editSession.flushQueue();
                         } catch (WorldEditException worldEditException) {
                             worldEditException.printStackTrace();
                         }
