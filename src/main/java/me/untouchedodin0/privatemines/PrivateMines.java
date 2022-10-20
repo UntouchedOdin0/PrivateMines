@@ -267,7 +267,7 @@ public class PrivateMines extends JavaPlugin {
                 getDescription().getName(),
                 getDescription().getVersion()));
         saveMines();
-//        savePregenMines();
+        savePregenMines();
     }
 
     public void setupSchematicUtils() {
@@ -428,18 +428,11 @@ public class PrivateMines extends JavaPlugin {
     public void loadPregenMines() {
         final PathMatcher jsonMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
         Path path = getPregenMines();
-//        Gson gson = new GsonBuilder()
-//                .enableComplexMapKeySerialization()
-//                .setPrettyPrinting()
-//                .registerTypeAdapter(World.class, new WorldAdapter())
-//                .registerTypeAdapter(Location.class, new LocationAdapter())
-//                .create();
 
         CompletableFuture.runAsync(() -> {
             try (Stream<Path> paths = Files.walk(path).filter(jsonMatcher::matches)) {
                 paths.forEach(streamPath -> {
                     File file = streamPath.toFile();
-                    Reader reader;
                     getLogger().info("Loading pregen mine file: " + file);
                     YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
 
@@ -459,14 +452,6 @@ public class PrivateMines extends JavaPlugin {
                     pregenMine.setFullMax(fullMax);
                     pregenMine.setFile(file);
                     pregenStorage.addMine(pregenMine);
-
-//                    try {
-//                        reader = Files.newBufferedReader(file.toPath());
-//                        PregenMine pregenMine = gson.fromJson(reader, PregenMine.class);
-//                        pregenStorage.addMine(pregenMine);
-//                    } catch (IOException e) {
-//                        throw new RuntimeException(e);
-//                    }
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);
