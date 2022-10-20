@@ -457,15 +457,8 @@ public class PrivateMines extends JavaPlugin {
                     pregenMine.setUpperRails(upperRails);
                     pregenMine.setFullMin(fullMin);
                     pregenMine.setFullMax(fullMax);
+                    pregenMine.setFile(file);
                     pregenStorage.addMine(pregenMine);
-
-
-                    privateMines.getLogger().info("location " + location);
-                    privateMines.getLogger().info("spawnLocation " + spawnLocation);
-                    privateMines.getLogger().info("lowerRails " + lowerRails);
-                    privateMines.getLogger().info("upperRails " + upperRails);
-                    privateMines.getLogger().info("fullMin " + fullMin);
-                    privateMines.getLogger().info("fullMax " + fullMax);
 
 //                    try {
 //                        reader = Files.newBufferedReader(file.toPath());

@@ -26,10 +26,10 @@ class PregenMine {
     }
 
     fun save() {
-        val file = File("plugins/PrivateMines/pregen/" + Utils.getRandom(10) + ".yml")
-        Files.createFile(file.toPath())
+        file = File("plugins/PrivateMines/pregen/" + Utils.getRandom(10) + ".yml")
+        Files.createFile(file!!.toPath())
 
-        val yml = YamlConfiguration.loadConfiguration(file)
+        val yml = YamlConfiguration.loadConfiguration(file!!)
 
         yml.set("location", LocationUtils.toString(location))
         yml.set("spawnLocation", LocationUtils.toString(spawnLocation))
@@ -38,6 +38,6 @@ class PregenMine {
         yml.set("fullMin", LocationUtils.toString(fullMin))
         yml.set("fullMax", LocationUtils.toString(fullMax))
 
-        yml.save(file)
+        yml.save(file!!)
     }
 }

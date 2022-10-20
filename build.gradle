@@ -10,7 +10,7 @@ group 'me.untouchedodin0.privatemines'
 //version '4.1.8-SNAPSHOT'
 version '5.0.0'
 
-def devBuild = false
+def devBuild = true
 
 if (devBuild) {
     version = version + "-DEV"

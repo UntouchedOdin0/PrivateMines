@@ -24,9 +24,13 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
+import me.untouchedodin0.privatemines.utils.ChunkUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import redempt.redlib.misc.Task;
@@ -35,6 +39,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -58,8 +63,9 @@ public class PregenFactory {
 
     public void generate(Player player, int amount) {
         long start = System.currentTimeMillis();
+        int correct = amount++;
 
-        generateLocations(amount);
+        generateLocations(correct);
         MineType defaultType = mineTypeManager.getDefaultMineType();
         File schematicFile = new File("plugins/PrivateMines/schematics/" + defaultType.getFile());
 
@@ -73,6 +79,12 @@ public class PregenFactory {
         SchematicIterator.MineBlocks mineBlocks = schematicStorage.getMineBlocksMap().get(schematicFile);
 
         for (Location location : generatedLocations) {
+            Collection<Chunk> chunks = ChunkUtils.around(location.getChunk(), 25);
+
+            chunks.forEach(chunk -> {
+                chunk.load(true);
+            });
+
             BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
             Task.asyncDelayed(() -> {
@@ -125,6 +137,7 @@ public class PregenFactory {
                         pregenMine.setUpperRails(urailsL);
                         pregenMine.setFullMin(fullMinL);
                         pregenMine.setFullMax(fullMaxL);
+                        pregenMine.save();
 
                         pregenStorage.addMine(pregenMine);
 
@@ -150,18 +163,18 @@ public class PregenFactory {
             });
 
             player.sendMessage(ChatColor.GREEN + "Finished Generating Mine #" + generated.getAndIncrement());
+        }
 
-            if (generated.get() == amount) {
-                long finished = System.currentTimeMillis();
-                long time = finished - start;
+        if (generated.get() == amount) {
+            long finished = System.currentTimeMillis();
+            long time = finished - start;
 
-                long millis = time % 1000;
-                long second = (time / 1000) % 60;
-                long minute = (time / (1000 * 60)) % 60;
-                long hour = (time / (1000 * 60 * 60)) % 24;
-                String formatted = String.format("%02d:%02d:%02d.%d", hour, minute, second, millis);
-                player.sendMessage(ChatColor.GREEN + String.format("Finished generating %d mines in %s!", amount, formatted));
-            }
+            long millis = time % 1000;
+            long second = (time / 1000) % 60;
+            long minute = (time / (1000 * 60)) % 60;
+            long hour = (time / (1000 * 60 * 60)) % 24;
+            String formatted = String.format("%02d:%02d:%02d.%d", hour, minute, second, millis);
+            player.sendMessage(ChatColor.GREEN + String.format("Finished generating the mines in %s!", formatted));
         }
     }
 

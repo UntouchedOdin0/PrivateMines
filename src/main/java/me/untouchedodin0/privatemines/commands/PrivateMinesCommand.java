@@ -307,7 +307,7 @@ public class PrivateMinesCommand {
     public void pregen(Player player, int amount) {
         PregenFactory pregenFactory = new PregenFactory();
         pregenFactory.generate(player, amount);
-        privateMines.savePregenMines();
+//        privateMines.savePregenMines();
     }
 
     @CommandHook("claim")
