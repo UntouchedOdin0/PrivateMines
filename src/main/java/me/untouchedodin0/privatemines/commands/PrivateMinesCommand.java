@@ -24,7 +24,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.CommandHook;
-import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.misc.ChatPrompt;
 import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;

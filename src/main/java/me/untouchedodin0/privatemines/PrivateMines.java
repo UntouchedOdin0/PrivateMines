@@ -2,8 +2,6 @@ package me.untouchedodin0.privatemines;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
@@ -26,8 +24,6 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
-import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
-import me.untouchedodin0.privatemines.utils.adapter.WorldAdapter;
 import me.untouchedodin0.privatemines.utils.addons.AddonDescriptionFile;
 import me.untouchedodin0.privatemines.utils.addons.JarLoader;
 import me.untouchedodin0.privatemines.utils.conversion.ConversionUtils;
@@ -41,7 +37,6 @@ import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -58,7 +53,6 @@ import redempt.redlib.sql.SQLHelper;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -192,8 +186,8 @@ public class PrivateMines extends JavaPlugin {
 
             if (Config.useAdventure) {
                 this.adventure = BukkitAudiences.create(this);
-
             }
+
             this.Y_LEVEL = Config.mineYLevel;
             this.MINE_DISTANCE = Config.mineDistance;
 
@@ -256,13 +250,13 @@ public class PrivateMines extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        getLogger().info(String.format("Disabling adventure for %s", getDescription().getName()));
-        if (this.adventure != null) {
+        if (adventure != null) {
+            getLogger().info(String.format("Disabling adventure for %s", getDescription().getName()));
             adventure.close();
             this.adventure = null;
+            getLogger().info(String.format("Disabled adventure for %s", getDescription().getName()));
         }
 
-        getLogger().info(String.format("Disabled adventure for %s", getDescription().getName()));
         getLogger().info(String.format("%s v%s has successfully been Disabled",
                 getDescription().getName(),
                 getDescription().getVersion()));
@@ -450,8 +444,13 @@ public class PrivateMines extends JavaPlugin {
                     pregenMine.setUpperRails(upperRails);
                     pregenMine.setFullMin(fullMin);
                     pregenMine.setFullMax(fullMax);
-                    pregenMine.setFile(file);
                     pregenStorage.addMine(pregenMine);
+
+                    try {
+                        Files.delete(file.toPath());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);

@@ -45,7 +45,6 @@ import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import de.themoep.minedown.MineDown;
 import me.untouchedodin0.privatemines.PrivateMines;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -61,7 +60,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class Utils {
     public static final String TABLE_NAME = "privatemines";
@@ -232,12 +230,8 @@ public class Utils {
         return rows * 9;
     }
 
-    public static BaseComponent[] colorComponent(String string) {
-        return new MineDown(string).toComponent();
-    }
-
     public static String color(String string) {
-        return BaseComponent.toLegacyText(colorComponent(string));
+        return ChatColor.translateAlternateColorCodes('&', string);
     }
 
     public static List<String> color(List<String> list) {

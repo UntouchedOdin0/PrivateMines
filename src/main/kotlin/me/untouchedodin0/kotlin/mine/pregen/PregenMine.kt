@@ -7,7 +7,6 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import redempt.redlib.misc.LocationUtils
 import java.io.File
-import java.nio.file.Files
 
 class PregenMine {
 
@@ -27,7 +26,6 @@ class PregenMine {
 
     fun save() {
         file = File("plugins/PrivateMines/pregen/" + Utils.getRandom(10) + ".yml")
-        Files.createFile(file!!.toPath())
 
         val yml = YamlConfiguration.loadConfiguration(file!!)
 

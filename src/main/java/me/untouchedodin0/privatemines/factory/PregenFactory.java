@@ -137,7 +137,7 @@ public class PregenFactory {
                         pregenMine.setUpperRails(urailsL);
                         pregenMine.setFullMin(fullMinL);
                         pregenMine.setFullMax(fullMaxL);
-                        pregenMine.save();
+//                        pregenMine.save();
 
                         pregenStorage.addMine(pregenMine);
 
