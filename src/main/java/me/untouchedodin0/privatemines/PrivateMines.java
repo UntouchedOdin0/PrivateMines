@@ -1,7 +1,5 @@
 package me.untouchedodin0.privatemines;
 
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
@@ -26,7 +24,6 @@ import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.addons.AddonDescriptionFile;
 import me.untouchedodin0.privatemines.utils.addons.JarLoader;
-import me.untouchedodin0.privatemines.utils.conversion.ConversionUtils;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -57,7 +54,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.sql.Connection;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -97,7 +93,6 @@ public class PrivateMines extends JavaPlugin {
     private SQLite sqlite;
     private SQLHelper sqlHelper;
     private BukkitAudiences adventure;
-    private ProtocolManager protocolManager;
     private WorldBorderUtils worldBorderUtils;
     String matString;
     double percent;
@@ -126,10 +121,6 @@ public class PrivateMines extends JavaPlugin {
             mineTypeManager = new MineTypeManager(this);
             if (RedLib.MID_VERSION >= 19) {
                 worldBorderUtils = new WorldBorderUtils();
-            }
-
-            if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
-                protocolManager = ProtocolLibrary.getProtocolManager();
             }
 
             new CommandParser(getResource("commands.rdcml"))
@@ -387,38 +378,6 @@ public class PrivateMines extends JavaPlugin {
         });
     }
 
-    public void loadSQLMines() {
-        Connection connection = sqlite.getSQLConnection();
-
-        SQLHelper sqlHelper = new SQLHelper(connection);
-    }
-
-    public void saveSQLMines() {
-        Connection connection = sqlite.getSQLConnection();
-        SQLHelper sqlHelper = new SQLHelper(connection);
-
-        sqlHelper.executeUpdate("UPDATE privatemines SET mineOwner=?;", UUID.randomUUID());
-        sqlHelper.commit();
-
-        mineStorage.getMines().forEach((uuid, mine) -> {
-            privateMines.getLogger().info("saving mine: " + mine);
-            MineData mineData = mine.getMineData();
-            UUID owner = mineData.getMineOwner();
-
-//            String command = String.format("INSERT INTO privatemines(mineOwner) VALUES(%s);", String.valueOf(owner));
-
-//            sqlHelper.execute("UPDATE privatemines SET mineOwner=?;", owner);
-        });
-
-        privateMines.getLogger().info("save sql mines connection: " + connection);
-        privateMines.getLogger().info("save sql mines sqlHelper: " + sqlHelper);
-    }
-
-    public void convertToSQL(Player player) {
-        player.sendMessage("mine directory: " + minesDirectory);
-        ConversionUtils.convertSQLDirectory(minesDirectory);
-    }
-
     public void loadPregenMines() {
         final PathMatcher jsonMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
         Path path = getPregenMines();
@@ -521,11 +480,6 @@ public class PrivateMines extends JavaPlugin {
 //        saveResource("menus.yml", false);
     }
 
-    public void startAutoReset() {
-        Map<UUID, Mine> mines = mineStorage.getMines();
-        mines.forEach((uuid, mine) -> mine.startResetTask());
-    }
-
     public SchematicStorage getSchematicStorage() {
         return schematicStorage;
     }
@@ -566,16 +520,8 @@ public class PrivateMines extends JavaPlugin {
         return mineTypeManager;
     }
 
-    public SlimeUtils getSlimeUtils() {
-        return slimeUtils;
-    }
-
     public static Economy getEconomy() {
         return econ;
-    }
-
-    public SQLite getSqlite() {
-        return sqlite;
     }
 
     public void registerSellListener() {
@@ -612,10 +558,6 @@ public class PrivateMines extends JavaPlugin {
 
     public void setPregenMode(boolean pregenMode) {
         this.pregenMode = pregenMode;
-    }
-
-    public ProtocolManager getProtocolManager() {
-        return protocolManager;
     }
 
     public WorldBorderUtils getWorldBorderUtils() {
