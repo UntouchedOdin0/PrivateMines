@@ -57,7 +57,7 @@ dependencies {
     compileOnly files('libs/AutoSellAPI-1.2.0.jar')
 
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-    implementation 'com.github.Redempt:RedLib:6.5.7'
+    implementation 'com.github.Redempt:RedLib:6.5.8'
     implementation 'com.github.Redempt:Crunch:1.1.2'
     implementation 'io.papermc:paperlib:1.0.7'
     implementation 'org.bstats:bstats-bukkit:3.0.0'

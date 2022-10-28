@@ -18,7 +18,7 @@ dependencies {
 
     compileOnly 'org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT'
 
-    implementation 'com.github.Redempt:RedLib:6.5.3.2'
+    implementation 'com.github.Redempt:RedLib:6.5.8'
 }
 
 test {
