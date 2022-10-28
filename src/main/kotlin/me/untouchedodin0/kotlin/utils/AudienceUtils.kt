@@ -42,7 +42,6 @@ class AudienceUtils {
     }
 
     fun sendMessage(player: Player, target: OfflinePlayer, message: String) {
-
         if (privateMines.adventure != null) {
             val miniMessage = MiniMessage.miniMessage()
             val audiences = privateMines.adventure
@@ -65,6 +64,21 @@ class AudienceUtils {
             audience.sendMessage(parsed)
         } else {
             val placeholderAPI = PlaceholderAPI.setPlaceholders(player, message.replace("{amount}", int.toString()))
+            player.sendMessage(placeholderAPI)
+        }
+    }
+
+    fun sendMessage(player: Player, target: OfflinePlayer, message: String, int: Int) {
+        if (privateMines.adventure != null) {
+            val miniMessage = MiniMessage.miniMessage()
+            val audiences = privateMines.adventure
+            val parsed = miniMessage.deserialize(message.replace("{target}", target.name!!).replace("{amount}", int.toString()))
+            val audience = audiences.player(player)
+            audience.sendMessage(parsed)
+        } else {
+            val placeholderAPI = PlaceholderAPI.setPlaceholders(player, message
+                .replace("{target}", target.name!!)
+                .replace("{amount}", int.toString()))
             player.sendMessage(placeholderAPI)
         }
     }

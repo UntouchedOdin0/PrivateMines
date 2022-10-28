@@ -72,4 +72,6 @@ public class Config {
     public static boolean enableTax = true;
     @Comment("Should we send tax messages to the owner of the mine?")
     public static boolean sendTaxMessages = true;
+    @Comment("Should mines be closed by default?")
+    public static boolean defaultClosed = true;
 }

@@ -38,6 +38,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
@@ -684,5 +685,78 @@ public class Mine {
                 }
             }
         }
+    }
+
+    public void createWorldGuardRegions() {
+
+        String mineRegionName = String.format("mine-%s", getMineData().getMineOwner());
+        String fullRegionName = String.format("full-mine-%s", getMineData().getMineOwner());
+        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(Objects.requireNonNull(getMineData().getMinimumMining().getWorld()));
+
+        MineType mineType = getMineData().getMineType();
+        Map<String, Boolean> flags = mineType.getFlags();
+        Map<String, Boolean> fullFlags = mineType.getFullFlags();
+
+        BlockVector3 minMining = BukkitAdapter.asBlockVector(getMineData().getMinimumMining());
+        BlockVector3 maxMining = BukkitAdapter.asBlockVector(getMineData().getMaximumMining());
+        BlockVector3 minFull = BukkitAdapter.asBlockVector(getMineData().getMinimumFullRegion());
+        BlockVector3 maxFull = BukkitAdapter.asBlockVector(getMineData().getMaximumFullRegion());
+
+        ProtectedCuboidRegion miningWorldGuardRegion = new ProtectedCuboidRegion(mineRegionName, minMining, maxMining);
+        ProtectedCuboidRegion fullWorldGuardRegion = new ProtectedCuboidRegion(fullRegionName, minFull, maxFull);
+        RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager regionManager = regionContainer.get(world);
+
+        if (regionManager != null) {
+            regionManager.addRegion(miningWorldGuardRegion);
+            regionManager.addRegion(fullWorldGuardRegion);
+        }
+
+        /**
+         This sadly has to be called synchronously else it'll throw a
+         {@link java.lang.IllegalStateException}
+         This is due to how WorldGuard handles their flags...
+         @see com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent
+         */
+        Task.syncDelayed(() -> {
+            FlagRegistry flagRegistry = WorldGuard.getInstance().getFlagRegistry();
+
+            if (flags != null) {
+                flags.forEach((s, aBoolean) -> {
+                    Flag<?> flag = Flags.fuzzyMatchFlag(flagRegistry, s);
+                    if (aBoolean) {
+                        try {
+                            Utils.setFlag(miningWorldGuardRegion, flag, "allow");
+                        } catch (InvalidFlagFormat e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        try {
+                            Utils.setFlag(miningWorldGuardRegion, flag, "deny");
+                        } catch (InvalidFlagFormat e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+            if (fullFlags != null) {
+                fullFlags.forEach((string, aBoolean) -> {
+                    Flag<?> flag = Flags.fuzzyMatchFlag(flagRegistry, string);
+                    if (aBoolean) {
+                        try {
+                            Utils.setFlag(fullWorldGuardRegion, flag, "allow");
+                        } catch (InvalidFlagFormat e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        try {
+                            Utils.setFlag(fullWorldGuardRegion, flag, "deny");
+                        } catch (InvalidFlagFormat e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+            }
+        });
     }
 }

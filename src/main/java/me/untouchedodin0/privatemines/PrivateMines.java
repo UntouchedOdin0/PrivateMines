@@ -175,10 +175,7 @@ public class PrivateMines extends JavaPlugin {
                     .saveDefaults()
                     .load();
 
-            if (Config.useAdventure) {
-                this.adventure = BukkitAudiences.create(this);
-            }
-
+            this.adventure = BukkitAudiences.create(this);
             this.Y_LEVEL = Config.mineYLevel;
             this.MINE_DISTANCE = Config.mineDistance;
 

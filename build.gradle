@@ -7,7 +7,6 @@ plugins {
 }
 
 group 'me.untouchedodin0.privatemines'
-//version '4.1.8-SNAPSHOT'
 version '5.0.0'
 
 def devBuild = true
@@ -49,8 +48,6 @@ dependencies {
     compileOnly("net.dv8tion:JDA:5.0.0-alpha.12") {
         exclude module: 'opus-java'
     }
-    compileOnly 'net.kyori:adventure-text-minimessage:4.11.0'
-    compileOnly 'net.kyori:adventure-platform-bukkit:4.1.2'
 
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
     compileOnly 'me.clip:placeholderapi:2.11.2'
@@ -63,11 +60,9 @@ dependencies {
     implementation 'com.github.Redempt:RedLib:6.5.7'
     implementation 'com.github.Redempt:Crunch:1.1.2'
     implementation 'io.papermc:paperlib:1.0.7'
-//    implementation 'net.kyori:adventure-text-minimessage:4.11.0'
-
-//    implementation 'net.kyori:adventure-text-minimessage:4.11.0'
-//    implementation 'net.kyori:adventure-platform-bukkit:4.1.2'
     implementation 'org.bstats:bstats-bukkit:3.0.0'
+    implementation 'net.kyori:adventure-text-minimessage:4.11.0'
+    implementation 'net.kyori:adventure-platform-bukkit:4.1.2'
 
     implementation project(':WorldBorder')
 }
@@ -79,6 +74,7 @@ shadowJar {
     relocate "io.papermc.lib", "me.untouchedodin0.privatemines.paperlib"
     relocate 'de.themoep.minedown', 'me.untouchedodin0.privatemines.minedown'
     relocate 'org.bstats', 'me.untouchedodin0.bstats'
+    relocate 'net.kyori', 'me.untouchedodin0.adventure'
 }
 
 task copyTo_DevServerOld(type: Copy) {
@@ -105,7 +101,8 @@ task copyTo_SWM(type: Copy) {
 publishing {
     repositories {
         maven {
-            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/" //"https://s01.oss.sonatype.org/"
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            //"https://s01.oss.sonatype.org/"
             def snapshotsRepoUrl = "https://repo.bristermitten.me/repository/maven-snapshots"
             url = releasesRepoUrl // version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 

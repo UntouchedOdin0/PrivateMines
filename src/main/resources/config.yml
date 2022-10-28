@@ -19,6 +19,7 @@ useAdventure: true
 enableMenu: true
 enableTax: true
 sendTaxMessages: true
+defaultClosed: true
 
 mineTypes:
   Test:

@@ -117,7 +117,6 @@ public class PrivateMinesCommand {
 
     @CommandHook("reset")
     public void reset(Player player) {
-
         if (!mineStorage.hasMine(player)) {
             player.sendMessage(MessagesConfig.dontOwnMine);
         } else {
@@ -161,7 +160,7 @@ public class PrivateMinesCommand {
                 MineData mineData = mine.getMineData();
                 mine.saveMineData(target, mineData);
                 if (commandSender instanceof Player player) {
-                    audienceUtils.sendMessage(player, MessagesConfig.playerMineExpanded, amount);
+                    audienceUtils.sendMessage(player, target, MessagesConfig.playerMineExpanded, amount);
                     audienceUtils.sendMessage(target, MessagesConfig.ownMineExpanded, amount);
                 }
             }
@@ -306,12 +305,10 @@ public class PrivateMinesCommand {
     public void pregen(Player player, int amount) {
         PregenFactory pregenFactory = new PregenFactory();
         pregenFactory.generate(player, amount);
-//        privateMines.savePregenMines();
     }
 
     @CommandHook("claim")
     public void claim(Player player) {
-
         AudienceUtils audienceUtils = new AudienceUtils();
 
         if (mineStorage.hasMine(player)) {
@@ -375,6 +372,8 @@ public class PrivateMinesCommand {
                 mine.saveMineData(player, mineData);
                 mineStorage.addMine(player.getUniqueId(), mine);
                 mine.reset();
+                mine.createWorldGuardRegions();
+
                 try {
                     if (file != null) {
                         Files.delete(file.toPath());

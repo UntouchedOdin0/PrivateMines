@@ -53,6 +53,7 @@ import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.events.PrivateMineCreationEvent;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
@@ -235,7 +236,6 @@ public class MineFactory {
                             if (fullFlags != null) {
                                 fullFlags.forEach((string, aBoolean) -> {
                                     Flag<?> flag = Flags.fuzzyMatchFlag(flagRegistry, string);
-                                    privateMines.getLogger().info("full flag: " + flag);
                                     if (aBoolean) {
                                         try {
                                             Utils.setFlag(fullWorldGuardRegion, flag, "allow");
@@ -265,7 +265,8 @@ public class MineFactory {
                                 shop
                         );
                         mineData.setMaxPlayers(maxPlayers);
-                        mineData.setOpen(false);
+
+                        mineData.setOpen(!Config.defaultClosed);
 
                         mine.setMineData(mineData);
                         mine.saveMineData(player, mineData);
