@@ -56,10 +56,7 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -296,6 +293,9 @@ public class PrivateMines extends JavaPlugin {
                     Location spawn = LocationUtils.fromString(yml.getString("spawn"));
                     Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
                     boolean isOpen = yml.getBoolean("isOpen");
+                    int maxPlayers = yml.getInt("maxPlayers");
+                    int maxMineSize = yml.getInt("maxMineSize");
+
                     double tax = yml.getDouble("tax");
                     String materialsString = yml.getString("materials");
 

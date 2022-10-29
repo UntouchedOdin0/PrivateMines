@@ -34,10 +34,7 @@ import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class PrivateMinesCommand {
@@ -291,6 +288,46 @@ public class PrivateMinesCommand {
             mineData.setOpen(false);
             mine.saveMineData(player, mineData);
             player.sendMessage(ChatColor.RED + "Your mine's now closed!");
+        }
+    }
+
+    @CommandHook("addfriend")
+    public void addFriend(Player player, Player target) {
+        Mine mine = mineStorage.get(player);
+        if (mine != null) {
+            MineData mineData = mine.getMineData();
+            List<UUID> friends = mineData.getFriends();
+            UUID targetUUID = target.getUniqueId();
+
+            if (friends.contains(targetUUID)) {
+                player.sendMessage(ChatColor.RED + "You have already added that user as a friend!");
+            } else {
+                friends.add(targetUUID);
+                player.sendMessage(String.format(ChatColor.GREEN + "You have added %s as a friend to your mine!", target.getName()));
+                mineData.setFriends(friends);
+                mine.setMineData(mineData);
+                mine.saveMineData(player, mineData);
+            }
+        }
+    }
+
+    @CommandHook("removefriend")
+    public void removeFriend(Player player, Player target) {
+        Mine mine = mineStorage.get(player);
+        if (mine != null) {
+            MineData mineData = mine.getMineData();
+            List<UUID> friends = mineData.getFriends();
+            UUID targetUUID = target.getUniqueId();
+
+            if (!friends.contains(targetUUID)) {
+                player.sendMessage(ChatColor.RED + "You have not added that user as a friend!");
+            } else {
+                friends.remove(targetUUID);
+                player.sendMessage(String.format(ChatColor.GREEN + "You have remove %s as a friend from your mine!", target.getName()));
+                mineData.setFriends(friends);
+                mine.setMineData(mineData);
+                mine.saveMineData(player, mineData);
+            }
         }
     }
 

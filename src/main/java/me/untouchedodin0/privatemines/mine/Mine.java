@@ -583,6 +583,9 @@ public class Mine {
         int maxMineSize = mineData.getMaxMineSize();
 
         List<UUID> bannedPlayers = mineData.getBannedPlayers();
+        List<UUID> friends = mineData.getFriends();
+
+        bannedPlayers.add(UUID.randomUUID());
 
         Map<Material, Double> materials = mineData.getMaterials();
 
@@ -608,6 +611,8 @@ public class Mine {
             yml.set("maxPlayers", maxPlayers);
             yml.set("maxMineSize", maxMineSize);
             yml.set("bannedPlayers", bannedPlayers);
+            yml.set("friends", friends);
+
             if (!materials.isEmpty()) {
                 yml.set("materials", materials.toString());
             }

@@ -21,6 +21,7 @@ data class MineData(
     var shop: Shop? = null
 
     var bannedPlayers: MutableList<UUID> = mutableListOf()
+    var friends: MutableList<UUID> = mutableListOf()
     var materials: Map<Material, Double> = EnumMap(Material::class.java)
     var maxPlayers: Int = 0
     var maxMineSize: Int = 0

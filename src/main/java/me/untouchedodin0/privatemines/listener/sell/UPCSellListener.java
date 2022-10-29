@@ -32,11 +32,9 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.mine.Mine;
+import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -48,12 +46,18 @@ import java.util.UUID;
 public class UPCSellListener implements Listener {
     PrivateMines privateMines = PrivateMines.getPrivateMines();
     MineStorage mineStorage = privateMines.getMineStorage();
+    MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
     double taxForOwner = 0;
 
     @EventHandler
     public void onSellAll(UltraPrisonSellAllEvent sellAllEvent) {
         Player player = sellAllEvent.getPlayer();
         Location playerLocation = player.getLocation();
+        World playerWorld = player.getWorld();
+        World minesWorld = mineWorldManager.getMinesWorld();
+
+        if (playerWorld != minesWorld) return;
+
         Mine mine = mineStorage.getClosest(playerLocation);
 
         if (mine != null) {
@@ -90,6 +94,11 @@ public class UPCSellListener implements Listener {
     public void onAutoSell(UltraPrisonAutoSellEvent autoSellEvent) {
         Player player = autoSellEvent.getPlayer();
         Location playerLocation = player.getLocation();
+        World playerWorld = player.getWorld();
+        World minesWorld = mineWorldManager.getMinesWorld();
+
+        if (playerWorld != minesWorld) return;
+
         Mine mine = mineStorage.getClosest(playerLocation);
 
         if (mine != null) {
