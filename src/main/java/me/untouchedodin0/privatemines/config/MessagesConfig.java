@@ -3,6 +3,7 @@ package me.untouchedodin0.privatemines.config;
 public class MessagesConfig {
 
     public static String mineReset = "<green>Your mine has been reset!";
+    public static String resetTargetMine = "<green>You've reset {name}'s mine!";
     public static String dontOwnMine = "<red>You don't own a mine!";
     public static String playerDoesntOwnMine = "<red>That player doesn't own a mine!";
     public static String playerAlreadyOwnsAMine = "<red>That player already owns a mine!";

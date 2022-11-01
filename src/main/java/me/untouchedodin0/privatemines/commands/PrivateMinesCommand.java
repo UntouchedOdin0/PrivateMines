@@ -17,8 +17,10 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopBuilder;
+import me.untouchedodin0.privatemines.utils.SQLUtils;
 import me.untouchedodin0.privatemines.utils.inventory.PublicMinesMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import net.royawesome.jlibnoise.module.combiner.Min;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -113,15 +115,25 @@ public class PrivateMinesCommand {
     }
 
     @CommandHook("reset")
-    public void reset(Player player) {
-        if (!mineStorage.hasMine(player)) {
-            player.sendMessage(MessagesConfig.dontOwnMine);
+    public void reset(Player player, OfflinePlayer target) {
+
+        if (target != null) {
+            Player targetPlayer = target.getPlayer();
+            if (!mineStorage.hasMine(Objects.requireNonNull(targetPlayer))) {
+                player.sendMessage(ChatColor.RED + target.getName() + " Doesn't own a mine!");
+            } else {
+                Mine mine = mineStorage.get(Objects.requireNonNull(targetPlayer));
+                if (mine != null) {
+                    mine.reset();
+                }
+                audienceUtils.sendMessage(player, target, MessagesConfig.resetTargetMine);
+            }
         } else {
             Mine mine = mineStorage.get(player);
             if (mine != null) {
                 mine.reset();
-                audienceUtils.sendMessage(player, MessagesConfig.mineReset);
             }
+            audienceUtils.sendMessage(player, MessagesConfig.mineReset);
         }
     }
 
@@ -507,5 +519,45 @@ public class PrivateMinesCommand {
         WorldBorderUtils worldBorderUtils = privateMines.getWorldBorderUtils();
         WorldBorder worldBorder = worldBorderUtils.getWorldBorder(player);
         worldBorderUtils.clearBorder(player);
+    }
+
+    @CommandHook("testsql")
+    public void testSQL(Player player) {
+        Mine mine = mineStorage.get(player);
+        if (mine != null) {
+            SQLUtils.insert(mine);
+        }
+
+//        SQLHelper sqlHelper = privateMines.getSqlHelper();
+//        Connection connection = sqlHelper.getConnection();
+//        String updateString = "INSERT INTO privatemines (mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials)" +
+//                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+//                //"update privatemines " + "set mineOwner = ? where COF_NAME = ?";
+//        try {
+//            PreparedStatement updateSales = connection.prepareStatement(updateString);
+//            updateSales.setString(1, "mine owner");
+//            updateSales.setString(2, "mine type");
+//            updateSales.setString(3, "mine location");
+//            updateSales.setString(4, "corner 1");
+//            updateSales.setString(5, "corner 2");
+//            updateSales.setString(6, "full region min");
+//            updateSales.setString(7, "full region max");
+//            updateSales.setString(8, "spawn");
+//            updateSales.setDouble(9, 5.0);
+//            updateSales.setBoolean(10, false);
+//            updateSales.setInt(11, 1);
+//            updateSales.setInt(12, 2);
+//            updateSales.setString(13, "materials");
+//
+//            player.sendMessage("" + sqlHelper);
+//            player.sendMessage("update sales " + updateSales);
+//
+//            updateSales.executeUpdate();
+////            updateSales.close();
+//
+//            connection.commit();
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 }

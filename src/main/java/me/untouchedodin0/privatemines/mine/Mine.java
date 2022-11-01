@@ -559,7 +559,8 @@ public class Mine {
     }
 
     public void saveMineData(Player player, MineData mineData) {
-        String fileName = String.format("/%s.yml", player.getUniqueId());
+        String uuidString = String.valueOf(player.getUniqueId());
+        String fileName = String.format("/%s.yml", uuidString);
 
         Path minesDirectory = privateMines.getMinesDirectory();
         File file = new File(minesDirectory + fileName);
@@ -585,7 +586,7 @@ public class Mine {
         List<UUID> bannedPlayers = mineData.getBannedPlayers();
         List<UUID> friends = mineData.getFriends();
 
-        bannedPlayers.add(UUID.randomUUID());
+//        bannedPlayers.add(UUID.randomUUID());
 
         Map<Material, Double> materials = mineData.getMaterials();
 
@@ -610,8 +611,8 @@ public class Mine {
             yml.set("isOpen", open);
             yml.set("maxPlayers", maxPlayers);
             yml.set("maxMineSize", maxMineSize);
-            yml.set("bannedPlayers", bannedPlayers);
-            yml.set("friends", friends);
+//            yml.set("bannedPlayers", bannedPlayers);
+//            yml.set("friends", friends);
 
             if (!materials.isEmpty()) {
                 yml.set("materials", materials.toString());
@@ -629,7 +630,7 @@ public class Mine {
             yml.set("isOpen", open);
             yml.set("maxPlayers", maxPlayers);
             yml.set("maxMineSize", maxMineSize);
-            yml.set("bannedPlayers", bannedPlayers);
+//            yml.set("bannedPlayers", bannedPlayers);
             if (!materials.isEmpty()) {
                 yml.set("materials", materials.toString());
             }

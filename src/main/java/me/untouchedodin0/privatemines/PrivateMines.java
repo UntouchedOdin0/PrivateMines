@@ -193,7 +193,7 @@ public class PrivateMines extends JavaPlugin {
             this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
             sqlHelper.setAutoCommit(false);
             sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
-                    "`mineOwner` UUID," +
+                    "`mineOwner` TEXT," +
                     "`mineType` TEXT," +
                     "`mineLocation` TEXT," +
                     "`corner1` TEXT," +
@@ -440,8 +440,6 @@ public class PrivateMines extends JavaPlugin {
                     AddonDescriptionFile addonDescriptionFile = jarLoader.getAddonDescription(file);
                     getLogger().info("jar loader " + jarLoader);
                     getLogger().info("addon description file: " + addonDescriptionFile);
-
-
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);

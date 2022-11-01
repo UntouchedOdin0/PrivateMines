@@ -13,7 +13,7 @@ privatemine,privatemines,pmine,pmines {
         permission privatemines.delete
     }
 
-    reset {
+    reset player:target? {
         hook reset
         help Resets your private mine
         permission privatemines.reset
@@ -107,6 +107,11 @@ privatemine,privatemines,pmine,pmines {
     clearborder player:target {
         hook clearborder
         permission privatemines.clearborder
+    }
+
+    testsql {
+        hook testsql
+        permission privatemines.testsql
     }
 
     debug {
