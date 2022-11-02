@@ -59,6 +59,8 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import redempt.redlib.itemutils.ItemBuilder;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
@@ -310,6 +312,8 @@ public class Mine {
         } else {
             if (materials != null) {
                 materials.forEach((material, chance) -> {
+                    ItemStack itemStack = new ItemBuilder(Material.STONE).setCustomModelData(1);
+//                    Pattern pattern = BukkitAdapter.adapt(itemStack);
                     Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
                     randomPattern.add(pattern, chance);
                 });
