@@ -83,6 +83,7 @@ public class PregenFactory {
 
             chunks.forEach(chunk -> {
                 chunk.load(true);
+                chunk.setForceLoaded(true);
             });
 
             BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());

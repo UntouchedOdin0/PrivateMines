@@ -12,7 +12,7 @@ version '5.0.0'
 def devBuild = true
 
 if (devBuild) {
-    version = version + "targetReset-DEV"
+    version = version + "-DEV"
 }
 
 repositories {
