@@ -681,7 +681,6 @@ public class Mine {
                         mine.reset();
                     }
                 } else {
-
                     double balance = economy.getBalance(player);
                     if (balance < upgradeCost) {
                         player.sendMessage(ChatColor.RED + "You don't have enough money to upgrade your mine!");

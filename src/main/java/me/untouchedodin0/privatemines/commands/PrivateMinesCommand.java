@@ -20,13 +20,9 @@ import me.untouchedodin0.privatemines.playershops.ShopBuilder;
 import me.untouchedodin0.privatemines.utils.SQLUtils;
 import me.untouchedodin0.privatemines.utils.inventory.PublicMinesMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import net.royawesome.jlibnoise.module.combiner.Min;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.misc.ChatPrompt;
 import redempt.redlib.misc.Task;
@@ -53,11 +49,6 @@ public class PrivateMinesCommand {
         if (sender instanceof Player player) {
             Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
             mainMenu.open(player);
-
-            World world = player.getWorld();
-            Location location = player.getLocation();
-            Entity npc = world.spawnEntity(location, EntityType.PLAYER);
-
 //            if (!(player.getUniqueId() == UUID.fromString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b"))) {
 //                Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
 //                mainMenu.open(player);
