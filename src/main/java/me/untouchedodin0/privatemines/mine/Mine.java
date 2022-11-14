@@ -110,6 +110,8 @@ public class Mine {
             getSpawnLocation().getBlock().setType(Material.AIR, false);
             if (PaperLib.isPaper()) {
                 PaperLib.teleportAsync(player, getSpawnLocation());
+            } else {
+                player.teleport(getSpawnLocation());
             }
         }
     }
@@ -416,6 +418,15 @@ public class Mine {
                 reset();
             }
         }, 0L, 20L);
+    }
+
+    public void stopTasks() {
+        if (task != null && percentageTask != null) {
+            if (task.isCurrentlyRunning() && percentageTask.isCurrentlyRunning()) {
+                task.cancel();
+                percentageTask.cancel();
+            }
+        }
     }
 
     public double getPercentage() {

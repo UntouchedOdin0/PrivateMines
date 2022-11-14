@@ -14,6 +14,7 @@ import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.listener.MaxPlayersListener;
+import me.untouchedodin0.privatemines.listener.MineResetListener;
 import me.untouchedodin0.privatemines.listener.PlayerJoinListener;
 import me.untouchedodin0.privatemines.listener.sell.AutoSellListener;
 import me.untouchedodin0.privatemines.listener.sell.UPCSellListener;
@@ -137,7 +138,6 @@ public class PrivateMines extends JavaPlugin {
             }
             registerListeners();
             setupSchematicUtils();
-            Messages.load(this);
 
             if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
                 boolean registered = new PrivateMinesExpansion(this).register();
@@ -370,8 +370,8 @@ public class PrivateMines extends JavaPlugin {
                         mine.setMineData(mineData);
                         mineStorage.addMine(owner, mine);
                     }
-                    mine.startResetTask();
-                    mine.startPercentageTask();
+//                    mine.startResetTask();
+//                    mine.startPercentageTask();
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -538,6 +538,7 @@ public class PrivateMines extends JavaPlugin {
 
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new MaxPlayersListener(), this);
+        getServer().getPluginManager().registerEvents(new MineResetListener(), this);
     }
 
     public SQLHelper getSqlHelper() {
