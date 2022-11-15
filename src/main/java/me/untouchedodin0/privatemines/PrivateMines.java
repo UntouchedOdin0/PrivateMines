@@ -23,8 +23,7 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
-import me.untouchedodin0.privatemines.utils.addons.AddonDescriptionFile;
-import me.untouchedodin0.privatemines.utils.addons.JarLoader;
+import me.untouchedodin0.privatemines.utils.addons.Service;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -42,7 +41,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.ArgType;
 import redempt.redlib.commandmanager.CommandParser;
-import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.inventorygui.InventoryGUI;
 import redempt.redlib.misc.LocationUtils;
@@ -57,10 +55,7 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -112,6 +107,7 @@ public class PrivateMines extends JavaPlugin {
         saveResource("messages.yml", false);
 
         privateMines = this;
+        loadAddons();
         if (RedLib.MID_VERSION < 13) {
             Utils.complain();
         } else {
@@ -432,24 +428,72 @@ public class PrivateMines extends JavaPlugin {
     }
 
     public void loadAddons() {
-        final PathMatcher jarMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
-        Path path = getAddonsDirectory();
 
-        CompletableFuture.runAsync(() -> {
-            try (Stream<Path> paths = Files.walk(path).filter(jarMatcher::matches)) {
-                paths.forEach(streamPath -> {
-                    File file = streamPath.toFile();
-                    getLogger().info("Loading addon file " + file.getName() + "....");
-                    JarLoader jarLoader = new JarLoader();
-                    AddonDescriptionFile addonDescriptionFile = jarLoader.getAddonDescription(file);
-                    getLogger().info("jar loader " + jarLoader);
-                    getLogger().info("addon description file: " + addonDescriptionFile);
-                });
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+//        ServiceLoader serviceLoader = ServiceLoader.load(Service.class);
+
+        ServiceLoader<Service> myService = ServiceLoader.load(Service.class);
+
+        getLogger().info("myservice " + myService);
+        getLogger().info("" + myService.stream().count());
+
+//        ServiceLoader<MyService> serviceLoader = ServiceLoader.load(MyService.class, ServiceLoader.class.getClassLoader());
+//        Stream<ServiceLoader.Provider<MyService>> stream = serviceLoader.stream();
+
+//        getLogger().info("stream " + stream);
+//        getLogger().info("" + stream.count());
+////        getLogger().info("service loader " + serviceLoader);
+//
+//        serviceLoader.stream().forEach(myServiceProvider -> {
+//            MyService myService = myServiceProvider.get();
+//            getLogger().info("myService: " + myService);
+//        });
+
+
+//        serviceLoader.iterator().forEachRemaining(myService -> {
+//            getLogger().info("my service: " + myService);
+//
+//            getLogger().info("name: " + myService.getName());
+//        ServiceLoader<MyService> serviceLoader = ServiceLoader.load(MyService.class);
+//
+//        Map<String, MyService> services = new HashMap<>();
+//        for (MyService service : serviceLoader) {
+//            System.out.println("I've found a service called '" + service.getName() + "' !");
+//            services.put(service.getName(), service);
+//        }
+//
+//        System.out.println("Found " + services.size() + " services!");
     }
+
+
+//        ServiceLoader<Addon> serviceLoader = ServiceLoader.load(Addon.class);
+//
+//        getLogger().info("service loader: " + serviceLoader);
+//        getLogger().info("addons? " + serviceLoader.stream().toList());
+//
+////        Map<String, Addon> addonServices = new HashMap<>();
+////        getLogger().info("addonServices: " + addonServices);
+//
+//        for (Addon addonService : serviceLoader) {
+//            getLogger().info("addon service " + addonService);
+
+
+//        final PathMatcher jarMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
+//        Path path = getAddonsDirectory();
+//
+//        CompletableFuture.runAsync(() -> {
+//            try (Stream<Path> paths = Files.walk(path).filter(jarMatcher::matches)) {
+//                paths.forEach(streamPath -> {
+//                    File file = streamPath.toFile();
+//                    getLogger().info("Loading addon file " + file.getName() + "....");
+//                    JarLoader jarLoader = new JarLoader();
+//                    AddonDescriptionFile addonDescriptionFile = jarLoader.getAddonDescription(file);
+//                    getLogger().info("jar loader " + jarLoader);
+//                    getLogger().info("addon description file: " + addonDescriptionFile);
+//                });
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
 
     @Deprecated
     public void loadMenus() {
