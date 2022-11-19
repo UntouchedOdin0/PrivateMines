@@ -107,7 +107,7 @@ public class PrivateMines extends JavaPlugin {
         saveResource("messages.yml", false);
 
         privateMines = this;
-        loadAddons();
+//        loadAddons();
         if (RedLib.MID_VERSION < 13) {
             Utils.complain();
         } else {
@@ -210,7 +210,18 @@ public class PrivateMines extends JavaPlugin {
 
             Task.asyncDelayed(this::loadMines);
             Task.syncDelayed(this::loadPregenMines);
-            Task.asyncDelayed(this::loadAddons);
+//            Task.asyncDelayed(this::loadAddons);
+
+            ServiceLoader<Service> loader = ServiceLoader.load(Service.class);
+            getLogger().info("loader " + loader);
+            getLogger().info("" + loader.findFirst());
+
+//            ServiceLoader<Service> test = ServiceLoader.load(Service.class);
+//            getLogger().info("" + test.stream().toList());
+
+//            ServiceLoader<Service> myService = ServiceLoader.load(Service.class);
+//            getLogger().info("myservice " + myService);
+//            getLogger().info("" + myService.stream().count());
 
             PaperLib.suggestPaper(this);
 

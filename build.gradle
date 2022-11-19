@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'java-library'
     id 'maven-publish'
+    id 'io.github.gradle-nexus.publish-plugin' version "1.1.0"
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'org.jetbrains.kotlin.jvm' version '1.7.20'
 }
@@ -63,10 +64,14 @@ dependencies {
     implementation 'net.kyori:adventure-text-minimessage:4.11.0'
     implementation 'net.kyori:adventure-platform-bukkit:4.1.2'
     implementation 'com.google.code.gson:gson:2.10'
+
+    implementation 'com.google.auto.service:auto-service:1.0-rc5'
     implementation 'com.google.auto.service:auto-service:1.0.1'
 
     implementation project(':WorldBorder')
 }
+
+jar { from('resources') { include 'META-INF/services/*.*' } }
 
 shadowJar {
     minimize()
@@ -99,30 +104,56 @@ task copyTo_SWM(type: Copy) {
     into "E:/Coding/Spigot Test Servers/1.18 Slime World Manager (Paper)/plugins"
 }
 
-publishing {
-    repositories {
-        maven {
-            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            //"https://s01.oss.sonatype.org/"
-            def snapshotsRepoUrl = "https://repo.bristermitten.me/repository/maven-snapshots"
-            url = releasesRepoUrl // version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-
-            credentials {
-                username = System.getenv('MAVEN_USER')
-                password = System.getenv('MAVEN_PASSWORD')
-            }
-        }
-    }
-    publications {
-//        shadow(MavenPublication) {
-//            publication -> project.shadow.component(publication)
+//publishing {
+//    repositories {
+//        maven {
+//            var releasesRepoUrl = "https://repo.bristermitten.me/repository/maven-releases"
+//            var snapshotsRepoUrl = "https://repo.bristermitten.me/repository/maven-snapshots"
+//
+//            if (version.toString().endsWith("SNAPSHOT")) {
+//                url = uri(snapshotsRepoUrl)
+//            } else {
+//                url = uri(releasesRepoUrl)
+//            }
+//
+//            credentials {
+//                username = project.findProperty("mavenUser")?.toString() ?: System.getenv("MAVEN_USER")
+//                password = project.findProperty("mavenPassword")?.toString() ?: System.getenv("MAVEN_PASSWORD")
+//            }
 //        }
-        mavenJava(MavenPublication) {
-            from components.java
-//                artifact sourceJar
-        }
-    }
-}
+//
+//        publications {
+//                from components.java
+//            }
+//        }
+//    }
+
+//
+//publishing {
+//    repositories {
+//        maven {
+//            url = ""
+////            def releasesRepoUrl = "https://repo.bristermitten.me/repository/maven-public/"
+//            //"https://s01.oss.sonatype.org/"
+////            def snapshotsRepoUrl = "https://repo.bristermitten.me/repository/maven-public/"
+////            url = releasesRepoUrl // version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+//
+//            credentials {
+//                username = "odin"//System.getenv('MAVEN_USER')
+//                password = "kj;BP{}`[mF\\5x&2" //System.getenv('MAVEN_PASSWORD')
+//            }
+//        }
+//    }
+//    publications {
+////        shadow(MavenPublication) {
+////            publication -> project.shadow.component(publication)
+////        }
+//        mavenJava(MavenPublication) {
+//            from components.java
+////                artifact sourceJar
+//        }
+//    }
+//}
 
 test {
     useJUnitPlatform()
