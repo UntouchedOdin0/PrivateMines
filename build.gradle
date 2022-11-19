@@ -65,7 +65,7 @@ dependencies {
     implementation 'net.kyori:adventure-platform-bukkit:4.1.2'
     implementation 'com.google.code.gson:gson:2.10'
 
-    implementation 'com.google.auto.service:auto-service:1.0-rc5'
+    implementation 'com.google.auto.service:auto-service:1.0.1'
     implementation 'com.google.auto.service:auto-service:1.0.1'
 
     implementation project(':WorldBorder')
