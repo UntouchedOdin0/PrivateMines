@@ -1,18 +1,32 @@
 package me.untouchedodin0.privatemines.utils.addons.test;
 
-import com.google.auto.service.AutoService;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.utils.addons.Service;
+import me.untouchedodin0.privatemines.utils.addons.ServiceProvider;
 
-@AutoService(Service.class)
-public class TestAddon implements Service {
+public class TestAddon {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
+    ServiceProvider serviceProvider = new ServiceProvider() {
+        @Override
+        public String getMessage() {
+            return "hi";
+        }
 
-    @Override
-    public void print() {
-        System.out.println("Print Test.");
+        @Override
+        public void onLoad() {
+            System.out.println("Loading Test Addon, message: " + getMessage());
+        }
+    };
+
+    public ServiceProvider getServiceProvider() {
+        return serviceProvider;
     }
+
+    //    @Override
+//    public void print() {
+//        System.out.println("Print Test.");
+//    }
+
 
 //    @Override
 //    public void print() {

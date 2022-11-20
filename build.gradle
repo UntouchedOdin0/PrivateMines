@@ -74,6 +74,7 @@ dependencies {
 jar { from('resources') { include 'META-INF/services/*.*' } }
 
 shadowJar {
+    mergeServiceFiles()
     minimize()
     relocate 'org.codemc.worldguardwrapper', 'me.untouchedodin0.privatemines.worldguardwrapper'
     relocate 'com.google.gson', 'me.untouchedodin0.privatemines.gson'
@@ -103,6 +104,7 @@ task copyTo_SWM(type: Copy) {
     from shadowJar
     into "E:/Coding/Spigot Test Servers/1.18 Slime World Manager (Paper)/plugins"
 }
+
 
 //publishing {
 //    repositories {

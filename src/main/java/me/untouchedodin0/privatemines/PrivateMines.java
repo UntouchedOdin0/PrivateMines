@@ -24,6 +24,8 @@ import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.addons.Service;
+import me.untouchedodin0.privatemines.utils.addons.ServiceProvider;
+import me.untouchedodin0.privatemines.utils.addons.test.TestAddon;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -212,9 +214,24 @@ public class PrivateMines extends JavaPlugin {
             Task.syncDelayed(this::loadPregenMines);
 //            Task.asyncDelayed(this::loadAddons);
 
-            ServiceLoader<Service> loader = ServiceLoader.load(Service.class);
-            getLogger().info("loader " + loader);
-            getLogger().info("" + loader.findFirst());
+
+            ServiceProvider provider = ServiceProvider.getDefault();
+            TestAddon testAddon = new TestAddon();
+            ServiceProvider serviceProvider = testAddon.getServiceProvider();
+            serviceProvider.onLoad();
+//            getLogger().info("message " + serviceProvider.getMessage());
+
+
+
+//            getLogger().info(" ");
+//            ServiceProvider serviceProvider = ServiceProvider.getDefault();
+//            getLogger().info("serviceProvide " + serviceProvider);
+//            getLogger().info(" ");
+//            System.out.println(serviceProvider.getMessage());
+
+//            ServiceLoader<Service> loader = ServiceLoader.load(Service.class);
+//            getLogger().info("loader " + loader);
+//            getLogger().info("" + loader.findFirst());
 
 //            ServiceLoader<Service> test = ServiceLoader.load(Service.class);
 //            getLogger().info("" + test.stream().toList());
