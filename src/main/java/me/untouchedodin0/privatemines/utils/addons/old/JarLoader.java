@@ -1,5 +1,8 @@
 package me.untouchedodin0.privatemines.utils.addons.old;
 
+import me.untouchedodin0.privatemines.utils.addons.AddonDescriptionFile;
+import org.bukkit.plugin.InvalidDescriptionException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +31,7 @@ public class JarLoader {
             stream = jarFile.getInputStream(jarEntry);
             return new AddonDescriptionFile(stream);
 
-        } catch (IOException e) {
+        } catch (IOException | InvalidDescriptionException e) {
             throw new RuntimeException(e);
         }
     }

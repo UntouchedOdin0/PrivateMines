@@ -24,8 +24,6 @@ import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.addons.Service;
-import me.untouchedodin0.privatemines.utils.addons.ServiceProvider;
-import me.untouchedodin0.privatemines.utils.addons.test.TestAddon;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -215,10 +213,22 @@ public class PrivateMines extends JavaPlugin {
 //            Task.asyncDelayed(this::loadAddons);
 
 
-            ServiceProvider provider = ServiceProvider.getDefault();
-            TestAddon testAddon = new TestAddon();
-            ServiceProvider serviceProvider = testAddon.getServiceProvider();
-            serviceProvider.onLoad();
+//            getLogger().info("" + file);
+
+//            getLogger().info("" + getAddonsDirectory().getFileName());
+//            getAddonsDirectory().forEach(path -> {
+//                File file = path.toFile();
+//                getLogger().info("file " + file);
+////                if (!file.exists()) {
+////                    getLogger().info("File doesn't exist!");
+////                } else {
+////                    jarLoader.load(file, ExampleLoadingClass.class);
+////                }
+//            });
+//            ServiceProvider provider = ServiceProvider.getDefault();
+//            TestAddon testAddon = new TestAddon();
+//            ServiceProvider serviceProvider = testAddon.getServiceProvider();
+//            serviceProvider.onLoad();
 //            getLogger().info("message " + serviceProvider.getMessage());
 
 
