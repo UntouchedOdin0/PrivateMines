@@ -55,6 +55,7 @@ import me.untouchedodin0.privatemines.events.PrivateMineUpgradeEvent;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -322,7 +323,11 @@ public class Mine {
             }
         }
 
+        final MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
+
         World world = location.getWorld();
+        World privateMinesWorld = mineWorldManager.getMinesWorld();
+
         Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
 
         Player player = Bukkit.getPlayer(mineData.getMineOwner());
@@ -330,9 +335,9 @@ public class Mine {
             boolean isPlayerInRegion = region.contains(player.getLocation().getBlockX(),
                     player.getLocation().getBlockY(),
                     player.getLocation().getBlockZ());
-            if (isPlayerInRegion) {
-                teleport(player);
-            }
+            boolean inWorld = player.getWorld().equals(privateMinesWorld);
+
+            if (isPlayerInRegion && inWorld) teleport(player);
         }
 
         for (Player online : Bukkit.getOnlinePlayers()) {
@@ -340,7 +345,9 @@ public class Mine {
                     online.getLocation().getBlockX(),
                     online.getLocation().getBlockY(),
                     online.getLocation().getBlockZ());
-            if (isPlayerInRegion) teleport(online);
+            boolean inWorld = online.getWorld().equals(privateMinesWorld);
+
+            if (isPlayerInRegion && inWorld) teleport(online);
         }
 
         if (Config.addWallGap) {
