@@ -59,35 +59,34 @@ public class UPCSellListener implements Listener {
         if (playerWorld != minesWorld) return;
 
         Mine mine = mineStorage.getClosest(playerLocation);
+        if (mine == null) return;
 
-        if (mine != null) {
-            MineData mineData = mine.getMineData();
-            Economy economy = PrivateMines.getEconomy();
-            UUID owner = mineData.getMineOwner();
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
-            String sellerName = player.getDisplayName();
+        MineData mineData = mine.getMineData();
+        Economy economy = PrivateMines.getEconomy();
+        UUID owner = mineData.getMineOwner();
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
+        String sellerName = player.getDisplayName();
 
-            Map<AutoSellItemStack, Double> items = sellAllEvent.getItemsToSell();
-            Map<AutoSellItemStack, Double> itemsToSell = new HashMap<>();
+        Map<AutoSellItemStack, Double> items = sellAllEvent.getItemsToSell();
+        Map<AutoSellItemStack, Double> itemsToSell = new HashMap<>();
 
-            items.forEach((autoSellItemStack, aDouble) -> {
-                double tax = aDouble / 100.0 * mineData.getTax();
-                double removed = aDouble - tax;
-                itemsToSell.put(autoSellItemStack, removed);
-                taxForOwner = taxForOwner + tax;
-            });
-            sellAllEvent.setItemsToSell(itemsToSell);
-            economy.depositPlayer(offlinePlayer, taxForOwner);
+        items.forEach((autoSellItemStack, aDouble) -> {
+            double tax = aDouble / 100.0 * mineData.getTax();
+            double removed = aDouble - tax;
+            itemsToSell.put(autoSellItemStack, removed);
+            taxForOwner = taxForOwner + tax;
+        });
+        sellAllEvent.setItemsToSell(itemsToSell);
+        economy.depositPlayer(offlinePlayer, taxForOwner);
 
-            if (Config.sendTaxMessages) {
-                player.sendMessage(ChatColor.GREEN + String.format(ChatColor.GREEN + "Deducted $%f for the owner of the mine!", taxForOwner));
-                if (offlinePlayer.getPlayer() != null) {
-                    offlinePlayer.getPlayer().sendMessage(ChatColor.GREEN + String.format(ChatColor.GREEN + "You've received $%f from %s"
-                            + ChatColor.GREEN + "!", taxForOwner, sellerName));
-                }
+        if (Config.sendTaxMessages) {
+            player.sendMessage(ChatColor.GREEN + String.format(ChatColor.GREEN + "Deducted $%f for the owner of the mine!", taxForOwner));
+            if (offlinePlayer.getPlayer() != null) {
+                offlinePlayer.getPlayer().sendMessage(ChatColor.GREEN + String.format(ChatColor.GREEN + "You've received $%f from %s"
+                        + ChatColor.GREEN + "!", taxForOwner, sellerName));
             }
-            taxForOwner = 0;
         }
+        taxForOwner = 0;
     }
 
     @EventHandler

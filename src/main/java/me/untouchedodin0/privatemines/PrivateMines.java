@@ -111,12 +111,13 @@ public class PrivateMines extends JavaPlugin {
         if (RedLib.MID_VERSION < 13) {
             Utils.complain();
         } else {
+            mineWorldManager = new MineWorldManager();
             mineFactory = new MineFactory();
             mineStorage = new MineStorage();
             pregenStorage = new PregenStorage();
-            mineWorldManager = new MineWorldManager();
             mineTypeManager = new MineTypeManager(this);
 
+            getLogger().info("mine world manager " + mineStorage.getMineWorldManager());
             if (RedLib.MID_VERSION >= 19) {
                 worldBorderUtils = new WorldBorderUtils();
             }

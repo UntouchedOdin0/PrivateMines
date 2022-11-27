@@ -2,14 +2,18 @@ package me.untouchedodin0.kotlin.mine.storage
 
 import me.untouchedodin0.privatemines.PrivateMines
 import me.untouchedodin0.privatemines.mine.Mine
+import me.untouchedodin0.privatemines.utils.world.MineWorldManager
 import org.bukkit.ChatColor
 import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.entity.Player
 import java.util.*
 
 class MineStorage {
     var mines: MutableMap<UUID, Mine> = HashMap()
     var privateMines: PrivateMines = PrivateMines.getPrivateMines()
+    var mineWorldManager: MineWorldManager = privateMines.mineWorldManager
+    var world: World = mineWorldManager.minesWorld
     private val logger = privateMines.logger
 
     fun addMine(uuid: UUID, mine: Mine) = mines.computeIfAbsent(uuid) { mine }
@@ -70,6 +74,7 @@ class MineStorage {
         // Make a distances value and make an empty map for the distances
         val distances: MutableMap<Mine, Double> = HashMap()
 
+        if (location.world != world) return null
         // Iterate over all the mines calculating the distance
         // from the location then add the mine, and it's distance
         // into the map.
