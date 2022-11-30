@@ -33,6 +33,7 @@ import static me.untouchedodin0.privatemines.utils.world.utils.Direction.NORTH;
 public class MineWorldManager {
 
     private final Location defaultLocation;
+    private Location currentLocation;
     private final int borderDistance;
     private int distance = 0;
     private Direction direction;
@@ -67,6 +68,7 @@ public class MineWorldManager {
 
         if (direction == null) direction = NORTH;
         Location location = direction.addTo(defaultLocation, distance * borderDistance);
+        this.currentLocation = location;
         direction = direction.next();
         if (direction == NORTH) distance++;
         return location;
@@ -74,5 +76,9 @@ public class MineWorldManager {
 
     public World getMinesWorld() {
         return minesWorld;
+    }
+
+    public Location getCurrentLocation() {
+        return currentLocation;
     }
 }

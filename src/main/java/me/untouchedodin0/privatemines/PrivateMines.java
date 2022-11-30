@@ -34,6 +34,7 @@ import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -105,6 +106,7 @@ public class PrivateMines extends JavaPlugin {
         saveDefaultConfig();
         saveResource("menus.yml", false);
         saveResource("messages.yml", false);
+        saveResource("donottouch.yml", false);
 
         privateMines = this;
 //        loadAddons();
@@ -117,7 +119,7 @@ public class PrivateMines extends JavaPlugin {
             pregenStorage = new PregenStorage();
             mineTypeManager = new MineTypeManager(this);
 
-            getLogger().info("mine world manager " + mineStorage.getMineWorldManager());
+            getLogger().info(LocationUtils.toString(mineWorldManager.getNextFreeLocation()));
             if (RedLib.MID_VERSION >= 19) {
                 worldBorderUtils = new WorldBorderUtils();
             }
@@ -274,12 +276,44 @@ public class PrivateMines extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        File file = new File("plugins/PrivateMines/donottouch.yml");
+        YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(file);
+        yamlConfiguration.set("nextlocation", "Hi 23");
+
+        getLogger().info("" + yamlConfiguration);
+        try {
+            yamlConfiguration.save(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+//        yml.set("test", "test");
+////        yml.set("nextlocation", LocationUtils.toString(mineWorldManager.getNextFreeLocation()));
+//        try {
+//            yml.save(file);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
         if (adventure != null) {
             getLogger().info(String.format("Disabling adventure for %s", getDescription().getName()));
             adventure.close();
             this.adventure = null;
             getLogger().info(String.format("Disabled adventure for %s", getDescription().getName()));
         }
+
+
+
+//        if (mineWorldManager.getCurrentLocation() != null) {
+//            getLogger().info("current location: " + mineWorldManager.getCurrentLocation());
+//        } else {
+//            getLogger().info("next location: " + mineWorldManager.getNextFreeLocation());
+//            try {
+//                yml.save(file);
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
 
         getLogger().info(String.format("%s v%s has successfully been Disabled",
                 getDescription().getName(),
