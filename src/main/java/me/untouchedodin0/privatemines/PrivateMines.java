@@ -34,7 +34,6 @@ import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -110,169 +109,127 @@ public class PrivateMines extends JavaPlugin {
 
         privateMines = this;
 //        loadAddons();
-        if (RedLib.MID_VERSION < 13) {
-            Utils.complain();
-        } else {
-            mineWorldManager = new MineWorldManager();
-            mineFactory = new MineFactory();
-            mineStorage = new MineStorage();
-            pregenStorage = new PregenStorage();
-            mineTypeManager = new MineTypeManager(this);
+        mineWorldManager = new MineWorldManager();
+        mineFactory = new MineFactory();
+        mineStorage = new MineStorage();
+        pregenStorage = new PregenStorage();
+        mineTypeManager = new MineTypeManager(this);
 
-            getLogger().info(LocationUtils.toString(mineWorldManager.getNextFreeLocation()));
-            if (RedLib.MID_VERSION >= 19) {
-                worldBorderUtils = new WorldBorderUtils();
+        if (RedLib.MID_VERSION >= 19) {
+            worldBorderUtils = new WorldBorderUtils();
+        }
+
+        new CommandParser(getResource("commands.rdcml"))
+                .setArgTypes(
+                        ArgType.of("materials", Material.class),
+                        ArgType.of("mineType", mineTypeManager.getMineTypes()))
+                .parse()
+                .register("privatemines",
+                        new PrivateMinesCommand());
+
+        if (Config.enableTax) {
+            registerSellListener();
+        }
+        registerListeners();
+        setupSchematicUtils();
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            boolean registered = new PrivateMinesExpansion(this).register();
+            if (registered) {
+                privateMines.getLogger().info("Registered the PlaceholderAPI expansion!");
             }
+        }
 
-            new CommandParser(getResource("commands.rdcml"))
-                    .setArgTypes(
-                            ArgType.of("materials", Material.class),
-                            ArgType.of("mineType", mineTypeManager.getMineTypes()))
-                    .parse()
-                    .register("privatemines",
-                            new PrivateMinesCommand());
+        try {
+            Files.createDirectories(minesDirectory);
+            Files.createDirectories(schematicsDirectory);
+            Files.createDirectories(pregenMines);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-            if (Config.enableTax) {
-                registerSellListener();
-            }
-            registerListeners();
-            setupSchematicUtils();
+        configManager = ConfigManager.create(this)
+                .addConverter(Material.class, Material::valueOf, Material::toString)
+                .target(Config.class)
+                .saveDefaults()
+                .load();
+        //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
+        ConfigManager mineConfig = ConfigManager.create(this)
+                .addConverter(Material.class, Material::valueOf, Material::toString)
+                .target(MineConfig.class)
+                .saveDefaults()
+                .load();
+        //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
+        ConfigManager menuConfig = ConfigManager.create(this, "menus.yml")
+                .addConverter(Material.class, Material::valueOf, Material::toString)
+                .target(MenuConfig.class)
+                .load();
+        //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
+        ConfigManager messagesConfig = ConfigManager.create(this, "messages.yml")
+                .target(MessagesConfig.class)
+                .saveDefaults()
+                .load();
 
-            if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-                boolean registered = new PrivateMinesExpansion(this).register();
-                if (registered) {
-                    privateMines.getLogger().info("Registered the PlaceholderAPI expansion!");
-                }
-            }
+        this.adventure = BukkitAudiences.create(this);
+        this.Y_LEVEL = Config.mineYLevel;
+        this.MINE_DISTANCE = Config.mineDistance;
 
-            try {
-                Files.createDirectories(minesDirectory);
-                Files.createDirectories(schematicsDirectory);
-                Files.createDirectories(pregenMines);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            configManager = ConfigManager.create(this)
-                    .addConverter(Material.class, Material::valueOf, Material::toString)
-                    .target(Config.class)
-                    .saveDefaults()
-                    .load();
-            //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
-            ConfigManager mineConfig = ConfigManager.create(this)
-                    .addConverter(Material.class, Material::valueOf, Material::toString)
-                    .target(MineConfig.class)
-                    .saveDefaults()
-                    .load();
-            //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
-            ConfigManager menuConfig = ConfigManager.create(this, "menus.yml")
-                    .addConverter(Material.class, Material::valueOf, Material::toString)
-                    .target(MenuConfig.class)
-                    .load();
-            //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
-            ConfigManager messagesConfig = ConfigManager.create(this, "messages.yml")
-                    .target(MessagesConfig.class)
-                    .saveDefaults()
-                    .load();
-
-            this.adventure = BukkitAudiences.create(this);
-            this.Y_LEVEL = Config.mineYLevel;
-            this.MINE_DISTANCE = Config.mineDistance;
-
-            MineConfig.getMineTypes().forEach((s, mineType) -> mineTypeManager.registerMineType(mineType));
-            MineConfig.mineTypes.forEach((name, mineType) -> {
-                File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
-                if (!schematicFile.exists()) {
-                    getLogger().info("File doesn't exist!");
-                    return;
-                }
-                SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
-                schematicStorage.addSchematic(schematicFile, mineBlocks);
-                privateMines.getLogger().info("Loaded file: " + schematicFile);
-            });
-
-            sqlite = new SQLite();
-
-            this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
-            sqlHelper.setAutoCommit(false);
-            sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
-                    "`mineOwner` TEXT," +
-                    "`mineType` TEXT," +
-                    "`mineLocation` TEXT," +
-                    "`corner1` TEXT," +
-                    "`corner2` TEXT," +
-                    "`fullRegionMin` TEXT," +
-                    "`fullRegionMax` TEXT," +
-                    "`spawn` TEXT," +
-                    "`tax` DOUBLE," +
-                    "`isOpen` BOOLEAN," +
-                    "`maxPlayers` INT," +
-                    "`maxMineSize` INT," +
-                    "`materials` TEXT" +
-                    ");");
-
-            Task.asyncDelayed(this::loadMines);
-            Task.syncDelayed(this::loadPregenMines);
-//            Task.asyncDelayed(this::loadAddons);
-
-
-//            getLogger().info("" + file);
-
-//            getLogger().info("" + getAddonsDirectory().getFileName());
-//            getAddonsDirectory().forEach(path -> {
-//                File file = path.toFile();
-//                getLogger().info("file " + file);
-////                if (!file.exists()) {
-////                    getLogger().info("File doesn't exist!");
-////                } else {
-////                    jarLoader.load(file, ExampleLoadingClass.class);
-////                }
-//            });
-//            ServiceProvider provider = ServiceProvider.getDefault();
-//            TestAddon testAddon = new TestAddon();
-//            ServiceProvider serviceProvider = testAddon.getServiceProvider();
-//            serviceProvider.onLoad();
-//            getLogger().info("message " + serviceProvider.getMessage());
-
-
-
-//            getLogger().info(" ");
-//            ServiceProvider serviceProvider = ServiceProvider.getDefault();
-//            getLogger().info("serviceProvide " + serviceProvider);
-//            getLogger().info(" ");
-//            System.out.println(serviceProvider.getMessage());
-
-//            ServiceLoader<Service> loader = ServiceLoader.load(Service.class);
-//            getLogger().info("loader " + loader);
-//            getLogger().info("" + loader.findFirst());
-
-//            ServiceLoader<Service> test = ServiceLoader.load(Service.class);
-//            getLogger().info("" + test.stream().toList());
-
-//            ServiceLoader<Service> myService = ServiceLoader.load(Service.class);
-//            getLogger().info("myservice " + myService);
-//            getLogger().info("" + myService.stream().count());
-
-            PaperLib.suggestPaper(this);
-
-            if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
-                slimeUtils = new SlimeUtils();
-                Task.asyncDelayed(() -> slimeUtils.setupSlimeWorld(UUID.randomUUID()));
-            }
-
-            getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
-            if (!setupEconomy()) {
-                privateMines.getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
-                getServer().getPluginManager().disablePlugin(this);
+        MineConfig.getMineTypes().forEach((s, mineType) -> mineTypeManager.registerMineType(mineType));
+        MineConfig.mineTypes.forEach((name, mineType) -> {
+            File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
+            if (!schematicFile.exists()) {
+                getLogger().info("File doesn't exist!");
                 return;
             }
-            Metrics metrics = new Metrics(this, PLUGIN_ID);
-            metrics.addCustomChart(new SingleLineChart("mines", () -> mineStorage.getTotalMines()));
-            Instant end = Instant.now();
-            Duration loadTime = Duration.between(start, end);
-            getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
+            SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
+            schematicStorage.addSchematic(schematicFile, mineBlocks);
+            privateMines.getLogger().info("Loaded file: " + schematicFile);
+        });
+
+        sqlite = new SQLite();
+
+        this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
+        sqlHelper.setAutoCommit(false);
+        sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
+                "`mineOwner` TEXT," +
+                "`mineType` TEXT," +
+                "`mineLocation` TEXT," +
+                "`corner1` TEXT," +
+                "`corner2` TEXT," +
+                "`fullRegionMin` TEXT," +
+                "`fullRegionMax` TEXT," +
+                "`spawn` TEXT," +
+                "`tax` DOUBLE," +
+                "`isOpen` BOOLEAN," +
+                "`maxPlayers` INT," +
+                "`maxMineSize` INT," +
+                "`materials` TEXT" +
+                ");");
+
+        Task.asyncDelayed(this::loadMines);
+        Task.syncDelayed(this::loadPregenMines);
+//            Task.asyncDelayed(this::loadAddons);
+
+        PaperLib.suggestPaper(this);
+
+        if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
+            slimeUtils = new SlimeUtils();
+            Task.asyncDelayed(() -> slimeUtils.setupSlimeWorld(UUID.randomUUID()));
         }
+
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+        if (!setupEconomy()) {
+            privateMines.getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        Metrics metrics = new Metrics(this, PLUGIN_ID);
+        metrics.addCustomChart(new SingleLineChart("mines", () -> mineStorage.getTotalMines()));
+        Instant end = Instant.now();
+        Duration loadTime = Duration.between(start, end);
+        getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
     }
+
 
     @Override
     public void onDisable() {
@@ -301,7 +258,6 @@ public class PrivateMines extends JavaPlugin {
             this.adventure = null;
             getLogger().info(String.format("Disabled adventure for %s", getDescription().getName()));
         }
-
 
 
 //        if (mineWorldManager.getCurrentLocation() != null) {

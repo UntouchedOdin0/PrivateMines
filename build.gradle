@@ -91,6 +91,7 @@ task copyTo_DevServer(type: Copy) {
     into "E:/Coding/Spigot Test Servers/1.18.2 Privates Mines (Paper)/plugins"
 }
 
+
 task copyTo_DevServer1_19(type: Copy) {
     from shadowJar
     into "E:/Coding/Spigot Test Servers/1.19.2 Privates Mines (Paper)/plugins"
