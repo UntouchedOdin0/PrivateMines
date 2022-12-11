@@ -60,6 +60,7 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
+import me.untouchedodin0.privatemines.utils.SQLUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -82,6 +83,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 public class MineFactory {
     PrivateMines privateMines = PrivateMines.getPrivateMines();
+    MineStorage mineStorage = privateMines.getMineStorage();
     EditSession editSession;
     Location quarryL;
 
@@ -265,11 +267,14 @@ public class MineFactory {
                                 shop
                         );
                         mineData.setMaxPlayers(maxPlayers);
-
                         mineData.setOpen(!Config.defaultClosed);
 
                         mine.setMineData(mineData);
-                        mine.saveMineData(player, mineData);
+                        mineStorage.addMine(uuid, mine);
+
+//                        mine.saveMineData(player, mineData);
+
+//                        SQLUtils.insert(mine);
                     } catch (IncompleteRegionException e) {
                         e.printStackTrace();
                     }
@@ -286,8 +291,10 @@ public class MineFactory {
                         privateMines.getMineStorage().addMine(uuid, mine);
                     }
 
+                    SQLUtils.insert(mine);
+
                     mine.resetIgnoreWallCheck();
-//                    mine.reset();
+                    mine.reset();
                     TextComponent teleportMessage = new TextComponent(ChatColor.GREEN + "Click me to teleport to your mine!");
                     teleportMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/privatemines teleport"));
                     PrivateMineCreationEvent privateMineCreationEvent = new PrivateMineCreationEvent(uuid, mine);

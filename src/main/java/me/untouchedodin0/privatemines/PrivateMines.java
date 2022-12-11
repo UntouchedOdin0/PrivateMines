@@ -24,8 +24,10 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
+import me.untouchedodin0.privatemines.utils.SQLUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
+import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
 import me.untouchedodin0.privatemines.utils.addons.Service;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
@@ -56,6 +58,9 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -119,8 +124,10 @@ public class PrivateMines extends JavaPlugin {
         pregenStorage = new PregenStorage();
         mineTypeManager = new MineTypeManager(this);
 
+
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
+        gsonBuilder.registerTypeHierarchyAdapter(Path.class, new PathAdapter());
         gson = gsonBuilder.create();
 
         File file = new File("plugins/PrivateMines/donottouch.json");
@@ -205,24 +212,40 @@ public class PrivateMines extends JavaPlugin {
         });
 
         sqlite = new SQLite();
-
         this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
-        sqlHelper.setAutoCommit(false);
-        sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
-                "`mineOwner` TEXT," +
-                "`mineType` TEXT," +
-                "`mineLocation` TEXT," +
-                "`corner1` TEXT," +
-                "`corner2` TEXT," +
-                "`fullRegionMin` TEXT," +
-                "`fullRegionMax` TEXT," +
-                "`spawn` TEXT," +
-                "`tax` DOUBLE," +
-                "`isOpen` BOOLEAN," +
-                "`maxPlayers` INT," +
-                "`maxMineSize` INT," +
-                "`materials` TEXT" +
-                ");");
+
+//        try (Connection connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("privatemines.db"))) {
+//            String insertSQL = "INSERT INTO privatemines (uuid, json) VALUES (?, ?)";
+//            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
+//            preparedStatement.setString(1, "uuid");
+//            preparedStatement.setString(2, "json");
+//            preparedStatement.executeUpdate();
+//
+////            this.sqlHelper = new SQLHelper(connection);
+////            sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS privatemines (uuid STRING, json STRING);");
+////            sqlHelper.executeUpdate(String.format("INSERT INTO privatemines (uuid, json) VALUES(%s, %s);", "uuid", "json"));
+//
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+
+
+//        sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS privatemines (`owner` TEXT, `data` TEXT);");
+//        sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
+//                "`mineOwner` TEXT," +
+//                "`mineType` TEXT," +
+//                "`mineLocation` TEXT," +
+//                "`corner1` TEXT," +
+//                "`corner2` TEXT," +
+//                "`fullRegionMin` TEXT," +
+//                "`fullRegionMax` TEXT," +
+//                "`spawn` TEXT," +
+//                "`tax` DOUBLE," +
+//                "`isOpen` BOOLEAN," +
+//                "`maxPlayers` INT," +
+//                "`maxMineSize` INT," +
+//                "`materials` TEXT" +
+//                ");");
 
         Task.asyncDelayed(this::loadMines);
         Task.syncDelayed(this::loadPregenMines);
@@ -469,6 +492,7 @@ public class PrivateMines extends JavaPlugin {
             Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
             if (player != null) {
                 mine.saveMineData(player, mine.getMineData());
+//                SQLUtils.insert(mine);
             }
         });
     }
@@ -656,5 +680,9 @@ public class PrivateMines extends JavaPlugin {
 
     public WorldBorderUtils getWorldBorderUtils() {
         return worldBorderUtils;
+    }
+
+    public Gson getGson() {
+        return gson;
     }
 }
