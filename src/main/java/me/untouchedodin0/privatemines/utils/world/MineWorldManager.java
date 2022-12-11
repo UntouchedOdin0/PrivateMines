@@ -60,18 +60,22 @@ public class MineWorldManager {
         this.defaultLocation = new Location(minesWorld, 0, yLevel, 0);
     }
 
-    public synchronized Location getNextFreeLocation() {
+    public Location getNextFreeLocation() {
         if (distance == 0) {
             distance++;
             return defaultLocation;
         }
 
         if (direction == null) direction = NORTH;
-        Location location = direction.addTo(defaultLocation, distance * borderDistance);
-        this.currentLocation = location;
+        if (currentLocation == null) {
+            setCurrentLocation(direction.addTo(defaultLocation, distance * borderDistance));
+        } else {
+            this.currentLocation = direction.addTo(currentLocation, distance * borderDistance);
+        }
+
         direction = direction.next();
         if (direction == NORTH) distance++;
-        return location;
+        return currentLocation;
     }
 
     public World getMinesWorld() {
@@ -80,5 +84,9 @@ public class MineWorldManager {
 
     public Location getCurrentLocation() {
         return currentLocation;
+    }
+
+    public void setCurrentLocation(Location currentLocation) {
+        this.currentLocation = currentLocation;
     }
 }

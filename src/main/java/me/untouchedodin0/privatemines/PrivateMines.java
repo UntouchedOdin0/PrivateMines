@@ -1,5 +1,7 @@
 package me.untouchedodin0.privatemines;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.papermc.lib.PaperLib;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
@@ -23,6 +25,7 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.addons.Service;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
@@ -47,8 +50,8 @@ import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -90,6 +93,7 @@ public class PrivateMines extends JavaPlugin {
     private SQLHelper sqlHelper;
     private BukkitAudiences adventure;
     private WorldBorderUtils worldBorderUtils;
+    private Gson gson;
     String matString;
     double percent;
     boolean pregenMode;
@@ -105,7 +109,7 @@ public class PrivateMines extends JavaPlugin {
         saveDefaultConfig();
         saveResource("menus.yml", false);
         saveResource("messages.yml", false);
-        saveResource("donottouch.yml", false);
+        saveResource("donottouch.json", false);
 
         privateMines = this;
 //        loadAddons();
@@ -114,6 +118,20 @@ public class PrivateMines extends JavaPlugin {
         mineStorage = new MineStorage();
         pregenStorage = new PregenStorage();
         mineTypeManager = new MineTypeManager(this);
+
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
+        gson = gsonBuilder.create();
+
+        File file = new File("plugins/PrivateMines/donottouch.json");
+        try {
+            try (FileReader fileReader = new FileReader(file)) {
+                Location currentLocation = gson.fromJson(fileReader, Location.class);
+                mineWorldManager.setCurrentLocation(currentLocation);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         if (RedLib.MID_VERSION >= 19) {
             worldBorderUtils = new WorldBorderUtils();
@@ -233,21 +251,36 @@ public class PrivateMines extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        File file = new File("plugins/PrivateMines/donottouch.yml");
-        YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(file);
-        yamlConfiguration.set("nextlocation", "Hi 23");
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
+        gson = gsonBuilder.create();
 
-        getLogger().info("" + yamlConfiguration);
+        File file = new File("plugins/PrivateMines/donottouch.json");
+        Location currentLocation = mineWorldManager.getCurrentLocation();
+        String currentLocationJson = gson.toJson(currentLocation);
+        getLogger().info("current loc: " + currentLocation);
+        getLogger().info("test? " + currentLocationJson);
         try {
-            yamlConfiguration.save(file);
+            Files.writeString(file.toPath(), currentLocationJson);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-//        yml.set("test", "test");
-////        yml.set("nextlocation", LocationUtils.toString(mineWorldManager.getNextFreeLocation()));
+//        Location nextLocation = mineWorldManager.getNextFreeLocation();
+
+//        String currentLocationString = gson.toJson(currentLocation);
+//        String nextLocationString = gson.toJson(nextLocation);
+
+        getLogger().info("currentLocation: " + currentLocation);
+//        getLogger().info("current location string: " + currentLocationString);
+
+//        getLogger().info("nextLocation: " + nextLocation);
+//        getLogger().info("next location string: " + nextLocationString);
+
 //        try {
-//            yml.save(file);
+//            try (Writer writer = new FileWriter(file)) {
+//                writer.append(currentLocationString);
+//            }
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
@@ -258,18 +291,6 @@ public class PrivateMines extends JavaPlugin {
             this.adventure = null;
             getLogger().info(String.format("Disabled adventure for %s", getDescription().getName()));
         }
-
-
-//        if (mineWorldManager.getCurrentLocation() != null) {
-//            getLogger().info("current location: " + mineWorldManager.getCurrentLocation());
-//        } else {
-//            getLogger().info("next location: " + mineWorldManager.getNextFreeLocation());
-//            try {
-//                yml.save(file);
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
 
         getLogger().info(String.format("%s v%s has successfully been Disabled",
                 getDescription().getName(),

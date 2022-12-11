@@ -80,6 +80,7 @@ public class PrivateMinesCommand {
         MineFactory mineFactory = new MineFactory();
         MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
         Location location = mineWorldManager.getNextFreeLocation();
+        mineWorldManager.setCurrentLocation(location);
         MineType defaultMineType = mineTypeManager.getDefaultMineType();
 
         if (target.getPlayer() != null) {
