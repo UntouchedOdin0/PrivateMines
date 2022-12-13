@@ -68,7 +68,6 @@ import redempt.redlib.misc.Task;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -160,14 +159,10 @@ public class Mine {
         privateMines.getLogger().info(String.format("It took %dms to reset the mine", durationInMS));
         privateMines.getMineStorage().removeMine(uuid);
         String fileName = String.format("/%s.yml", uuid);
-        Path minesDirectory = privateMines.getMinesDirectory();
+        File minesDirectory = privateMines.getMinesDirectory().toFile();
         File file = new File(minesDirectory + fileName);
 
-        try {
-            Files.delete(file.toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        file.delete();
     }
 
     /**
@@ -213,13 +208,13 @@ public class Mine {
         privateMines.getLogger().info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
         privateMines.getMineStorage().removeMine(uuid);
         String fileName = String.format("/%s.yml", uuid);
-        Path minesDirectory = privateMines.getMinesDirectory();
+        File minesDirectory = privateMines.getMinesDirectory().toFile();
         File file = new File(minesDirectory + fileName);
-        try {
-            Files.delete(file.toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Files.delete(file.toPath());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Deprecated
@@ -584,7 +579,7 @@ public class Mine {
         String uuidString = String.valueOf(player.getUniqueId());
         String fileName = String.format("/%s.yml", uuidString);
 
-        Path minesDirectory = privateMines.getMinesDirectory();
+        File minesDirectory = privateMines.getMinesDirectory().toFile();
         File file = new File(minesDirectory + fileName);
         privateMines.getLogger().info("Saving file " + file.getName() + "...");
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);

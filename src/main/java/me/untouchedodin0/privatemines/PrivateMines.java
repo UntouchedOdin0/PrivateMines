@@ -127,8 +127,8 @@ public class PrivateMines extends JavaPlugin {
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
-        gsonBuilder.registerTypeHierarchyAdapter(Path.class, new PathAdapter());
-        gson = gsonBuilder.create();
+        gsonBuilder.registerTypeAdapter(Path.class, new PathAdapter());
+        this.gson = gsonBuilder.create();
 
         File file = new File("plugins/PrivateMines/donottouch.json");
         try {
@@ -144,13 +144,7 @@ public class PrivateMines extends JavaPlugin {
             worldBorderUtils = new WorldBorderUtils();
         }
 
-        new CommandParser(getResource("commands.rdcml"))
-                .setArgTypes(
-                        ArgType.of("materials", Material.class),
-                        ArgType.of("mineType", mineTypeManager.getMineTypes()))
-                .parse()
-                .register("privatemines",
-                        new PrivateMinesCommand());
+        new CommandParser(getResource("commands.rdcml")).setArgTypes(ArgType.of("materials", Material.class), ArgType.of("mineType", mineTypeManager.getMineTypes())).parse().register("privatemines", new PrivateMinesCommand());
 
         if (Config.enableTax) {
             registerSellListener();
@@ -173,27 +167,13 @@ public class PrivateMines extends JavaPlugin {
             e.printStackTrace();
         }
 
-        configManager = ConfigManager.create(this)
-                .addConverter(Material.class, Material::valueOf, Material::toString)
-                .target(Config.class)
-                .saveDefaults()
-                .load();
+        configManager = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(Config.class).saveDefaults().load();
         //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
-        ConfigManager mineConfig = ConfigManager.create(this)
-                .addConverter(Material.class, Material::valueOf, Material::toString)
-                .target(MineConfig.class)
-                .saveDefaults()
-                .load();
+        ConfigManager mineConfig = ConfigManager.create(this).addConverter(Material.class, Material::valueOf, Material::toString).target(MineConfig.class).saveDefaults().load();
         //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
-        ConfigManager menuConfig = ConfigManager.create(this, "menus.yml")
-                .addConverter(Material.class, Material::valueOf, Material::toString)
-                .target(MenuConfig.class)
-                .load();
+        ConfigManager menuConfig = ConfigManager.create(this, "menus.yml").addConverter(Material.class, Material::valueOf, Material::toString).target(MenuConfig.class).load();
         //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
-        ConfigManager messagesConfig = ConfigManager.create(this, "messages.yml")
-                .target(MessagesConfig.class)
-                .saveDefaults()
-                .load();
+        ConfigManager messagesConfig = ConfigManager.create(this, "messages.yml").target(MessagesConfig.class).saveDefaults().load();
 
         this.adventure = BukkitAudiences.create(this);
         this.Y_LEVEL = Config.mineYLevel;
@@ -211,8 +191,16 @@ public class PrivateMines extends JavaPlugin {
             privateMines.getLogger().info("Loaded file: " + schematicFile);
         });
 
+        File dataFolder = new File(privateMines.getDataFolder(), "privatemines.db");
+        if (!dataFolder.exists()) {
+            dataFolder.mkdir();
+        }
+
         sqlite = new SQLite();
         this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
+        sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS privatemines (uuid STRING, json STRING);");
+
+//        sqlite.load();
 
 //        try (Connection connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("privatemines.db"))) {
 //            String insertSQL = "INSERT INTO privatemines (uuid, json) VALUES (?, ?)";
@@ -247,9 +235,12 @@ public class PrivateMines extends JavaPlugin {
 //                "`materials` TEXT" +
 //                ");");
 
-        Task.asyncDelayed(this::loadMines);
+        loadMines(true);
+//        Task.syncDelayed(this::loadMines);
         Task.syncDelayed(this::loadPregenMines);
 //            Task.asyncDelayed(this::loadAddons);
+
+        privateMines.getLogger().info("Converting mines......");
 
         PaperLib.suggestPaper(this);
 
@@ -315,9 +306,7 @@ public class PrivateMines extends JavaPlugin {
             getLogger().info(String.format("Disabled adventure for %s", getDescription().getName()));
         }
 
-        getLogger().info(String.format("%s v%s has successfully been Disabled",
-                getDescription().getName(),
-                getDescription().getVersion()));
+        getLogger().info(String.format("%s v%s has successfully been Disabled", getDescription().getName(), getDescription().getVersion()));
         saveMines();
         savePregenMines();
     }
@@ -339,7 +328,7 @@ public class PrivateMines extends JavaPlugin {
         return true;
     }
 
-    public void loadMines() {
+    public void loadMines(boolean convert) {
         final PathMatcher jsonMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
         Path path = getMinesDirectory();
         Map<Material, Double> customMaterials = new HashMap<>();
@@ -347,97 +336,131 @@ public class PrivateMines extends JavaPlugin {
             Material material;
         };
 
-        CompletableFuture.runAsync(() -> {
             try (Stream<Path> paths = Files.walk(path).filter(jsonMatcher::matches)) {
                 paths.forEach(streamPath -> {
                     File file = streamPath.toFile();
                     Mine mine = new Mine(privateMines);
 
-                    getLogger().info("Loading file " + file.getName() + "....");
-                    YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
+                    if (convert) {
+//                        getLogger().info("Converting file " + file.getName() + "....");
 
-                    UUID owner = UUID.fromString(Objects.requireNonNull(yml.getString("mineOwner")));
-                    String mineTypeName = yml.getString("mineType");
-                    MineType mineType = mineTypeManager.getMineType(mineTypeName);
-                    Location corner1 = LocationUtils.fromString(yml.getString("corner1"));
-                    Location corner2 = LocationUtils.fromString(yml.getString("corner2"));
-                    Location fullRegionMin = LocationUtils.fromString(yml.getString("fullRegionMin"));
-                    Location fullRegionMax = LocationUtils.fromString(yml.getString("fullRegionMax"));
-                    Location spawn = LocationUtils.fromString(yml.getString("spawn"));
-                    Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
-                    boolean isOpen = yml.getBoolean("isOpen");
-                    int maxPlayers = yml.getInt("maxPlayers");
-                    int maxMineSize = yml.getInt("maxMineSize");
+                        CompletableFuture.supplyAsync(() -> {
+                            // Run some computation
+                            getLogger().info("Converting file " + file.getName() + "....");
+                            YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
+                            getLogger().info("yml: " + yml);
 
-                    double tax = yml.getDouble("tax");
-                    String materialsString = yml.getString("materials");
 
-                    if (materialsString != null) {
-                        materialsString = materialsString.substring(1, materialsString.length() - 1);
-                        String[] pairs = materialsString.split(",");
+                            /**
+                             *             yml.set("mineOwner", owner.toString());
+                             *             yml.set("mineType", mineTypeName);
+                             *             yml.set("mineLocation", LocationUtils.toString(mineLocation));
+                             *             yml.set("corner1", LocationUtils.toString(corner1));
+                             *             yml.set("corner2", LocationUtils.toString(corner2));
+                             *             yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
+                             *             yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
+                             *             yml.set("spawn", LocationUtils.toString(spawn));
+                             *             yml.set("tax", tax);
+                             *             yml.set("isOpen", open);
+                             *             yml.set("maxPlayers", maxPlayers);
+                             *             yml.set("maxMineSize", maxMineSize);
+                             */
+                            Mine convertMine = new Mine(privateMines);
 
-                        Pattern materialRegex = Pattern.compile("[a-zA-Z]+_[a-zA-Z]+");
-                        Pattern singleMaterialRegex = Pattern.compile("[a-zA-Z]+");
-                        Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
+                            UUID owner = UUID.fromString(Objects.requireNonNull(yml.getString("mineOwner")));
+                            getLogger().info("owner " + owner);
 
-                        for (String string : pairs) {
-                            boolean containsUnderscore = string.contains("_");
-                            Matcher materialMatcher = materialRegex.matcher(string);
-                            Matcher singleMaterialMatcher = singleMaterialRegex.matcher(string);
-                            Matcher percentPatcher = percentRegex.matcher(string);
-                            if (containsUnderscore) {
-                                if (materialMatcher.find()) {
-                                    matString = materialMatcher.group();
-                                    ref.material = Material.valueOf(matString);
-                                }
-                            } else {
-                                if (singleMaterialMatcher.find()) {
-                                    matString = singleMaterialMatcher.group();
-                                    ref.material = Material.valueOf(matString);
-                                }
-                            }
+                            String mineTypeName = yml.getString("mineType");
+                            MineType mineType = mineTypeManager.getMineType(mineTypeName);
+                            Location corner1 = LocationUtils.fromString(yml.getString("corner1"));
+                            Location corner2 = LocationUtils.fromString(yml.getString("corner2"));
+                            Location fullRegionMin = LocationUtils.fromString(yml.getString("fullRegionMin"));
+                            Location fullRegionMax = LocationUtils.fromString(yml.getString("fullRegionMax"));
+                            Location spawn = LocationUtils.fromString(yml.getString("spawn"));
+                            Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
+                            boolean isOpen = yml.getBoolean("isOpen");
+                            double tax = yml.getDouble("tax");
 
-                            if (percentPatcher.find()) {
-                                percent = Double.parseDouble(percentPatcher.group());
-                            }
-                            customMaterials.put(ref.material, percent);
-                        }
+                            MineData mineData = new MineData(owner, corner1, corner2, fullRegionMin, fullRegionMax, mineLocation, spawn, mineType, isOpen, 0);
+                            convertMine.setMineData(mineData);
+                            getLogger().info("convertMine: " + convertMine);
 
-                        MineData mineData = new MineData(
-                                owner,
-                                corner1,
-                                corner2,
-                                fullRegionMin,
-                                fullRegionMax,
-                                mineLocation,
-                                spawn,
-                                mineType,
-                                isOpen,
-                                tax
-                        );
-
-                        if (!customMaterials.isEmpty()) {
-                            mineData.setMaterials(customMaterials);
-                        }
-                        mineData.setMaxMineSize(mineType.getMaxMineSize());
-                        mine.setMineData(mineData);
-                        mineStorage.addMine(owner, mine);
+//                            SQLHelper sqlHelper = privateMines.getSqlHelper();
+//                            Connection connection = sqlHelper.getConnection();
+//
+//                            getLogger().info("connection: " + connection);
+                            SQLUtils.insert(convertMine);
+//                            getLogger().info("convertMine: " + convertMine);
+                            return null;
+                        }).thenRun(() -> {
+                            getLogger().info("Converted " + file.getName() +  "!");
+                            // Computation Finished.
+                        });
                     } else {
-                        MineData mineData = new MineData(
-                                owner,
-                                corner1,
-                                corner2,
-                                fullRegionMin,
-                                fullRegionMax,
-                                mineLocation,
-                                spawn,
-                                mineType,
-                                isOpen,
-                                tax
-                        );
-                        mineData.setMaxMineSize(mineType.getMaxMineSize());
-                        mine.setMineData(mineData);
-                        mineStorage.addMine(owner, mine);
+                        getLogger().info("Loading file " + file.getName() + "....");
+                        YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
+
+                        UUID owner = UUID.fromString(Objects.requireNonNull(yml.getString("mineOwner")));
+                        String mineTypeName = yml.getString("mineType");
+                        MineType mineType = mineTypeManager.getMineType(mineTypeName);
+                        Location corner1 = LocationUtils.fromString(yml.getString("corner1"));
+                        Location corner2 = LocationUtils.fromString(yml.getString("corner2"));
+                        Location fullRegionMin = LocationUtils.fromString(yml.getString("fullRegionMin"));
+                        Location fullRegionMax = LocationUtils.fromString(yml.getString("fullRegionMax"));
+                        Location spawn = LocationUtils.fromString(yml.getString("spawn"));
+                        Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
+                        boolean isOpen = yml.getBoolean("isOpen");
+                        int maxPlayers = yml.getInt("maxPlayers");
+                        int maxMineSize = yml.getInt("maxMineSize");
+
+                        double tax = yml.getDouble("tax");
+                        String materialsString = yml.getString("materials");
+
+                        if (materialsString != null) {
+                            materialsString = materialsString.substring(1, materialsString.length() - 1);
+                            String[] pairs = materialsString.split(",");
+
+                            Pattern materialRegex = Pattern.compile("[a-zA-Z]+_[a-zA-Z]+");
+                            Pattern singleMaterialRegex = Pattern.compile("[a-zA-Z]+");
+                            Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
+
+                            for (String string : pairs) {
+                                boolean containsUnderscore = string.contains("_");
+                                Matcher materialMatcher = materialRegex.matcher(string);
+                                Matcher singleMaterialMatcher = singleMaterialRegex.matcher(string);
+                                Matcher percentPatcher = percentRegex.matcher(string);
+                                if (containsUnderscore) {
+                                    if (materialMatcher.find()) {
+                                        matString = materialMatcher.group();
+                                        ref.material = Material.valueOf(matString);
+                                    }
+                                } else {
+                                    if (singleMaterialMatcher.find()) {
+                                        matString = singleMaterialMatcher.group();
+                                        ref.material = Material.valueOf(matString);
+                                    }
+                                }
+
+                                if (percentPatcher.find()) {
+                                    percent = Double.parseDouble(percentPatcher.group());
+                                }
+                                customMaterials.put(ref.material, percent);
+                            }
+
+                            MineData mineData = new MineData(owner, corner1, corner2, fullRegionMin, fullRegionMax, mineLocation, spawn, mineType, isOpen, tax);
+
+                            if (!customMaterials.isEmpty()) {
+                                mineData.setMaterials(customMaterials);
+                            }
+                            mineData.setMaxMineSize(mineType.getMaxMineSize());
+                            mine.setMineData(mineData);
+                            mineStorage.addMine(owner, mine);
+                        } else {
+                            MineData mineData = new MineData(owner, corner1, corner2, fullRegionMin, fullRegionMax, mineLocation, spawn, mineType, isOpen, tax);
+                            mineData.setMaxMineSize(mineType.getMaxMineSize());
+                            mine.setMineData(mineData);
+                            mineStorage.addMine(owner, mine);
+                        }
                     }
 //                    mine.startResetTask();
 //                    mine.startPercentageTask();
@@ -445,7 +468,6 @@ public class PrivateMines extends JavaPlugin {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        });
     }
 
     public void loadPregenMines() {

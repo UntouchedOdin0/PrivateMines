@@ -27,7 +27,7 @@ public abstract class Database {
     public void initialize() {
         connection = getSQLConnection();
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + databaseName + " WHERE mineOwner = ?");
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + databaseName + " WHERE owner = ?");
             ResultSet resultSet = preparedStatement.executeQuery();
             close(preparedStatement, resultSet);
 

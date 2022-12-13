@@ -291,7 +291,7 @@ public class MineFactory {
                         privateMines.getMineStorage().addMine(uuid, mine);
                     }
 
-                    SQLUtils.insert(mine);
+//                    SQLUtils.insert(mine);
 
                     mine.resetIgnoreWallCheck();
                     mine.reset();
@@ -312,6 +312,7 @@ public class MineFactory {
                         player.teleport(spongeL);
                         Bukkit.getPluginManager().callEvent(privateMineCreationEvent);
                     });
+                    SQLUtils.insert(mine);
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }

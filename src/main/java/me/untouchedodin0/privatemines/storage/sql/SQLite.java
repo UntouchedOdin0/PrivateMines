@@ -59,7 +59,18 @@ public class SQLite extends Database {
         connection = getSQLConnection();
         try {
             Statement s = connection.createStatement();
-            s.executeUpdate("CREATE TABLE IF NOT EXISTS privatemines (`owner` TEXT, `data` TEXT);");
+            s.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS `privatemines` (
+                    `owner` TEXT NOT NULL,
+                    `mineType` TEXT,
+                    `corner1` TEXT,
+                    `corner2` TEXT,
+                    `fullMin` TEXT,
+                    `fullMax` TEXT,
+                    `spawn` TEXT,
+                    `open` BOOLEAN,
+                    );""");
+//            s.executeUpdate("CREATE TABLE IF NOT EXISTS privatemines (`owner` TEXT, `data` TEXT);");
 //            s.executeUpdate(SQLiteCreateTokensTable);
             s.close();
         } catch (SQLException e) {
