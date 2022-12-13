@@ -40,7 +40,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     compileOnly 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT'
-    compileOnly 'com.fastasyncworldedit:FastAsyncWorldEdit-Core:2.4.10'
+    compileOnly 'com.fastasyncworldedit:FastAsyncWorldEdit-Core:2.5.0'
     compileOnly 'com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit:2.4.8'
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.7'
     compileOnly 'com.grinderwolf:slimeworldmanager-api:2.7.0-SNAPSHOT'
@@ -62,7 +62,7 @@ dependencies {
     implementation 'io.papermc:paperlib:1.0.7'
     implementation 'org.bstats:bstats-bukkit:3.0.0'
     implementation 'net.kyori:adventure-text-minimessage:4.12.0'
-    implementation 'net.kyori:adventure-platform-bukkit:4.1.2'
+    implementation 'net.kyori:adventure-platform-bukkit:4.2.0'
     implementation 'com.google.code.gson:gson:2.10'
 
     implementation project(':WorldBorder')
