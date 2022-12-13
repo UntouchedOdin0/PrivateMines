@@ -54,53 +54,75 @@ public class SQLUtils {
         boolean isOpen = mineData.isOpen();
         double tax = mineData.getTax();
 
+
         privateMines.getLogger().info("insertting mine " + mine);
-        try {
-            PreparedStatement updateStatement = connection.prepareStatement(updateString);
 
-            updateStatement.setString(1, "uuid?");
-            updateStatement.setString(2, "minetype?");
-            updateStatement.setString(3, "corner1?");
-            updateStatement.setString(4, "corner2?");
-            updateStatement.setString(5, "fullmin");
-            updateStatement.setString(6, "fullmax");
-            updateStatement.setString(7, "spawn");
-            updateStatement.setBoolean(8, false);
-            updateStatement.setDouble(9, 5.0);
-            updateStatement.setString(10, "nothing");
-            privateMines.getLogger().info("" + updateStatement);
+        sqlHelper.executeUpdate("INSERT INTO privatemines owner=?, mineType=?, corner1=?, corner2=?, fullMin=?, fullMax=?, spawn=?, open=?;",
+                "uuid", "minetype", "corner1", "corner2", "fullMin", "fullMax", "spawn", false);
+        sqlHelper.commit();
+        privateMines.getLogger().info("" + sqlHelper);
 
-//            updateStatement.setString(1, uuidString);
-//            updateStatement.setString(2, mineTypeName);
-//            updateStatement.setString(3, corner1);
-//            updateStatement.setString(4, corner2);
-//            updateStatement.setString(5, fullMin);
-//            updateStatement.setString(6, fullMax);
-//            updateStatement.setString(7, spawn);
-//            updateStatement.setBoolean(8, isOpen);
-//            updateStatement.setDouble(9, tax);
-//            updateStatement.setString(10, "none");
 
-            updateStatement.executeUpdate();
-//            updateStatement.setString(2, json);
-
-//            updateStatement.setString(1, String.valueOf(mineData.getMineOwner()));
-//            updateStatement.setString(2, mineType.getName());
-//            updateStatement.setString(3, LocationUtils.toString(mineData.getMineLocation()));
-//            updateStatement.setString(4, LocationUtils.toString(mineData.getMinimumMining()));
-//            updateStatement.setString(5, LocationUtils.toString(mineData.getMaximumMining()));
-//            updateStatement.setString(6, LocationUtils.toString(mineData.getMinimumFullRegion()));
-//            updateStatement.setString(7, LocationUtils.toString(mineData.getMaximumFullRegion()));
-//            updateStatement.setString(8, LocationUtils.toString(mineData.getSpawnLocation()));
-//            updateStatement.setDouble(9, mineData.getTax());
-//            updateStatement.setBoolean(10, mineData.isOpen());
-//            updateStatement.setInt(11, mineData.getMaxPlayers());
-//            updateStatement.setInt(12, mineData.getMaxMineSize());
-//            updateStatement.setString(13, mineData.getMaterials().toString());
-
+//        try {
+//            PreparedStatement updateStatement = connection.prepareStatement(updateString);
+//
+//            /**
+//             *         sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
+//             *                 "`owner` TEXT NOT NULL," +
+//             *                 "`mineType` TEXT," +
+//             *                 "`corner1` TEXT," +
+//             *                 "`corner2` TEXT," +
+//             *                 "`fullMin` TEXT," +
+//             *                 "`fullMax` TEXT," +
+//             *                 "`spawn` TEXT," +
+//             *                 "`open` BOOLEAN);");
+//             */
+//
+////            updateStatement.setString(1, "uuid?");
+////            updateStatement.setString(2, "minetype?");
+////            updateStatement.setString(3, "corner1?");
+////            updateStatement.setString(4, "corner2?");
+////            updateStatement.setString(5, "fullmin");
+////            updateStatement.setString(6, "fullmax");
+////            updateStatement.setString(7, "spawn");
+////            updateStatement.setBoolean(8, false);
+//
+//            // INSERT INTO TABLE_NAME (column1, column2, column3,...columnN)
+//            //VALUES (value1, value2, value3,...valueN);
+//
+//
+//
+////            updateStatement.setString(1, uuidString);
+////            updateStatement.setString(2, mineTypeName);
+////            updateStatement.setString(3, corner1);
+////            updateStatement.setString(4, corner2);
+////            updateStatement.setString(5, fullMin);
+////            updateStatement.setString(6, fullMax);
+////            updateStatement.setString(7, spawn);
+////            updateStatement.setBoolean(8, isOpen);
+////            updateStatement.setDouble(9, tax);
+////            updateStatement.setString(10, "none");
+//
 //            updateStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+////            updateStatement.setString(2, json);
+//
+////            updateStatement.setString(1, String.valueOf(mineData.getMineOwner()));
+////            updateStatement.setString(2, mineType.getName());
+////            updateStatement.setString(3, LocationUtils.toString(mineData.getMineLocation()));
+////            updateStatement.setString(4, LocationUtils.toString(mineData.getMinimumMining()));
+////            updateStatement.setString(5, LocationUtils.toString(mineData.getMaximumMining()));
+////            updateStatement.setString(6, LocationUtils.toString(mineData.getMinimumFullRegion()));
+////            updateStatement.setString(7, LocationUtils.toString(mineData.getMaximumFullRegion()));
+////            updateStatement.setString(8, LocationUtils.toString(mineData.getSpawnLocation()));
+////            updateStatement.setDouble(9, mineData.getTax());
+////            updateStatement.setBoolean(10, mineData.isOpen());
+////            updateStatement.setInt(11, mineData.getMaxPlayers());
+////            updateStatement.setInt(12, mineData.getMaxMineSize());
+////            updateStatement.setString(13, mineData.getMaterials().toString());
+//
+////            updateStatement.executeUpdate();
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 }

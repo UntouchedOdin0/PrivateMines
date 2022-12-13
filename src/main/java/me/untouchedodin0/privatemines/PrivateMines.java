@@ -193,12 +193,25 @@ public class PrivateMines extends JavaPlugin {
 
         File dataFolder = new File(privateMines.getDataFolder(), "privatemines.db");
         if (!dataFolder.exists()) {
-            dataFolder.mkdir();
+            try {
+                dataFolder.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         sqlite = new SQLite();
         this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
-        sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS privatemines (uuid STRING, json STRING);");
+        sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
+                "`owner` TEXT NOT NULL," +
+                "`mineType` TEXT," +
+                "`corner1` TEXT," +
+                "`corner2` TEXT," +
+                "`fullMin` TEXT," +
+                "`fullMax` TEXT," +
+                "`spawn` TEXT," +
+                "`open` BOOLEAN);");
+
 
 //        sqlite.load();
 
@@ -240,7 +253,7 @@ public class PrivateMines extends JavaPlugin {
         Task.syncDelayed(this::loadPregenMines);
 //            Task.asyncDelayed(this::loadAddons);
 
-        privateMines.getLogger().info("Converting mines......");
+//        privateMines.getLogger().info("Converting mines......");
 
         PaperLib.suggestPaper(this);
 
