@@ -20,8 +20,8 @@ import java.util.UUID;
 
 public class SQLUtils {
 
-    public static String updateString = "INSERT INTO privatemines (owner, mineType, corner1, corner2, fullMin, fullMax, spawn, open, tax);" +
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    public static String updateString = "INSERT INTO privatemines (owner, mineType, corner1, corner2, fullMin, fullMax, spawn, open) " +
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
 //    public static String updateString = "INSERT INTO privatemines (owner, mineType, corner1, corner2, fullMin, fullMax, spawn, open, tax, materials);" +
 //            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
@@ -57,10 +57,39 @@ public class SQLUtils {
 
         privateMines.getLogger().info("insertting mine " + mine);
 
-        sqlHelper.executeUpdate("INSERT INTO privatemines owner=?, mineType=?, corner1=?, corner2=?, fullMin=?, fullMax=?, spawn=?, open=?;",
-                "uuid", "minetype", "corner1", "corner2", "fullMin", "fullMax", "spawn", false);
-        sqlHelper.commit();
-        privateMines.getLogger().info("" + sqlHelper);
+        try {
+            PreparedStatement updateStatement = connection.prepareStatement(updateString);
+
+            /**
+             *         sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
+             *                 "`owner` TEXT NOT NULL," +
+             *                 "`mineType` TEXT," +
+             *                 "`corner1` TEXT," +
+             *                 "`corner2` TEXT," +
+             *                 "`fullMin` TEXT," +
+             *                 "`fullMax` TEXT," +
+             *                 "`spawn` TEXT," +
+             *                 "`open` BOOLEAN);");
+             */
+
+            updateStatement.setString(1, "uuid?");
+            updateStatement.setString(2, "minetype?");
+            updateStatement.setString(3, "corner1?");
+            updateStatement.setString(4, "corner2?");
+            updateStatement.setString(5, "fullmin");
+            updateStatement.setString(6, "fullmax");
+            updateStatement.setString(7, "spawn");
+            updateStatement.setBoolean(8, true);
+
+            updateStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+//
+//        sqlHelper.executeUpdate("INSERT INTO privatemines (owner=?, mineType=?, corner1=?, corner2=?, fullMin=?, fullMax=?, spawn=?, open=?);",
+//                "uuid", "minetype", "corner1", "corner2", "fullMin", "fullMax", "spawn", false);
+//        sqlHelper.commit();
+//        privateMines.getLogger().info("" + sqlHelper);
 
 
 //        try {

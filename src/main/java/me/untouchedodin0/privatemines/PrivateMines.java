@@ -202,7 +202,7 @@ public class PrivateMines extends JavaPlugin {
 
         sqlite = new SQLite();
         this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
-        sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
+        sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS privatemines (" +
                 "`owner` TEXT NOT NULL," +
                 "`mineType` TEXT," +
                 "`corner1` TEXT," +
