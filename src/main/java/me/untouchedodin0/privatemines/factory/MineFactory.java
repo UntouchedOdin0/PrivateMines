@@ -84,7 +84,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MineFactory {
     PrivateMines privateMines = PrivateMines.getPrivateMines();
-    MineStorage mineStorage = privateMines.getMineStorage();
     EditSession editSession;
     Location quarryL;
 
@@ -168,8 +167,6 @@ public class MineFactory {
                     }
 
                     localSession.setClipboard(clipboardHolder);
-
-                    Bukkit.broadcastMessage("paste? " + paste);
 
                     if (paste) {
                         Operation operation = clipboardHolder.createPaste(editSession).to(vector).ignoreAirBlocks(true).build();
