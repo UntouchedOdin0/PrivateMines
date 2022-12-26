@@ -89,7 +89,7 @@ public class PrivateMinesCommand {
                     audienceUtils.sendMessage(player, MessagesConfig.playerAlreadyOwnsAMine);
                 }
             } else {
-                mineFactory.create(target.getPlayer(), location, Objects.requireNonNullElse(mineType, defaultMineType));
+                mineFactory.create(target.getPlayer(), location, Objects.requireNonNullElse(mineType, defaultMineType), true);
                 if (commandSender instanceof  Player player) {
                     audienceUtils.sendMessage(player, target, MessagesConfig.gavePlayerMine);
                 }
@@ -105,9 +105,8 @@ public class PrivateMinesCommand {
             }
         } else {
             Mine mine = mineStorage.get(target.getUniqueId());
-
             if (mine != null) {
-                mine.delete();
+                mine.delete(true);
                 if (commandSender instanceof Player player) {
                     audienceUtils.sendMessage(player, target, MessagesConfig.deletedPlayersMine);
                 }
@@ -117,6 +116,8 @@ public class PrivateMinesCommand {
 
     @CommandHook("reset")
     public void reset(Player player, OfflinePlayer target) {
+
+        Bukkit.broadcastMessage("minestorage " + mineStorage);
 
         if (target != null) {
             Player targetPlayer = target.getPlayer();

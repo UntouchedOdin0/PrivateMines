@@ -81,6 +81,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
 public class MineFactory {
     PrivateMines privateMines = PrivateMines.getPrivateMines();
     MineStorage mineStorage = privateMines.getMineStorage();
@@ -94,7 +95,7 @@ public class MineFactory {
      * @param location the location of the mine
      * @param mineType the type of mine to paste
      */
-    public void create(Player player, Location location, MineType mineType) {
+    public void create(Player player, Location location, MineType mineType, boolean paste) {
         Instant start = Instant.now();
         UUID uuid = player.getUniqueId();
         File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
@@ -160,7 +161,7 @@ public class MineFactory {
                     Location spongeL = new Location(location.getWorld(), vector.getBlockX(), vector.getBlockY(), vector.getBlockZ() + 1);
                     Location lrailsL = new Location(location.getWorld(), lrailsV.getBlockX(), lrailsV.getBlockY(), lrailsV.getBlockZ());
                     Location urailsL = new Location(location.getWorld(), urailsV.getBlockX(), urailsV.getBlockY(), urailsV.getBlockZ());
-                    Location spawnL  = spongeL.add(0.5, 0.5, 0.5);
+                    Location spawnL = spongeL.add(0.5, 0.5, 0.5);
 
                     if (quarryV != null) {
                         quarryL = new Location(location.getWorld(), quarryV.getBlockX(), quarryV.getBlockY(), quarryV.getBlockZ());
@@ -168,18 +169,20 @@ public class MineFactory {
 
                     localSession.setClipboard(clipboardHolder);
 
-                    Operation operation = clipboardHolder.createPaste(editSession).to(vector).ignoreAirBlocks(true).build();
+                    Bukkit.broadcastMessage("paste? " + paste);
 
-                    try {
-                        Operations.complete(operation);
-                        editSession.close();
-                    } catch (WorldEditException worldEditException) {
-                        if (worldEditException.getCause() instanceof UnsupportedVersionEditException) {
-                            privateMines.getLogger().warning("WorldEdit version " + WorldEdit.getVersion() + " is not supported," +
-                                    "if this issue persists, please try using FastAsyncWorldEdit.");
-                            return;
+                    if (paste) {
+                        Operation operation = clipboardHolder.createPaste(editSession).to(vector).ignoreAirBlocks(true).build();
+                        try {
+                            Operations.complete(operation);
+                            editSession.close();
+                        } catch (WorldEditException worldEditException) {
+                            if (worldEditException.getCause() instanceof UnsupportedVersionEditException) {
+                                privateMines.getLogger().warning("WorldEdit version " + WorldEdit.getVersion() + " is not supported," + "if this issue persists, please try using FastAsyncWorldEdit.");
+                                return;
+                            }
+                            worldEditException.printStackTrace();
                         }
-                        worldEditException.printStackTrace();
                     }
 
                     Region region = clipboard.getRegion();
@@ -255,26 +258,13 @@ public class MineFactory {
                             }
                         });
 
-                        MineData mineData = new MineData(
-                                uuid,
-                                urailsL,
-                                lrailsL,
-                                fullMin,
-                                fullMax,
-                                location,
-                                spawnL,
-                                mineType,
-                                shop
-                        );
+                        MineData mineData = new MineData(uuid, urailsL, lrailsL, fullMin, fullMax, location, spawnL, mineType, shop);
                         mineData.setMaxPlayers(maxPlayers);
                         mineData.setOpen(!Config.defaultClosed);
 
                         mine.setMineData(mineData);
-                        mineStorage.addMine(uuid, mine);
+                        mine.saveMineData(player, mineData);
 
-//                        mine.saveMineData(player, mineData);
-
-//                        SQLUtils.insert(mine);
                     } catch (IncompleteRegionException e) {
                         e.printStackTrace();
                     }
@@ -291,8 +281,6 @@ public class MineFactory {
                         privateMines.getMineStorage().addMine(uuid, mine);
                     }
 
-//                    SQLUtils.insert(mine);
-
                     mine.resetIgnoreWallCheck();
                     mine.reset();
                     TextComponent teleportMessage = new TextComponent(ChatColor.GREEN + "Click me to teleport to your mine!");
@@ -303,15 +291,12 @@ public class MineFactory {
                     Duration creationDuration = Duration.between(start, finished);
 
                     final long microseconds = TimeUnit.NANOSECONDS.toMillis(creationDuration.toNanos());
-                    privateMines.getLogger().info("Mine creation time: " + microseconds + " milliseconds");
                     Task.syncDelayed(() -> {
                         spongeL.getBlock().setType(Material.AIR, false);
-//                        if (quarryL != null) {
-//                            quarryL.getBlock().setType(Material.AIR, false);
-//                        }
                         player.teleport(spongeL);
                         Bukkit.getPluginManager().callEvent(privateMineCreationEvent);
                     });
+                    privateMines.getLogger().info("Mine creation time: " + microseconds + " milliseconds");
                     SQLUtils.insert(mine);
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
@@ -440,17 +425,7 @@ public class MineFactory {
                             }
                         });
 
-                        MineData mineData = new MineData(
-                                uuid,
-                                urailsL,
-                                lrailsL,
-                                fullMin,
-                                fullMax,
-                                location,
-                                spongeL,
-                                mineType,
-                                shop
-                        );
+                        MineData mineData = new MineData(uuid, urailsL, lrailsL, fullMin, fullMax, location, spongeL, mineType, shop);
 
                         mineData.setMaxPlayers(maxPlayers);
                         mine.setMineData(mineData);

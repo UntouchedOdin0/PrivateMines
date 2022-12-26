@@ -116,7 +116,7 @@ public class Mine {
         }
     }
 
-    public void delete() {
+    public void delete(boolean removeStructure) {
         UUID uuid = getMineData().getMineOwner();
         PrivateMineDeleteEvent privateMineDeleteEvent = new PrivateMineDeleteEvent(uuid, this);
         Bukkit.getPluginManager().callEvent(privateMineDeleteEvent);
@@ -142,21 +142,25 @@ public class Mine {
         Objects.requireNonNull(regionManager).removeRegion(fullRegionName);
 
         Instant start = Instant.now();
+
         final RandomPattern randomPattern = new RandomPattern();
         Pattern air = BukkitAdapter.adapt(Material.AIR.createBlockData());
         randomPattern.add(air, 1.0);
 
-        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
-            Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1BV3, corner2BV3);
-            editSession.setBlocks(region, randomPattern);
+        if (removeStructure) {
+            try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
+                Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1BV3, corner2BV3);
+                editSession.setBlocks(region, randomPattern);
+            }
+
+            Instant filled = Instant.now();
+            Duration durationToFill = Duration.between(start, filled);
+
+            long durationInMS = TimeUnit.NANOSECONDS.toMillis(durationToFill.toNanos());
+
+            privateMines.getLogger().info(String.format("It took %dms to reset the mine", durationInMS));
         }
 
-        Instant filled = Instant.now();
-        Duration durationToFill = Duration.between(start, filled);
-
-        long durationInMS = TimeUnit.NANOSECONDS.toMillis(durationToFill.toNanos());
-
-        privateMines.getLogger().info(String.format("It took %dms to reset the mine", durationInMS));
         privateMines.getMineStorage().removeMine(uuid);
         String fileName = String.format("/%s.yml", uuid);
         File minesDirectory = privateMines.getMinesDirectory().toFile();
@@ -224,8 +228,7 @@ public class Mine {
         Location location = mineData.getMinimumMining();
         BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
         BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
-        @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-        CuboidRegion fullRegion = new CuboidRegion(BukkitAdapter.adapt(location.getWorld()), corner1, corner2);
+        @SuppressWarnings("MismatchedQueryAndUpdateOfCollection") CuboidRegion fullRegion = new CuboidRegion(BukkitAdapter.adapt(location.getWorld()), corner1, corner2);
 
         Map<Material, Double> materials = mineType.getMaterials();
         Map<Material, Double> customMaterials = mineData.getMaterials();
@@ -253,37 +256,32 @@ public class Mine {
 
         //todo Move this code into the new teleportation method.
 
-            World world = location.getWorld();
-            Player player = Bukkit.getPlayer(mineData.getMineOwner());
-            if (player != null && player.isOnline()) {
-                boolean isPlayerInRegion = fullRegion.contains(player.getLocation().getBlockX(),
-                        player.getLocation().getBlockY(),
-                        player.getLocation().getBlockZ());
-                if (isPlayerInRegion) {
-                    teleport(player);
-                }
-            }
-
-            for (Player online : Bukkit.getOnlinePlayers()) {
-                boolean isPlayerInRegion = fullRegion.contains(
-                        online.getLocation().getBlockX(),
-                        online.getLocation().getBlockY(),
-                        online.getLocation().getBlockZ());
-                if (isPlayerInRegion) teleport(online);
-            }
-
-            try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
-                Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
-
-                if (Config.onlyReplaceAir) {
-                    if (BlockTypes.AIR != null) {
-                        editSession.replaceBlocks(region, Collections.singleton(BlockTypes.AIR.getDefaultState().toBaseBlock()), randomPattern);
-                    }
-                } else {
-                    editSession.setBlocks(region, randomPattern);
-                }
+        World world = location.getWorld();
+        Player player = Bukkit.getPlayer(mineData.getMineOwner());
+        if (player != null && player.isOnline()) {
+            boolean isPlayerInRegion = fullRegion.contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ());
+            if (isPlayerInRegion) {
+                teleport(player);
             }
         }
+
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            boolean isPlayerInRegion = fullRegion.contains(online.getLocation().getBlockX(), online.getLocation().getBlockY(), online.getLocation().getBlockZ());
+            if (isPlayerInRegion) teleport(online);
+        }
+
+        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
+            Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
+
+            if (Config.onlyReplaceAir) {
+                if (BlockTypes.AIR != null) {
+                    editSession.replaceBlocks(region, Collections.singleton(BlockTypes.AIR.getDefaultState().toBaseBlock()), randomPattern);
+                }
+            } else {
+                editSession.setBlocks(region, randomPattern);
+            }
+        }
+    }
 
     public void reset() {
         MineData mineData = getMineData();
@@ -327,19 +325,14 @@ public class Mine {
 
         Player player = Bukkit.getPlayer(mineData.getMineOwner());
         if (player != null && player.isOnline()) {
-            boolean isPlayerInRegion = region.contains(player.getLocation().getBlockX(),
-                    player.getLocation().getBlockY(),
-                    player.getLocation().getBlockZ());
+            boolean isPlayerInRegion = region.contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ());
             boolean inWorld = player.getWorld().equals(privateMinesWorld);
 
             if (isPlayerInRegion && inWorld) teleport(player);
         }
 
         for (Player online : Bukkit.getOnlinePlayers()) {
-            boolean isPlayerInRegion = region.contains(
-                    online.getLocation().getBlockX(),
-                    online.getLocation().getBlockY(),
-                    online.getLocation().getBlockZ());
+            boolean isPlayerInRegion = region.contains(online.getLocation().getBlockX(), online.getLocation().getBlockY(), online.getLocation().getBlockZ());
             boolean inWorld = online.getWorld().equals(privateMinesWorld);
 
             if (isPlayerInRegion && inWorld) teleport(online);
@@ -406,9 +399,7 @@ public class Mine {
             double percentage = getPercentage();
             MineType mineType = getMineData().getMineType();
             double resetPercentage = mineType.getResetPercentage();
-            redempt.redlib.region.CuboidRegion cuboidRegion =
-                    new redempt.redlib.region.CuboidRegion
-                    (mineData.getMinimumMining(), mineData.getMaximumMining());
+            redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(mineData.getMinimumMining(), mineData.getMaximumMining());
 
             if (percentage >= resetPercentage) {
 
@@ -675,6 +666,9 @@ public class Mine {
         MineType nextType = mineTypeManager.getNextMineType(currentType.getName());
         Economy economy = PrivateMines.getEconomy();
 
+        Bukkit.broadcastMessage("current type file " + currentType.getFile());
+        Bukkit.broadcastMessage("next type file: " + currentType.getFile());
+
         double upgradeCost = nextType.getUpgradeCost();
         PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this, currentType, nextType);
         Bukkit.getPluginManager().callEvent(privateMineUpgradeEvent);
@@ -687,22 +681,34 @@ public class Mine {
             } else {
                 if (upgradeCost == 0) {
                     Location mineLocation = mineData.getMineLocation();
-                    delete();
-                    mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
-                    Mine mine = mineStorage.get(mineOwner);
-                    if (mine != null) {
-                        mine.reset();
+                    if (Objects.equals(currentType.getFile(), nextType.getFile())) {
+                        delete(false);
+                        Bukkit.broadcastMessage("files matched, not deleting structure!");
+                        //todo make new mine here
+                    } else {
+                        delete(true);
+                        Bukkit.broadcastMessage("files didn't match, deleting structure!");
+                        mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
+                        Mine mine = mineStorage.get(mineOwner);
+                        if (mine != null) {
+                            mine.reset();
+                        }
                     }
                 } else {
                     double balance = economy.getBalance(player);
                     if (balance < upgradeCost) {
                         player.sendMessage(ChatColor.RED + "You don't have enough money to upgrade your mine!");
                     } else {
-                        Location mineLocation = mineData.getMineLocation();
-                        delete();
-                        mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType);
-
-                        economy.withdrawPlayer(player, upgradeCost);
+                        if (Objects.equals(currentType.getFile(), nextType.getFile())) {
+                            delete(false);
+                            Location mineLocation = mineData.getMineLocation();
+                            mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, false);
+                        } else {
+                            delete(true);
+                            Location mineLocation = mineData.getMineLocation();
+                            mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
+                            economy.withdrawPlayer(player, upgradeCost);
+                        }
                     }
                 }
             }

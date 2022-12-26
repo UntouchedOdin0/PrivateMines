@@ -57,7 +57,7 @@ public class PlayerJoinListener implements Listener {
 
             if (mineStorage.hasMine(player)) return;
 
-            mineFactory.create(player, location, defaultMineType);
+            mineFactory.create(player, location, defaultMineType, true);
         }
     }
 }
