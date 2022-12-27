@@ -22,7 +22,6 @@ package me.untouchedodin0.privatemines.utils.adapter;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,19 +32,21 @@ import java.nio.file.Paths;
  * Converts a path
  */
 public class PathAdapter extends TypeAdapter<Path> {
-    @Override
-    public void write(JsonWriter out, Path value) throws IOException {
-        final String stringPath = value.toUri().toString();
-        out.value(stringPath);
-    }
 
-    @Override
-    public Path read(JsonReader in) throws IOException {
-        final String uri = in.nextString();
-        try {
-            return Paths.get(new URI(uri));
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+  @Override
+  public void write(JsonWriter out, Path value) throws IOException {
+    final String stringPath = value.toUri().toString();
+    out.value(stringPath);
+  }
+
+  @Override
+  public Path read(JsonReader in) throws IOException {
+    final String uri = in.nextString();
+    try {
+      return Paths.get(new URI(uri));
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
     }
+  }
 }
+
