@@ -1,29 +1,32 @@
 package me.untouchedodin0.privatemines.utils.locale;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class LocaleManager {
 
-    public Map<File, LocaleObject> localeObjects = new HashMap<>();
-    public Map<UUID, LocaleObject> localeObjectMap = new HashMap<>();
-    public void putPlayerLocale(UUID uuid, LocaleObject localeObject) {
-        localeObjectMap.put(uuid, localeObject);
-    }
+  public Map<File, LocaleObject> localeObjects = new HashMap<>();
+  public Map<UUID, LocaleObject> localeObjectMap = new HashMap<>();
 
-    public void removePlayerLocale(UUID uuid) {
-        localeObjectMap.remove(uuid);
-    }
+  public void putPlayerLocale(UUID uuid, LocaleObject localeObject) {
+    localeObjectMap.put(uuid, localeObject);
+  }
 
-    public LocaleObject getPlayerLocale(UUID uuid) {
-        return localeObjectMap.get(uuid);
-    }
+  public void removePlayerLocale(UUID uuid) {
+    localeObjectMap.remove(uuid);
+  }
 
-    public void addLocaleObject(File file, LocaleObject localeObject) {
-        localeObjects.put(file, localeObject);
-    }
+  public LocaleObject getPlayerLocale(UUID uuid) {
+    return localeObjectMap.get(uuid);
+  }
 
-    public Map<File, LocaleObject> getLocaleObjects() {
-        return localeObjects;
-    }
+  public void addLocaleObject(File file, LocaleObject localeObject) {
+    localeObjects.put(file, localeObject);
+  }
+
+  public Map<File, LocaleObject> getLocaleObjects() {
+    return localeObjects;
+  }
 }
