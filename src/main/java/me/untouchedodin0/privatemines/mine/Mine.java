@@ -732,9 +732,6 @@ public class Mine {
     MineType nextType = mineTypeManager.getNextMineType(currentType.getName());
     Economy economy = PrivateMines.getEconomy();
 
-    Bukkit.broadcastMessage("current type file " + currentType.getFile());
-    Bukkit.broadcastMessage("next type file: " + currentType.getFile());
-
     double upgradeCost = nextType.getUpgradeCost();
     PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this,
         currentType, nextType);
