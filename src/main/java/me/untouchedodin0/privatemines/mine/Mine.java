@@ -44,7 +44,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -73,8 +72,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import redempt.redlib.itemutils.ItemBuilder;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
@@ -236,78 +233,6 @@ public class Mine {
 //        }
   }
 
-  @Deprecated
-  public void resetOld() {
-    MineData mineData = getMineData();
-    MineType mineType = mineData.getMineType();
-    Location location = mineData.getMinimumMining();
-    BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
-    BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection") CuboidRegion fullRegion = new CuboidRegion(
-        BukkitAdapter.adapt(location.getWorld()), corner1, corner2);
-
-    Map<Material, Double> materials = mineType.getMaterials();
-    Map<Material, Double> customMaterials = mineData.getMaterials();
-
-    final RandomPattern randomPattern = new RandomPattern();
-
-    PrivateMineResetEvent privateMineResetEvent = new PrivateMineResetEvent(mineData.getMineOwner(),
-        this);
-    Task.syncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineResetEvent));
-
-    if (privateMineResetEvent.isCancelled()) {
-      return;
-    }
-
-    if (!customMaterials.isEmpty()) {
-      customMaterials.forEach((material, chance) -> {
-        Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
-        randomPattern.add(pattern, chance);
-      });
-    } else {
-      if (materials != null && !materials.isEmpty()) {
-        materials.forEach((material, chance) -> {
-          Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
-          randomPattern.add(pattern, chance);
-        });
-      }
-    }
-
-    //todo Move this code into the new teleportation method.
-
-    World world = location.getWorld();
-    Player player = Bukkit.getPlayer(mineData.getMineOwner());
-    if (player != null && player.isOnline()) {
-      boolean isPlayerInRegion = fullRegion.contains(player.getLocation().getBlockX(),
-          player.getLocation().getBlockY(), player.getLocation().getBlockZ());
-      if (isPlayerInRegion) {
-        teleport(player);
-      }
-    }
-
-    for (Player online : Bukkit.getOnlinePlayers()) {
-      boolean isPlayerInRegion = fullRegion.contains(online.getLocation().getBlockX(),
-          online.getLocation().getBlockY(), online.getLocation().getBlockZ());
-      if (isPlayerInRegion) {
-        teleport(online);
-      }
-    }
-
-    try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
-        .world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
-      Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
-
-      if (Config.onlyReplaceAir) {
-        if (BlockTypes.AIR != null) {
-          editSession.replaceBlocks(region,
-              Collections.singleton(BlockTypes.AIR.getDefaultState().toBaseBlock()), randomPattern);
-        }
-      } else {
-        editSession.setBlocks(region, randomPattern);
-      }
-    }
-  }
-
   public void reset() {
     MineData mineData = getMineData();
     MineType mineType = mineData.getMineType();
@@ -336,8 +261,6 @@ public class Mine {
     } else {
       if (materials != null) {
         materials.forEach((material, chance) -> {
-          ItemStack itemStack = new ItemBuilder(Material.STONE).setCustomModelData(1);
-//                    Pattern pattern = BukkitAdapter.adapt(itemStack);
           Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
           randomPattern.add(pattern, chance);
         });
@@ -375,49 +298,6 @@ public class Mine {
     if (Config.addWallGap) {
       region.contract(ExpansionUtils.expansionVectors(Config.wallsGap));
     }
-    try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
-        .world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
-      editSession.setBlocks(region, randomPattern);
-      editSession.flushQueue();
-    }
-  }
-
-  public void resetIgnoreWallCheck() {
-    MineData mineData = getMineData();
-    MineType mineType = mineData.getMineType();
-    Location location = mineData.getMinimumMining();
-    BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
-    BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
-
-    Map<Material, Double> materials = mineType.getMaterials();
-    Map<Material, Double> mineBlocks = mineData.getMaterials();
-
-    final RandomPattern randomPattern = new RandomPattern();
-
-    PrivateMineResetEvent privateMineResetEvent = new PrivateMineResetEvent(mineData.getMineOwner(),
-        this);
-    Task.syncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineResetEvent));
-
-    if (privateMineResetEvent.isCancelled()) {
-      return;
-    }
-
-    if (!mineBlocks.isEmpty()) {
-      mineBlocks.forEach((material, chance) -> {
-        Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
-        randomPattern.add(pattern, chance);
-      });
-    } else {
-      if (materials != null) {
-        materials.forEach((material, chance) -> {
-          Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
-          randomPattern.add(pattern, chance);
-        });
-      }
-    }
-
-    World world = location.getWorld();
-    Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
     try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
         .world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
       editSession.setBlocks(region, randomPattern);
@@ -660,8 +540,6 @@ public class Mine {
     List<UUID> bannedPlayers = mineData.getBannedPlayers();
     List<UUID> friends = mineData.getFriends();
 
-//        bannedPlayers.add(UUID.randomUUID());
-
     Map<Material, Double> materials = mineData.getMaterials();
 
     if (!file.exists()) {
@@ -685,8 +563,6 @@ public class Mine {
       yml.set("isOpen", open);
       yml.set("maxPlayers", maxPlayers);
       yml.set("maxMineSize", maxMineSize);
-//            yml.set("bannedPlayers", bannedPlayers);
-//            yml.set("friends", friends);
 
       if (!materials.isEmpty()) {
         yml.set("materials", materials.toString());
@@ -748,8 +624,7 @@ public class Mine {
           Location mineLocation = mineData.getMineLocation();
           if (Objects.equals(currentType.getFile(), nextType.getFile())) {
             delete(false);
-            Bukkit.broadcastMessage("files matched, not deleting structure!");
-            //todo make new mine here
+            mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, false);
           } else {
             delete(true);
             Bukkit.broadcastMessage("files didn't match, deleting structure!");

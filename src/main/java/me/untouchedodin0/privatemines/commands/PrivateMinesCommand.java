@@ -103,9 +103,6 @@ public class PrivateMinesCommand {
 
   @CommandHook("reset")
   public void reset(Player player, OfflinePlayer target) {
-
-    Bukkit.broadcastMessage("minestorage " + mineStorage);
-
     if (target != null) {
       Player targetPlayer = target.getPlayer();
       if (!mineStorage.hasMine(Objects.requireNonNull(targetPlayer))) {

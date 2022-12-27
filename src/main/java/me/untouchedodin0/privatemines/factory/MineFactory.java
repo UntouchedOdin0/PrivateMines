@@ -304,7 +304,6 @@ public class MineFactory {
             privateMines.getMineStorage().addMine(uuid, mine);
           }
 
-          mine.resetIgnoreWallCheck();
           mine.reset();
           TextComponent teleportMessage = new TextComponent(
               ChatColor.GREEN + "Click me to teleport to your mine!");
