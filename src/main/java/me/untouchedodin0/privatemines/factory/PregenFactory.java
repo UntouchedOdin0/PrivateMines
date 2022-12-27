@@ -164,9 +164,9 @@ public class PregenFactory {
               editSession.close();
             } catch (WorldEditException worldEditException) {
               if (worldEditException.getCause() instanceof UnsupportedVersionEditException) {
-                privateMines.getLogger()
-                    .warning("WorldEdit version " + WorldEdit.getVersion() + " is not supported," +
-                        "if this issue persists, please try using FastAsyncWorldEdit.");
+                privateMines.getLogger().warning(
+                    "WorldEdit version " + WorldEdit.getVersion() + " is not supported,"
+                        + "if this issue persists, please try using FastAsyncWorldEdit.");
                 return;
               }
               worldEditException.printStackTrace();

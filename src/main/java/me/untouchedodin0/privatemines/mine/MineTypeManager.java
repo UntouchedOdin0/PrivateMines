@@ -56,9 +56,9 @@ public class MineTypeManager {
 
   public MineType getDefaultMineType() {
     if (mineTypes.isEmpty()) {
-      privateMines.getLogger().info("No default mine type was found!\n" +
-          "Create a mine type in the mineTypes section of the config.yml" +
-          "Please ask in the discord server if you need help");
+      privateMines.getLogger().info("No default mine type was found!\n"
+          + "Create a mine type in the mineTypes section of the config.yml"
+          + "Please ask in the discord server if you need help");
       throw new RuntimeException();
     }
     return mineTypes.firstEntry().getValue();
@@ -74,13 +74,11 @@ public class MineTypeManager {
 
   public MineType getNextMineType(MineType mineType) {
     return Optional.ofNullable(mineTypes.higherEntry(mineType.getName()))
-        .orElse(mineTypes.lastEntry())
-        .getValue();
+        .orElse(mineTypes.lastEntry()).getValue();
   }
 
   public MineType getNextMineType(String name) {
-    return Optional.ofNullable(mineTypes.higherEntry(name))
-        .orElse(mineTypes.lastEntry())
+    return Optional.ofNullable(mineTypes.higherEntry(name)).orElse(mineTypes.lastEntry())
         .getValue();
   }
 
