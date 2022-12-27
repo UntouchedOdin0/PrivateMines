@@ -76,9 +76,7 @@ class AudienceUtils {
             val audience = audiences.player(player)
             audience.sendMessage(parsed)
         } else {
-            val placeholderAPI = PlaceholderAPI.setPlaceholders(player, message
-                .replace("{target}", target.name!!)
-                .replace("{amount}", int.toString()))
+            val placeholderAPI = PlaceholderAPI.setPlaceholders(player, message.replace("{target}", target.name!!).replace("{amount}", int.toString()))
             player.sendMessage(placeholderAPI)
         }
     }

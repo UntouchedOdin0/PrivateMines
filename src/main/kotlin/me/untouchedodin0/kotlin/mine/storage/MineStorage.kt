@@ -18,15 +18,17 @@ class MineStorage {
 
     fun addMine(uuid: UUID, mine: Mine) = mines.computeIfAbsent(uuid) { mine }
 
-    fun removeMine(uuid: UUID) = mines.remove(uuid) ?: logger.warning("Player $uuid doesn't have a mine!!")
+    fun removeMine(uuid: UUID) = mines.remove(uuid)
+            ?: logger.warning("Player $uuid doesn't have a mine!")
 
     fun replaceMine(uuid: UUID, mine: Mine) {
-        mines.replace(uuid,mine).also {
+        mines.replace(uuid, mine).also {
             logger.info("Successfully replaced $uuid's mine!")
-        } ?: logger.warning("Player $uuid doesn't have a mine!!")
+        } ?: logger.warning("Player $uuid doesn't have a mine!")
     }
 
-    fun replaceMineNoLog(uuid: UUID, mine: Mine) = mines.replace(uuid,mine) ?: logger.warning("Player $uuid doesn't have a mine!!")
+    fun replaceMineNoLog(uuid: UUID, mine: Mine) = mines.replace(uuid, mine)
+            ?: logger.warning("Player $uuid doesn't have a mine!")
 
     fun hasMine(uuid: UUID): Boolean {
         return mines.containsKey(uuid)
@@ -45,7 +47,7 @@ class MineStorage {
     }
 
     val totalMines
-    get() = mines.size
+        get() = mines.size
 
     fun getClosest(player: Player, location: Location): Mine? {
         // Make a distances value and make an empty map for the distances

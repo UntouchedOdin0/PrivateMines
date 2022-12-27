@@ -37,13 +37,11 @@ class Menu {
                     val name = "${Bukkit.getOfflinePlayer(uuid).name}'s Mine"
                     val tax = mine.mineData.tax
 
-                    val itemButton = ItemButton.create(
-                        BuilderUtils().itemBuilder(Material.BEACON) {
-                            setName(name)
-                            addLore("${ChatColor.GRAY}Click to teleport")
-                            addLore("${ChatColor.GRAY}Tax $tax%")
-                        }
-                    ) { event: InventoryClickEvent? ->
+                    val itemButton = ItemButton.create(BuilderUtils().itemBuilder(Material.BEACON) {
+                        setName(name)
+                        addLore("${ChatColor.GRAY}Click to teleport")
+                        addLore("${ChatColor.GRAY}Tax $tax%")
+                    }) { event: InventoryClickEvent? ->
                         run {
                             event?.isCancelled = true
                             mine.teleport(player)
@@ -63,16 +61,14 @@ class Menu {
                 val loreColored = Utils.color(lore)
                 val action = it.value.action
 
-                val itemButton = ItemButton.create(
-                    ItemBuilder(material).setName(nameColored).addLore(loreColored)
-                ) { event: InventoryClickEvent? ->
+                val itemButton = ItemButton.create(ItemBuilder(material).setName(nameColored).addLore(loreColored)) { event: InventoryClickEvent? ->
                     run {
                         event?.isCancelled = true
                         ActionUtils.handleClick(player, action)
                     }
                 }
                 slot?.let {
-                    inventoryGUI.addButton(slot,itemButton)
+                    inventoryGUI.addButton(slot, itemButton)
                 }
             }
             inventoryGUI.open(player)
