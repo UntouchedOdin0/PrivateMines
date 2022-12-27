@@ -5,9 +5,9 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 
 public class MessageUtils {
 
-    private final static MiniMessage miniMessage = MiniMessage.miniMessage();
+  private final static MiniMessage miniMessage = MiniMessage.miniMessage();
 
-    public static Component deserialize(String string) {
-        return miniMessage.deserialize(string);
-    }
+  public static Component deserialize(String string) {
+    return miniMessage.deserialize(string);
+  }
 }

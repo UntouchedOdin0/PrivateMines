@@ -1,7 +1,11 @@
 package me.untouchedodin0.privatemines.utils;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -12,16 +16,11 @@ import org.bukkit.Location;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.sql.SQLHelper;
 
-import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.UUID;
-
 public class SQLUtils {
 
-    public static String updateString = "INSERT INTO privatemines (owner, mineType, corner1, corner2, fullMin, fullMax, spawn, open) " +
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+  public static String updateString =
+      "INSERT INTO privatemines (owner, mineType, corner1, corner2, fullMin, fullMax, spawn, open) "
+          + " VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
 //    public static String updateString = "INSERT INTO privatemines (owner, mineType, corner1, corner2, fullMin, fullMax, spawn, open, tax, materials);" +
 //            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
@@ -29,68 +28,66 @@ public class SQLUtils {
 //            "(mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials)" +
 //            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    public static void insert(Mine mine) {
-        PrivateMines privateMines = PrivateMines.getPrivateMines();
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
-        gsonBuilder.registerTypeAdapter(Path.class, new PathAdapter());
+  public static void insert(Mine mine) {
+    PrivateMines privateMines = PrivateMines.getPrivateMines();
+    GsonBuilder gsonBuilder = new GsonBuilder();
+    gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
+    gsonBuilder.registerTypeAdapter(Path.class, new PathAdapter());
 //        Gson gson = gsonBuilder.create();
 
-        SQLHelper sqlHelper = privateMines.getSqlHelper();
-        Connection connection = sqlHelper.getConnection();
-        privateMines.getLogger().info("connection " + connection);
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
+    Connection connection = sqlHelper.getConnection();
+    privateMines.getLogger().info("connection " + connection);
 
-        MineData mineData = mine.getMineData();
-        MineType mineType = mineData.getMineType();
+    MineData mineData = mine.getMineData();
+    MineType mineType = mineData.getMineType();
 
-        UUID uuid = mineData.getMineOwner();
-        String uuidString = String.valueOf(uuid);
-        String mineTypeName = mineType.getName();
-        String corner1 = LocationUtils.toString(mineData.getMinimumMining());
-        String corner2 = LocationUtils.toString(mineData.getMaximumMining());
-        String fullMin = LocationUtils.toString(mineData.getMinimumFullRegion());
-        String fullMax = LocationUtils.toString(mineData.getMaximumFullRegion());
-        String spawn = LocationUtils.toString(mine.getSpawnLocation());
-        boolean isOpen = mineData.isOpen();
-        double tax = mineData.getTax();
+    UUID uuid = mineData.getMineOwner();
+    String uuidString = String.valueOf(uuid);
+    String mineTypeName = mineType.getName();
+    String corner1 = LocationUtils.toString(mineData.getMinimumMining());
+    String corner2 = LocationUtils.toString(mineData.getMaximumMining());
+    String fullMin = LocationUtils.toString(mineData.getMinimumFullRegion());
+    String fullMax = LocationUtils.toString(mineData.getMaximumFullRegion());
+    String spawn = LocationUtils.toString(mine.getSpawnLocation());
+    boolean isOpen = mineData.isOpen();
+    double tax = mineData.getTax();
 
+    privateMines.getLogger().info("insertting mine " + mine);
 
-        privateMines.getLogger().info("insertting mine " + mine);
+    try {
+      PreparedStatement updateStatement = connection.prepareStatement(updateString);
 
-        try {
-            PreparedStatement updateStatement = connection.prepareStatement(updateString);
+      /**
+       *         sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
+       *                 "`owner` TEXT NOT NULL," +
+       *                 "`mineType` TEXT," +
+       *                 "`corner1` TEXT," +
+       *                 "`corner2` TEXT," +
+       *                 "`fullMin` TEXT," +
+       *                 "`fullMax` TEXT," +
+       *                 "`spawn` TEXT," +
+       *                 "`open` BOOLEAN);");
+       */
 
-            /**
-             *         sqlHelper.executeUpdate("CREATE TABLE IF NOT EXISTS `privatemines` (" +
-             *                 "`owner` TEXT NOT NULL," +
-             *                 "`mineType` TEXT," +
-             *                 "`corner1` TEXT," +
-             *                 "`corner2` TEXT," +
-             *                 "`fullMin` TEXT," +
-             *                 "`fullMax` TEXT," +
-             *                 "`spawn` TEXT," +
-             *                 "`open` BOOLEAN);");
-             */
+      updateStatement.setString(1, "uuid?");
+      updateStatement.setString(2, "minetype?");
+      updateStatement.setString(3, "corner1?");
+      updateStatement.setString(4, "corner2?");
+      updateStatement.setString(5, "fullmin");
+      updateStatement.setString(6, "fullmax");
+      updateStatement.setString(7, "spawn");
+      updateStatement.setBoolean(8, true);
 
-            updateStatement.setString(1, "uuid?");
-            updateStatement.setString(2, "minetype?");
-            updateStatement.setString(3, "corner1?");
-            updateStatement.setString(4, "corner2?");
-            updateStatement.setString(5, "fullmin");
-            updateStatement.setString(6, "fullmax");
-            updateStatement.setString(7, "spawn");
-            updateStatement.setBoolean(8, true);
-
-            updateStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+      updateStatement.executeUpdate();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
 //
 //        sqlHelper.executeUpdate("INSERT INTO privatemines (owner=?, mineType=?, corner1=?, corner2=?, fullMin=?, fullMax=?, spawn=?, open=?);",
 //                "uuid", "minetype", "corner1", "corner2", "fullMin", "fullMax", "spawn", false);
 //        sqlHelper.commit();
 //        privateMines.getLogger().info("" + sqlHelper);
-
 
 //        try {
 //            PreparedStatement updateStatement = connection.prepareStatement(updateString);
@@ -153,5 +150,5 @@ public class SQLUtils {
 //        } catch (SQLException e) {
 //            throw new RuntimeException(e);
 //        }
-    }
+  }
 }
