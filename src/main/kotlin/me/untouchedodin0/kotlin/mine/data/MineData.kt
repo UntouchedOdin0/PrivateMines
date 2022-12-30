@@ -7,16 +7,16 @@ import org.bukkit.Material
 import java.util.*
 
 data class MineData(
-        val mineOwner: UUID,
-        var maximumMining: Location,
-        var minimumMining: Location,
-        var minimumFullRegion: Location,
-        var maximumFullRegion: Location,
-        val mineLocation: Location,
-        var spawnLocation: Location,
-        val mineType: MineType,
-        var isOpen: Boolean = false,
-        var tax: Double = 5.0,
+    val mineOwner: UUID,
+    var maximumMining: Location,
+    var minimumMining: Location,
+    var minimumFullRegion: Location,
+    var maximumFullRegion: Location,
+    val mineLocation: Location,
+    var spawnLocation: Location,
+    val mineType: MineType,
+    var isOpen: Boolean = false,
+    var tax: Double = 5.0,
 ) {
     var shop: Shop? = null
 
@@ -27,16 +27,25 @@ data class MineData(
     var maxMineSize: Int = 0
 
     constructor(
-            mineOwner: UUID,
-            maximumMining: Location,
-            minimumMining: Location,
-            minimumFullRegion: Location,
-            maximumFullRegion: Location,
-            spawnLocation: Location,
-            mineLocation: Location,
-            mineType: MineType,
-            shop: Shop,
-    ) : this(mineOwner, maximumMining, minimumMining, minimumFullRegion, maximumFullRegion, mineLocation, spawnLocation, mineType) {
+        mineOwner: UUID,
+        maximumMining: Location,
+        minimumMining: Location,
+        minimumFullRegion: Location,
+        maximumFullRegion: Location,
+        spawnLocation: Location,
+        mineLocation: Location,
+        mineType: MineType,
+        shop: Shop,
+    ) : this(
+        mineOwner,
+        maximumMining,
+        minimumMining,
+        minimumFullRegion,
+        maximumFullRegion,
+        mineLocation,
+        spawnLocation,
+        mineType
+    ) {
         this.shop = shop
     }
 }

@@ -24,9 +24,10 @@ object ProtectionUtils {
     }
 
     fun getMine(location: Location?): ProtectedRegion {
-        return getProtectedRegion(location).regions.stream().filter { protectedRegion: ProtectedRegion ->
-            protectedRegion.id.startsWith("mine-")
-        }.findFirst().orElseThrow()
+        return getProtectedRegion(location).regions.stream()
+            .filter { protectedRegion: ProtectedRegion ->
+                protectedRegion.id.startsWith("mine-")
+            }.findFirst().orElseThrow()
     }
 
     fun isMine(protectedRegion: ProtectedRegion): Boolean {

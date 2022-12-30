@@ -61,7 +61,9 @@ class Menu {
                 val loreColored = Utils.color(lore)
                 val action = it.value.action
 
-                val itemButton = ItemButton.create(ItemBuilder(material).setName(nameColored).addLore(loreColored)) { event: InventoryClickEvent? ->
+                val itemButton = ItemButton.create(
+                    ItemBuilder(material).setName(nameColored).addLore(loreColored)
+                ) { event: InventoryClickEvent? ->
                     run {
                         event?.isCancelled = true
                         ActionUtils.handleClick(player, action)

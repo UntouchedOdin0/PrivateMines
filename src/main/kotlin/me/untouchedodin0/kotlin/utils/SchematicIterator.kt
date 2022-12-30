@@ -77,17 +77,27 @@ class SchematicIterator {
         }
 
         val mineBlocks
-            get() = MineBlocks(spawn?.let { posAt(it.x, it.y, it.z) }, npc?.let { posAt(it.x, it.y, it.z) }, quarry?.let { posAt(it.x, it.y, it.z) }, Corners(
+            get() = MineBlocks(
+                spawn?.let { posAt(it.x, it.y, it.z) },
+                npc?.let { posAt(it.x, it.y, it.z) },
+                quarry?.let { posAt(it.x, it.y, it.z) },
+                Corners(
                     corner1?.let { posAt(it.x, it.y, it.z) },
                     corner2?.let { posAt(it.x, it.y, it.z) },
-            ))
+                )
+            )
 
         private fun posAt(x: Int, y: Int, z: Int): BlockVector3 {
             return BlockVector3.at(x, y, z)
         }
     }
 
-    class MineBlocks(var spawnLocation: BlockVector3? = null, var npcLocation: BlockVector3? = null, var quarryLocation: BlockVector3? = null, var corners: Corners? = null)
+    class MineBlocks(
+        var spawnLocation: BlockVector3? = null,
+        var npcLocation: BlockVector3? = null,
+        var quarryLocation: BlockVector3? = null,
+        var corners: Corners? = null
+    )
 
     class Corners(val corner1: BlockVector3?, val corner2: BlockVector3?)
 }

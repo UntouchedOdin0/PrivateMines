@@ -18,8 +18,8 @@ class MineStorage {
 
     fun addMine(uuid: UUID, mine: Mine) = mines.computeIfAbsent(uuid) { mine }
 
-    fun removeMine(uuid: UUID) = mines.remove(uuid)
-            ?: logger.warning("Player $uuid doesn't have a mine!")
+    fun removeMine(uuid: UUID) =
+        mines.remove(uuid) ?: logger.warning("Player $uuid doesn't have a mine!")
 
     fun replaceMine(uuid: UUID, mine: Mine) {
         mines.replace(uuid, mine).also {
@@ -27,8 +27,8 @@ class MineStorage {
         } ?: logger.warning("Player $uuid doesn't have a mine!")
     }
 
-    fun replaceMineNoLog(uuid: UUID, mine: Mine) = mines.replace(uuid, mine)
-            ?: logger.warning("Player $uuid doesn't have a mine!")
+    fun replaceMineNoLog(uuid: UUID, mine: Mine) =
+        mines.replace(uuid, mine) ?: logger.warning("Player $uuid doesn't have a mine!")
 
     fun hasMine(uuid: UUID): Boolean {
         return mines.containsKey(uuid)
