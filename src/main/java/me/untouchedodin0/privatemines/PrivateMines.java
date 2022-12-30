@@ -357,8 +357,11 @@ public class PrivateMines extends JavaPlugin {
             customMaterials.put(ref.material, percent);
           }
 
-          MineData mineData = new MineData(owner, corner1, corner2, fullRegionMin, fullRegionMax,
-              mineLocation, spawn, mineType, isOpen, tax);
+          MineData mineData = null;
+          if (owner != null) {
+            mineData = new MineData(owner, corner1, corner2, fullRegionMin, fullRegionMax,
+                mineLocation, spawn, mineType, isOpen, tax);
+          }
 
           if (!customMaterials.isEmpty()) {
             mineData.setMaterials(customMaterials);
@@ -367,8 +370,11 @@ public class PrivateMines extends JavaPlugin {
           mine.setMineData(mineData);
           mineStorage.addMine(owner, mine);
         } else {
-          MineData mineData = new MineData(owner, corner1, corner2, fullRegionMin, fullRegionMax,
-              mineLocation, spawn, mineType, isOpen, tax);
+          MineData mineData = null;
+          if (owner != null) {
+            mineData = new MineData(owner, corner1, corner2, fullRegionMin, fullRegionMax,
+                mineLocation, spawn, mineType, isOpen, tax);
+          }
           mineData.setMaxMineSize(mineType.getMaxMineSize());
           mine.setMineData(mineData);
           mineStorage.addMine(owner, mine);
@@ -425,7 +431,6 @@ public class PrivateMines extends JavaPlugin {
       Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
       if (player != null) {
         mine.saveMineData(player, mine.getMineData());
-//                SQLUtils.insert(mine);
       }
     });
   }
@@ -514,8 +519,6 @@ public class PrivateMines extends JavaPlugin {
       InventoryGUI inventoryGUI = new InventoryGUI(Utils.getInventorySize(Utils.rowsToSlots(1)),
           menu.getName());
 
-      getLogger().info("inventoryGUI: " + inventoryGUI);
-
       menu.getItems().forEach((s1, menuItem) -> {
         getLogger().info("s1: " + s1);
         getLogger().info("menu item name: " + menuItem.getItemName());
@@ -525,7 +528,6 @@ public class PrivateMines extends JavaPlugin {
         getLogger().info("menu item action: " + menuItem.getAction());
       });
     });
-//        saveResource("menus.yml", false);
   }
 
   public SchematicStorage getSchematicStorage() {
