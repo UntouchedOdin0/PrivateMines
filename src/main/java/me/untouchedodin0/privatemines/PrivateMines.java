@@ -588,7 +588,7 @@ public class PrivateMines extends JavaPlugin {
   }
 
   private void registerListeners() {
-    getServer().getPluginManager().registerEvents(new MaxPlayersListener(), this);
+//    getServer().getPluginManager().registerEvents(new MaxPlayersListener(), this);
     getServer().getPluginManager().registerEvents(new MineResetListener(), this);
   }
 
