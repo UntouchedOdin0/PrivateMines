@@ -242,6 +242,7 @@ public class PrivateMines extends JavaPlugin {
 //    loadMines(false);
     Task.syncDelayed(this::loadPregenMines);
 //            Task.asyncDelayed(this::loadAddons);
+    getLogger().info("mine types: " + mineTypeManager.getMineTypes());
 
     PaperLib.suggestPaper(this);
 

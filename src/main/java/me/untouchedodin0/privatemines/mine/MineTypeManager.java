@@ -43,20 +43,20 @@ public class MineTypeManager {
     }
     if (mineType != null) {
       privateMines.getLogger().info("Registering mine type: " + mineType.getName());
-      mineTypes.put(mineType.getName(), mineType);
+      mineTypeTreeMap.put(mineType.getName(), mineType);
     }
   }
 
   public MineType getMineType(MineType name) {
-    return mineTypes.get(name.getName());
+    return mineTypeTreeMap.get(name.getName());
   }
 
   public MineType getMineType(String string) {
-    return mineTypes.get(string);
+    return mineTypeTreeMap.get(string);
   }
 
   public MineType getDefaultMineType() {
-    if (mineTypes.isEmpty()) {
+    if (mineTypeTreeMap.isEmpty()) {
       privateMines.getLogger().info("No default mine type was found!\n"
           + "Create a mine type in the mineTypes section of the config.yml"
           + "Please ask in the discord server if you need help");
@@ -83,8 +83,8 @@ public class MineTypeManager {
         .orElse(mineTypeTreeMap.lastEntry()).getValue();
   }
 
-  public LinkedHashMap<String, MineType> getMineTypes() {
-    return mineTypes;
+  public TreeMap<String, MineType> getMineTypes() {
+    return mineTypeTreeMap;
   }
 
   public int getTotalMineTypes() {
