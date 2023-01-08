@@ -211,6 +211,7 @@ public class PrivateMines extends JavaPlugin {
 
     MineConfig.getMineTypes().forEach((s, mineType) -> mineTypeManager.registerMineType(mineType));
     MineConfig.mineTypes.forEach((name, mineType) -> {
+      getLogger().info("loading mine type " + mineType.getName());
       File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
       if (!schematicFile.exists()) {
         getLogger().info("File doesn't exist!");
@@ -237,7 +238,8 @@ public class PrivateMines extends JavaPlugin {
             + "`corner1` TEXT," + "`corner2` TEXT," + "`fullMin` TEXT," + "`fullMax` TEXT,"
             + "`spawn` TEXT," + "`open` BOOLEAN);");
 
-    loadMines(false);
+    Task.syncDelayed(() -> loadMines(false));
+//    loadMines(false);
     Task.syncDelayed(this::loadPregenMines);
 //            Task.asyncDelayed(this::loadAddons);
 
@@ -397,9 +399,13 @@ public class PrivateMines extends JavaPlugin {
             mineData = new MineData(owner, corner1, corner2, fullRegionMin, fullRegionMax,
                 mineLocation, spawn, mineType, isOpen, tax);
           }
-          mineData.setMaxMineSize(mineType.getMaxMineSize());
+          if (mineData != null) {
+            mineData.setMaxMineSize(mineType.getMaxMineSize());
+          }
           mine.setMineData(mineData);
+          getLogger().info("mine type load log: " + mineData.getMineType());
           mineStorage.addMine(owner, mine);
+          getLogger().info("Loaded file " + file.getName() + "!");
         }
       });
     } catch (IOException e) {
