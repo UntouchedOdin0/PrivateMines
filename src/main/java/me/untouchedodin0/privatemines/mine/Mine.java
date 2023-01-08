@@ -602,6 +602,7 @@ public class Mine {
     MineStorage mineStorage = privateMines.getMineStorage();
 
     MineData mineData = getMineData();
+    Location mineLocation = mineData.getMineLocation();
     UUID mineOwner = mineData.getMineOwner();
     Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
     MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
@@ -621,7 +622,6 @@ public class Mine {
             .info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
       } else {
         if (upgradeCost == 0) {
-          Location mineLocation = mineData.getMineLocation();
           if (Objects.equals(currentType.getFile(), nextType.getFile())) {
             delete(false);
             mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, false);
@@ -641,11 +641,9 @@ public class Mine {
           } else {
             if (Objects.equals(currentType.getFile(), nextType.getFile())) {
               delete(false);
-              Location mineLocation = mineData.getMineLocation();
               mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, false);
             } else {
               delete(true);
-              Location mineLocation = mineData.getMineLocation();
               mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
               economy.withdrawPlayer(player, upgradeCost);
             }
