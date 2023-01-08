@@ -34,8 +34,8 @@ import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -211,7 +211,6 @@ public class PrivateMines extends JavaPlugin {
 
     MineConfig.getMineTypes().forEach((s, mineType) -> mineTypeManager.registerMineType(mineType));
     MineConfig.mineTypes.forEach((name, mineType) -> {
-      getLogger().info("loading mine type " + mineType.getName());
       File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
       if (!schematicFile.exists()) {
         getLogger().info("File doesn't exist!");
@@ -238,11 +237,15 @@ public class PrivateMines extends JavaPlugin {
             + "`corner1` TEXT," + "`corner2` TEXT," + "`fullMin` TEXT," + "`fullMax` TEXT,"
             + "`spawn` TEXT," + "`open` BOOLEAN);");
 
-    Task.syncDelayed(() -> loadMines(false));
+    loadMines(false);
+//    Task.syncDelayed(() -> loadMines(false));
 //    loadMines(false);
     Task.syncDelayed(this::loadPregenMines);
 //            Task.asyncDelayed(this::loadAddons);
-    getLogger().info("mine types: " + mineTypeManager.getMineTypes());
+    AtomicInteger type = new AtomicInteger();
+    mineTypeManager.getMineTypes().forEach((s, mineType) -> {
+      getLogger().info(String.format("Type %s %d", mineType.getName(), type.getAndIncrement()));
+    });
 
     PaperLib.suggestPaper(this);
 
@@ -337,6 +340,7 @@ public class PrivateMines extends JavaPlugin {
           owner = UUID.fromString(ownerString);
         }
         String mineTypeName = yml.getString("mineType");
+
         MineType mineType = mineTypeManager.getMineType(mineTypeName);
         Location corner1 = LocationUtils.fromString(yml.getString("corner1"));
         Location corner2 = LocationUtils.fromString(yml.getString("corner2"));
@@ -389,20 +393,16 @@ public class PrivateMines extends JavaPlugin {
           }
 
           if (!customMaterials.isEmpty()) {
-            mineData.setMaterials(customMaterials);
+            if (mineData != null) {
+              mineData.setMaterials(customMaterials);
+            }
           }
-          mineData.setMaxMineSize(mineType.getMaxMineSize());
+//          mineData.setMaxMineSize(mineType.getMaxMineSize());
           mine.setMineData(mineData);
-          mineStorage.addMine(owner, mine);
+          mineStorage.addMine(Objects.requireNonNull(owner), mine);
         } else {
-          MineData mineData = null;
-          if (owner != null) {
-            mineData = new MineData(owner, corner1, corner2, fullRegionMin, fullRegionMax,
-                mineLocation, spawn, mineType, isOpen, tax);
-          }
-          if (mineData != null) {
-            mineData.setMaxMineSize(mineType.getMaxMineSize());
-          }
+          MineData mineData = new MineData(Objects.requireNonNull(owner), corner1, corner2, fullRegionMin, fullRegionMax,
+              mineLocation, spawn, mineType, isOpen, tax);
           mine.setMineData(mineData);
           getLogger().info("mine type load log: " + mineData.getMineType());
           mineStorage.addMine(owner, mine);

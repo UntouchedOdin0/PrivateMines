@@ -322,7 +322,6 @@ public class MineFactory {
             Bukkit.getPluginManager().callEvent(privateMineCreationEvent);
           });
           privateMines.getLogger().info("Mine creation time: " + microseconds + " milliseconds");
-          SQLUtils.insert(mine);
         } catch (IOException ioException) {
           ioException.printStackTrace();
         }

@@ -52,7 +52,7 @@ public class MineTypeManager {
   }
 
   public MineType getMineType(String string) {
-    return mineTypeTreeMap.get(string);
+    return mineTypes.get(string);
   }
 
   public MineType getDefaultMineType() {
