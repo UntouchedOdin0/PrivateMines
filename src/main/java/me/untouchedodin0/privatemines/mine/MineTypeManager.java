@@ -21,7 +21,7 @@
 
 package me.untouchedodin0.privatemines.mine;
 
-import java.util.NavigableMap;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.TreeMap;
 import me.untouchedodin0.kotlin.mine.type.MineType;
@@ -29,7 +29,8 @@ import me.untouchedodin0.privatemines.PrivateMines;
 
 public class MineTypeManager {
 
-  private final NavigableMap<String, MineType> mineTypes = new TreeMap<>();
+  private final LinkedHashMap<String, MineType> mineTypes = new LinkedHashMap<>();
+  private final TreeMap<String, MineType> mineTypeTreeMap = new TreeMap<>(mineTypes);
   private final PrivateMines privateMines;
 
   public MineTypeManager(PrivateMines privateMines) {
@@ -61,7 +62,7 @@ public class MineTypeManager {
           + "Please ask in the discord server if you need help");
       throw new RuntimeException();
     }
-    return mineTypes.firstEntry().getValue();
+    return mineTypeTreeMap.firstEntry().getValue();
   }
 
   public void clear() {
@@ -69,20 +70,20 @@ public class MineTypeManager {
   }
 
   public boolean isLastMineType(MineType mineType) {
-    return mineTypes.lastEntry().getValue().equals(mineType);
+    return mineTypeTreeMap.lastEntry().getValue().equals(mineType);
   }
 
   public MineType getNextMineType(MineType mineType) {
-    return Optional.ofNullable(mineTypes.higherEntry(mineType.getName()))
-        .orElse(mineTypes.lastEntry()).getValue();
+    return Optional.ofNullable(mineTypeTreeMap.higherEntry(mineType.getName()))
+        .orElse(mineTypeTreeMap.lastEntry()).getValue();
   }
 
   public MineType getNextMineType(String name) {
-    return Optional.ofNullable(mineTypes.higherEntry(name)).orElse(mineTypes.lastEntry())
-        .getValue();
+    return Optional.ofNullable(mineTypeTreeMap.higherEntry(name))
+        .orElse(mineTypeTreeMap.lastEntry()).getValue();
   }
 
-  public NavigableMap<String, MineType> getMineTypes() {
+  public LinkedHashMap<String, MineType> getMineTypes() {
     return mineTypes;
   }
 
