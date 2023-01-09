@@ -611,31 +611,37 @@ public class Mine {
     MineType nextType = mineTypeManager.getNextMineType(currentType.getName());
     Economy economy = PrivateMines.getEconomy();
     double upgradeCost = nextType.getUpgradeCost();
-    PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this, currentType, nextType);
+    PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this,
+        currentType, nextType);
     Bukkit.getPluginManager().callEvent(privateMineUpgradeEvent);
-    if (privateMineUpgradeEvent.isCancelled())
+    if (privateMineUpgradeEvent.isCancelled()) {
       return;
-    if (player != null)
+    }
+    if (player != null) {
       if (currentType == nextType) {
-        this.privateMines.getLogger().info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
+        this.privateMines.getLogger()
+            .info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
       } else if (upgradeCost == 0.0D) {
         Location mineLocation = mineData.getMineLocation();
         delete(true);
         mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
         Mine mine = mineStorage.get(mineOwner);
-        if (mine != null)
+        if (mine != null) {
           mine.reset();
+        }
       } else {
         double balance = economy.getBalance(player);
         if (balance < upgradeCost) {
-          player.sendMessage("" + ChatColor.RED + "You don't have enough money to upgrade your mine!");
+          player.sendMessage(
+              "" + ChatColor.RED + "You don't have enough money to upgrade your mine!");
         } else {
           Location mineLocation = mineData.getMineLocation();
           delete(true);
           mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
-          economy.withdrawPlayer((OfflinePlayer)player, upgradeCost);
+          economy.withdrawPlayer((OfflinePlayer) player, upgradeCost);
         }
       }
+    }
   }
 
 //  public void upgrade(Location location) {

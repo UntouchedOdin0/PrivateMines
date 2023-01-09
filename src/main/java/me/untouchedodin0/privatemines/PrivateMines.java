@@ -239,7 +239,6 @@ public class PrivateMines extends JavaPlugin {
             + "`spawn` TEXT," + "`open` BOOLEAN);");
 
     Task.syncDelayed(() -> loadMines(false));
-//    loadMines(false);
     Task.syncDelayed(this::loadPregenMines);
 //            Task.asyncDelayed(this::loadAddons);
     getLogger().info("mine types: " + mineTypeManager.getMineTypes());
