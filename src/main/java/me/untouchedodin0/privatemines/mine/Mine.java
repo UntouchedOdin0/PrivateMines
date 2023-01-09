@@ -69,6 +69,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -239,6 +240,9 @@ public class Mine {
     Location location = mineData.getMinimumMining();
     BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
     BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
+
+    Bukkit.broadcastMessage("min mining " + LocationUtils.toString(mineData.getMinimumMining()));
+    Bukkit.broadcastMessage("max mining " + LocationUtils.toString(mineData.getMaximumMining()));
 
     Map<Material, Double> materials = mineType.getMaterials();
     Map<Material, Double> mineBlocks = mineData.getMaterials();
@@ -597,61 +601,101 @@ public class Mine {
   }
 
   public void upgrade() {
-    MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
-    MineFactory mineFactory = privateMines.getMineFactory();
-    MineStorage mineStorage = privateMines.getMineStorage();
-
+    MineTypeManager mineTypeManager = this.privateMines.getMineTypeManager();
+    MineFactory mineFactory = this.privateMines.getMineFactory();
+    MineStorage mineStorage = this.privateMines.getMineStorage();
     MineData mineData = getMineData();
-    Location mineLocation = mineData.getMineLocation();
     UUID mineOwner = mineData.getMineOwner();
     Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
     MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
     MineType nextType = mineTypeManager.getNextMineType(currentType.getName());
     Economy economy = PrivateMines.getEconomy();
-
     double upgradeCost = nextType.getUpgradeCost();
-    PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this,
-        currentType, nextType);
+    PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this, currentType, nextType);
     Bukkit.getPluginManager().callEvent(privateMineUpgradeEvent);
-    if (privateMineUpgradeEvent.isCancelled()) {
+    if (privateMineUpgradeEvent.isCancelled())
       return;
-    }
-    if (player != null) {
+    if (player != null)
       if (currentType == nextType) {
-        privateMines.getLogger()
-            .info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
+        this.privateMines.getLogger().info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
+      } else if (upgradeCost == 0.0D) {
+        Location mineLocation = mineData.getMineLocation();
+        delete(true);
+        mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
+        Mine mine = mineStorage.get(mineOwner);
+        if (mine != null)
+          mine.reset();
       } else {
-        if (upgradeCost == 0) {
-          if (Objects.equals(currentType.getFile(), nextType.getFile())) {
-            delete(false);
-            mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, false);
-          } else {
-            delete(true);
-            Bukkit.broadcastMessage("files didn't match, deleting structure!");
-            mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
-            Mine mine = mineStorage.get(mineOwner);
-            if (mine != null) {
-              mine.reset();
-            }
-          }
+        double balance = economy.getBalance(player);
+        if (balance < upgradeCost) {
+          player.sendMessage("" + ChatColor.RED + "You don't have enough money to upgrade your mine!");
         } else {
-          double balance = economy.getBalance(player);
-          if (balance < upgradeCost) {
-            player.sendMessage(ChatColor.RED + "You don't have enough money to upgrade your mine!");
-          } else {
-            if (Objects.equals(currentType.getFile(), nextType.getFile())) {
-              delete(false);
-              mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, false);
-            } else {
-              delete(true);
-              mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
-              economy.withdrawPlayer(player, upgradeCost);
-            }
-          }
+          Location mineLocation = mineData.getMineLocation();
+          delete(true);
+          mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
+          economy.withdrawPlayer((OfflinePlayer)player, upgradeCost);
         }
       }
-    }
   }
+
+//  public void upgrade(Location location) {
+//    MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
+//    MineFactory mineFactory = privateMines.getMineFactory();
+//    MineStorage mineStorage = privateMines.getMineStorage();
+//
+//    MineData mineData = getMineData();
+//    UUID mineOwner = mineData.getMineOwner();
+//    Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
+//    MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
+//    MineType nextType = mineTypeManager.getNextMineType(currentType.getName());
+//    Economy economy = PrivateMines.getEconomy();
+//
+//    double upgradeCost = nextType.getUpgradeCost();
+//    PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this,
+//        currentType, nextType);
+//    Bukkit.getPluginManager().callEvent(privateMineUpgradeEvent);
+//    if (privateMineUpgradeEvent.isCancelled()) {
+//      return;
+//    }
+//    if (player != null) {
+//      if (currentType == nextType) {
+//        privateMines.getLogger()
+//            .info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
+//      } else {
+//        if (upgradeCost == 0) {
+//          Location mineLocation = mineData.getMineLocation();
+//          if (Objects.equals(currentType.getFile(), nextType.getFile())) {
+//            delete(false);
+//            mineFactory.create(Objects.requireNonNull(player), location, nextType, false);
+//          } else {
+//            delete(true);
+//            Bukkit.broadcastMessage("files didn't match, deleting structure!");
+//            mineFactory.create(Objects.requireNonNull(player), location, nextType, true);
+//            Mine mine = mineStorage.get(mineOwner);
+//            if (mine != null) {
+//              mine.reset();
+//            }
+//          }
+//        } else {
+//          double balance = economy.getBalance(player);
+//          if (balance < upgradeCost) {
+//            player.sendMessage(ChatColor.RED + "You don't have enough money to upgrade your mine!");
+//          } else {
+//            if (Objects.equals(currentType.getFile(), nextType.getFile())) {
+//              delete(false);
+//              Location mineLocation = mineData.getMineLocation();
+//              mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, false);
+//            } else {
+//              delete(true);
+//              Location mineLocation = mineData.getMineLocation();
+//              mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
+//              economy.withdrawPlayer(player, upgradeCost);
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
 
   public void createWorldGuardRegions() {
 

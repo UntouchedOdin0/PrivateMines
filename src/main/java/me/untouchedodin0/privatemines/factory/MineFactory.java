@@ -123,6 +123,8 @@ public class MineFactory {
     ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
     BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(),
         location.getBlockZ());
+    Bukkit.broadcastMessage("vector: " + vector);
+
     SchematicStorage storage = privateMines.getSchematicStorage();
     SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
 
@@ -283,6 +285,7 @@ public class MineFactory {
             mineData.setMaxPlayers(maxPlayers);
             mineData.setOpen(!Config.defaultClosed);
 
+//            mine.setLocation(vector.subtract(0, 0, 1));
             mine.setMineData(mineData);
             mine.saveMineData(player, mineData);
 
@@ -473,6 +476,8 @@ public class MineFactory {
                 spongeL, mineType, shop);
 
             mineData.setMaxPlayers(maxPlayers);
+            mine.setLocation(vector);
+//            mine.setLocation(BukkitAdapter.asBlockVector(location));
             mine.setMineData(mineData);
             mine.saveMineData(player, mineData);
           } catch (IncompleteRegionException e) {

@@ -24,6 +24,7 @@
 
 package me.untouchedodin0.privatemines.commands;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -66,6 +67,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.misc.ChatPrompt;
+import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
 
@@ -156,6 +158,10 @@ public class PrivateMinesCommand {
     } else {
       Mine mine = mineStorage.get(player);
       if (mine != null) {
+        MineData mineData = mine.getMineData();
+        Bukkit.broadcastMessage("mine loc " + mine.getLocation());
+        Bukkit.broadcastMessage("mindata loc " + mineData.getMineLocation());
+
         mine.upgrade();
         audienceUtils.sendMessage(player, MessagesConfig.mineUpgraded);
       }
