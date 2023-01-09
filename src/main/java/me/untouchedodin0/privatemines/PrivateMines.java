@@ -34,7 +34,6 @@ import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.UUID;
@@ -166,7 +165,7 @@ public class PrivateMines extends JavaPlugin {
 
     new CommandParser(getResource("commands.rdcml")).setArgTypes(
             ArgType.of("materials", Material.class),
-            ArgType.of("mineType", mineTypeManager.getMineTypes())).parse()
+            ArgType.of("mineType", mineTypeManager.getTypes())).parse()
         .register("privatemines", new PrivateMinesCommand());
 
     if (Config.enableTax) {
@@ -211,7 +210,6 @@ public class PrivateMines extends JavaPlugin {
 
     MineConfig.getMineTypes().forEach((s, mineType) -> mineTypeManager.registerMineType(mineType));
     MineConfig.mineTypes.forEach((name, mineType) -> {
-      getLogger().info("loading mine type " + mineType.getName());
       File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
       if (!schematicFile.exists()) {
         getLogger().info("File doesn't exist!");
@@ -219,7 +217,7 @@ public class PrivateMines extends JavaPlugin {
       }
       SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
       schematicStorage.addSchematic(schematicFile, mineBlocks);
-      privateMines.getLogger().info("Loaded file: " + schematicFile);
+//      privateMines.getLogger().info("Loaded file: " + schematicFile);
     });
 
     File dataFolder = new File(privateMines.getDataFolder(), "privatemines.db");
@@ -241,7 +239,18 @@ public class PrivateMines extends JavaPlugin {
     Task.syncDelayed(() -> loadMines(false));
     Task.syncDelayed(this::loadPregenMines);
 //            Task.asyncDelayed(this::loadAddons);
-    getLogger().info("mine types: " + mineTypeManager.getMineTypes());
+
+    AtomicInteger atomicInteger = new AtomicInteger(1);
+    mineTypeManager.getTypes().forEach((s, mineType) -> {
+      getLogger().info("type: " + mineType.getName());
+      getLogger().info("next type " + mineTypeManager.getNextType(mineType));
+    });
+//    mineTypeManager.getMineTypes().forEach((s, mineType) -> {
+//      getLogger().info("found type " + mineType.getName());
+//    });
+//    mineTypeManager.getMineTypes().forEach((s, mineType) -> {
+//      getLogger().info(String.format("#%d %s", atomicInteger.getAndIncrement(), mineType.getName()));
+//    });
 
     PaperLib.suggestPaper(this);
 

@@ -42,27 +42,29 @@ public class MineTypeManager {
       privateMines.getLogger().info("MineType was null!");
     }
     if (mineType != null) {
-      privateMines.getLogger().info("Registering mine type: " + mineType.getName());
-      mineTypeTreeMap.put(mineType.getName(), mineType);
+      privateMines.getLogger().info("name: " + mineType.getName());
+//      privateMines.getLogger().info("Registering mine type: " + mineType.getName());
+      mineTypes.put(mineType.getName(), mineType);
+//      mineTypeTreeMap.put(mineType.getName(), mineType);
     }
   }
 
   public MineType getMineType(MineType name) {
-    return mineTypeTreeMap.get(name.getName());
+    return mineTypes.get(name.getName());
   }
 
   public MineType getMineType(String string) {
-    return mineTypeTreeMap.get(string);
+    return mineTypes.get(string);
   }
 
   public MineType getDefaultMineType() {
-    if (mineTypeTreeMap.isEmpty()) {
+    if (mineTypes.isEmpty()) {
       privateMines.getLogger().info("No default mine type was found!\n"
           + "Create a mine type in the mineTypes section of the config.yml"
           + "Please ask in the discord server if you need help");
       throw new RuntimeException();
     }
-    return mineTypeTreeMap.firstEntry().getValue();
+    return mineTypes.entrySet().stream().findFirst().get().getValue();
   }
 
   public void clear() {
@@ -73,19 +75,34 @@ public class MineTypeManager {
     return mineTypeTreeMap.lastEntry().getValue().equals(mineType);
   }
 
-  public MineType getNextMineType(MineType mineType) {
-    return Optional.ofNullable(mineTypeTreeMap.higherEntry(mineType.getName()))
-        .orElse(mineTypeTreeMap.lastEntry()).getValue();
+  public MineType getNextType(MineType mineType) {
+    TreeMap<String, MineType> mineTypeTreeMap = new TreeMap<>(mineTypes);
+    if (mineTypeTreeMap.lastEntry().getValue().equals(mineType)) return mineType;
+    return mineTypeTreeMap.higherEntry(mineType.getName()).getValue();
   }
 
-  public MineType getNextMineType(String name) {
-    return Optional.ofNullable(mineTypeTreeMap.higherEntry(name))
-        .orElse(mineTypeTreeMap.lastEntry()).getValue();
+//  public MineType getNextMineType(MineType mineType) {
+//    for (Entry<String, MineType> stringMineTypeEntry : mineTypes.entrySet()) {
+//      return stringMineTypeEntry.getValue();
+//    }
+
+//    return Optional.ofNullable(mineTypeTreeMap.higherEntry(mineType.getName()))
+//        .orElse(mineTypeTreeMap.lastEntry()).getValue();
+
+
+//  public MineType getNextMineType(String name) {
+//    return Optional.ofNullable(mineTypeTreeMap.higherEntry(name))
+//        .orElse(mineTypeTreeMap.lastEntry()).getValue();
+//  }
+
+//  public TreeMap<String, MineType> getMineTypes() {
+//    return mineTypeTreeMap;
+//  }
+
+  public LinkedHashMap<String, MineType> getTypes() {
+    return mineTypes;
   }
 
-  public TreeMap<String, MineType> getMineTypes() {
-    return mineTypeTreeMap;
-  }
 
   public int getTotalMineTypes() {
     return mineTypes.size();

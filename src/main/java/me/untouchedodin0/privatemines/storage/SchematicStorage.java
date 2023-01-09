@@ -34,8 +34,8 @@ public class SchematicStorage {
 
   public void addSchematic(File file, MineBlocks mineBlocks) {
     if (mineBlocksMap.containsKey(file)) {
-      PrivateMines.getPrivateMines().getLogger()
-          .info(String.format("File %s was already stored in the map!", file.getName()));
+//      PrivateMines.getPrivateMines().getLogger()
+//          .info(String.format("File %s was already stored in the map!", file.getName()));
     } else {
       mineBlocksMap.put(file, mineBlocks);
     }
