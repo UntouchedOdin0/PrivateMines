@@ -21,9 +21,12 @@
 
 package me.untouchedodin0.privatemines.mine;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 
@@ -90,6 +93,11 @@ public class MineTypeManager {
 
   public boolean isLastMineType(MineType mineType) {
     return mineType.equals(getLast(mineTypes));
+  }
+
+  public MineType getNextType(MineType mineType) {
+    TreeMap<String, MineType> treeMap = new TreeMap<>(mineTypes);
+    return treeMap.higherEntry(mineType.getName()).getValue();
   }
 
 //  public MineType getNextType(MineType mineType) {

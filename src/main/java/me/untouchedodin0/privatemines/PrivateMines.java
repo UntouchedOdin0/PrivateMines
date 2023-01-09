@@ -168,6 +168,13 @@ public class PrivateMines extends JavaPlugin {
 //            ArgType.of("mineType", mineTypeManager.getTypes())).parse()
 //        .register("privatemines", new PrivateMinesCommand());
 
+    new CommandParser(getResource("commands.rdcml")).setArgTypes(
+            ArgType.of("materials", Material.class),
+            ArgType.of("mineType", mineTypeManager.getMineTypes())
+            )
+        .parse()
+        .register("privatemines", new PrivateMinesCommand());
+
     if (Config.enableTax) {
       registerSellListener();
     }
@@ -243,15 +250,9 @@ public class PrivateMines extends JavaPlugin {
     AtomicInteger atomicInteger = new AtomicInteger(1);
 
     mineTypeManager.getMineTypes().forEach((s, mineType) -> {
-          MineType last = mineTypeManager.getLast(mineTypeManager.getMineTypes());
-          getLogger().info(String.format("Is %s last? %b", mineType.getName(), mineType.equals(last)));
+      MineType last = mineTypeManager.getLast(mineTypeManager.getMineTypes());
+      getLogger().info(String.format("Is %s last? %b", mineType.getName(), mineType.equals(last)));
     });
-//    mineTypeManager.getTypes().forEach((s, mineType) -> {
-//      getLogger().info("type: " + mineType.getName());
-//      getLogger().info("next type " + mineTypeManager.getNextType(mineType).getName());
-//    });
-//
-
 
 //    mineTypeManager.getTypes().forEach((s, mineType) -> {
 //      MineType next = mineTypeManager.getNextType(mineType);
