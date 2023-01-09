@@ -159,9 +159,6 @@ public class PrivateMinesCommand {
       Mine mine = mineStorage.get(player);
       if (mine != null) {
         MineData mineData = mine.getMineData();
-        Bukkit.broadcastMessage("mine loc " + mine.getLocation());
-        Bukkit.broadcastMessage("mindata loc " + mineData.getMineLocation());
-
         mine.upgrade();
         audienceUtils.sendMessage(player, MessagesConfig.mineUpgraded);
       }

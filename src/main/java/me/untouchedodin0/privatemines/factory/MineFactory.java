@@ -123,7 +123,6 @@ public class MineFactory {
     ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
     BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(),
         location.getBlockZ());
-    Bukkit.broadcastMessage("vector: " + vector);
 
     SchematicStorage storage = privateMines.getSchematicStorage();
     SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
