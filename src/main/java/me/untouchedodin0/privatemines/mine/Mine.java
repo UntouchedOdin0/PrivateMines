@@ -608,7 +608,7 @@ public class Mine {
     UUID mineOwner = mineData.getMineOwner();
     Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
     MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
-    MineType nextType = mineTypeManager.getNextType(currentType);
+    MineType nextType = currentType; //mineTypeManager.getNextType(currentType);
     Economy economy = PrivateMines.getEconomy();
     double upgradeCost = nextType.getUpgradeCost();
     PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this,

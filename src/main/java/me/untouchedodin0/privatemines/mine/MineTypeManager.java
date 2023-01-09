@@ -22,6 +22,7 @@
 package me.untouchedodin0.privatemines.mine;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.TreeMap;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -29,9 +30,7 @@ import me.untouchedodin0.privatemines.PrivateMines;
 public class MineTypeManager {
 
   private final LinkedHashMap<String, MineType> mineTypes = new LinkedHashMap<>();
-
-  private final TreeMap<String, MineType> mineTypeTreeMap = new TreeMap<>(mineTypes);
-
+//  private final TreeMap<String, MineType> mineTypeTreeMap = new TreeMap<>();
   private final PrivateMines privateMines;
 
   public MineTypeManager(PrivateMines privateMines) {
@@ -43,17 +42,20 @@ public class MineTypeManager {
       privateMines.getLogger().info("MineType was null!");
     }
     if (mineType != null) {
-      privateMines.getLogger().info("name: " + mineType.getName());
+//      privateMines.getLogger().info("name: " + mineType.getName());
+//      mineTypes.put(mineType.getName(), mineType);
       mineTypes.put(mineType.getName(), mineType);
     }
   }
 
   public MineType getMineType(MineType name) {
     return mineTypes.get(name.getName());
+//    return mineTypes.get(name.getName());
   }
 
   public MineType getMineType(String string) {
     return mineTypes.get(string);
+//    return mineTypes.get(string);
   }
 
   public MineType getDefaultMineType() {
@@ -69,21 +71,47 @@ public class MineTypeManager {
     mineTypes.clear();
   }
 
-  public boolean isLastMineType(MineType mineType) {
-    return mineTypeTreeMap.lastEntry().getValue().equals(mineType);
-  }
+  public MineType getLast(LinkedHashMap<String, MineType> lhm)
+  {
+    MineType last;
+    int count = 1;
 
-  public MineType getNextType(MineType mineType) {
-//    TreeMap<String, MineType> mineTypeTreeMap = new TreeMap<>(mineTypes);
-    if (mineTypeTreeMap.lastEntry().getValue().equals(mineType)) {
-      return mineType;
+    for (Map.Entry<String, MineType> it :
+        lhm.entrySet()) {
+
+      if (count == lhm.size()) {
+        last = it.getValue();
+        return last;
+      }
+      count++;
     }
-    return mineTypeTreeMap.higherEntry(mineType.getName()).getValue();
+    return null;
   }
 
-  public LinkedHashMap<String, MineType> getTypes() {
+  public boolean isLastMineType(MineType mineType) {
+    return mineType.equals(getLast(mineTypes));
+  }
+
+//  public MineType getNextType(MineType mineType) {
+//    return mineTypeTreeMap.higherEntry(mineType.getName()).getValue();
+//  }
+//    if (mineTypeTreeMap.lastEntry().getValue().equals(mineType)) {
+//      return mineType;
+//    }
+//    return mineTypeTreeMap.higherEntry(mineType.getName()).getValue();
+//  }
+
+  public LinkedHashMap<String, MineType> getMineTypes() {
     return mineTypes;
   }
+
+//  public TreeMap<String, MineType> getTypes() {
+//    return mineTypeTreeMap;
+//  }
+
+//  public LinkedHashMap<String, MineType> getTypes() {
+//    return mineTypes;
+//  }
 
   public int getTotalMineTypes() {
     return mineTypes.size();
