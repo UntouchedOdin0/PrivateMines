@@ -241,10 +241,20 @@ public class PrivateMines extends JavaPlugin {
 //            Task.asyncDelayed(this::loadAddons);
 
     AtomicInteger atomicInteger = new AtomicInteger(1);
+
     mineTypeManager.getTypes().forEach((s, mineType) -> {
       getLogger().info("type: " + mineType.getName());
-      getLogger().info("next type " + mineTypeManager.getNextType(mineType));
+      getLogger().info("next type " + mineTypeManager.getNextType(mineType).getName());
     });
+
+//    mineTypeManager.getTypes().forEach((s, mineType) -> {
+//      MineType next = mineTypeManager.getNextType(mineType);
+//      getLogger().info(String.format("Current %s - Next %s", mineType.getName(), next.getName()));
+//    });
+//    mineTypeManager.getTypes().forEach((s, mineType) -> {
+//      getLogger().info("type: " + mineType.getName());
+//      getLogger().info("next type " + mineTypeManager.getNextType(mineType));
+//    });
 //    mineTypeManager.getMineTypes().forEach((s, mineType) -> {
 //      getLogger().info("found type " + mineType.getName());
 //    });
