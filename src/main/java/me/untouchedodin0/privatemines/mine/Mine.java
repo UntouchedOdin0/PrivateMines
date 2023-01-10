@@ -241,9 +241,6 @@ public class Mine {
     BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
     BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
 
-    Bukkit.broadcastMessage("min mining " + LocationUtils.toString(mineData.getMinimumMining()));
-    Bukkit.broadcastMessage("max mining " + LocationUtils.toString(mineData.getMaximumMining()));
-
     Map<Material, Double> materials = mineType.getMaterials();
     Map<Material, Double> mineBlocks = mineData.getMaterials();
 
@@ -638,7 +635,7 @@ public class Mine {
           Location mineLocation = mineData.getMineLocation();
           delete(true);
           mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
-          economy.withdrawPlayer((OfflinePlayer) player, upgradeCost);
+          economy.withdrawPlayer(player, upgradeCost);
         }
       }
     }
