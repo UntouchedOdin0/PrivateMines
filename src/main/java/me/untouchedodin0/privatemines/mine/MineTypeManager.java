@@ -21,7 +21,6 @@
 
 package me.untouchedodin0.privatemines.mine;
 
-import com.google.gson.internal.LinkedTreeMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,7 +30,6 @@ import me.untouchedodin0.privatemines.PrivateMines;
 public class MineTypeManager {
 
   private final LinkedHashMap<String, MineType> mineTypes = new LinkedHashMap<>();
-  LinkedTreeMap<String, MineType> linkedTreeMap = new LinkedTreeMap<>();
   private final PrivateMines privateMines;
 
   public MineTypeManager(PrivateMines privateMines) {
