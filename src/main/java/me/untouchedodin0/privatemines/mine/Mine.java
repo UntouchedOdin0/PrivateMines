@@ -224,14 +224,6 @@ public class Mine {
     privateMines.getLogger()
         .info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
     privateMines.getMineStorage().removeMine(uuid);
-    String fileName = String.format("/%s.yml", uuid);
-    File minesDirectory = privateMines.getMinesDirectory().toFile();
-    File file = new File(minesDirectory + fileName);
-//        try {
-//            Files.delete(file.toPath());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
   }
 
   public void reset() {
@@ -413,7 +405,6 @@ public class Mine {
     final World world = privateMines.getMineWorldManager().getMinesWorld();
     boolean canExpand = canExpand(1);
     Map<String, Boolean> flags = mineData.getMineType().getFlags();
-    final MineType mineType = getMineData().getMineType();
 
     if (!canExpand) {
       privateMines.getLogger().info("Failed to expand the mine due to the mine being too large");
@@ -428,7 +419,6 @@ public class Mine {
           BukkitAdapter.asBlockVector(max));
       final Region walls = new CuboidRegion(BukkitAdapter.asBlockVector(min),
           BukkitAdapter.asBlockVector(max));
-      final var maxMineSize = mineType.getMaxMineSize();
 
       if (fillType == null || wallType == null) {
         return;
@@ -593,10 +583,6 @@ public class Mine {
     }
   }
 
-  public void saveMineData(UUID uuid, MineData mineData) {
-    saveMineData(Objects.requireNonNull(Bukkit.getOfflinePlayer(uuid).getPlayer()), mineData);
-  }
-
   public void upgrade() {
     MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
     MineFactory mineFactory = privateMines.getMineFactory();
@@ -642,65 +628,6 @@ public class Mine {
     }
   }
 
-//  public void upgrade(Location location) {
-//    MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
-//    MineFactory mineFactory = privateMines.getMineFactory();
-//    MineStorage mineStorage = privateMines.getMineStorage();
-//
-//    MineData mineData = getMineData();
-//    UUID mineOwner = mineData.getMineOwner();
-//    Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
-//    MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
-//    MineType nextType = mineTypeManager.getNextMineType(currentType.getName());
-//    Economy economy = PrivateMines.getEconomy();
-//
-//    double upgradeCost = nextType.getUpgradeCost();
-//    PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this,
-//        currentType, nextType);
-//    Bukkit.getPluginManager().callEvent(privateMineUpgradeEvent);
-//    if (privateMineUpgradeEvent.isCancelled()) {
-//      return;
-//    }
-//    if (player != null) {
-//      if (currentType == nextType) {
-//        privateMines.getLogger()
-//            .info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
-//      } else {
-//        if (upgradeCost == 0) {
-//          Location mineLocation = mineData.getMineLocation();
-//          if (Objects.equals(currentType.getFile(), nextType.getFile())) {
-//            delete(false);
-//            mineFactory.create(Objects.requireNonNull(player), location, nextType, false);
-//          } else {
-//            delete(true);
-//            Bukkit.broadcastMessage("files didn't match, deleting structure!");
-//            mineFactory.create(Objects.requireNonNull(player), location, nextType, true);
-//            Mine mine = mineStorage.get(mineOwner);
-//            if (mine != null) {
-//              mine.reset();
-//            }
-//          }
-//        } else {
-//          double balance = economy.getBalance(player);
-//          if (balance < upgradeCost) {
-//            player.sendMessage(ChatColor.RED + "You don't have enough money to upgrade your mine!");
-//          } else {
-//            if (Objects.equals(currentType.getFile(), nextType.getFile())) {
-//              delete(false);
-//              Location mineLocation = mineData.getMineLocation();
-//              mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, false);
-//            } else {
-//              delete(true);
-//              Location mineLocation = mineData.getMineLocation();
-//              mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
-//              economy.withdrawPlayer(player, upgradeCost);
-//            }
-//          }
-//        }
-//      }
-//    }
-//  }
-
   public void createWorldGuardRegions() {
 
     String mineRegionName = String.format("mine-%s", getMineData().getMineOwner());
@@ -729,7 +656,7 @@ public class Mine {
       regionManager.addRegion(fullWorldGuardRegion);
     }
 
-    /**
+    /*
      This sadly has to be called synchronously else it'll throw a
      {@link java.lang.IllegalStateException}
      This is due to how WorldGuard handles their flags...
