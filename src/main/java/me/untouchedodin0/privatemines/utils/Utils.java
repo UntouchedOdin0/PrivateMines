@@ -100,9 +100,11 @@ public class Utils {
    */
   public static <V> void setFlag(ProtectedRegion region, Flag<V> flag, String value)
       throws InvalidFlagFormat {
-    V val = flag.parseInput(
-        FlagContext.create().setInput(value).setObject("region", region).build());
-    region.setFlag(flag, val);
+    if (flag != null) {
+      V val = flag.parseInput(
+          FlagContext.create().setInput(value).setObject("region", region).build());
+      region.setFlag(flag, val);
+    }
   }
 
   public static int getInventorySize(int max) {

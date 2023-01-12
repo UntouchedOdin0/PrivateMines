@@ -24,7 +24,6 @@
 
 package me.untouchedodin0.privatemines.commands;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -67,7 +66,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.misc.ChatPrompt;
-import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
 
