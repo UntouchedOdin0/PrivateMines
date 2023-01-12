@@ -35,10 +35,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -62,10 +60,8 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
-import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
-import me.untouchedodin0.privatemines.utils.addons.Service;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -84,7 +80,6 @@ import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.ArgType;
 import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.config.ConfigManager;
-import redempt.redlib.inventorygui.InventoryGUI;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
@@ -114,7 +109,6 @@ public class PrivateMines extends JavaPlugin {
   private ConfigManager configManager;
   private SlimeUtils slimeUtils;
   private static Economy econ = null;
-  private SQLite sqlite;
   private SQLHelper sqlHelper;
   private BukkitAudiences adventure;
   private WorldBorderUtils worldBorderUtils;
@@ -163,16 +157,9 @@ public class PrivateMines extends JavaPlugin {
       worldBorderUtils = new WorldBorderUtils();
     }
 
-//    new CommandParser(getResource("commands.rdcml")).setArgTypes(
-//            ArgType.of("materials", Material.class),
-//            ArgType.of("mineType", mineTypeManager.getTypes())).parse()
-//        .register("privatemines", new PrivateMinesCommand());
-
     new CommandParser(getResource("commands.rdcml")).setArgTypes(
             ArgType.of("materials", Material.class),
-            ArgType.of("mineType", mineTypeManager.getMineTypes())
-            )
-        .parse()
+            ArgType.of("mineType", mineTypeManager.getMineTypes())).parse()
         .register("privatemines", new PrivateMinesCommand());
 
     if (Config.enableTax) {
@@ -224,19 +211,18 @@ public class PrivateMines extends JavaPlugin {
       }
       SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
       schematicStorage.addSchematic(schematicFile, mineBlocks);
-//      privateMines.getLogger().info("Loaded file: " + schematicFile);
     });
 
     File dataFolder = new File(privateMines.getDataFolder(), "privatemines.db");
     if (!dataFolder.exists()) {
       try {
-        dataFolder.createNewFile();
+        boolean created = dataFolder.createNewFile();
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
     }
 
-    sqlite = new SQLite();
+    SQLite sqlite = new SQLite();
     this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
     sqlHelper.executeUpdate(
         "CREATE TABLE IF NOT EXISTS privatemines (" + "`owner` TEXT NOT NULL," + "`mineType` TEXT,"
@@ -246,28 +232,6 @@ public class PrivateMines extends JavaPlugin {
     Task.syncDelayed(() -> loadMines(false));
     Task.syncDelayed(this::loadPregenMines);
 //            Task.asyncDelayed(this::loadAddons);
-
-    AtomicInteger atomicInteger = new AtomicInteger(1);
-
-    mineTypeManager.getMineTypes().forEach((s, mineType) -> {
-      MineType last = mineTypeManager.getLast(mineTypeManager.getMineTypes());
-      getLogger().info(String.format("Is %s last? %b", mineType.getName(), mineType.equals(last)));
-    });
-
-//    mineTypeManager.getTypes().forEach((s, mineType) -> {
-//      MineType next = mineTypeManager.getNextType(mineType);
-//      getLogger().info(String.format("Current %s - Next %s", mineType.getName(), next.getName()));
-//    });
-//    mineTypeManager.getTypes().forEach((s, mineType) -> {
-//      getLogger().info("type: " + mineType.getName());
-//      getLogger().info("next type " + mineTypeManager.getNextType(mineType));
-//    });
-//    mineTypeManager.getMineTypes().forEach((s, mineType) -> {
-//      getLogger().info("found type " + mineType.getName());
-//    });
-//    mineTypeManager.getMineTypes().forEach((s, mineType) -> {
-//      getLogger().info(String.format("#%d %s", atomicInteger.getAndIncrement(), mineType.getName()));
-//    });
 
     PaperLib.suggestPaper(this);
 
@@ -414,11 +378,17 @@ public class PrivateMines extends JavaPlugin {
           }
 
           if (!customMaterials.isEmpty()) {
-            mineData.setMaterials(customMaterials);
+            if (mineData != null) {
+              mineData.setMaterials(customMaterials);
+            }
           }
-          mineData.setMaxMineSize(mineType.getMaxMineSize());
+          if (mineData != null) {
+            mineData.setMaxMineSize(mineType.getMaxMineSize());
+          }
           mine.setMineData(mineData);
-          mineStorage.addMine(owner, mine);
+          if (owner != null) {
+            mineStorage.addMine(owner, mine);
+          }
         } else {
           MineData mineData = null;
           if (owner != null) {
@@ -429,8 +399,9 @@ public class PrivateMines extends JavaPlugin {
             mineData.setMaxMineSize(mineType.getMaxMineSize());
           }
           mine.setMineData(mineData);
-          getLogger().info("mine type load log: " + mineData.getMineType());
-          mineStorage.addMine(owner, mine);
+          if (owner != null) {
+            mineStorage.addMine(owner, mine);
+          }
           getLogger().info("Loaded file " + file.getName() + "!");
         }
       });
@@ -493,97 +464,6 @@ public class PrivateMines extends JavaPlugin {
     getPregenStorage().getMines().forEach(PregenMine::save);
   }
 
-  public void loadAddons() {
-
-//        ServiceLoader serviceLoader = ServiceLoader.load(Service.class);
-
-    ServiceLoader<Service> myService = ServiceLoader.load(Service.class);
-
-    getLogger().info("myservice " + myService);
-    getLogger().info("" + myService.stream().count());
-
-//        ServiceLoader<MyService> serviceLoader = ServiceLoader.load(MyService.class, ServiceLoader.class.getClassLoader());
-//        Stream<ServiceLoader.Provider<MyService>> stream = serviceLoader.stream();
-
-//        getLogger().info("stream " + stream);
-//        getLogger().info("" + stream.count());
-////        getLogger().info("service loader " + serviceLoader);
-//
-//        serviceLoader.stream().forEach(myServiceProvider -> {
-//            MyService myService = myServiceProvider.get();
-//            getLogger().info("myService: " + myService);
-//        });
-
-//        serviceLoader.iterator().forEachRemaining(myService -> {
-//            getLogger().info("my service: " + myService);
-//
-//            getLogger().info("name: " + myService.getName());
-//        ServiceLoader<MyService> serviceLoader = ServiceLoader.load(MyService.class);
-//
-//        Map<String, MyService> services = new HashMap<>();
-//        for (MyService service : serviceLoader) {
-//            System.out.println("I've found a service called '" + service.getName() + "' !");
-//            services.put(service.getName(), service);
-//        }
-//
-//        System.out.println("Found " + services.size() + " services!");
-  }
-
-//        ServiceLoader<Addon> serviceLoader = ServiceLoader.load(Addon.class);
-//
-//        getLogger().info("service loader: " + serviceLoader);
-//        getLogger().info("addons? " + serviceLoader.stream().toList());
-//
-////        Map<String, Addon> addonServices = new HashMap<>();
-////        getLogger().info("addonServices: " + addonServices);
-//
-//        for (Addon addonService : serviceLoader) {
-//            getLogger().info("addon service " + addonService);
-
-//        final PathMatcher jarMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
-//        Path path = getAddonsDirectory();
-//
-//        CompletableFuture.runAsync(() -> {
-//            try (Stream<Path> paths = Files.walk(path).filter(jarMatcher::matches)) {
-//                paths.forEach(streamPath -> {
-//                    File file = streamPath.toFile();
-//                    getLogger().info("Loading addon file " + file.getName() + "....");
-//                    JarLoader jarLoader = new JarLoader();
-//                    AddonDescriptionFile addonDescriptionFile = jarLoader.getAddonDescription(file);
-//                    getLogger().info("jar loader " + jarLoader);
-//                    getLogger().info("addon description file: " + addonDescriptionFile);
-//                });
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        });
-
-  @Deprecated
-  public void loadMenus() {
-    getLogger().info("Loading Menus...");
-
-    getLogger().info("" + MenuConfig.menus);
-    MenuConfig.menus.forEach((s, menu) -> {
-      getLogger().info("s: " + s);
-      getLogger().info("menu: " + menu);
-      getLogger().info("name: " + menu.getName());
-      getLogger().info("rows: " + menu.getRows());
-      getLogger().info("items: " + menu.getItems());
-
-      InventoryGUI inventoryGUI = new InventoryGUI(Utils.getInventorySize(Utils.rowsToSlots(1)),
-          menu.getName());
-
-      menu.getItems().forEach((s1, menuItem) -> {
-        getLogger().info("s1: " + s1);
-        getLogger().info("menu item name: " + menuItem.getItemName());
-        getLogger().info("menu item slot: " + menuItem.getSlot());
-        getLogger().info("menu item display name: " + menuItem.getName());
-        getLogger().info("menu item lore " + menuItem.getLore());
-        getLogger().info("menu item action: " + menuItem.getAction());
-      });
-    });
-  }
-
   public SchematicStorage getSchematicStorage() {
     return schematicStorage;
   }
@@ -642,7 +522,6 @@ public class PrivateMines extends JavaPlugin {
   }
 
   private void registerListeners() {
-//    getServer().getPluginManager().registerEvents(new MaxPlayersListener(), this);
     getServer().getPluginManager().registerEvents(new MineResetListener(), this);
   }
 
@@ -657,19 +536,7 @@ public class PrivateMines extends JavaPlugin {
     return adventure;
   }
 
-  public boolean isPregenMode() {
-    return pregenMode;
-  }
-
-  public void setPregenMode(boolean pregenMode) {
-    this.pregenMode = pregenMode;
-  }
-
   public WorldBorderUtils getWorldBorderUtils() {
     return worldBorderUtils;
-  }
-
-  public Gson getGson() {
-    return gson;
   }
 }

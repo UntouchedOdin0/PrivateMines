@@ -598,14 +598,15 @@ public class Mine {
   }
 
   public void upgrade() {
-    MineTypeManager mineTypeManager = this.privateMines.getMineTypeManager();
-    MineFactory mineFactory = this.privateMines.getMineFactory();
-    MineStorage mineStorage = this.privateMines.getMineStorage();
+    MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
+    MineFactory mineFactory = privateMines.getMineFactory();
+    MineStorage mineStorage = privateMines.getMineStorage();
     MineData mineData = getMineData();
     UUID mineOwner = mineData.getMineOwner();
     Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
     MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
-    MineType nextType = mineTypeManager.getNextType(currentType); //mineTypeManager.getNextType(currentType);
+    MineType nextType = mineTypeManager.getNextMineType(currentType); //mineTypeManager.getNextType(currentType);
+
     Economy economy = PrivateMines.getEconomy();
     double upgradeCost = nextType.getUpgradeCost();
     PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this,

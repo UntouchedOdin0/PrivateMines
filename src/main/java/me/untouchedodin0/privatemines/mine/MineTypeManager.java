@@ -21,19 +21,17 @@
 
 package me.untouchedodin0.privatemines.mine;
 
+import com.google.gson.internal.LinkedTreeMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 
 public class MineTypeManager {
 
   private final LinkedHashMap<String, MineType> mineTypes = new LinkedHashMap<>();
-//  private final TreeMap<String, MineType> mineTypeTreeMap = new TreeMap<>();
+  LinkedTreeMap<String, MineType> linkedTreeMap = new LinkedTreeMap<>();
   private final PrivateMines privateMines;
 
   public MineTypeManager(PrivateMines privateMines) {
@@ -45,26 +43,22 @@ public class MineTypeManager {
       privateMines.getLogger().info("MineType was null!");
     }
     if (mineType != null) {
-//      privateMines.getLogger().info("name: " + mineType.getName());
-//      mineTypes.put(mineType.getName(), mineType);
       mineTypes.put(mineType.getName(), mineType);
     }
   }
 
   public MineType getMineType(MineType name) {
     return mineTypes.get(name.getName());
-//    return mineTypes.get(name.getName());
   }
 
   public MineType getMineType(String string) {
     return mineTypes.get(string);
-//    return mineTypes.get(string);
   }
 
   public MineType getDefaultMineType() {
     if (mineTypes.isEmpty()) {
       privateMines.getLogger().info(
-          "No default mine type was found!\nCreate a mine type in the mineTypes section of the config.ymlPlease ask in the discord server if you need help");
+          "No default mine type was found!\nCreate a mine type in the mineTypes section of the config.yml\nPlease ask in the discord server if you need help");
       throw new RuntimeException();
     }
     return mineTypes.entrySet().stream().findFirst().get().getValue();
@@ -74,52 +68,24 @@ public class MineTypeManager {
     mineTypes.clear();
   }
 
-  public MineType getLast(LinkedHashMap<String, MineType> lhm)
-  {
-    MineType last;
-    int count = 1;
-
-    for (Map.Entry<String, MineType> it :
-        lhm.entrySet()) {
-
-      if (count == lhm.size()) {
-        last = it.getValue();
-        return last;
+  public MineType getNextMineType(MineType current) {
+    Iterator<Map.Entry<String, MineType>> iterator = mineTypes.entrySet().iterator();
+    while (iterator.hasNext()) {
+      Map.Entry<String, MineType> entry = iterator.next();
+      if (entry.getValue().equals(current)) {
+        if (iterator.hasNext()) {
+          return iterator.next().getValue();
+        } else {
+          return current;
+        }
       }
-      count++;
     }
     return null;
   }
 
-  public boolean isLastMineType(MineType mineType) {
-    return mineType.equals(getLast(mineTypes));
-  }
-
-  public MineType getNextType(MineType mineType) {
-    TreeMap<String, MineType> treeMap = new TreeMap<>(mineTypes);
-    return treeMap.higherEntry(mineType.getName()).getValue();
-  }
-
-//  public MineType getNextType(MineType mineType) {
-//    return mineTypeTreeMap.higherEntry(mineType.getName()).getValue();
-//  }
-//    if (mineTypeTreeMap.lastEntry().getValue().equals(mineType)) {
-//      return mineType;
-//    }
-//    return mineTypeTreeMap.higherEntry(mineType.getName()).getValue();
-//  }
-
   public LinkedHashMap<String, MineType> getMineTypes() {
     return mineTypes;
   }
-
-//  public TreeMap<String, MineType> getTypes() {
-//    return mineTypeTreeMap;
-//  }
-
-//  public LinkedHashMap<String, MineType> getTypes() {
-//    return mineTypes;
-//  }
 
   public int getTotalMineTypes() {
     return mineTypes.size();
