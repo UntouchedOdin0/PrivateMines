@@ -71,7 +71,6 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
-import me.untouchedodin0.privatemines.utils.SQLUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -284,7 +283,6 @@ public class MineFactory {
             mineData.setMaxPlayers(maxPlayers);
             mineData.setOpen(!Config.defaultClosed);
 
-//            mine.setLocation(vector.subtract(0, 0, 1));
             mine.setMineData(mineData);
             mine.saveMineData(player, mineData);
 
@@ -324,7 +322,7 @@ public class MineFactory {
             Bukkit.getPluginManager().callEvent(privateMineCreationEvent);
           });
           privateMines.getLogger().info("Mine creation time: " + microseconds + " milliseconds");
-          SQLUtils.insert(mine);
+//          SQLUtils.insert(mine);
         } catch (IOException ioException) {
           ioException.printStackTrace();
         }
