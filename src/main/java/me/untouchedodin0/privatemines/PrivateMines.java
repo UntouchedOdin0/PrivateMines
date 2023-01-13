@@ -21,6 +21,8 @@
 
 package me.untouchedodin0.privatemines;
 
+import co.aikar.commands.PaperCommandManager;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.papermc.lib.PaperLib;
@@ -33,7 +35,10 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -46,6 +51,7 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
+import me.untouchedodin0.privatemines.commands.PrivateMinesCommandOld;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
@@ -116,6 +122,7 @@ public class PrivateMines extends JavaPlugin {
   String matString;
   double percent;
   boolean pregenMode;
+  List<String> types = new ArrayList<>();
 
   public static PrivateMines getPrivateMines() {
     return privateMines;
@@ -157,10 +164,16 @@ public class PrivateMines extends JavaPlugin {
       worldBorderUtils = new WorldBorderUtils();
     }
 
-    new CommandParser(getResource("commands.rdcml")).setArgTypes(
-            ArgType.of("materials", Material.class),
-            ArgType.of("mineType", mineTypeManager.getMineTypes())).parse()
-        .register("privatemines", new PrivateMinesCommand());
+//    paperCommandManager.getCommandCompletions().registerCompletion("mineType", c -> {
+//
+//      List<String> types = new ArrayList<>();
+//      mineTypeManager.getMineTypes().forEach((s, mineType) -> types.add(mineType.getName()));
+//      return types;
+//    });
+//    new CommandParser(getResource("commands.rdcml")).setArgTypes(
+//            ArgType.of("materials", Material.class),
+//            ArgType.of("mineType", mineTypeManager.getMineTypes())).parse()
+//        .register("privatemines", new PrivateMinesCommandOld());
 
     if (Config.enableTax) {
       registerSellListener();
@@ -221,6 +234,24 @@ public class PrivateMines extends JavaPlugin {
         throw new RuntimeException(e);
       }
     }
+
+    PaperCommandManager paperCommandManager = new PaperCommandManager(this);
+    paperCommandManager.registerCommand(new PrivateMinesCommand());
+    List<String> types = new ArrayList<>();
+    mineTypeManager.getMineTypes().forEach((s, mineType) -> {
+      types.add(mineType.getName());
+    });
+
+    paperCommandManager.getCommandCompletions().registerAsyncCompletion("addon", c -> List.of("one", "two", "three"));
+
+
+//    paperCommandManager.getCommandCompletions().registerCompletion("mineType", c -> {
+//      List<String> mineTypes = new ArrayList<>();
+//      mineTypeManager.getMineTypes().forEach((s, mineType) -> {
+//        mineTypes.add(mineType.getName());
+//      });
+//      return mineTypes;
+//    });
 
     SQLite sqlite = new SQLite();
     this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());

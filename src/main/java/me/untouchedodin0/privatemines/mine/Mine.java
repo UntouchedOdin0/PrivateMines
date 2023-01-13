@@ -592,6 +592,7 @@ public class Mine {
     Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
     MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
     MineType nextType = mineTypeManager.getNextMineType(currentType); //mineTypeManager.getNextType(currentType);
+    Location mineLocation = mineData.getMineLocation();
 
     Economy economy = PrivateMines.getEconomy();
     double upgradeCost = nextType.getUpgradeCost();
@@ -606,7 +607,6 @@ public class Mine {
         this.privateMines.getLogger()
             .info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
       } else if (upgradeCost == 0.0D) {
-        Location mineLocation = mineData.getMineLocation();
         delete(true);
         mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
         Mine mine = mineStorage.get(mineOwner);
@@ -619,9 +619,8 @@ public class Mine {
           player.sendMessage(
               "" + ChatColor.RED + "You don't have enough money to upgrade your mine!");
         } else {
-          Location mineLocation = mineData.getMineLocation();
           delete(true);
-          mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
+          mineFactory.create(Objects.requireNonNull(player), mineLocation.subtract(0, 0, 1), nextType, true);
           economy.withdrawPlayer(player, upgradeCost);
         }
       }
