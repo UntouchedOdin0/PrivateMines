@@ -162,8 +162,8 @@ public abstract class Region implements Cloneable {
   /**
    * @return A cuboid representation of this Region using the extreme corners
    */
-  public CuboidRegion toCuboid() {
-    return new CuboidRegion(getMinimumPoint().clone(), getMaximumPoint().clone());
+  public CubeRegion toCuboid() {
+    return new CubeRegion(getMinimumPoint().clone(), getMaximumPoint().clone());
   }
 
   /**

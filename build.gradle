@@ -53,6 +53,7 @@ dependencies {
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.8.0'
     compileOnly 'me.clip:placeholderapi:2.11.2'
     compileOnly 'com.github.LoneDev6:api-itemsadder:3.0.0'
+    compileOnly 'com.github.oraxen:oraxen:-SNAPSHOT'
 
     compileOnly files('libs/UltraPrisonCore-1.12.7.14-RELEASE.jar')
     compileOnly files('libs/AutoSellAPI-1.2.0.jar')

@@ -40,6 +40,8 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import io.papermc.lib.PaperLib;
+import io.th0rgal.oraxen.OraxenPlugin;
+import io.th0rgal.oraxen.api.OraxenBlocks;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
@@ -63,6 +65,7 @@ import me.untouchedodin0.privatemines.events.PrivateMineUpgradeEvent;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.regions.CubeRegion;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -291,11 +294,29 @@ public class Mine {
     if (Config.addWallGap) {
       region.contract(ExpansionUtils.expansionVectors(Config.wallsGap));
     }
-    try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
-        .world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
-      editSession.setBlocks(region, randomPattern);
-      editSession.flushQueue();
+
+    if (world != null) {
+      Location min = BukkitAdapter.adapt(world, region.getMinimumPoint());
+      Location max = BukkitAdapter.adapt(world, region.getMaximumPoint());
+
+      Bukkit.broadcastMessage("isBlock? " + OraxenBlocks.isOraxenBlock("orax_ore"));
+
+      CubeRegion cubeRegion = new CubeRegion(min, max);
+
+      Bukkit.broadcastMessage("min " + min);
+      Bukkit.broadcastMessage("max " + max);
+
+      cubeRegion.forEachBlock(block -> {
+        Location loc = block.getLocation();
+        OraxenBlocks.place("orax_ore", loc);
+      });
     }
+
+//    try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
+//        .world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
+//      editSession.setBlocks(region, randomPattern);
+//      editSession.flushQueue();
+//    }
   }
 
   public void startResetTask() {

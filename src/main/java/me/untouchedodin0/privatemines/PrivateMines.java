@@ -237,12 +237,14 @@ public class PrivateMines extends JavaPlugin {
 
     PaperCommandManager paperCommandManager = new PaperCommandManager(this);
     paperCommandManager.registerCommand(new PrivateMinesCommand());
+    paperCommandManager.enableUnstableAPI("help");
+
     List<String> types = new ArrayList<>();
     mineTypeManager.getMineTypes().forEach((s, mineType) -> {
       types.add(mineType.getName());
     });
 
-    paperCommandManager.getCommandCompletions().registerAsyncCompletion("addon", c -> List.of("one", "two", "three"));
+//    paperCommandManager.getCommandCompletions().registerAsyncCompletion("addon", c -> List.of("one", "two", "three"));
 
 
 //    paperCommandManager.getCommandCompletions().registerCompletion("mineType", c -> {

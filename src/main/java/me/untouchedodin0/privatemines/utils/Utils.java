@@ -33,6 +33,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import me.untouchedodin0.privatemines.utils.regions.CubeRegion;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -76,12 +77,12 @@ public class Utils {
   }
 
   public static CuboidRegion toWorldEditCuboid(
-      me.untouchedodin0.privatemines.utils.regions.CuboidRegion cuboidRegion) {
-    var min = BlockVector3.at(cuboidRegion.getMinimumPoint().getBlockX(),
-        cuboidRegion.getMinimumPoint().getBlockY(), cuboidRegion.getMinimumPoint().getBlockZ());
+      CubeRegion cubeRegion) {
+    var min = BlockVector3.at(cubeRegion.getMinimumPoint().getBlockX(),
+        cubeRegion.getMinimumPoint().getBlockY(), cubeRegion.getMinimumPoint().getBlockZ());
 
-    var max = BlockVector3.at(cuboidRegion.getMaximumPoint().getBlockX(),
-        cuboidRegion.getMaximumPoint().getBlockY(), cuboidRegion.getMaximumPoint().getBlockZ());
+    var max = BlockVector3.at(cubeRegion.getMaximumPoint().getBlockX(),
+        cubeRegion.getMaximumPoint().getBlockY(), cubeRegion.getMaximumPoint().getBlockZ());
 
     return new CuboidRegion(min, max);
   }

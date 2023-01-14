@@ -33,7 +33,6 @@ public class PrivateMinesCommand extends BaseCommand {
     commandHelp.showHelp();
   }
 
-
   @Subcommand("version")
   @CommandCompletion("@player @addon")
   public void version(Player player, String addon) {
@@ -98,6 +97,16 @@ public class PrivateMinesCommand extends BaseCommand {
       if (mine != null) {
         mine.upgrade();
       }
+    }
+  }
+
+  @Subcommand("reset")
+  public void reset(Player player) {
+    if (!mineStorage.hasMine(player)) {
+      player.sendMessage(ChatColor.RED + "You don't own a mine!");
+    } else {
+      Mine mine = mineStorage.get(player);
+      mine.reset();
     }
   }
 }
