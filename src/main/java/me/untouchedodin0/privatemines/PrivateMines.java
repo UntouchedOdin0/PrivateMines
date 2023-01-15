@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
@@ -182,6 +183,25 @@ public class PrivateMines extends JavaPlugin {
       }
     }
 
+    if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
+      slimeUtils = new SlimeUtils();
+      Task.asyncDelayed(() -> slimeUtils.setupSlimeWorld(UUID.randomUUID()));
+    }
+
+    if (Bukkit.getPluginManager().isPluginEnabled("Oraxen")) {
+      String oraxenVersion = Objects.requireNonNull(Bukkit.getPluginManager()
+          .getPlugin("Oraxen"))
+          .getDescription()
+          .getVersion();
+
+      getLogger().info(String.format("""
+
+          Found Oraxen v%s installed,
+          make sure to list the materials under the oraxen section
+          within each mine type if you want to use oraxen
+          blocks or it won't load correctly!""", oraxenVersion));
+    }
+
     try {
       Files.createDirectories(minesDirectory);
       Files.createDirectories(schematicsDirectory);
@@ -250,11 +270,6 @@ public class PrivateMines extends JavaPlugin {
 //            Task.asyncDelayed(this::loadAddons);
 
     PaperLib.suggestPaper(this);
-
-    if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
-      slimeUtils = new SlimeUtils();
-      Task.asyncDelayed(() -> slimeUtils.setupSlimeWorld(UUID.randomUUID()));
-    }
 
     getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
     if (!setupEconomy()) {
