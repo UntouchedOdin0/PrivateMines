@@ -40,7 +40,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import io.papermc.lib.PaperLib;
-import io.th0rgal.oraxen.OraxenPlugin;
 import io.th0rgal.oraxen.api.OraxenBlocks;
 import java.io.File;
 import java.io.IOException;
@@ -65,19 +64,19 @@ import me.untouchedodin0.privatemines.events.PrivateMineUpgradeEvent;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
-import me.untouchedodin0.privatemines.utils.regions.CubeRegion;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
+import redempt.redlib.misc.WeightedRandom;
 
 public class Mine {
 
@@ -291,32 +290,138 @@ public class Mine {
       }
     }
 
-    if (Config.addWallGap) {
-      region.contract(ExpansionUtils.expansionVectors(Config.wallsGap));
+//    if (Config.addWallGap) {
+//      region.contract(ExpansionUtils.expansionVectors(Config.wallsGap));
+//    }
+
+//    if (world != null) {
+//      Location min = BukkitAdapter.adapt(world, corner1);
+//      //mineData.getMinimumMining();
+//      Location max = BukkitAdapter.adapt(world, corner2);
+//      //mineData.getMaximumMining();
+//
+//      Bukkit.broadcastMessage("isBlock? " + OraxenBlocks.isOraxenBlock("orax_ore"));
+//
+//      int i = (int) Math.min(min.getX(), max.getX());
+//      int j = (int) Math.min(min.getY(), max.getY());
+//      int k = (int) Math.min(min.getZ(), max.getZ());
+//      int m = (int) Math.max(min.getX(), max.getX());
+//      int n = (int) Math.max(min.getY(), max.getY());
+//      int i1 = (int) Math.max(min.getZ(), max.getZ());
+//
+//      for (int i2 = i; i2 <= m; i2++) {
+//        for (int i3 = j; i3 <= n; i3++) {
+//          for (int i4 = k; i4 <= i1; i4++) {
+//            Block block = world.getBlockAt(i2, i3, i4);
+//            block.setType(Material.AIR, false);
+//            OraxenBlocks.place("orax_ore", block.getLocation());
+//          }
+//        }
+//      }
+//    }
+
+    try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
+        .world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
+      editSession.setBlocks(region, randomPattern);
+      editSession.flushQueue();
+    }
+  }
+
+  public void resetOraxen() {
+    MineData mineData = getMineData();
+    MineType mineType = mineData.getMineType();
+    Location location = mineData.getMinimumMining();
+    BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
+    BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
+
+    Map<Material, Double> materials = mineType.getMaterials();
+    Map<Material, Double> mineBlocks = mineData.getMaterials();
+    Map<String, Double> oraxenMaterials = mineType.getOraxen();
+    WeightedRandom<String> weightedRandom = new WeightedRandom<>();
+
+    if (oraxenMaterials != null) {
+      oraxenMaterials.forEach(weightedRandom::set);
+    }
+
+    Bukkit.broadcastMessage("oraxen materials " + oraxenMaterials);
+    Bukkit.broadcastMessage("weighted random " + weightedRandom);
+
+    final RandomPattern randomPattern = new RandomPattern();
+
+    PrivateMineResetEvent privateMineResetEvent = new PrivateMineResetEvent(mineData.getMineOwner(),
+        this);
+    Task.syncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineResetEvent));
+
+    if (privateMineResetEvent.isCancelled()) {
+      return;
+    }
+
+    if (!mineBlocks.isEmpty()) {
+      mineBlocks.forEach((material, chance) -> {
+        Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+        randomPattern.add(pattern, chance);
+      });
+    } else {
+      if (materials != null) {
+        materials.forEach((material, chance) -> {
+          Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+          randomPattern.add(pattern, chance);
+        });
+      }
+    }
+
+    final MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
+
+    World world = location.getWorld();
+    World privateMinesWorld = mineWorldManager.getMinesWorld();
+
+    Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
+
+    Player player = Bukkit.getPlayer(mineData.getMineOwner());
+    if (player != null && player.isOnline()) {
+      boolean isPlayerInRegion = region.contains(player.getLocation().getBlockX(),
+          player.getLocation().getBlockY(), player.getLocation().getBlockZ());
+      boolean inWorld = player.getWorld().equals(privateMinesWorld);
+
+      if (isPlayerInRegion && inWorld) {
+        teleport(player);
+      }
+    }
+
+    for (Player online : Bukkit.getOnlinePlayers()) {
+      boolean isPlayerInRegion = region.contains(online.getLocation().getBlockX(),
+          online.getLocation().getBlockY(), online.getLocation().getBlockZ());
+      boolean inWorld = online.getWorld().equals(privateMinesWorld);
+
+      if (isPlayerInRegion && inWorld) {
+        teleport(online);
+      }
     }
 
     if (world != null) {
-      Location min = BukkitAdapter.adapt(world, region.getMinimumPoint());
-      Location max = BukkitAdapter.adapt(world, region.getMaximumPoint());
+      Location min = BukkitAdapter.adapt(world, corner1);
+      Location max = BukkitAdapter.adapt(world, corner2);
 
       Bukkit.broadcastMessage("isBlock? " + OraxenBlocks.isOraxenBlock("orax_ore"));
 
-      CubeRegion cubeRegion = new CubeRegion(min, max);
+      int i = (int) Math.min(min.getX(), max.getX());
+      int j = (int) Math.min(min.getY(), max.getY());
+      int k = (int) Math.min(min.getZ(), max.getZ());
+      int m = (int) Math.max(min.getX(), max.getX());
+      int n = (int) Math.max(min.getY(), max.getY());
+      int i1 = (int) Math.max(min.getZ(), max.getZ());
 
-      Bukkit.broadcastMessage("min " + min);
-      Bukkit.broadcastMessage("max " + max);
-
-      cubeRegion.forEachBlock(block -> {
-        Location loc = block.getLocation();
-        OraxenBlocks.place("orax_ore", loc);
-      });
+      for (int i2 = i; i2 <= m; i2++) {
+        for (int i3 = j; i3 <= n; i3++) {
+          for (int i4 = k; i4 <= i1; i4++) {
+            String random = weightedRandom.roll();
+            Block block = world.getBlockAt(i2, i3, i4);
+            block.setType(Material.AIR, false);
+            OraxenBlocks.place(random, block.getLocation());
+          }
+        }
+      }
     }
-
-//    try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
-//        .world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
-//      editSession.setBlocks(region, randomPattern);
-//      editSession.flushQueue();
-//    }
   }
 
   public void startResetTask() {
@@ -356,10 +461,12 @@ public class Mine {
   }
 
   public double getPercentage() {
-    CuboidRegion region = new CuboidRegion(BlockVector3.at(mineData.getMinimumMining().getBlockX(),
-        mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()),
+    CuboidRegion region = new CuboidRegion(
+        BlockVector3.at(mineData.getMinimumMining().getBlockX(),
+            mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()),
         BlockVector3.at(mineData.getMaximumMining().getBlockX(),
-            mineData.getMaximumMining().getBlockY(), mineData.getMaximumMining().getBlockZ()));
+            mineData.getMaximumMining().getBlockY(),
+            mineData.getMaximumMining().getBlockZ()));
 
     long total = region.getVolume();
     int airBlocks = 0;
@@ -428,7 +535,8 @@ public class Mine {
     Map<String, Boolean> flags = mineData.getMineType().getFlags();
 
     if (!canExpand) {
-      privateMines.getLogger().info("Failed to expand the mine due to the mine being too large");
+      privateMines.getLogger()
+          .info("Failed to expand the mine due to the mine being too large");
     } else {
       final var fillType = BlockTypes.DIAMOND_BLOCK;
       final var wallType = BlockTypes.BEDROCK;
@@ -500,7 +608,8 @@ public class Mine {
 
       if (flags != null) {
         flags.forEach((string, aBoolean) -> {
-          Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), string);
+          Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(),
+              string);
           if (aBoolean) {
             try {
               Utils.setFlag(protectedCuboidRegion, flag, "allow");
@@ -612,12 +721,14 @@ public class Mine {
     UUID mineOwner = mineData.getMineOwner();
     Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
     MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
-    MineType nextType = mineTypeManager.getNextMineType(currentType); //mineTypeManager.getNextType(currentType);
+    MineType nextType = mineTypeManager.getNextMineType(
+        currentType); //mineTypeManager.getNextType(currentType);
     Location mineLocation = mineData.getMineLocation();
 
     Economy economy = PrivateMines.getEconomy();
     double upgradeCost = nextType.getUpgradeCost();
-    PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this,
+    PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner,
+        this,
         currentType, nextType);
     Bukkit.getPluginManager().callEvent(privateMineUpgradeEvent);
     if (privateMineUpgradeEvent.isCancelled()) {
@@ -626,7 +737,8 @@ public class Mine {
     if (player != null) {
       if (currentType == nextType) {
         this.privateMines.getLogger()
-            .info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
+            .info("Failed to upgrade " + player.getName()
+                + "'s mine as it was fully upgraded!");
       } else if (upgradeCost == 0.0D) {
         delete(true);
         mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
@@ -641,7 +753,8 @@ public class Mine {
               "" + ChatColor.RED + "You don't have enough money to upgrade your mine!");
         } else {
           delete(true);
-          mineFactory.create(Objects.requireNonNull(player), mineLocation.subtract(0, 0, 1), nextType, true);
+          mineFactory.create(Objects.requireNonNull(player), mineLocation.subtract(0, 0, 1),
+              nextType, true);
           economy.withdrawPlayer(player, upgradeCost);
         }
       }
@@ -666,9 +779,11 @@ public class Mine {
 
     ProtectedCuboidRegion miningWorldGuardRegion = new ProtectedCuboidRegion(mineRegionName,
         minMining, maxMining);
-    ProtectedCuboidRegion fullWorldGuardRegion = new ProtectedCuboidRegion(fullRegionName, minFull,
+    ProtectedCuboidRegion fullWorldGuardRegion = new ProtectedCuboidRegion(fullRegionName,
+        minFull,
         maxFull);
-    RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
+    RegionContainer regionContainer = WorldGuard.getInstance().getPlatform()
+        .getRegionContainer();
     RegionManager regionManager = regionContainer.get(world);
 
     if (regionManager != null) {

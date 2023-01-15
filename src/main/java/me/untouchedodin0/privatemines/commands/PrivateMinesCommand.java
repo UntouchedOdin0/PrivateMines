@@ -6,6 +6,7 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
+import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.AudienceUtils;
@@ -63,7 +64,8 @@ public class PrivateMinesCommand extends BaseCommand {
       } else {
         mineFactory.create(target, location, defaultMineType, true);
         if (sender instanceof Player player) {
-          audienceUtils.sendMessage(player, target, MessagesConfig.gavePlayerMine.replace("{name}", target.getName()));
+          audienceUtils.sendMessage(player, target,
+              MessagesConfig.gavePlayerMine.replace("{name}", target.getName()));
         }
       }
     }
@@ -106,7 +108,17 @@ public class PrivateMinesCommand extends BaseCommand {
       player.sendMessage(ChatColor.RED + "You don't own a mine!");
     } else {
       Mine mine = mineStorage.get(player);
-      mine.reset();
+      if (mine != null) {
+        MineData mineData = mine.getMineData();
+        MineType mineType = mineData.getMineType();
+        boolean useOraxen = mineType.getUseOraxen();
+
+        if (useOraxen) {
+          mine.resetOraxen();
+        } else {
+          mine.reset();
+        }
+      }
     }
   }
 }
