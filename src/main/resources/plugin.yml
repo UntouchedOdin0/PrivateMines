@@ -1,12 +1,13 @@
 name: PrivateMines
 main: me.untouchedodin0.privatemines.PrivateMines
-version: 5.1.5
+version: 5.2
 api-version: 1.13
 
 depend:
   - FastAsyncWorldEdit
   - WorldGuard
   - Vault
+  - Oraxen
 
 softdepend:
   - AutoSell
