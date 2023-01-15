@@ -343,9 +343,6 @@ public class Mine {
       oraxenMaterials.forEach(weightedRandom::set);
     }
 
-    Bukkit.broadcastMessage("oraxen materials " + oraxenMaterials);
-    Bukkit.broadcastMessage("weighted random " + weightedRandom);
-
     final RandomPattern randomPattern = new RandomPattern();
 
     PrivateMineResetEvent privateMineResetEvent = new PrivateMineResetEvent(mineData.getMineOwner(),
@@ -401,8 +398,6 @@ public class Mine {
     if (world != null) {
       Location min = BukkitAdapter.adapt(world, corner1);
       Location max = BukkitAdapter.adapt(world, corner2);
-
-      Bukkit.broadcastMessage("isBlock? " + OraxenBlocks.isOraxenBlock("orax_ore"));
 
       int i = (int) Math.min(min.getX(), max.getX());
       int j = (int) Math.min(min.getY(), max.getY());

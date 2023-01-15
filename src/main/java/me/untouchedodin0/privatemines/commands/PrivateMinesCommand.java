@@ -113,11 +113,17 @@ public class PrivateMinesCommand extends BaseCommand {
         MineType mineType = mineData.getMineType();
         boolean useOraxen = mineType.getUseOraxen();
 
-        if (useOraxen) {
-          mine.resetOraxen();
-        } else {
+        if (!useOraxen) {
           mine.reset();
+        } else if (mineType.getOraxen() != null && mineType.getUseOraxen()) {
+          mine.resetOraxen();
         }
+
+//        if (useOraxen) {
+//          mine.resetOraxen();
+//        } else {
+//          mine.reset();
+//        }
       }
     }
   }
