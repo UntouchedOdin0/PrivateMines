@@ -46,7 +46,6 @@ public class PrivateMinesCommand extends BaseCommand {
 
   @Subcommand("give")
   @CommandCompletion("@players")
-//  @CommandCompletion("@players|@mineType")
   public void give(CommandSender sender, Player target) {
     sender.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a mine!");
 
@@ -118,12 +117,18 @@ public class PrivateMinesCommand extends BaseCommand {
         } else if (mineType.getOraxen() != null && mineType.getUseOraxen()) {
           mine.resetOraxen();
         }
+      }
+    }
+  }
 
-//        if (useOraxen) {
-//          mine.resetOraxen();
-//        } else {
-//          mine.reset();
-//        }
+  @Subcommand("teleport")
+  public void teleport(Player player) {
+    if (!mineStorage.hasMine(player)) {
+      player.sendMessage(ChatColor.RED + "You don't own a mine!");
+    } else {
+      Mine mine = mineStorage.get(player);
+      if (mine != null) {
+        mine.teleport(player);
       }
     }
   }

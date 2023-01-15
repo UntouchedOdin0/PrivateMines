@@ -7,10 +7,10 @@ depend:
   - FastAsyncWorldEdit
   - WorldGuard
   - Vault
-  - Oraxen
 
 softdepend:
   - AutoSell
   - UltraPrisonCore
   - ProtocolLib
   - PlaceholderAPI
+  - Oraxen
