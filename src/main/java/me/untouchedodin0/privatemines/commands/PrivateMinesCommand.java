@@ -4,13 +4,16 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
+import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
+import me.untouchedodin0.kotlin.menu.Menu;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.AudienceUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
@@ -30,15 +33,18 @@ public class PrivateMinesCommand extends BaseCommand {
   AudienceUtils audienceUtils = new AudienceUtils();
 
   @Default
-  public void defaultCommand(CommandHelp commandHelp) {
-    commandHelp.showHelp();
+  public void defaultCommand(Player player) {
+    Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
+    mainMenu.open(player);
+//    commandHelp.showHelp();
   }
 
   @Subcommand("version")
   @CommandCompletion("@player @addon")
+  @CommandPermission("privatemines.version")
   public void version(Player player, String addon) {
     if (addon.isEmpty()) {
-      player.sendMessage(String.format("IceCore is running addons v%s", "0"));
+      player.sendMessage(String.format("PrivateMines is running addons v%s", "0"));
     } else {
       player.sendMessage("ignoreme " + addon);
     }
@@ -46,6 +52,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
   @Subcommand("give")
   @CommandCompletion("@players")
+  @CommandPermission("privatemines.give")
   public void give(CommandSender sender, Player target) {
     sender.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a mine!");
 
@@ -71,6 +78,8 @@ public class PrivateMinesCommand extends BaseCommand {
   }
 
   @Subcommand("delete")
+  @CommandCompletion("@players")
+  @CommandPermission("privatemines.delete")
   public void delete(CommandSender sender, Player target) {
     if (!mineStorage.hasMine(target.getUniqueId())) {
       if (sender instanceof Player player) {
@@ -88,6 +97,8 @@ public class PrivateMinesCommand extends BaseCommand {
   }
 
   @Subcommand("upgrade")
+  @CommandCompletion("@players")
+  @CommandPermission("privatemines.upgrade")
   public void upgrade(CommandSender sender, Player target, String mineType) {
     if (!mineStorage.hasMine(target.getUniqueId())) {
       if (sender instanceof Player player) {
@@ -102,6 +113,7 @@ public class PrivateMinesCommand extends BaseCommand {
   }
 
   @Subcommand("reset")
+  @CommandPermission("privatemines.reset")
   public void reset(Player player) {
     if (!mineStorage.hasMine(player)) {
       player.sendMessage(ChatColor.RED + "You don't own a mine!");
@@ -122,6 +134,7 @@ public class PrivateMinesCommand extends BaseCommand {
   }
 
   @Subcommand("teleport")
+  @CommandPermission("privatemines.teleport")
   public void teleport(Player player) {
     if (!mineStorage.hasMine(player)) {
       player.sendMessage(ChatColor.RED + "You don't own a mine!");

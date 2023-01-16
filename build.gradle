@@ -10,7 +10,7 @@ plugins {
 group 'me.untouchedodin0.privatemines'
 version '5.2'
 
-def devBuild = true
+def devBuild = false
 
 if (devBuild) {
     version = version + "-DEV"
