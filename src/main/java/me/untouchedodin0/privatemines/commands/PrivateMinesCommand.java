@@ -7,6 +7,7 @@ import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
+import java.nio.Buffer;
 import me.untouchedodin0.kotlin.menu.Menu;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
@@ -19,6 +20,7 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -123,11 +125,14 @@ public class PrivateMinesCommand extends BaseCommand {
         MineData mineData = mine.getMineData();
         MineType mineType = mineData.getMineType();
         boolean useOraxen = mineType.getUseOraxen();
+        boolean useItemsAdder = mineType.getUseItemsAdder();
 
-        if (!useOraxen) {
+        if (!useOraxen && !useItemsAdder) {
           mine.reset();
-        } else if (mineType.getOraxen() != null && mineType.getUseOraxen()) {
+        } else if (mineType.getOraxen() != null && useOraxen) {
           mine.resetOraxen();
+        } else if (mineType.getItemsAdder() != null && useItemsAdder) {
+          mine.resetItemsAdder();
         }
       }
     }
@@ -142,6 +147,20 @@ public class PrivateMinesCommand extends BaseCommand {
       Mine mine = mineStorage.get(player);
       if (mine != null) {
         mine.teleport(player);
+      }
+    }
+  }
+
+  @Subcommand("expand")
+  @CommandPermission("privatemines.expand")
+  public void expand(CommandSender commandSender, Player target, int amount) {
+    if (!mineStorage.hasMine(target)) return;
+    Mine mine = mineStorage.get(target);
+    if (mine != null) {
+      if (mine.canExpand(amount)) {
+        for (int i = 0; i < amount; i++) {
+          mine.expand();
+        }
       }
     }
   }

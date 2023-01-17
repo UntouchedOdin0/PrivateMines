@@ -37,8 +37,10 @@ class MineType {
     val upgradeCost: Double = 0.0
     val upgradeCurrency: String? = null
     val useOraxen: Boolean = false
+    val useItemsAdder: Boolean = false
     val materials: Map<Material, Double>? = null
     val oraxen: Map<String, Double>? = null
+    val itemsAdder: Map<String, Double>? = null
     val maxPlayers: Int = 0
     val maxMineSize: Int = 0
     val flags: Map<String, Boolean>? = null

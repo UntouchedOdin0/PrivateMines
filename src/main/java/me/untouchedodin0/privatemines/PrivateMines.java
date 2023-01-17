@@ -202,6 +202,20 @@ public class PrivateMines extends JavaPlugin {
           blocks or it won't load correctly!""", oraxenVersion));
     }
 
+    if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder")) {
+      String itemsAdderVersion = Objects.requireNonNull(Bukkit.getPluginManager()
+              .getPlugin("ItemsAdder"))
+          .getDescription()
+          .getVersion();
+
+      getLogger().info(String.format("""
+
+          Found ItemsAdder v%s installed,
+          make sure to list the materials under the itemsadder section
+          within each mine type if you want to use itemsadder
+          blocks or it won't load correctly!""", itemsAdderVersion));
+    }
+
     try {
       Files.createDirectories(minesDirectory);
       Files.createDirectories(schematicsDirectory);

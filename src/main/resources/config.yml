@@ -30,11 +30,14 @@ mineTypes:
     upgradeCost: 1.0
     upgradeCurrency: VAULT # Supported currencies: VAULT, ULTRAPRISONCORE (Coming soon, hopefully...)
     useOraxen: true
+    useItemsAdder: false
     materials:
       STONE: 0.9
       COBBLESTONE: 0.1
     oraxen:
       orax_ore: 1.0
+    itemsAdder:
+      nice_stone: 1.0
     maxPlayers: 1
     flags:
       block-break: true

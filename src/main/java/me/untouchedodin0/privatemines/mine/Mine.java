@@ -39,6 +39,8 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import dev.lone.itemsadder.api.CustomBlock;
+import dev.lone.itemsadder.api.CustomStack;
 import io.papermc.lib.PaperLib;
 import io.th0rgal.oraxen.api.OraxenBlocks;
 import java.io.File;
@@ -294,32 +296,6 @@ public class Mine {
 //      region.contract(ExpansionUtils.expansionVectors(Config.wallsGap));
 //    }
 
-//    if (world != null) {
-//      Location min = BukkitAdapter.adapt(world, corner1);
-//      //mineData.getMinimumMining();
-//      Location max = BukkitAdapter.adapt(world, corner2);
-//      //mineData.getMaximumMining();
-//
-//      Bukkit.broadcastMessage("isBlock? " + OraxenBlocks.isOraxenBlock("orax_ore"));
-//
-//      int i = (int) Math.min(min.getX(), max.getX());
-//      int j = (int) Math.min(min.getY(), max.getY());
-//      int k = (int) Math.min(min.getZ(), max.getZ());
-//      int m = (int) Math.max(min.getX(), max.getX());
-//      int n = (int) Math.max(min.getY(), max.getY());
-//      int i1 = (int) Math.max(min.getZ(), max.getZ());
-//
-//      for (int i2 = i; i2 <= m; i2++) {
-//        for (int i3 = j; i3 <= n; i3++) {
-//          for (int i4 = k; i4 <= i1; i4++) {
-//            Block block = world.getBlockAt(i2, i3, i4);
-//            block.setType(Material.AIR, false);
-//            OraxenBlocks.place("orax_ore", block.getLocation());
-//          }
-//        }
-//      }
-//    }
-
     try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
         .world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
       editSession.setBlocks(region, randomPattern);
@@ -328,6 +304,10 @@ public class Mine {
   }
 
   public void resetOraxen() {
+    if (!Bukkit.getPluginManager().isPluginEnabled("Oraxen")) {
+      privateMines.getLogger().warning("Failed to reset mine due to Oraxen plugin missing!");
+      return;
+    }
     MineData mineData = getMineData();
     MineType mineType = mineData.getMineType();
     Location location = mineData.getMinimumMining();
@@ -413,6 +393,104 @@ public class Mine {
             Block block = world.getBlockAt(i2, i3, i4);
             block.setType(Material.AIR, false);
             OraxenBlocks.place(random, block.getLocation());
+          }
+        }
+      }
+    }
+  }
+
+  public void resetItemsAdder() {
+    if (!Bukkit.getPluginManager().isPluginEnabled("ItemsAdder")) {
+      privateMines.getLogger().warning("Failed to reset mine due to ItemsAdder plugin missing!");
+      return;
+    }
+
+    MineData mineData = getMineData();
+    MineType mineType = mineData.getMineType();
+    Location location = mineData.getMinimumMining();
+    BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
+    BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
+
+    Map<Material, Double> materials = mineType.getMaterials();
+    Map<Material, Double> mineBlocks = mineData.getMaterials();
+    Map<String, Double> itemsAdderMaterials = mineType.getItemsAdder();
+    WeightedRandom<String> weightedRandom = new WeightedRandom<>();
+
+    if (itemsAdderMaterials != null) {
+      itemsAdderMaterials.forEach(weightedRandom::set);
+    }
+
+    final RandomPattern randomPattern = new RandomPattern();
+
+    PrivateMineResetEvent privateMineResetEvent = new PrivateMineResetEvent(mineData.getMineOwner(),
+        this);
+    Task.syncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineResetEvent));
+
+    if (privateMineResetEvent.isCancelled()) {
+      return;
+    }
+
+    if (!mineBlocks.isEmpty()) {
+      mineBlocks.forEach((material, chance) -> {
+        Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+        randomPattern.add(pattern, chance);
+      });
+    } else {
+      if (materials != null) {
+        materials.forEach((material, chance) -> {
+          Pattern pattern = BukkitAdapter.adapt(material.createBlockData());
+          randomPattern.add(pattern, chance);
+        });
+      }
+    }
+
+    final MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
+
+    World world = location.getWorld();
+    World privateMinesWorld = mineWorldManager.getMinesWorld();
+
+    Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
+
+    Player player = Bukkit.getPlayer(mineData.getMineOwner());
+    if (player != null && player.isOnline()) {
+      boolean isPlayerInRegion = region.contains(player.getLocation().getBlockX(),
+          player.getLocation().getBlockY(), player.getLocation().getBlockZ());
+      boolean inWorld = player.getWorld().equals(privateMinesWorld);
+
+      if (isPlayerInRegion && inWorld) {
+        teleport(player);
+      }
+    }
+
+    for (Player online : Bukkit.getOnlinePlayers()) {
+      boolean isPlayerInRegion = region.contains(online.getLocation().getBlockX(),
+          online.getLocation().getBlockY(), online.getLocation().getBlockZ());
+      boolean inWorld = online.getWorld().equals(privateMinesWorld);
+
+      if (isPlayerInRegion && inWorld) {
+        teleport(online);
+      }
+    }
+
+    if (world != null) {
+      Location min = BukkitAdapter.adapt(world, corner1);
+      Location max = BukkitAdapter.adapt(world, corner2);
+
+      int i = (int) Math.min(min.getX(), max.getX());
+      int j = (int) Math.min(min.getY(), max.getY());
+      int k = (int) Math.min(min.getZ(), max.getZ());
+      int m = (int) Math.max(min.getX(), max.getX());
+      int n = (int) Math.max(min.getY(), max.getY());
+      int i1 = (int) Math.max(min.getZ(), max.getZ());
+
+      for (int i2 = i; i2 <= m; i2++) {
+        for (int i3 = j; i3 <= n; i3++) {
+          for (int i4 = k; i4 <= i1; i4++) {
+            String random = weightedRandom.roll();
+            Block block = world.getBlockAt(i2, i3, i4);
+            block.setType(Material.AIR, false);
+            CustomBlock customBlock = CustomBlock.getInstance(random);
+            customBlock.place(block.getLocation());
           }
         }
       }

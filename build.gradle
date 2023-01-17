@@ -8,9 +8,9 @@ plugins {
 }
 
 group 'me.untouchedodin0.privatemines'
-version '5.2'
+version '5.3'
 
-def devBuild = false
+def devBuild = true
 
 if (devBuild) {
     version = version + "-DEV"
@@ -54,6 +54,7 @@ dependencies {
     compileOnly 'me.clip:placeholderapi:2.11.2'
     compileOnly 'com.github.LoneDev6:api-itemsadder:3.0.0'
     compileOnly 'com.github.oraxen:oraxen:-SNAPSHOT'
+    compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.2.5'
 
     compileOnly files('libs/UltraPrisonCore-1.12.7.14-RELEASE.jar')
     compileOnly files('libs/AutoSellAPI-1.2.0.jar')
