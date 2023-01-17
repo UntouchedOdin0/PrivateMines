@@ -40,7 +40,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import dev.lone.itemsadder.api.CustomBlock;
-import dev.lone.itemsadder.api.CustomStack;
 import io.papermc.lib.PaperLib;
 import io.th0rgal.oraxen.api.OraxenBlocks;
 import java.io.File;
