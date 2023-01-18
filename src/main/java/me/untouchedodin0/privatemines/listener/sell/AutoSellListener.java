@@ -58,19 +58,23 @@ public class AutoSellListener implements Listener {
 
         Mine mine = mineStorage.getClosest(location);
 
-        MineData mineData = mine.getMineData();
-        Player owner = Bukkit.getOfflinePlayer(mineData.getMineOwner()).getPlayer();
-        if (player.equals(owner)) return;
+        MineData mineData = null;
+        if (mine != null) {
+            mineData = mine.getMineData();
 
-        double tax = sellAllEvent.getTotalCost() / 100.0 * mineData.getTax();
-        double sellPrice = sellAllEvent.getTotalCost();
-        double afterTax = sellPrice - tax;
-        sellAllEvent.setTotalCost(afterTax);
-        economy.depositPlayer(owner, tax);
+            Player owner = Bukkit.getOfflinePlayer(mineData.getMineOwner()).getPlayer();
+            if (player.equals(owner)) return;
 
-        if (Config.sendTaxMessages) {
-            if (owner != null) {
-                owner.sendMessage(ChatColor.GREEN + "You've received $" + tax + " in taxes from " + player.getDisplayName() + ChatColor.GREEN + "!");
+            double tax = sellAllEvent.getTotalCost() / 100.0 * mineData.getTax();
+            double sellPrice = sellAllEvent.getTotalCost();
+            double afterTax = sellPrice - tax;
+            sellAllEvent.setTotalCost(afterTax);
+            economy.depositPlayer(owner, tax);
+
+            if (Config.sendTaxMessages) {
+                if (owner != null) {
+                    owner.sendMessage(ChatColor.GREEN + "You've received $" + tax + " in taxes from " + player.getDisplayName() + ChatColor.GREEN + "!");
+                }
             }
         }
     }

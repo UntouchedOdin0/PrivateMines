@@ -52,7 +52,7 @@ public class MineResetListener implements Listener {
   }
 
   @EventHandler
-  public void onJoin(PlayerQuitEvent event) {
+  public void onQuit(PlayerQuitEvent event) {
     Player player = event.getPlayer();
     UUID uuid = player.getUniqueId();
     Mine mine = mineStorage.get(uuid);

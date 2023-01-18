@@ -68,9 +68,8 @@ public class ConversionUtils {
     public static PreparedStatement convertToSQL(File file) throws SQLException {
         final PrivateMines privateMines = PrivateMines.getPrivateMines();
         final PathMatcher yamlMatcher = FileSystems.getDefault().getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
-        final SQLHelper sqlHelper = privateMines.getSqlHelper();
 
-        Connection connection = sqlHelper.getConnection();
+        Connection connection = null;
         String query = "INSERT INTO privatemines values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement preparedStatement = connection.prepareStatement(query);
 

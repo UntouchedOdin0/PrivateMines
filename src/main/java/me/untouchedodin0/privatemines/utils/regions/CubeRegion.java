@@ -2,7 +2,6 @@ package me.untouchedodin0.privatemines.utils.regions;
 
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import me.untouchedodin0.privatemines.utils.location.LocationUtilsOld;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -10,6 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.util.Vector;
+import redempt.redlib.misc.LocationUtils;
 
 /**
  * Represents a cuboid region in a world
@@ -165,7 +165,7 @@ public class CubeRegion extends Overlappable {
    * @return Itself
    */
   public CubeRegion expand(BlockFace direction, double amount) {
-    Vector vec = LocationUtilsOld.getDirection(direction);
+    Vector vec = LocationUtils.getDirection(direction);
     if (vec.getX() + vec.getY() + vec.getZ() > 0) {
       vec = vec.multiply(amount);
       end = end.add(vec);

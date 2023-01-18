@@ -24,7 +24,6 @@ package me.untouchedodin0.privatemines.storage;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator.MineBlocks;
 
 public class SchematicStorage {
@@ -33,12 +32,7 @@ public class SchematicStorage {
 
 
   public void addSchematic(File file, MineBlocks mineBlocks) {
-    if (mineBlocksMap.containsKey(file)) {
-//      PrivateMines.getPrivateMines().getLogger()
-//          .info(String.format("File %s was already stored in the map!", file.getName()));
-    } else {
-      mineBlocksMap.put(file, mineBlocks);
-    }
+    mineBlocksMap.putIfAbsent(file, mineBlocks);
   }
 
   public Map<File, MineBlocks> getMineBlocksMap() {

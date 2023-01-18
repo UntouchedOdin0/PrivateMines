@@ -27,9 +27,6 @@ package me.untouchedodin0.privatemines.commands;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +49,6 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopBuilder;
-import me.untouchedodin0.privatemines.utils.SQLUtils;
 import me.untouchedodin0.privatemines.utils.inventory.PublicMinesMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
@@ -65,9 +61,7 @@ import org.bukkit.WorldBorder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
-import redempt.redlib.misc.ChatPrompt;
 import redempt.redlib.misc.Task;
-import redempt.redlib.sql.SQLHelper;
 
 @SuppressWarnings("unused")
 public class PrivateMinesCommandOld {
@@ -444,67 +438,6 @@ public class PrivateMinesCommandOld {
       }
     }
   }
-
-  @CommandHook("convert")
-  public void convert(Player player) {
-    player.sendMessage("" + ChatColor.RED + ChatColor.BOLD + "NOT WORKING YET!");
-    ChatPrompt.prompt(player, ChatColor.YELLOW
-        + "Are you sure you want to convert the mines to SQL? Type Yes to carry on the process "
-        + "or No to cancel the process.", str -> {
-      if (str.equalsIgnoreCase("Yes")) {
-        player.sendMessage(ChatColor.GREEN + "Starting conversion...");
-        SQLHelper sqlHelper = privateMines.getSqlHelper();
-        Connection connection = sqlHelper.getConnection();
-        String query = "INSERT INTO privatemines values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        // 13
-
-        try {
-          PreparedStatement preparedStatement = connection.prepareStatement(query);
-          preparedStatement.setString(1, "1");
-          preparedStatement.setString(2, "2");
-          preparedStatement.setString(3, "3");
-          preparedStatement.setString(4, "4");
-          preparedStatement.setString(5, "5");
-          preparedStatement.setString(6, "6");
-          preparedStatement.setString(7, "7");
-          preparedStatement.setString(8, "8");
-          preparedStatement.setString(9, "9");
-          preparedStatement.setString(10, "10");
-          preparedStatement.setString(11, "11");
-          preparedStatement.setString(12, "12");
-          preparedStatement.setString(13, "13");
-
-          int res = preparedStatement.executeUpdate();
-
-//                    connection.commit();
-//                    connection.close();
-        } catch (SQLException e) {
-          throw new RuntimeException(e);
-        }
-
-        player.sendMessage("connection " + connection);
-
-        try {
-          connection.commit();
-          connection.close();
-        } catch (SQLException e) {
-          throw new RuntimeException(e);
-        }
-
-//                sqlHelper.executeUpdate("UPDATE privatemines SET mineOwner=? mineType=? mineLocation=? corner1=? corner2=? fullRegionMin=? fullRegionMax=? spawn=? tax=? isOpen=? maxPlayers=? maxMineSize=? materials=?", "owner", "type", "minelocation", "corner1", "corner2", "fullmin", "fullmax", "spawn", 5.0, false, 1, 1, "materials");
-//                sqlHelper.commit();
-//
-//                player.sendMessage("" + sqlHelper);
-//                sqlHelper.execute("INSERT INTO privatemines (mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) VALUES(mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials);");
-
-//                privateMines.convertToSQL(player);
-      } else {
-        player.sendMessage(ChatColor.RED + "Cancelled the process.");
-      }
-    });
-  }
-
   @CommandHook("reload")
   public void reload(Player player) {
     privateMines.getConfigManager().reload();
@@ -526,45 +459,5 @@ public class PrivateMinesCommandOld {
     WorldBorderUtils worldBorderUtils = privateMines.getWorldBorderUtils();
     WorldBorder worldBorder = worldBorderUtils.getWorldBorder(player);
     worldBorderUtils.clearBorder(player);
-  }
-
-  @CommandHook("testsql")
-  public void testSQL(Player player) {
-    Mine mine = mineStorage.get(player);
-    if (mine != null) {
-      SQLUtils.insert(mine);
-    }
-
-//        SQLHelper sqlHelper = privateMines.getSqlHelper();
-//        Connection connection = sqlHelper.getConnection();
-//        String updateString = "INSERT INTO privatemines (mineOwner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials)" +
-//                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-//                //"update privatemines " + "set mineOwner = ? where COF_NAME = ?";
-//        try {
-//            PreparedStatement updateSales = connection.prepareStatement(updateString);
-//            updateSales.setString(1, "mine owner");
-//            updateSales.setString(2, "mine type");
-//            updateSales.setString(3, "mine location");
-//            updateSales.setString(4, "corner 1");
-//            updateSales.setString(5, "corner 2");
-//            updateSales.setString(6, "full region min");
-//            updateSales.setString(7, "full region max");
-//            updateSales.setString(8, "spawn");
-//            updateSales.setDouble(9, 5.0);
-//            updateSales.setBoolean(10, false);
-//            updateSales.setInt(11, 1);
-//            updateSales.setInt(12, 2);
-//            updateSales.setString(13, "materials");
-//
-//            player.sendMessage("" + sqlHelper);
-//            player.sendMessage("update sales " + updateSales);
-//
-//            updateSales.executeUpdate();
-////            updateSales.close();
-//
-//            connection.commit();
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
   }
 }

@@ -62,10 +62,6 @@ public class MineTypeManager {
     return mineTypes.entrySet().stream().findFirst().get().getValue();
   }
 
-  public void clear() {
-    mineTypes.clear();
-  }
-
   public MineType getNextMineType(MineType current) {
     Iterator<Map.Entry<String, MineType>> iterator = mineTypes.entrySet().iterator();
     while (iterator.hasNext()) {
@@ -79,13 +75,5 @@ public class MineTypeManager {
       }
     }
     return null;
-  }
-
-  public LinkedHashMap<String, MineType> getMineTypes() {
-    return mineTypes;
-  }
-
-  public int getTotalMineTypes() {
-    return mineTypes.size();
   }
 }

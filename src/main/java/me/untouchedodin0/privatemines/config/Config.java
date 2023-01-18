@@ -57,15 +57,8 @@ public class Config {
     public static boolean giveMineOnFirstJoin = false;
     @Comment("Used for giving mines before the server has released")
     public static boolean preLoginGiveMine = false;
-    @Comment("Should we only replace air blocks when the mine resets?")
-    public static boolean onlyReplaceAir = true;
     @Comment("Should we upgrade the mine upon reaching the outside border?")
     public static boolean borderUpgrade = true;
-
-    @Comment("Which locale should we use?")
-    public static String locale = "en_US";
-    @Comment("Should we support adventure?")
-    public static boolean useAdventure = false;
     @Comment("Should the menu be enabled?")
     public static boolean enableMenu = true;
     @Comment("Should the tax feature be enabled?")

@@ -34,9 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -63,7 +61,6 @@ import me.untouchedodin0.privatemines.listener.sell.UPCSellListener;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
-import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
@@ -84,7 +81,6 @@ import redempt.redlib.RedLib;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
-import redempt.redlib.sql.SQLHelper;
 
 /**
  * TODO Make a way for people to register mines via a discord channel before server launches
@@ -96,7 +92,6 @@ public class PrivateMines extends JavaPlugin {
   private static final int PLUGIN_ID = 11413;
   public int Y_LEVEL = 50;
   public int MINE_DISTANCE = 150;
-
   private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
   private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
   private final Path addonsDirectory = getDataFolder().toPath().resolve("addons");
@@ -111,13 +106,11 @@ public class PrivateMines extends JavaPlugin {
   private ConfigManager configManager;
   private SlimeUtils slimeUtils;
   private static Economy econ = null;
-  private SQLHelper sqlHelper;
   private BukkitAudiences adventure;
   private WorldBorderUtils worldBorderUtils;
   private Gson gson;
   String matString;
   double percent;
-  boolean pregenMode;
 
   public static PrivateMines getPrivateMines() {
     return privateMines;
@@ -158,17 +151,6 @@ public class PrivateMines extends JavaPlugin {
     if (RedLib.MID_VERSION >= 19) {
       worldBorderUtils = new WorldBorderUtils();
     }
-
-//    paperCommandManager.getCommandCompletions().registerCompletion("mineType", c -> {
-//
-//      List<String> types = new ArrayList<>();
-//      mineTypeManager.getMineTypes().forEach((s, mineType) -> types.add(mineType.getName()));
-//      return types;
-//    });
-//    new CommandParser(getResource("commands.rdcml")).setArgTypes(
-//            ArgType.of("materials", Material.class),
-//            ArgType.of("mineType", mineTypeManager.getMineTypes())).parse()
-//        .register("privatemines", new PrivateMinesCommandOld());
 
     if (Config.enableTax) {
       registerSellListener();
@@ -254,34 +236,12 @@ public class PrivateMines extends JavaPlugin {
       schematicStorage.addSchematic(schematicFile, mineBlocks);
     });
 
-    File dataFolder = new File(privateMines.getDataFolder(), "privatemines.db");
-    if (!dataFolder.exists()) {
-      try {
-        boolean created = dataFolder.createNewFile();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
-
     PaperCommandManager paperCommandManager = new PaperCommandManager(this);
     paperCommandManager.registerCommand(new PrivateMinesCommand());
     paperCommandManager.enableUnstableAPI("help");
 
-    List<String> types = new ArrayList<>();
-    mineTypeManager.getMineTypes().forEach((s, mineType) -> {
-      types.add(mineType.getName());
-    });
-
-    SQLite sqlite = new SQLite();
-    this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
-    sqlHelper.executeUpdate(
-        "CREATE TABLE IF NOT EXISTS privatemines (" + "`owner` TEXT NOT NULL," + "`mineType` TEXT,"
-            + "`corner1` TEXT," + "`corner2` TEXT," + "`fullMin` TEXT," + "`fullMax` TEXT,"
-            + "`spawn` TEXT," + "`open` BOOLEAN);");
-
-    Task.syncDelayed(() -> loadMines(false));
+    Task.syncDelayed(this::loadMines);
     Task.syncDelayed(this::loadPregenMines);
-//            Task.asyncDelayed(this::loadAddons);
 
     PaperLib.suggestPaper(this);
 
@@ -350,7 +310,7 @@ public class PrivateMines extends JavaPlugin {
     return true;
   }
 
-  public void loadMines(boolean convert) {
+  public void loadMines() {
     final PathMatcher jsonMatcher = FileSystems.getDefault()
         .getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
     Path path = getMinesDirectory();
@@ -380,9 +340,6 @@ public class PrivateMines extends JavaPlugin {
         Location spawn = LocationUtils.fromString(yml.getString("spawn"));
         Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
         boolean isOpen = yml.getBoolean("isOpen");
-        int maxPlayers = yml.getInt("maxPlayers");
-        int maxMineSize = yml.getInt("maxMineSize");
-
         double tax = yml.getDouble("tax");
         String materialsString = yml.getString("materials");
 
@@ -534,10 +491,6 @@ public class PrivateMines extends JavaPlugin {
     return minesDirectory;
   }
 
-  public Path getAddonsDirectory() {
-    return addonsDirectory;
-  }
-
   public Path getPregenMines() {
     return pregenMines;
   }
@@ -569,10 +522,6 @@ public class PrivateMines extends JavaPlugin {
 
   private void registerListeners() {
     getServer().getPluginManager().registerEvents(new MineResetListener(), this);
-  }
-
-  public SQLHelper getSqlHelper() {
-    return sqlHelper;
   }
 
   public BukkitAudiences getAdventure() {

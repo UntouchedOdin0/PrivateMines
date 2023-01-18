@@ -30,6 +30,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
+import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -42,8 +43,6 @@ import org.bukkit.World;
  * @author Cory Redmond &lt;ace@ac3-servers.eu&gt;
  */
 public class LocationAdapter implements JsonDeserializer<Location>, JsonSerializer<Location> {
-
-  public static final LocationAdapter INSTANCE = new LocationAdapter();
 
   @Override
   public Location deserialize(JsonElement json, Type type,
@@ -104,7 +103,7 @@ public class LocationAdapter implements JsonDeserializer<Location>, JsonSerializ
       JsonSerializationContext jsonSerializationContext) {
 
     final JsonObject obj = new JsonObject();
-    obj.addProperty("world", location.getWorld().getName());
+    obj.addProperty("world", Objects.requireNonNull(location.getWorld()).getName());
     obj.addProperty("x", location.getX());
     obj.addProperty("y", location.getY());
     obj.addProperty("z", location.getZ());

@@ -24,7 +24,6 @@ package me.untouchedodin0.kotlin.mine.storage
 import me.untouchedodin0.privatemines.PrivateMines
 import me.untouchedodin0.privatemines.mine.Mine
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager
-import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.entity.Player
@@ -33,7 +32,7 @@ import java.util.*
 class MineStorage {
     var mines: MutableMap<UUID, Mine> = HashMap()
     var privateMines: PrivateMines = PrivateMines.getPrivateMines()
-    var mineWorldManager: MineWorldManager = privateMines.mineWorldManager
+    private var mineWorldManager: MineWorldManager = privateMines.mineWorldManager
     var world: World = mineWorldManager.minesWorld
     private val logger = privateMines.logger
 
@@ -69,29 +68,6 @@ class MineStorage {
 
     val totalMines
         get() = mines.size
-
-    fun getClosest(player: Player, location: Location): Mine? {
-        // Make a distances value and make an empty map for the distances
-        val distances: MutableMap<Mine, Double> = HashMap()
-
-        // Iterate over all the mines calculating the distance
-        // from the location then add the mine, and it's distance
-        // into the map.
-
-        mines.forEach {
-            val mineLocation = it.value.mineData.mineLocation
-            val distance = location.distance(mineLocation)
-            distances.putIfAbsent(it.value, distance)
-        }
-        val min = distances.entries.minByOrNull { it.value } ?: return null
-
-        if (min.value > 20) {
-            player.sendMessage("${ChatColor.RED}You're not in any mines!")
-            return null
-        }
-
-        return min.key
-    }
 
     fun getClosest(location: Location): Mine? {
         // Make a distances value and make an empty map for the distances
