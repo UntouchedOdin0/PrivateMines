@@ -1,13 +1,12 @@
 package me.untouchedodin0.privatemines.commands;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
-import java.nio.Buffer;
+import java.util.Objects;
 import me.untouchedodin0.kotlin.menu.Menu;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
@@ -20,9 +19,9 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -52,11 +51,16 @@ public class PrivateMinesCommand extends BaseCommand {
     }
   }
 
+  @Subcommand("test")
+  @CommandCompletion("@players")
+  public void test(CommandSender commandSender, OfflinePlayer offlinePlayer) {
+    commandSender.sendMessage("test");
+  }
+
   @Subcommand("give")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.give")
-  public void give(CommandSender sender, Player target) {
-    sender.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a mine!");
+  public void give(CommandSender sender, OfflinePlayer target) {
 
     MineFactory mineFactory = new MineFactory();
     MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
@@ -68,9 +72,12 @@ public class PrivateMinesCommand extends BaseCommand {
       if (mineStorage.hasMine(target.getUniqueId())) {
         if (sender instanceof Player player) {
           audienceUtils.sendMessage(player, MessagesConfig.playerAlreadyOwnsAMine);
+        } else {
+          sender.sendMessage(ChatColor.RED + "Player has a mine!");
         }
       } else {
-        mineFactory.create(target, location, defaultMineType, true);
+        sender.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a mine!");
+        mineFactory.create(target.getPlayer(), location, defaultMineType, true);
         if (sender instanceof Player player) {
           audienceUtils.sendMessage(player, target,
               MessagesConfig.gavePlayerMine.replace("{name}", target.getName()));
@@ -82,7 +89,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("delete")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.delete")
-  public void delete(CommandSender sender, Player target) {
+  public void delete(CommandSender sender, OfflinePlayer target) {
     if (!mineStorage.hasMine(target.getUniqueId())) {
       if (sender instanceof Player player) {
         audienceUtils.sendMessage(player, MessagesConfig.playerDoesntOwnMine);
@@ -101,13 +108,13 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("upgrade")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.upgrade")
-  public void upgrade(CommandSender sender, Player target, String mineType) {
+  public void upgrade(CommandSender sender, OfflinePlayer target) {
     if (!mineStorage.hasMine(target.getUniqueId())) {
       if (sender instanceof Player player) {
         audienceUtils.sendMessage(player, MessagesConfig.playerDoesntOwnMine);
       }
     } else {
-      Mine mine = mineStorage.get(target);
+      Mine mine = mineStorage.get(target.getUniqueId());
       if (mine != null) {
         mine.upgrade();
       }
@@ -122,8 +129,10 @@ public class PrivateMinesCommand extends BaseCommand {
     } else {
       Mine mine = mineStorage.get(player);
       if (mine != null) {
+
         MineData mineData = mine.getMineData();
         MineType mineType = mineData.getMineType();
+
         boolean useOraxen = mineType.getUseOraxen();
         boolean useItemsAdder = mineType.getUseItemsAdder();
 
@@ -153,9 +162,11 @@ public class PrivateMinesCommand extends BaseCommand {
 
   @Subcommand("expand")
   @CommandPermission("privatemines.expand")
-  public void expand(CommandSender commandSender, Player target, int amount) {
-    if (!mineStorage.hasMine(target)) return;
-    Mine mine = mineStorage.get(target);
+  public void expand(CommandSender commandSender, OfflinePlayer target, int amount) {
+    if (!mineStorage.hasMine(Objects.requireNonNull(target.getPlayer()))) {
+      return;
+    }
+    Mine mine = mineStorage.get(target.getPlayer());
     if (mine != null) {
       if (mine.canExpand(amount)) {
         for (int i = 0; i < amount; i++) {

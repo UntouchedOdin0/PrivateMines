@@ -2,6 +2,13 @@ name: PrivateMines
 main: me.untouchedodin0.privatemines.PrivateMines
 version: 5.3
 api-version: 1.13
+authors:
+  - UntouchedOdin0
+  - BristerMitten
+  - bobby29831
+  - DrZoddiak
+  - ComputerNerd100
+  - bbSnavy
 
 depend:
   - FastAsyncWorldEdit

@@ -181,13 +181,13 @@ public class Mine {
     File minesDirectory = privateMines.getMinesDirectory().toFile();
     File file = new File(minesDirectory + fileName);
 
-    file.delete();
+    boolean delete = file.delete();
   }
 
   /**
-   * @Deprecated This isn't really used anymore.
+   * This isn't really used anymore.
    */
-  @Deprecated
+  @Deprecated(since = "5.0", forRemoval = true)
   public void replace(UUID uuid) {
     MineData mineData = getMineData();
 
