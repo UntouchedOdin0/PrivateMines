@@ -144,10 +144,8 @@ public class Mine {
     BlockVector3 corner1BV3 = BukkitAdapter.asBlockVector(mineData.getMinimumFullRegion());
     BlockVector3 corner2BV3 = BukkitAdapter.asBlockVector(mineData.getMaximumFullRegion());
 
-    Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
-    String regionName = String.format("mine-%s", Objects.requireNonNull(player).getUniqueId());
-    String fullRegionName = String.format("full-mine-%s",
-        Objects.requireNonNull(player).getUniqueId());
+    String regionName = String.format("mine-%s", uuid);
+    String fullRegionName = String.format("full-mine-%s", uuid);
 
     World world = corner1.getWorld();
     RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
@@ -533,12 +531,10 @@ public class Mine {
   }
 
   public double getPercentage() {
-    CuboidRegion region = new CuboidRegion(
-        BlockVector3.at(mineData.getMinimumMining().getBlockX(),
-            mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()),
+    CuboidRegion region = new CuboidRegion(BlockVector3.at(mineData.getMinimumMining().getBlockX(),
+        mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()),
         BlockVector3.at(mineData.getMaximumMining().getBlockX(),
-            mineData.getMaximumMining().getBlockY(),
-            mineData.getMaximumMining().getBlockZ()));
+            mineData.getMaximumMining().getBlockY(), mineData.getMaximumMining().getBlockZ()));
 
     long total = region.getVolume();
     int airBlocks = 0;
@@ -607,8 +603,7 @@ public class Mine {
     Map<String, Boolean> flags = mineData.getMineType().getFlags();
 
     if (!canExpand) {
-      privateMines.getLogger()
-          .info("Failed to expand the mine due to the mine being too large");
+      privateMines.getLogger().info("Failed to expand the mine due to the mine being too large");
     } else {
       final var fillType = BlockTypes.DIAMOND_BLOCK;
       final var wallType = BlockTypes.BEDROCK;
@@ -680,8 +675,7 @@ public class Mine {
 
       if (flags != null) {
         flags.forEach((string, aBoolean) -> {
-          Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(),
-              string);
+          Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), string);
           if (aBoolean) {
             try {
               Utils.setFlag(protectedCuboidRegion, flag, "allow");
@@ -799,8 +793,7 @@ public class Mine {
 
     Economy economy = PrivateMines.getEconomy();
     double upgradeCost = nextType.getUpgradeCost();
-    PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner,
-        this,
+    PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this,
         currentType, nextType);
     Bukkit.getPluginManager().callEvent(privateMineUpgradeEvent);
     if (privateMineUpgradeEvent.isCancelled()) {
@@ -809,8 +802,7 @@ public class Mine {
     if (player != null) {
       if (currentType == nextType) {
         this.privateMines.getLogger()
-            .info("Failed to upgrade " + player.getName()
-                + "'s mine as it was fully upgraded!");
+            .info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
       } else if (upgradeCost == 0.0D) {
         delete(true);
         mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
@@ -851,11 +843,9 @@ public class Mine {
 
     ProtectedCuboidRegion miningWorldGuardRegion = new ProtectedCuboidRegion(mineRegionName,
         minMining, maxMining);
-    ProtectedCuboidRegion fullWorldGuardRegion = new ProtectedCuboidRegion(fullRegionName,
-        minFull,
+    ProtectedCuboidRegion fullWorldGuardRegion = new ProtectedCuboidRegion(fullRegionName, minFull,
         maxFull);
-    RegionContainer regionContainer = WorldGuard.getInstance().getPlatform()
-        .getRegionContainer();
+    RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
     RegionManager regionManager = regionContainer.get(world);
 
     if (regionManager != null) {
