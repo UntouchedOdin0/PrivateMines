@@ -49,12 +49,6 @@ public class PrivateMinesCommand extends BaseCommand {
     audienceUtils.sendMessage(player, String.format("<green>Private Mines is running v%s, latest commit <gray>(%s)", localVersion, gitVersion));
   }
 
-  @Subcommand("test")
-  @CommandCompletion("@players")
-  public void test(CommandSender commandSender, OfflinePlayer offlinePlayer) {
-    commandSender.sendMessage("test");
-  }
-
   @Subcommand("give")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.give")
