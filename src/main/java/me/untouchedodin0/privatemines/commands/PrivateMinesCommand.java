@@ -18,6 +18,7 @@ import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
+import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -37,18 +38,15 @@ public class PrivateMinesCommand extends BaseCommand {
   public void defaultCommand(Player player) {
     Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
     mainMenu.open(player);
-//    commandHelp.showHelp();
   }
 
   @Subcommand("version")
-  @CommandCompletion("@player @addon")
   @CommandPermission("privatemines.version")
-  public void version(Player player, String addon) {
-    if (addon.isEmpty()) {
-      player.sendMessage(String.format("PrivateMines is running addons v%s", "0"));
-    } else {
-      player.sendMessage("ignoreme " + addon);
-    }
+  public void version(Player player) {
+    String localVersion = privateMines.getDescription().getVersion();
+    String gitVersion = Utils.getGit();
+
+    audienceUtils.sendMessage(player, String.format("<green>Private Mines is running v%s, latest commit <gray>(%s)", localVersion, gitVersion));
   }
 
   @Subcommand("test")

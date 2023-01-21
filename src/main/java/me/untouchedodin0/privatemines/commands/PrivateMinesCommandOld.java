@@ -40,7 +40,6 @@ import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.AudienceUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.WorldBorderUtils;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
@@ -444,20 +443,20 @@ public class PrivateMinesCommandOld {
     privateMines.getConfigManager().load();
   }
 
-  @CommandHook("setborder")
-  public void setBorder(Player player, Player target, int size) {
-    WorldBorderUtils worldBorderUtils = privateMines.getWorldBorderUtils();
-    Server server = Bukkit.getServer();
-    Location location = player.getLocation();
-
-    player.sendMessage("worldBorderUtils: " + worldBorderUtils);
-    worldBorderUtils.sendWorldBorder(server, player, location, size);
-  }
-
-  @CommandHook("clearborder")
-  public void clearborder(Player player, Player target) {
-    WorldBorderUtils worldBorderUtils = privateMines.getWorldBorderUtils();
-    WorldBorder worldBorder = worldBorderUtils.getWorldBorder(player);
-    worldBorderUtils.clearBorder(player);
-  }
+//  @CommandHook("setborder")
+//  public void setBorder(Player player, Player target, int size) {
+//    WorldBorderUtils worldBorderUtils = privateMines.getWorldBorderUtils();
+//    Server server = Bukkit.getServer();
+//    Location location = player.getLocation();
+//
+//    player.sendMessage("worldBorderUtils: " + worldBorderUtils);
+//    worldBorderUtils.sendWorldBorder(server, player, location, size);
+//  }
+//
+//  @CommandHook("clearborder")
+//  public void clearborder(Player player, Player target) {
+//    WorldBorderUtils worldBorderUtils = privateMines.getWorldBorderUtils();
+//    WorldBorder worldBorder = worldBorderUtils.getWorldBorder(player);
+//    worldBorderUtils.clearBorder(player);
+//  }
 }

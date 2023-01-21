@@ -77,7 +77,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import redempt.redlib.RedLib;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
@@ -107,7 +106,6 @@ public class PrivateMines extends JavaPlugin {
   private SlimeUtils slimeUtils;
   private static Economy econ = null;
   private BukkitAudiences adventure;
-  private WorldBorderUtils worldBorderUtils;
   private Gson gson;
   String matString;
   double percent;
@@ -146,10 +144,6 @@ public class PrivateMines extends JavaPlugin {
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
-    }
-
-    if (RedLib.MID_VERSION >= 19) {
-      worldBorderUtils = new WorldBorderUtils();
     }
 
     if (Config.enableTax) {
@@ -531,7 +525,7 @@ public class PrivateMines extends JavaPlugin {
     return adventure;
   }
 
-  public WorldBorderUtils getWorldBorderUtils() {
-    return worldBorderUtils;
-  }
+//  public WorldBorderUtils getWorldBorderUtils() {
+//    return worldBorderUtils;
+//  }
 }

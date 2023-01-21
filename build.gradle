@@ -5,10 +5,11 @@ plugins {
     id 'io.github.gradle-nexus.publish-plugin' version "1.1.0"
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'org.jetbrains.kotlin.jvm' version '1.7.22'
+    id 'org.ajoberstar.grgit' version '4.0.1'
 }
 
 group 'me.untouchedodin0.privatemines'
-version '5.3.1'
+version '5.3.2'
 
 def devBuild = false
 
@@ -68,11 +69,12 @@ dependencies {
     implementation 'net.kyori:adventure-platform-bukkit:4.2.0'
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
+    implementation 'com.jeff_media:SpigotUpdateChecker:3.0.0'
 
-    implementation project(':WorldBorder')
+//    implementation project(':WorldBorder')
 }
-
-jar { from('resources') { include 'META-INF/services/*.*' } }
 
 shadowJar {
     mergeServiceFiles()

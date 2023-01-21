@@ -21,6 +21,8 @@
 
 package me.untouchedodin0.privatemines.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -30,16 +32,23 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import me.untouchedodin0.privatemines.utils.regions.CubeRegion;
 import org.apache.commons.lang.WordUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
 public class Utils {
+
 
   public static Location getRelative(Region region, int x, int y, int z) {
     final BlockVector3 point = region.getMinimumPoint().getMinimum(region.getMaximumPoint());
@@ -76,8 +85,7 @@ public class Utils {
     return false;
   }
 
-  public static CuboidRegion toWorldEditCuboid(
-      CubeRegion cubeRegion) {
+  public static CuboidRegion toWorldEditCuboid(CubeRegion cubeRegion) {
     var min = BlockVector3.at(cubeRegion.getMinimumPoint().getBlockX(),
         cubeRegion.getMinimumPoint().getBlockY(), cubeRegion.getMinimumPoint().getBlockZ());
 
@@ -147,5 +155,23 @@ public class Utils {
       randomString.append(total_characters.charAt(index));
     }
     return randomString.toString();
+  }
+
+  public static String getGit() {
+
+    try (CloseableHttpClient client = HttpClients.createDefault()) {
+      HttpGet request = new HttpGet(
+          "https://api.github.com/repos/UntouchedOdin0/PrivateMines/commits");
+      CloseableHttpResponse response = client.execute(request);
+      String responseBody = EntityUtils.toString(response.getEntity());
+
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode root = mapper.readTree(responseBody);
+      JsonNode latestCommit = root.get(0);
+      String sha = latestCommit.get("sha").textValue();
+      return sha.substring(0, Math.min(7, sha.length()));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
