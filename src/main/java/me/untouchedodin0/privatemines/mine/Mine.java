@@ -388,8 +388,8 @@ public class Mine {
           for (int i4 = k; i4 <= i1; i4++) {
             String random = weightedRandom.roll();
             Block block = world.getBlockAt(i2, i3, i4);
-            block.setType(Material.AIR, false);
-            OraxenBlocks.place(random, block.getLocation());
+            Task.syncDelayed(() -> block.setType(Material.AIR, false));
+            Task.syncDelayed(() -> OraxenBlocks.place(random, block.getLocation()));
           }
         }
       }
@@ -491,6 +491,22 @@ public class Mine {
           }
         }
       }
+    }
+  }
+
+  public void handleReset() {
+    MineData mineData = getMineData();
+    MineType mineType = mineData.getMineType();
+
+    boolean useOraxen = mineType.getUseOraxen();
+    boolean useItemsAdder = mineType.getUseItemsAdder();
+
+    if (!useOraxen && !useItemsAdder) {
+      reset();
+    } else if (mineType.getOraxen() != null && useOraxen) {
+      resetOraxen();
+    } else if (mineType.getItemsAdder() != null && useItemsAdder) {
+      resetItemsAdder();
     }
   }
 

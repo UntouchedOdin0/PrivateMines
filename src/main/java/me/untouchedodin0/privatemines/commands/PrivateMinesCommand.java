@@ -125,20 +125,7 @@ public class PrivateMinesCommand extends BaseCommand {
     } else {
       Mine mine = mineStorage.get(player);
       if (mine != null) {
-
-        MineData mineData = mine.getMineData();
-        MineType mineType = mineData.getMineType();
-
-        boolean useOraxen = mineType.getUseOraxen();
-        boolean useItemsAdder = mineType.getUseItemsAdder();
-
-        if (!useOraxen && !useItemsAdder) {
-          mine.reset();
-        } else if (mineType.getOraxen() != null && useOraxen) {
-          mine.resetOraxen();
-        } else if (mineType.getItemsAdder() != null && useItemsAdder) {
-          mine.resetItemsAdder();
-        }
+        mine.handleReset();
       }
     }
   }
