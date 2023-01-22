@@ -310,9 +310,9 @@ public class MineFactory {
           if (!useOraxen && !useItemsAdder) {
             mine.reset();
           } else if (mineType.getOraxen() != null && useOraxen) {
-            Task.syncDelayed(mine::resetOraxen);
+            mine.resetOraxen();
           } else if (mineType.getItemsAdder() != null && useItemsAdder) {
-            Task.syncDelayed(mine::resetItemsAdder);
+            mine.resetItemsAdder();
           }
 
           TextComponent teleportMessage = new TextComponent(

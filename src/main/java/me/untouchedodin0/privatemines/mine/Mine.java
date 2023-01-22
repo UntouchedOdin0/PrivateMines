@@ -801,15 +801,11 @@ public class Mine {
     }
     if (player != null) {
       if (currentType == nextType) {
-        this.privateMines.getLogger()
+        privateMines.getLogger()
             .info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
       } else if (upgradeCost == 0.0D) {
         delete(true);
         mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
-        Mine mine = mineStorage.get(mineOwner);
-        if (mine != null) {
-          mine.reset();
-        }
       } else {
         double balance = economy.getBalance(player);
         if (balance < upgradeCost) {
