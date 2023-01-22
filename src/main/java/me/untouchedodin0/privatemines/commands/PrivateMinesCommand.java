@@ -6,6 +6,7 @@ import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
+import com.comphenix.protocol.PacketType.Play;
 import java.util.Objects;
 import me.untouchedodin0.kotlin.menu.Menu;
 import me.untouchedodin0.kotlin.mine.data.MineData;
@@ -18,8 +19,10 @@ import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
+import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import net.royawesome.jlibnoise.module.combiner.Min;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -72,7 +75,8 @@ public class PrivateMinesCommand extends BaseCommand {
         mineFactory.create(target.getPlayer(), location, defaultMineType, true);
         if (sender instanceof Player player) {
           audienceUtils.sendMessage(player, target,
-              MessagesConfig.gavePlayerMine.replace("{name}", target.getName()));
+              MessagesConfig.gavePlayerMine.replace("{name}",
+                  Objects.requireNonNull(target.getName())));
         }
       }
     }
@@ -166,5 +170,70 @@ public class PrivateMinesCommand extends BaseCommand {
         }
       }
     }
+  }
+
+  @Subcommand("open")
+  @CommandPermission("privatemines.open")
+  public void open(Player player) {
+    Mine mine = mineStorage.get(player);
+    MineData mineData;
+    if (mine != null) {
+      mineData = mine.getMineData();
+      mineData.setOpen(true);
+      mine.setMineData(mineData);
+      mineStorage.replaceMineNoLog(player, mine);
+    }
+  }
+
+  @Subcommand("close")
+  @CommandPermission("privatemines.close")
+  public void close(Player player) {
+    Mine mine = mineStorage.get(player);
+    MineData mineData;
+    if (mine != null) {
+      mineData = mine.getMineData();
+      mineData.setOpen(false);
+      mine.setMineData(mineData);
+      mineStorage.replaceMineNoLog(player, mine);
+    }
+  }
+
+  @Subcommand("ban")
+  public void ban(Player player, Player target) {
+    Mine mine = mineStorage.get(player);
+    if (mine != null) {
+      mine.ban(target);
+      mineStorage.replaceMineNoLog(player, mine);
+    }
+  }
+
+  @Subcommand("unban")
+  public void unban(Player player, Player target) {
+    Mine mine = mineStorage.get(player);
+    if (mine != null) {
+      mine.unban(target);
+      mineStorage.replaceMineNoLog(player, mine);
+    }
+  }
+
+  @Subcommand("tax")
+  public void tax(Player player, double tax) {
+    Mine mine = mineStorage.get(player);
+    if (mine != null) {
+      MineData mineData = mine.getMineData();
+      mineData.setTax(tax);
+      mine.setMineData(mineData);
+      mineStorage.replaceMineNoLog(player, mine);
+    }
+  }
+
+  @Subcommand("claim")
+  public void claim(Player player) {
+    QueueUtils queueUtils = privateMines.getQueueUtils();
+    if (queueUtils.isInQueue(player.getUniqueId())) {
+      player.sendMessage(ChatColor.RED + "You're already in the queue!");
+      return;
+    }
+    queueUtils.claim(player);
   }
 }

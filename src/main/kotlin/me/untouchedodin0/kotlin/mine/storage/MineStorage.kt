@@ -50,6 +50,10 @@ class MineStorage {
     fun replaceMineNoLog(uuid: UUID, mine: Mine) =
         mines.replace(uuid, mine) ?: logger.warning("Player $uuid doesn't have a mine!")
 
+    fun replaceMineNoLog(player: Player, mine: Mine) {
+        mines.replace(player.uniqueId, mine)
+    }
+
     fun hasMine(uuid: UUID): Boolean {
         return mines.containsKey(uuid)
     }

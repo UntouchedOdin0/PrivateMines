@@ -11,6 +11,7 @@ plugins {
 group 'me.untouchedodin0.privatemines'
 version '5.3.2'
 
+def pluginVersion = '5.3.2'
 def devBuild = false
 
 if (devBuild) {

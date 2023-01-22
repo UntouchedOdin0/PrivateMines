@@ -61,6 +61,7 @@ import me.untouchedodin0.privatemines.listener.sell.UPCSellListener;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
+import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
@@ -104,6 +105,7 @@ public class PrivateMines extends JavaPlugin {
   private MineTypeManager mineTypeManager;
   private ConfigManager configManager;
   private SlimeUtils slimeUtils;
+  private QueueUtils queueUtils;
   private static Economy econ = null;
   private BukkitAudiences adventure;
   private Gson gson;
@@ -130,6 +132,7 @@ public class PrivateMines extends JavaPlugin {
     this.mineStorage = new MineStorage();
     this.pregenStorage = new PregenStorage();
     this.mineTypeManager = new MineTypeManager(this);
+    this.queueUtils = new QueueUtils();
 
     GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
@@ -525,7 +528,7 @@ public class PrivateMines extends JavaPlugin {
     return adventure;
   }
 
-//  public WorldBorderUtils getWorldBorderUtils() {
-//    return worldBorderUtils;
-//  }
+  public QueueUtils getQueueUtils() {
+    return queueUtils;
+  }
 }
