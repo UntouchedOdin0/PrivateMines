@@ -5,8 +5,10 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Split;
 import co.aikar.commands.annotation.Subcommand;
-import com.comphenix.protocol.PacketType.Play;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import me.untouchedodin0.kotlin.menu.Menu;
 import me.untouchedodin0.kotlin.mine.data.MineData;
@@ -22,9 +24,9 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import net.royawesome.jlibnoise.module.combiner.Min;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -144,6 +146,7 @@ public class PrivateMinesCommand extends BaseCommand {
   }
 
   @Subcommand("expand")
+  @CommandCompletion("@players")
   @CommandPermission("privatemines.expand")
   public void expand(CommandSender commandSender, OfflinePlayer target, int amount) {
     if (!mineStorage.hasMine(Objects.requireNonNull(target.getPlayer()))) {
@@ -186,6 +189,7 @@ public class PrivateMinesCommand extends BaseCommand {
   }
 
   @Subcommand("ban")
+  @CommandPermission("privatemines.ban")
   public void ban(Player player, Player target) {
     Mine mine = mineStorage.get(player);
     if (mine != null) {
@@ -195,6 +199,7 @@ public class PrivateMinesCommand extends BaseCommand {
   }
 
   @Subcommand("unban")
+  @CommandPermission("privatemines.unban")
   public void unban(Player player, Player target) {
     Mine mine = mineStorage.get(player);
     if (mine != null) {
@@ -204,6 +209,7 @@ public class PrivateMinesCommand extends BaseCommand {
   }
 
   @Subcommand("tax")
+  @CommandPermission("privatemines.tax")
   public void tax(Player player, double tax) {
     Mine mine = mineStorage.get(player);
     if (mine != null) {
@@ -215,6 +221,7 @@ public class PrivateMinesCommand extends BaseCommand {
   }
 
   @Subcommand("claim")
+  @CommandPermission("privatemines.claim")
   public void claim(Player player) {
     QueueUtils queueUtils = privateMines.getQueueUtils();
     if (queueUtils.isInQueue(player.getUniqueId())) {
@@ -222,5 +229,26 @@ public class PrivateMinesCommand extends BaseCommand {
       return;
     }
     queueUtils.claim(player);
+  }
+
+  @Subcommand("setblocks")
+  @CommandCompletion("@players")
+  @CommandPermission("privatemines.setblocks")
+  public void setBlocks(Player player, @Split(",") String[] materials, Player target) {
+    Map<Material, Double> map = new HashMap<>();
+
+    for (String mat : materials) {
+      Material material = Material.valueOf(mat.toUpperCase());
+      map.put(material, 1.0);
+    }
+
+    Mine mine = mineStorage.get(target);
+    if (mine != null) {
+      MineData mineData = mine.getMineData();
+      mineData.setMaterials(map);
+      mine.setMineData(mineData);
+      mineStorage.replaceMineNoLog(player, mine);
+      mine.handleReset();
+    }
   }
 }

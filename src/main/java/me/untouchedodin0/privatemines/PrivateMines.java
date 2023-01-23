@@ -24,7 +24,6 @@ package me.untouchedodin0.privatemines;
 import co.aikar.commands.PaperCommandManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.papermc.lib.PaperLib;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -239,8 +238,6 @@ public class PrivateMines extends JavaPlugin {
 
     Task.syncDelayed(this::loadMines);
     Task.syncDelayed(this::loadPregenMines);
-
-    PaperLib.suggestPaper(this);
 
     getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
     if (!setupEconomy()) {

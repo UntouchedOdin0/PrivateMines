@@ -40,7 +40,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import dev.lone.itemsadder.api.CustomBlock;
-import io.papermc.lib.PaperLib;
 import io.th0rgal.oraxen.api.OraxenBlocks;
 import java.io.File;
 import java.io.IOException;
@@ -115,13 +114,10 @@ public class Mine {
   public void teleport(Player player) {
     if (getSpawnLocation().getBlock().getType().isBlock()) {
       getSpawnLocation().getBlock().setType(Material.AIR, false);
-      if (PaperLib.isPaper()) {
-        PaperLib.teleportAsync(player, getSpawnLocation());
-      } else {
-        player.teleport(getSpawnLocation());
-      }
+      player.teleport(getSpawnLocation());
     }
   }
+
 
   public void delete(boolean removeStructure) {
     UUID uuid = getMineData().getMineOwner();

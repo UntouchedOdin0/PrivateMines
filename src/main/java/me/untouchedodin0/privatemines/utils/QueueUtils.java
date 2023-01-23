@@ -12,7 +12,6 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -72,7 +71,19 @@ public class QueueUtils {
         if (!uuid.equals(player.getUniqueId())) {
           slot.incrementAndGet();
         } else {
-          player.sendMessage(ChatColor.GREEN + "You're at slot #" + slot.get());
+          AtomicInteger place = new AtomicInteger(1);
+          for (UUID uuid1 : uuidList) {
+            if (!uuid1.equals(player.getUniqueId())) {
+              place.incrementAndGet();
+            }
+          }
+          int estimateSeconds = place.get() * 3;
+
+          player.sendTitle(ChatColor.GREEN + "You're at slot #" + slot.get(),
+              ChatColor.YELLOW + String.format(" Estimated wait time: %d seconds!", estimateSeconds));
+
+          player.sendMessage(ChatColor.GREEN + "You're at slot #" + slot.get()
+              + String.format(" Estimated wait time: %d seconds!", estimateSeconds));
         }
       }
     }, 0L, 60L);
@@ -80,7 +91,6 @@ public class QueueUtils {
     Task.syncRepeating(() -> {
       UUID poll = queue.poll();
       if (poll == null) return;
-      Bukkit.broadcastMessage("poll " + poll);
       if (poll.equals(player.getUniqueId())) {
         player.sendMessage(ChatColor.GREEN + "Creating your mine.....");
         mineFactory.create(player, location, defaultMineType, true);
