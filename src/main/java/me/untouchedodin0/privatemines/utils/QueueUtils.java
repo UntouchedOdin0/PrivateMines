@@ -81,9 +81,6 @@ public class QueueUtils {
 
           player.sendTitle(ChatColor.GREEN + "You're at slot #" + slot.get(),
               ChatColor.YELLOW + String.format(" Estimated wait time: %d seconds!", estimateSeconds));
-
-          player.sendMessage(ChatColor.GREEN + "You're at slot #" + slot.get()
-              + String.format(" Estimated wait time: %d seconds!", estimateSeconds));
         }
       }
     }, 0L, 60L);
