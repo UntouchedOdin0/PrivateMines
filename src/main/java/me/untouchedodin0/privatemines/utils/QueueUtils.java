@@ -57,10 +57,12 @@ public class QueueUtils {
       return;
     }
 
+    if (queue.contains(player.getUniqueId())) {
+      player.sendMessage(ChatColor.RED + "You're already in the queue!");
+    }
     for (int i = 0; i < 15; i++) {
       queue.add(UUID.randomUUID());
     }
-    if (queue.contains(player.getUniqueId())) return;
     claim(player.getUniqueId());
 
     Task.syncRepeating(() -> {

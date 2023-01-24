@@ -257,40 +257,17 @@ public class Mine {
       }
     }
 
-    final MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
-
     World world = location.getWorld();
-    World privateMinesWorld = mineWorldManager.getMinesWorld();
-
     Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
-
-    Player player = Bukkit.getPlayer(mineData.getMineOwner());
-    if (player != null && player.isOnline()) {
-      boolean isPlayerInRegion = region.contains(player.getLocation().getBlockX(),
-          player.getLocation().getBlockY(), player.getLocation().getBlockZ());
-      boolean inWorld = player.getWorld().equals(privateMinesWorld);
-
-      if (isPlayerInRegion && inWorld) {
-        teleport(player);
-      }
-    }
-
-    for (Player online : Bukkit.getOnlinePlayers()) {
-      boolean isPlayerInRegion = region.contains(online.getLocation().getBlockX(),
-          online.getLocation().getBlockY(), online.getLocation().getBlockZ());
-      boolean inWorld = online.getWorld().equals(privateMinesWorld);
-
-      if (isPlayerInRegion && inWorld) {
-        teleport(online);
-      }
-    }
-
-//    if (Config.addWallGap) {
-//      region.contract(ExpansionUtils.expansionVectors(Config.wallsGap));
-//    }
 
     try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
         .world(BukkitAdapter.adapt(world)).fastMode(true).build()) {
+      if (Config.addWallGap) {
+        editSession.setBlocks(region, BukkitAdapter.adapt(Material.AIR.createBlockData()));
+        for (int i = 0; i < Config.wallsGap; i++) {
+          region.contract(ExpansionUtils.contractVectors(1));
+        }
+      }
       editSession.setBlocks(region, randomPattern);
       editSession.flushQueue();
     }
@@ -503,6 +480,28 @@ public class Mine {
       resetOraxen();
     } else if (mineType.getItemsAdder() != null && useItemsAdder) {
       resetItemsAdder();
+    }
+
+    World world = PrivateMines.getPrivateMines().getMineWorldManager().getMinesWorld();
+    BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
+    BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
+
+    Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
+    Player owner = Bukkit.getPlayer(mineData.getMineOwner());
+
+    for (Player online : Bukkit.getOnlinePlayers()) {
+      boolean isPlayerInRegion = region.contains(online.getLocation().getBlockX(),
+          online.getLocation().getBlockY(), online.getLocation().getBlockZ());
+      boolean inWorld = online.getWorld().equals(world);
+
+      if (isPlayerInRegion && inWorld) teleport(online);
+    }
+
+    if (owner != null) {
+      boolean isPlayerInRegion = region.contains(owner.getLocation().getBlockX(),
+          owner.getLocation().getBlockY(), owner.getLocation().getBlockZ());
+      boolean inWorld = owner.getWorld().equals(world);
+      if (isPlayerInRegion && inWorld) teleport(owner);
     }
   }
 
