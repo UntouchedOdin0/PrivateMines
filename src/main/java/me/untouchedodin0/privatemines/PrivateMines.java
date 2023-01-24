@@ -238,6 +238,7 @@ public class PrivateMines extends JavaPlugin {
 
     Task.syncDelayed(this::loadMines);
     Task.syncDelayed(this::loadPregenMines);
+    Task.syncDelayed(this::saveCache);
 
     getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
     if (!setupEconomy()) {
@@ -263,7 +264,7 @@ public class PrivateMines extends JavaPlugin {
     gson = gsonBuilder.create();
 
     File file = new File("plugins/PrivateMines/donottouch.json");
-    Location currentLocation = mineWorldManager.getCurrentLocation();
+    Location currentLocation = mineWorldManager.getNextFreeLocation();
     String currentLocationJson = gson.toJson(currentLocation);
 
     try {
@@ -459,6 +460,25 @@ public class PrivateMines extends JavaPlugin {
 
   public void savePregenMines() {
     getPregenStorage().getMines().forEach(PregenMine::save);
+  }
+
+  public void saveCache() {
+    Task.asyncRepeating(() -> {
+
+      GsonBuilder gsonBuilder = new GsonBuilder();
+      gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
+      gson = gsonBuilder.create();
+
+      File file = new File("plugins/PrivateMines/donottouch.json");
+      Location currentLocation = mineWorldManager.getCurrentLocation();
+      String currentLocationJson = gson.toJson(currentLocation);
+
+      try {
+        Files.writeString(file.toPath(), currentLocationJson);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }, 100L, 100L);
   }
 
   public SchematicStorage getSchematicStorage() {

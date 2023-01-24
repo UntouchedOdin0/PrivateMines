@@ -7,6 +7,7 @@ import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Split;
 import co.aikar.commands.annotation.Subcommand;
+import java.nio.Buffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -24,6 +25,7 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -158,6 +160,7 @@ public class PrivateMinesCommand extends BaseCommand {
         for (int i = 0; i < amount; i++) {
           mine.expand();
         }
+        commandSender.sendMessage(ChatColor.GREEN + "Successfully expanded " + target.getName() + "'s mine!");
       }
     }
   }

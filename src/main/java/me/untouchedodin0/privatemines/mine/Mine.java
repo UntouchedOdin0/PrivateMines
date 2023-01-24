@@ -446,20 +446,26 @@ public class Mine {
       Location min = BukkitAdapter.adapt(world, corner1);
       Location max = BukkitAdapter.adapt(world, corner2);
 
-      int i = (int) Math.min(min.getX(), max.getX());
-      int j = (int) Math.min(min.getY(), max.getY());
-      int k = (int) Math.min(min.getZ(), max.getZ());
-      int m = (int) Math.max(min.getX(), max.getX());
-      int n = (int) Math.max(min.getY(), max.getY());
-      int i1 = (int) Math.max(min.getZ(), max.getZ());
+      int xMin = (int) Math.min(min.getX(), max.getX());
+      int yMin = (int) Math.min(min.getY(), max.getY());
+      int zMin = (int) Math.min(min.getZ(), max.getZ());
+      int xMax = (int) Math.max(min.getX(), max.getX());
+      int yMax = (int) Math.max(min.getY(), max.getY());
+      int zMax = (int) Math.max(min.getZ(), max.getZ());
 
-      for (int i2 = i; i2 <= m; i2++) {
-        for (int i3 = j; i3 <= n; i3++) {
-          for (int i4 = k; i4 <= i1; i4++) {
+      // Iterate over all blocks in the x, y, and z range
+      for (int x = xMin; x <= xMax; x++) {
+        for (int y = yMin; y <= yMax; y++) {
+          for (int z = zMin; z <= zMax; z++) {
+            // Get a random block from the weightedRandom object
             String random = weightedRandom.roll();
-            Block block = world.getBlockAt(i2, i3, i4);
+            // Get the block at the current x, y, z coordinates
+            Block block = world.getBlockAt(x, y, z);
+            // Set the block to air
             block.setType(Material.AIR, false);
+            // Get the custom block corresponding to the random block
             CustomBlock customBlock = CustomBlock.getInstance(random);
+            // Place the custom block at the current location
             customBlock.place(block.getLocation());
           }
         }
