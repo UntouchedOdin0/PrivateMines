@@ -29,7 +29,9 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import redempt.redlib.misc.LocationUtils;
 
 public class PrivateMinesExpansion extends PlaceholderExpansion {
 
@@ -60,28 +62,47 @@ public class PrivateMinesExpansion extends PlaceholderExpansion {
   }
 
   @Override
-  public String onRequest(OfflinePlayer player, @NotNull String params) {
+  public String onRequest(OfflinePlayer offlinePlayer, @NotNull String params) {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
+    Player player = offlinePlayer.getPlayer();
     MineStorage mineStorage = privateMines.getMineStorage();
-    Mine mine = mineStorage.get(Objects.requireNonNull(player.getPlayer()).getUniqueId());
-    MineData mineData;
+    Mine mine;
 
-    if (params.equalsIgnoreCase("size")) {
-      if (mine != null) {
-        mineData = mine.getMineData();
-        Location minimum = mineData.getMinimumMining();
-        Location maximum = mineData.getMaximumMining();
-        double distance = maximum.distance(minimum);
-        int distanceInt = (int) distance;
+    if (player != null) {
+      mine = mineStorage.get(Objects.requireNonNull(player.getPlayer()).getUniqueId());
 
-        return Integer.toString(distanceInt);
+      Location location = player.getPlayer().getLocation();
+
+      switch (params.toLowerCase()) {
+        case "size":
+          if (mine != null) {
+            MineData mineData = mine.getMineData();
+            Location minimum = mineData.getMinimumMining();
+            Location maximum = mineData.getMaximumMining();
+            double distance = maximum.distance(minimum);
+            int distanceInt = (int) distance;
+
+            return Integer.toString(distanceInt);
+          }
+        case "owner":
+          Mine closest = mineStorage.getClosest(location);
+          if (closest != null) {
+            MineData mineData = closest.getMineData();
+            return String.valueOf(mineData.getMineOwner());
+          }
+          break;
+        case "location":
+          Mine mine1 = mineStorage.get(player);
+          if (mine1 != null) {
+            return String.valueOf(mine1.getLocation());
+          }
+        case "spawn":
+          Mine mine2 = mineStorage.get(player);
+          if (mine2 != null) {
+            return LocationUtils.toString(mine2.getSpawnLocation());
+          }
       }
-      return "";
-    }
-
-    if (params.equalsIgnoreCase("placeholder2")) {
-      return "test2";
     }
 
     return null; // Placeholder is unknown by the Expansion

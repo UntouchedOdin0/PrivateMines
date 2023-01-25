@@ -7,7 +7,6 @@ import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Split;
 import co.aikar.commands.annotation.Subcommand;
-import java.nio.Buffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -25,7 +24,6 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -53,7 +51,9 @@ public class PrivateMinesCommand extends BaseCommand {
     String localVersion = privateMines.getDescription().getVersion();
     String gitVersion = Utils.getGit();
 
-    audienceUtils.sendMessage(player, String.format("<green>Private Mines is running v%s, latest commit <gray>(%s)", localVersion, gitVersion));
+    audienceUtils.sendMessage(player,
+        String.format("<green>Private Mines is running v%s, latest commit <gray>(%s)", localVersion,
+            gitVersion));
   }
 
   @Subcommand("give")
@@ -160,7 +160,8 @@ public class PrivateMinesCommand extends BaseCommand {
         for (int i = 0; i < amount; i++) {
           mine.expand();
         }
-        commandSender.sendMessage(ChatColor.GREEN + "Successfully expanded " + target.getName() + "'s mine!");
+        commandSender.sendMessage(
+            ChatColor.GREEN + "Successfully expanded " + target.getName() + "'s mine!");
       }
     }
   }
@@ -235,9 +236,8 @@ public class PrivateMinesCommand extends BaseCommand {
   }
 
   @Subcommand("setblocks")
-  @CommandCompletion("@players")
   @CommandPermission("privatemines.setblocks")
-  public void setBlocks(Player player, @Split(",") String[] materials, Player target) {
+  public void setBlocks(CommandSender commandSender, @Split(",") String[] materials, OfflinePlayer target) {
     Map<Material, Double> map = new HashMap<>();
 
     for (String mat : materials) {
@@ -245,13 +245,15 @@ public class PrivateMinesCommand extends BaseCommand {
       map.put(material, 1.0);
     }
 
-    Mine mine = mineStorage.get(target);
-    if (mine != null) {
-      MineData mineData = mine.getMineData();
-      mineData.setMaterials(map);
-      mine.setMineData(mineData);
-      mineStorage.replaceMineNoLog(player, mine);
-      mine.handleReset();
+    if (target != null) {
+      Mine mine = mineStorage.get(Objects.requireNonNull(target.getPlayer()));
+      if (mine != null) {
+        MineData mineData = mine.getMineData();
+        mineData.setMaterials(map);
+        mine.setMineData(mineData);
+        mineStorage.replaceMineNoLog(target.getPlayer(), mine);
+        mine.handleReset();
+      }
     }
   }
 }

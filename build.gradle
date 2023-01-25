@@ -51,7 +51,6 @@ dependencies {
         exclude module: 'opus-java'
     }
 
-    compileOnly 'com.comphenix.protocol:ProtocolLib:4.8.0'
     compileOnly 'me.clip:placeholderapi:2.11.2'
     compileOnly 'com.github.LoneDev6:api-itemsadder:3.0.0'
     compileOnly 'com.github.oraxen:oraxen:-SNAPSHOT'
@@ -69,6 +68,7 @@ dependencies {
     implementation 'net.kyori:adventure-platform-bukkit:4.2.0'
     implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    implementation 'com.github.byteful:MiniMapGUI:1.0.0'
 
 //    implementation project(':WorldBorder')
 }
