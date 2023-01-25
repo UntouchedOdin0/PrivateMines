@@ -27,7 +27,9 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
+import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -56,7 +58,14 @@ public class PlayerJoinListener implements Listener {
         return;
       }
 
-      mineFactory.create(player, location, defaultMineType, true);
+      QueueUtils queueUtils = privateMines.getQueueUtils();
+      if (queueUtils.isInQueue(player.getUniqueId())) {
+        player.sendMessage(ChatColor.RED + "You're already in the queue!");
+        return;
+      }
+      queueUtils.claim(player);
+
+//      mineFactory.create(player, location, defaultMineType, true);
     }
   }
 }
