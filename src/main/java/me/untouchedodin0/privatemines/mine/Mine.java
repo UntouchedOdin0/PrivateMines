@@ -823,6 +823,10 @@ public class Mine {
       } else if (upgradeCost == 0.0D) {
         delete(true);
         mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
+        Mine mine = mineStorage.get(player);
+        if (mine != null) {
+          mine.handleReset();
+        }
       } else {
         double balance = economy.getBalance(player);
         if (balance < upgradeCost) {
@@ -832,6 +836,10 @@ public class Mine {
           delete(true);
           mineFactory.create(Objects.requireNonNull(player), mineLocation.subtract(0, 0, 1),
               nextType, true);
+          Mine mine = mineStorage.get(player);
+          if (mine != null) {
+            mine.handleReset();
+          }
           economy.withdrawPlayer(player, upgradeCost);
         }
       }

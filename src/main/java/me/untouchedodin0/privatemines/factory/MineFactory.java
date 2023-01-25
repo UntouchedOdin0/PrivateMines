@@ -307,13 +307,7 @@ public class MineFactory {
           boolean useOraxen = mineType.getUseOraxen();
           boolean useItemsAdder = mineType.getUseItemsAdder();
 
-          if (!useOraxen && !useItemsAdder) {
-            mine.reset();
-          } else if (mineType.getOraxen() != null && useOraxen) {
-            mine.resetOraxen();
-          } else if (mineType.getItemsAdder() != null && useItemsAdder) {
-            mine.resetItemsAdder();
-          }
+          mine.handleReset();
 
           TextComponent teleportMessage = new TextComponent(
               ChatColor.GREEN + "Click me to teleport to your mine!");
@@ -505,7 +499,8 @@ public class MineFactory {
             privateMines.getMineStorage().addMine(uuid, mine);
           }
 
-          mine.reset();
+          mine.handleReset();
+//          mine.reset();
           TextComponent teleportMessage = new TextComponent(
               ChatColor.GREEN + "Click me to teleport to your mine!");
           teleportMessage.setClickEvent(
