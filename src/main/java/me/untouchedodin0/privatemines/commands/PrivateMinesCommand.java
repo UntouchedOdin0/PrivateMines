@@ -236,6 +236,7 @@ public class PrivateMinesCommand extends BaseCommand {
   }
 
   @Subcommand("setblocks")
+  @CommandCompletion("@players")
   @CommandPermission("privatemines.setblocks")
   public void setBlocks(CommandSender commandSender, @Split(",") String[] materials, OfflinePlayer target) {
     Map<Material, Double> map = new HashMap<>();
