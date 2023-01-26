@@ -43,10 +43,8 @@ public class MineResetListener implements Listener {
     if (event.getLoginResult().equals(ALLOWED)) {
       UUID uuid = event.getUniqueId();
       Mine mine = mineStorage.get(uuid);
-
       if (mine != null) {
-        mine.startResetTask();
-        mine.startPercentageTask();
+        mine.startTasks();
       }
     }
   }

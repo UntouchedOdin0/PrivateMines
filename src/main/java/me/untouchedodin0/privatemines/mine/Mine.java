@@ -283,6 +283,12 @@ public class Mine {
     Location location = mineData.getMinimumMining();
     BlockVector3 corner1 = BukkitAdapter.asBlockVector(mineData.getMinimumMining());
     BlockVector3 corner2 = BukkitAdapter.asBlockVector(mineData.getMaximumMining());
+    Region region = new CuboidRegion(BukkitAdapter.adapt(location.getWorld()), corner1, corner2);
+    if (Config.addWallGap) {
+      for (int i = 0; i < Config.wallsGap; i++) {
+        region.contract(ExpansionUtils.contractVectors(1));
+      }
+    }
 
     Map<Material, Double> materials = mineType.getMaterials();
     Map<Material, Double> mineBlocks = mineData.getMaterials();
@@ -322,8 +328,6 @@ public class Mine {
     World world = location.getWorld();
     World privateMinesWorld = mineWorldManager.getMinesWorld();
 
-    Region region = new CuboidRegion(BukkitAdapter.adapt(world), corner1, corner2);
-
     Player player = Bukkit.getPlayer(mineData.getMineOwner());
     if (player != null && player.isOnline()) {
       boolean isPlayerInRegion = region.contains(player.getLocation().getBlockX(),
@@ -346,8 +350,12 @@ public class Mine {
     }
 
     if (world != null) {
-      Location min = BukkitAdapter.adapt(world, corner1);
-      Location max = BukkitAdapter.adapt(world, corner2);
+
+      BlockVector3 regionCorner1 = region.getMinimumPoint();
+      BlockVector3 regionCorner2 = region.getMaximumPoint();
+
+      Location min = BukkitAdapter.adapt(world, regionCorner1);
+      Location max = BukkitAdapter.adapt(world, regionCorner2);
 
       int i = (int) Math.min(min.getX(), max.getX());
       int j = (int) Math.min(min.getY(), max.getY());
@@ -515,7 +523,8 @@ public class Mine {
     MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
     MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
     int resetTime = mineType.getResetTime();
-    this.task = Task.syncRepeating(this::reset, 0L, resetTime * 20 * 60L);
+    this.task = Task.syncRepeating(this::handleReset, 0L, resetTime * 20 * 60L);
+//    this.task = Task.syncRepeating(this::reset, 0L, resetTime * 20 * 60L);
   }
 
   public void startPercentageTask() {
@@ -526,18 +535,21 @@ public class Mine {
       redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
           mineData.getMinimumMining(), mineData.getMaximumMining());
 
-      if (percentage >= resetPercentage) {
-
+      if (percentage > resetPercentage) {
         for (Player player : Bukkit.getOnlinePlayers()) {
           if (cuboidRegion.contains(player.getLocation())) {
             player.teleport(getSpawnLocation());
           }
         }
-        reset();
+        handleReset();
       }
     }, 0L, 20L);
   }
 
+  public void startTasks() {
+    startResetTask();
+    startPercentageTask();
+  }
   public void stopTasks() {
     if (task != null && percentageTask != null) {
       if (task.isCurrentlyRunning() && percentageTask.isCurrentlyRunning()) {
@@ -547,11 +559,21 @@ public class Mine {
     }
   }
 
+  public List<Task> getTasks() {
+    return List.of(task, percentageTask);
+  }
+
   public double getPercentage() {
     CuboidRegion region = new CuboidRegion(BlockVector3.at(mineData.getMinimumMining().getBlockX(),
         mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()),
         BlockVector3.at(mineData.getMaximumMining().getBlockX(),
             mineData.getMaximumMining().getBlockY(), mineData.getMaximumMining().getBlockZ()));
+
+    if (Config.addWallGap) {
+      for (int i = 0; i < Config.wallsGap; i++) {
+        region.contract(ExpansionUtils.contractVectors(1));
+      }
+    }
 
     long total = region.getVolume();
     int airBlocks = 0;

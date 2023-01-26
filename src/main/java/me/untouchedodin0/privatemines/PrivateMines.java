@@ -454,6 +454,7 @@ public class PrivateMines extends JavaPlugin {
       Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
       if (player != null) {
         mine.saveMineData(player, mine.getMineData());
+        mine.stopTasks();
       }
     });
   }
