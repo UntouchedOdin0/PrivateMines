@@ -524,7 +524,6 @@ public class Mine {
     MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
     int resetTime = mineType.getResetTime();
     this.task = Task.syncRepeating(this::handleReset, 0L, resetTime * 20 * 60L);
-//    this.task = Task.syncRepeating(this::reset, 0L, resetTime * 20 * 60L);
   }
 
   public void startPercentageTask() {
