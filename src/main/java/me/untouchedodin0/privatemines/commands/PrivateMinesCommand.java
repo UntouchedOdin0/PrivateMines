@@ -78,9 +78,8 @@ public class PrivateMinesCommand extends BaseCommand {
         sender.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a mine!");
         mineFactory.create(target.getPlayer(), location, defaultMineType, true);
         if (sender instanceof Player player) {
-          audienceUtils.sendMessage(player, target,
-              MessagesConfig.gavePlayerMine.replace("{name}",
-                  Objects.requireNonNull(target.getName())));
+          audienceUtils.sendMessage(player, target, MessagesConfig.gavePlayerMine.replace("{name}",
+              Objects.requireNonNull(target.getName())));
         }
       }
     }
@@ -238,7 +237,8 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("setblocks")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.setblocks")
-  public void setBlocks(CommandSender sender, OfflinePlayer target, @Split(",") String[] materials) {
+  public void setBlocks(CommandSender sender, OfflinePlayer target,
+      @Split(",") String[] materials) {
     Map<Material, Double> map = new HashMap<>();
 
     for (String s : materials) {
