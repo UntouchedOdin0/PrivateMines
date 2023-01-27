@@ -9,7 +9,7 @@ plugins {
 }
 
 group 'me.untouchedodin0.privatemines'
-version '5.3.3'
+version '5.3.4'
 
 def devBuild = false
 

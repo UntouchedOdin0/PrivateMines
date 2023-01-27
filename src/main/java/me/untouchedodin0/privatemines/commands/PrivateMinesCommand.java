@@ -238,11 +238,11 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("setblocks")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.setblocks")
-  public void setBlocks(CommandSender commandSender, @Split(",") String[] materials, OfflinePlayer target) {
+  public void setBlocks(CommandSender sender, OfflinePlayer target, @Split(",") String[] materials) {
     Map<Material, Double> map = new HashMap<>();
 
-    for (String mat : materials) {
-      Material material = Material.valueOf(mat.toUpperCase());
+    for (String s : materials) {
+      Material material = Material.valueOf(s.toUpperCase());
       map.put(material, 1.0);
     }
 

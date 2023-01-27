@@ -23,11 +23,7 @@ package me.untouchedodin0.privatemines.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
@@ -36,7 +32,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import me.untouchedodin0.privatemines.utils.regions.CubeRegion;
 import org.apache.commons.lang.WordUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -49,52 +44,9 @@ import org.bukkit.Material;
 
 public class Utils {
 
-
-  public static Location getRelative(Region region, int x, int y, int z) {
-    final BlockVector3 point = region.getMinimumPoint().getMinimum(region.getMaximumPoint());
-    final int regionX = point.getX();
-    final int regionY = point.getY();
-    final int regionZ = point.getZ();
-    final BlockVector3 maxPoint = region.getMaximumPoint().getMaximum(region.getMinimumPoint());
-    final int maxX = maxPoint.getX();
-    final int maxY = maxPoint.getY();
-    final int maxZ = maxPoint.getZ();
-
-    final World worldeditWorld = region.getWorld();
-    final org.bukkit.World bukkitWorld;
-    if (worldeditWorld != null) {
-      bukkitWorld = BukkitAdapter.asBukkitWorld(worldeditWorld).getWorld();
-    } else {
-      bukkitWorld = null;
-    }
-    return new Location(bukkitWorld, regionX + x, regionY + y, regionZ + z);
-  }
-
   public static Location toLocation(BlockVector3 vector3, org.bukkit.World world) {
     return new Location(world, vector3.getX(), vector3.getY(), vector3.getZ());
   }
-
-  // Credits to Redempt for this method
-  // https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/region/CuboidRegion.java#L78-L87
-  public static boolean contains(Location min, Location max, Location loc) {
-    if (min.getWorld() != null && max.getWorld() != null && loc.getWorld() != null) {
-      return loc.getWorld().getName().equals(min.getWorld().getName()) && loc.getX() >= min.getX()
-          && loc.getY() >= min.getY() && loc.getZ() >= min.getZ() && loc.getX() < max.getX()
-          && loc.getY() < max.getY() && loc.getZ() < max.getZ();
-    }
-    return false;
-  }
-
-  public static CuboidRegion toWorldEditCuboid(CubeRegion cubeRegion) {
-    var min = BlockVector3.at(cubeRegion.getMinimumPoint().getBlockX(),
-        cubeRegion.getMinimumPoint().getBlockY(), cubeRegion.getMinimumPoint().getBlockZ());
-
-    var max = BlockVector3.at(cubeRegion.getMaximumPoint().getBlockX(),
-        cubeRegion.getMaximumPoint().getBlockY(), cubeRegion.getMaximumPoint().getBlockZ());
-
-    return new CuboidRegion(min, max);
-  }
-
 
   /**
    * Utility method to set a flag.
@@ -114,18 +66,6 @@ public class Utils {
           FlagContext.create().setInput(value).setObject("region", region).build());
       region.setFlag(flag, val);
     }
-  }
-
-  public static int getInventorySize(int max) {
-    if (max <= 0) {
-      return 9;
-    }
-    int quotient = (int) Math.ceil(max / 9.0);
-    return quotient > 5 ? 54 : quotient * 9;
-  }
-
-  public static int rowsToSlots(int rows) {
-    return rows * 9;
   }
 
   public static String color(String string) {

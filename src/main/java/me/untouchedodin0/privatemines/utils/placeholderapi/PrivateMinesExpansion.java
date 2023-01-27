@@ -27,6 +27,7 @@ import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
+import me.untouchedodin0.privatemines.utils.QueueUtils;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -42,17 +43,17 @@ public class PrivateMinesExpansion extends PlaceholderExpansion {
   }
 
   @Override
-  public String getAuthor() {
+  public @NotNull String getAuthor() {
     return "UntouchedOdin0";
   }
 
   @Override
-  public String getIdentifier() {
+  public @NotNull String getIdentifier() {
     return "privatemines";
   }
 
   @Override
-  public String getVersion() {
+  public @NotNull String getVersion() {
     return "1.0.0";
   }
 
@@ -65,6 +66,7 @@ public class PrivateMinesExpansion extends PlaceholderExpansion {
   public String onRequest(OfflinePlayer offlinePlayer, @NotNull String params) {
 
     PrivateMines privateMines = PrivateMines.getPrivateMines();
+    QueueUtils queueUtils = privateMines.getQueueUtils();
     Player player = offlinePlayer.getPlayer();
     MineStorage mineStorage = privateMines.getMineStorage();
     Mine mine;
@@ -102,6 +104,8 @@ public class PrivateMinesExpansion extends PlaceholderExpansion {
           if (mine2 != null) {
             return LocationUtils.toString(mine2.getSpawnLocation());
           }
+        case "inqueue":
+          return String.valueOf(queueUtils.isInQueue(player.getUniqueId()));
       }
     }
 
