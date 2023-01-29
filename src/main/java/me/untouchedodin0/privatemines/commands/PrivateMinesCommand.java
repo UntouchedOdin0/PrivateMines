@@ -21,6 +21,7 @@ import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
+import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -97,6 +98,7 @@ public class PrivateMinesCommand extends BaseCommand {
       Mine mine = mineStorage.get(target.getUniqueId());
       if (mine != null) {
         mine.delete(true);
+        SQLUtils.delete(mine);
         if (sender instanceof Player player) {
           audienceUtils.sendMessage(player, target, MessagesConfig.deletedPlayersMine);
         }
@@ -129,6 +131,8 @@ public class PrivateMinesCommand extends BaseCommand {
       Mine mine = mineStorage.get(player);
       if (mine != null) {
         mine.handleReset();
+
+        SQLUtils.get(player.getUniqueId());
       }
     }
   }

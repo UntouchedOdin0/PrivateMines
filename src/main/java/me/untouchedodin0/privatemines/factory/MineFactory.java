@@ -71,6 +71,7 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
+import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -285,6 +286,7 @@ public class MineFactory {
 
             mine.setMineData(mineData);
             mine.saveMineData(player, mineData);
+            SQLUtils.insert(mine);
 
           } catch (IncompleteRegionException e) {
             e.printStackTrace();
