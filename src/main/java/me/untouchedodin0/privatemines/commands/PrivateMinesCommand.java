@@ -7,7 +7,10 @@ import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Split;
 import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.Syntax;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import me.untouchedodin0.kotlin.menu.Menu;
@@ -25,12 +28,15 @@ import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import redempt.redlib.misc.Task;
+import redempt.redlib.region.CuboidRegion;
 
 @CommandAlias("privatemine|privatemines|pmine")
 public class PrivateMinesCommand extends BaseCommand {
@@ -117,7 +123,26 @@ public class PrivateMinesCommand extends BaseCommand {
     } else {
       Mine mine = mineStorage.get(target.getUniqueId());
       if (mine != null) {
+        List<Player> players = new ArrayList<>();
+
+        MineData mineData = mine.getMineData();
+        Location minFull = mineData.getMinimumFullRegion();
+        Location maxFull = mineData.getMaximumFullRegion();
+        CuboidRegion cuboidRegion = new CuboidRegion(minFull, maxFull);
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+          if (cuboidRegion.contains(player.getLocation())) {
+            players.add(player);
+          }
+        }
         mine.upgrade();
+
+        Task.syncDelayed(() -> {
+          for (Player player : players) {
+            mine.teleport(player);
+          }
+          players.clear();
+        }, 20L);
       }
     }
   }
@@ -133,6 +158,13 @@ public class PrivateMinesCommand extends BaseCommand {
         mine.handleReset();
 
         SQLUtils.get(player.getUniqueId());
+
+//        CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
+//          Bukkit.broadcastMessage("Hi");
+//          return null;
+//        }).thenRun(() -> {
+//          Bukkit.broadcastMessage("finished?");
+//        });
       }
     }
   }
@@ -241,6 +273,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("setblocks")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.setblocks")
+  @Syntax("<target> <materials> (DIRT, STONE)")
   public void setBlocks(CommandSender sender, OfflinePlayer target,
       @Split(",") String[] materials) {
     Map<Material, Double> map = new HashMap<>();
@@ -258,6 +291,7 @@ public class PrivateMinesCommand extends BaseCommand {
         mine.setMineData(mineData);
         mineStorage.replaceMineNoLog(target.getPlayer(), mine);
         mine.handleReset();
+        SQLUtils.replace(mine);
       }
     }
   }

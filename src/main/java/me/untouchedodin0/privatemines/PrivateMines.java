@@ -127,6 +127,7 @@ public class PrivateMines extends JavaPlugin {
     saveResource("menus.yml", false);
     saveResource("messages.yml", false);
     saveResource("donottouch.json", false);
+    getLogger().info("Plugin licensed to %%__USERNAME__%%");
 
     privateMines = this;
 

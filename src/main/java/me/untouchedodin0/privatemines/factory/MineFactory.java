@@ -286,7 +286,7 @@ public class MineFactory {
 
             mine.setMineData(mineData);
             mine.saveMineData(player, mineData);
-            SQLUtils.insert(mine);
+//            SQLUtils.insert(mine);
 
           } catch (IncompleteRegionException e) {
             e.printStackTrace();
@@ -309,7 +309,7 @@ public class MineFactory {
           boolean useOraxen = mineType.getUseOraxen();
           boolean useItemsAdder = mineType.getUseItemsAdder();
 
-          mine.handleReset();
+          Task.syncDelayed(mine::handleReset);
 
           TextComponent teleportMessage = new TextComponent(
               ChatColor.GREEN + "Click me to teleport to your mine!");
@@ -328,7 +328,7 @@ public class MineFactory {
             Bukkit.getPluginManager().callEvent(privateMineCreationEvent);
           });
           privateMines.getLogger().info("Mine creation time: " + microseconds + " milliseconds");
-//          SQLUtils.insert(mine);
+          SQLUtils.insert(mine);
         } catch (IOException ioException) {
           ioException.printStackTrace();
         }
