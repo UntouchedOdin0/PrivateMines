@@ -31,6 +31,8 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import org.apache.commons.lang.WordUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -113,5 +115,18 @@ public class Utils {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public static String mapToString(Map<String, Double> map) {
+    StringBuilder stringBuilder = new StringBuilder("{");
+    for (Entry<String, Double> entry : map.entrySet()) {
+      stringBuilder.append(entry.getKey());
+      stringBuilder.append("=");
+      stringBuilder.append(entry.getValue());
+      stringBuilder.append(", ");
+    }
+    stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
+    stringBuilder.append("}");
+    return stringBuilder.toString();
   }
 }
