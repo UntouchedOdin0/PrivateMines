@@ -265,6 +265,7 @@ public class PrivateMines extends JavaPlugin {
         materials VARCHAR(50) NOT NULL,
         PRIMARY KEY (owner)
         );""");
+    sqlHelper.setAutoCommit(false);
 
     getLogger().info("sqlLite: " + sqlite);
     getLogger().info("sql helper " + sqlHelper);
@@ -307,95 +308,95 @@ public class PrivateMines extends JavaPlugin {
         "{SPONGE=1.0, STONE=1.0, DIRT=1.0}"
     );
 
-
 //    sqlHelper.executeUpdate(insertQuery);
 //    sqlHelper.executeUpdate(insertQuery2);
 
-    Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
-    getLogger().info("results " + results);
-
-    results.forEach(results1 -> {
-      String owner = results.getString(1);
-      String mineType = results.getString(2);
-      String mineLocation = results.getString(3);
-      String corner1 = results.getString(4);
-      String corner2 = results.getString(5);
-      String fullRegionMin = results.getString(6);
-      String fullRegionMax = results.getString(7);
-      String spawn = results.getString(8);
-      double tax = results.get(9);
-      int isOpen = results.get(10);
-      int maxPlayers = results.get(11);
-      int maxMineSize = results.get(12);
-      String materials = results.getString(13);
-
-      String output = String.format("""
-              Owner: %s
-              Mine Type: %s
-              Mine Location: %s
-              Corner 1: %s
-              Corner 2: %s
-              Full Region Min: %s
-              Full Region Max: %s
-              Spawn: %s
-              Tax: %f
-              Is Open: %d
-              Max Players: %d
-              Max Mine Size: %d
-              Materials: %s""",
-          owner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax,
-          isOpen, maxPlayers, maxMineSize, materials);
-      getLogger().info("output: " + output);
-      Mine mine = new Mine(this);
-
-      UUID uuid = UUID.fromString(owner);
-      MineType type = mineTypeManager.getMineType(mineType);
-      Location minMining = LocationUtils.fromString(corner1);
-      Location maxMining = LocationUtils.fromString(corner2);
-      Location fullMin = LocationUtils.fromString(fullRegionMin);
-      Location fullMax = LocationUtils.fromString(fullRegionMax);
-      Location location = LocationUtils.fromString(mineLocation);
-      Location spawnLocation = LocationUtils.fromString(spawn);
-      boolean open = isOpen != 0;
-
-      MineData mineData = new MineData(
-          uuid,
-          minMining,
-          maxMining,
-          fullMin,
-          fullMax,
-          location,
-          spawnLocation,
-          type,
-          open,
-          tax);
-      mine.setMineData(mineData);
-
-      getLogger().info("minestorage content " + mineStorage.getMines());
-      mineStorage.addMine(uuid, mine);
-      getLogger().info("minestorage content " + mineStorage.getMines());
-
-      getLogger().info("uuid: " + uuid);
-      getLogger().info("minMining: " + minMining);
-      getLogger().info("maxMining: " + maxMining);
-      getLogger().info("fullMin: " + fullMin);
-      getLogger().info("fullMax: " + fullMax);
-      getLogger().info("location: " + location);
-      getLogger().info("spawnLocation: " + spawnLocation);
-      getLogger().info("type: " + type);
-      getLogger().info("open: " + open);
-      getLogger().info("tax: " + tax);
-
-      if (!results1.next()) {
-        getLogger().info("We're at the last mine!");
-      }
-    });
+//    Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
+//    getLogger().info("results " + results);
+//
+//    results.forEach(results1 -> {
+//      String owner = results.getString(1);
+//      String mineType = results.getString(2);
+//      String mineLocation = results.getString(3);
+//      String corner1 = results.getString(4);
+//      String corner2 = results.getString(5);
+//      String fullRegionMin = results.getString(6);
+//      String fullRegionMax = results.getString(7);
+//      String spawn = results.getString(8);
+//      double tax = results.get(9);
+//      int isOpen = results.get(10);
+//      int maxPlayers = results.get(11);
+//      int maxMineSize = results.get(12);
+//      String materials = results.getString(13);
+//
+//      String output = String.format("""
+//              Owner: %s
+//              Mine Type: %s
+//              Mine Location: %s
+//              Corner 1: %s
+//              Corner 2: %s
+//              Full Region Min: %s
+//              Full Region Max: %s
+//              Spawn: %s
+//              Tax: %f
+//              Is Open: %d
+//              Max Players: %d
+//              Max Mine Size: %d
+//              Materials: %s""",
+//          owner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax,
+//          isOpen, maxPlayers, maxMineSize, materials);
+//      getLogger().info("output: " + output);
+//      Mine mine = new Mine(this);
+//
+//      UUID uuid = UUID.fromString(owner);
+//      MineType type = mineTypeManager.getMineType(mineType);
+//      Location minMining = LocationUtils.fromString(corner1);
+//      Location maxMining = LocationUtils.fromString(corner2);
+//      Location fullMin = LocationUtils.fromString(fullRegionMin);
+//      Location fullMax = LocationUtils.fromString(fullRegionMax);
+//      Location location = LocationUtils.fromString(mineLocation);
+//      Location spawnLocation = LocationUtils.fromString(spawn);
+//      boolean open = isOpen != 0;
+//
+//      MineData mineData = new MineData(
+//          uuid,
+//          minMining,
+//          maxMining,
+//          fullMin,
+//          fullMax,
+//          location,
+//          spawnLocation,
+//          type,
+//          open,
+//          tax);
+//      mine.setMineData(mineData);
+//
+//      getLogger().info("minestorage content " + mineStorage.getMines());
+//      mineStorage.addMine(uuid, mine);
+//      getLogger().info("minestorage content " + mineStorage.getMines());
+//
+//      getLogger().info("uuid: " + uuid);
+//      getLogger().info("minMining: " + minMining);
+//      getLogger().info("maxMining: " + maxMining);
+//      getLogger().info("fullMin: " + fullMin);
+//      getLogger().info("fullMax: " + fullMax);
+//      getLogger().info("location: " + location);
+//      getLogger().info("spawnLocation: " + spawnLocation);
+//      getLogger().info("type: " + type);
+//      getLogger().info("open: " + open);
+//      getLogger().info("tax: " + tax);
+//
+//      if (!results1.next()) {
+//        getLogger().info("We're at the last mine!");
+//      }
+//    });
 
     PaperCommandManager paperCommandManager = new PaperCommandManager(this);
     paperCommandManager.registerCommand(new PrivateMinesCommand());
     paperCommandManager.enableUnstableAPI("help");
 
-    Task.syncDelayed(this::loadMines);
+//    Task.syncDelayed(this::loadMines);
+    Task.asyncDelayed(this::loadSQLMines);
     Task.syncDelayed(this::loadPregenMines);
     Task.syncDelayed(this::saveCache);
 
@@ -444,6 +445,7 @@ public class PrivateMines extends JavaPlugin {
             getDescription().getVersion()));
     saveMines();
     savePregenMines();
+    sqlHelper.close();
   }
 
   public void setupSchematicUtils() {
@@ -566,6 +568,104 @@ public class PrivateMines extends JavaPlugin {
       throw new RuntimeException(e);
     }
 
+  }
+
+  public void loadSQLMines() {
+    SQLHelper sqlHelper = getSqlHelper();
+    Bukkit.broadcastMessage("sql helper " + sqlHelper);
+    Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
+
+    results.forEach(result -> {
+      String owner = result.getString(1);
+      String mineType = result.getString(2);
+      String mineLocation = result.getString(3);
+      String corner1 = result.getString(4);
+      String corner2 = result.getString(5);
+      String fullRegionMin = result.getString(6);
+      String fullRegionMax = result.getString(7);
+      String spawn = result.getString(8);
+      double tax = result.get(9);
+      int isOpen = result.get(10);
+      int maxPlayers = result.get(11);
+      int maxMineSize = result.get(12);
+      String resultsMaterial = result.getString(13);
+      resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
+
+      Map<Material, Double> materials = new HashMap<>();
+
+      String[] pairs = resultsMaterial.split("\\s*,\\s*");
+
+      for (String string : pairs) {
+        String[] parts = string.split("=");
+        String matString = parts[0];
+        double percent = Double.parseDouble(parts[1].substring(0, parts[1].length() - 1));
+        Material material = Material.valueOf(matString);
+
+        privateMines.getLogger().info("material: " + material);
+        privateMines.getLogger().info("percent " + percent);
+        materials.put(material, percent);
+      }
+
+//      var ref = new Object() {
+//        Material material;
+//      };
+//
+//      resultsMaterial = resultsMaterial.substring(1, resultsMaterial.length() - 1);
+//      String[] pairs = resultsMaterial.split(",");
+//      Pattern materialRegex = Pattern.compile("[a-zA-Z]+_[a-zA-Z]+");
+//      Pattern singleMaterialRegex = Pattern.compile("[a-zA-Z]+");
+//      Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
+//
+//      for (String string : pairs) {
+//        boolean containsUnderscore = string.contains("_");
+//        Matcher materialMatcher = materialRegex.matcher(string);
+//        Matcher singleMaterialMatcher = singleMaterialRegex.matcher(string);
+//        Matcher percentPatcher = percentRegex.matcher(string);
+//        if (containsUnderscore) {
+//          if (materialMatcher.find()) {
+//            matString = materialMatcher.group();
+//            ref.material = Material.valueOf(matString);
+//          }
+//        } else {
+//          if (singleMaterialMatcher.find()) {
+//            matString = singleMaterialMatcher.group();
+//            ref.material = Material.valueOf(matString);
+//          }
+//        }
+//
+//        if (percentPatcher.find()) {
+//          percent = Double.parseDouble(percentPatcher.group());
+//        }
+//        materials.put(ref.material, percent);
+//      }
+
+      Mine mine = new Mine(this);
+      UUID uuid = UUID.fromString(owner);
+      MineType type = mineTypeManager.getMineType(mineType);
+      Location minMining = LocationUtils.fromString(corner1);
+      Location maxMining = LocationUtils.fromString(corner2);
+      Location fullMin = LocationUtils.fromString(fullRegionMin);
+      Location fullMax = LocationUtils.fromString(fullRegionMax);
+      Location location = LocationUtils.fromString(mineLocation);
+      Location spawnLocation = LocationUtils.fromString(spawn);
+      boolean open = isOpen != 0;
+
+      MineData mineData = new MineData(
+          uuid,
+          minMining,
+          maxMining,
+          fullMin,
+          fullMax,
+          location,
+          spawnLocation,
+          type,
+          open,
+          tax);
+      mineData.setMaterials(materials);
+
+      mine.setMineData(mineData);
+      mineStorage.addMine(uuid, mine);
+    });
   }
 
   public void loadPregenMines() {

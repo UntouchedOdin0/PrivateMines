@@ -62,6 +62,7 @@ import me.untouchedodin0.privatemines.events.PrivateMineExpandEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineResetEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineUpgradeEvent;
 import me.untouchedodin0.privatemines.factory.MineFactory;
+import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -861,6 +862,7 @@ public class Mine {
         Mine mine = mineStorage.get(player);
         if (mine != null) {
           mine.handleReset();
+          SQLUtils.replace(mine);
         }
       } else {
         double balance = economy.getBalance(player);
@@ -874,6 +876,7 @@ public class Mine {
           Mine mine = mineStorage.get(player);
           if (mine != null) {
             mine.handleReset();
+            SQLUtils.replace(mine);
           }
           economy.withdrawPlayer(player, upgradeCost);
         }

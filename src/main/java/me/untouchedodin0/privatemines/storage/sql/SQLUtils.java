@@ -1,12 +1,16 @@
 package me.untouchedodin0.privatemines.storage.sql;
 
+import java.util.Map;
 import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import redempt.redlib.misc.LocationUtils;
+import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
 import redempt.redlib.sql.SQLHelper.Results;
 
@@ -84,9 +88,12 @@ public class SQLUtils {
         "{DIRT=1.0}", //todo replace with actual materials
         "updateMaterials"
     );
-
-    sqlHelper.executeUpdate(dropQuery);
-    sqlHelper.executeUpdate(insertQuery);
+    delete(mine);
+    Task.asyncDelayed(() -> {
+      sqlHelper.executeUpdate(dropQuery);
+      sqlHelper.executeUpdate(insertQuery);
+      sqlHelper.commit();
+    }, 20L);
   }
 
   public static void delete(Mine mine) {
@@ -94,7 +101,10 @@ public class SQLUtils {
     String owner = mineData.getMineOwner().toString();
     String dropQuery = String.format("DELETE FROM privatemines WHERE owner = '%s'", owner);
 
-    sqlHelper.executeUpdate(dropQuery);
+    sqlHelper.execute(dropQuery);
+    sqlHelper.commit();
+
+//    sqlHelper.commit();
   }
 
   public static void get(UUID uuid) {
@@ -134,5 +144,20 @@ public class SQLUtils {
       privateMines.getLogger().info("maxMineSize: " + maxMineSize);
       privateMines.getLogger().info("materials: " + materials);
     }
+    sqlHelper.commit();
+  }
+
+  public static void updateMaterials(Mine mine) {
+    MineData mineData = mine.getMineData();
+    UUID owner = mineData.getMineOwner();
+
+    Map<Material, Double> mats = mineData.getMaterials();
+    Bukkit.broadcastMessage("mats " + mats);
+
+    String command = String.format("UPDATE privatemines SET materials = "
+        + "'%s' "
+        + "WHERE owner = '%s';", mats, owner);
+    sqlHelper.executeUpdate(command);
+    sqlHelper.commit();
   }
 }

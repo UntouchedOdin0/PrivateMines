@@ -285,7 +285,7 @@ public class MineFactory {
             mineData.setOpen(!Config.defaultClosed);
 
             mine.setMineData(mineData);
-            mine.saveMineData(player, mineData);
+            //mine.saveMineData(player, mineData);
           } catch (IncompleteRegionException e) {
             e.printStackTrace();
           }

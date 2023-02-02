@@ -122,7 +122,11 @@ public class PrivateMinesCommand extends BaseCommand {
       }
     } else {
       Mine mine = mineStorage.get(target.getUniqueId());
+      Bukkit.broadcastMessage("mine " + mine);
       if (mine != null) {
+        SQLUtils.delete(mine);
+        mine.upgrade();
+
         List<Player> players = new ArrayList<>();
 
         MineData mineData = mine.getMineData();
@@ -138,8 +142,9 @@ public class PrivateMinesCommand extends BaseCommand {
             players.add(player);
           }
         }
-        SQLUtils.delete(mine);
-        mine.upgrade();
+
+//        SQLUtils.replace(mine);
+//        mine.upgrade();
 
         for (Player toTeleport : players) {
           Bukkit.getServer().dispatchCommand(toTeleport, "spawn");
@@ -299,7 +304,9 @@ public class PrivateMinesCommand extends BaseCommand {
         mine.setMineData(mineData);
         mineStorage.replaceMineNoLog(target.getPlayer(), mine);
         mine.handleReset();
-        SQLUtils.replace(mine);
+        Task.asyncDelayed(() -> {
+          SQLUtils.updateMaterials(mine);
+        });
       }
     }
   }
