@@ -139,6 +139,8 @@ public class Mine {
     Location corner1 = mineData.getMinimumFullRegion();
     BlockVector3 corner1BV3 = BukkitAdapter.asBlockVector(mineData.getMinimumFullRegion());
     BlockVector3 corner2BV3 = BukkitAdapter.asBlockVector(mineData.getMaximumFullRegion());
+    redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
+        mineData.getMinimumMining(), mineData.getMaximumMining());
 
     String regionName = String.format("mine-%s", uuid);
     String fullRegionName = String.format("full-mine-%s", uuid);
@@ -162,12 +164,19 @@ public class Mine {
         editSession.setBlocks(region, randomPattern);
       }
 
+      cuboidRegion.forEachBlock(block -> {
+        if (mineData.getMineType().getUseItemsAdder()) {
+          CustomBlock customBlock = CustomBlock.byAlreadyPlaced(block);
+          if (customBlock != null) {
+            customBlock.remove();
+          }
+        }
+      });
       Instant filled = Instant.now();
       Duration durationToFill = Duration.between(start, filled);
-
       long durationInMS = TimeUnit.NANOSECONDS.toMillis(durationToFill.toNanos());
 
-      privateMines.getLogger().info(String.format("It took %dms to reset the mine", durationInMS));
+      privateMines.getLogger().info(String.format("It took %dms to delete the mine", durationInMS));
     }
 
     privateMines.getMineStorage().removeMine(uuid);
@@ -508,14 +517,18 @@ public class Mine {
           online.getLocation().getBlockY(), online.getLocation().getBlockZ());
       boolean inWorld = online.getWorld().equals(world);
 
-      if (isPlayerInRegion && inWorld) teleport(online);
+      if (isPlayerInRegion && inWorld) {
+        teleport(online);
+      }
     }
 
     if (owner != null) {
       boolean isPlayerInRegion = region.contains(owner.getLocation().getBlockX(),
           owner.getLocation().getBlockY(), owner.getLocation().getBlockZ());
       boolean inWorld = owner.getWorld().equals(world);
-      if (isPlayerInRegion && inWorld) teleport(owner);
+      if (isPlayerInRegion && inWorld) {
+        teleport(owner);
+      }
     }
   }
 
@@ -549,6 +562,7 @@ public class Mine {
     startResetTask();
     startPercentageTask();
   }
+
   public void stopTasks() {
     if (task != null && percentageTask != null) {
       if (task.isCurrentlyRunning() && percentageTask.isCurrentlyRunning()) {

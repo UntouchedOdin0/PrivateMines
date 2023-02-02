@@ -132,10 +132,18 @@ public class PrivateMinesCommand extends BaseCommand {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
           if (cuboidRegion.contains(player.getLocation())) {
+            if (player.getUniqueId().equals(mineData.getMineOwner())) {
+              return;
+            }
             players.add(player);
           }
         }
+        SQLUtils.delete(mine);
         mine.upgrade();
+
+        for (Player toTeleport : players) {
+          Bukkit.getServer().dispatchCommand(toTeleport, "spawn");
+        }
 
         Task.syncDelayed(() -> {
           for (Player player : players) {

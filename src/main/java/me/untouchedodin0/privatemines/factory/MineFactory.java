@@ -286,8 +286,6 @@ public class MineFactory {
 
             mine.setMineData(mineData);
             mine.saveMineData(player, mineData);
-//            SQLUtils.insert(mine);
-
           } catch (IncompleteRegionException e) {
             e.printStackTrace();
           }

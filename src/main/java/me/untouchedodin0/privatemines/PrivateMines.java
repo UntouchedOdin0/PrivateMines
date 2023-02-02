@@ -268,9 +268,6 @@ public class PrivateMines extends JavaPlugin {
 
     getLogger().info("sqlLite: " + sqlite);
     getLogger().info("sql helper " + sqlHelper);
-//    sqlite.load();
-    sqlHelper.executeUpdate(
-        "DELETE FROM privatemines WHERE owner = '79e6296e-6dfb-4b13-9b27-e1b37715ce3b'");
 
     String insertQuery = String.format(
         "INSERT INTO privatemines (owner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) "
