@@ -56,6 +56,7 @@ public class SQLUtils {
     );
 
     sqlHelper.executeUpdate(insertQuery);
+    sqlHelper.commit();
   }
 
   public static void replace(Mine mine) {

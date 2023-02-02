@@ -481,6 +481,7 @@ public class MineFactory {
 //            mine.setLocation(BukkitAdapter.asBlockVector(location));
             mine.setMineData(mineData);
             mine.saveMineData(player, mineData);
+            SQLUtils.insert(mine);
           } catch (IncompleteRegionException e) {
             e.printStackTrace();
           }
