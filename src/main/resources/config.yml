@@ -20,6 +20,7 @@ enableMenu: true
 enableTax: true
 sendTaxMessages: true
 defaultClosed: true
+storageType: YAML # Supports YAML, SQLLITE (Important: DO NOT CHANGE ONCE YOU START USING ONE)
 
 mineTypes:
   Test:

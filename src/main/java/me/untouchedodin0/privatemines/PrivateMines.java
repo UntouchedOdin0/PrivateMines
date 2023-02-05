@@ -60,6 +60,7 @@ import me.untouchedodin0.privatemines.listener.sell.UPCSellListener;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
+import me.untouchedodin0.privatemines.storage.StorageType;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
@@ -172,10 +173,8 @@ public class PrivateMines extends JavaPlugin {
     }
 
     if (Bukkit.getPluginManager().isPluginEnabled("Oraxen")) {
-      String oraxenVersion = Objects.requireNonNull(Bukkit.getPluginManager()
-              .getPlugin("Oraxen"))
-          .getDescription()
-          .getVersion();
+      String oraxenVersion = Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Oraxen"))
+          .getDescription().getVersion();
 
       getLogger().info(String.format("""
 
@@ -186,10 +185,8 @@ public class PrivateMines extends JavaPlugin {
     }
 
     if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder")) {
-      String itemsAdderVersion = Objects.requireNonNull(Bukkit.getPluginManager()
-              .getPlugin("ItemsAdder"))
-          .getDescription()
-          .getVersion();
+      String itemsAdderVersion = Objects.requireNonNull(
+          Bukkit.getPluginManager().getPlugin("ItemsAdder")).getDescription().getVersion();
 
       getLogger().info(String.format("""
 
@@ -208,7 +205,9 @@ public class PrivateMines extends JavaPlugin {
     }
 
     configManager = ConfigManager.create(this)
-        .addConverter(Material.class, Material::valueOf, Material::toString).target(Config.class)
+        .addConverter(Material.class, Material::valueOf, Material::toString)
+        .addConverter(StorageType.class, StorageType::valueOf, StorageType::toString)
+        .target(Config.class)
         .saveDefaults().load();
     //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
     ConfigManager mineConfig = ConfigManager.create(this)
@@ -267,136 +266,34 @@ public class PrivateMines extends JavaPlugin {
         );""");
     sqlHelper.setAutoCommit(false);
 
-    getLogger().info("sqlLite: " + sqlite);
-    getLogger().info("sql helper " + sqlHelper);
-
     String insertQuery = String.format(
         "INSERT INTO privatemines (owner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) "
             + "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, %d, %d, %d, '%s');"
-            + "ON CONFLICT IGNORE;",
-        "79e6296e-6dfb-4b13-9b27-e1b37715ce3b",
-        "one",
-        "privatemines 500.5 50.5 -2998.5",
-        "privatemines 488.0 20.0 -2965.0",
-        "privatemines 513.0 48.0 -2993.0",
-        "privatemines 483.0 15.0 -3007.0",
-        "privatemines 518.0 53.0 -2960.0",
-        "privatemines 500.0 50.0 -3000.0",
-        5.0,
-        0,
-        0,
-        0,
-        "{SPONGE=1.0, STONE=1.0, DIRT=1.0}"
-    );
+            + "ON CONFLICT IGNORE;", "79e6296e-6dfb-4b13-9b27-e1b37715ce3b", "one",
+        "privatemines 500.5 50.5 -2998.5", "privatemines 488.0 20.0 -2965.0",
+        "privatemines 513.0 48.0 -2993.0", "privatemines 483.0 15.0 -3007.0",
+        "privatemines 518.0 53.0 -2960.0", "privatemines 500.0 50.0 -3000.0", 5.0, 0, 0, 0,
+        "{SPONGE=1.0, STONE=1.0, DIRT=1.0}");
 
     String insertQuery2 = String.format(
         "INSERT INTO privatemines (owner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) "
             + "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, %d, %d, %d, '%s');"
-            + "ON CONFLICT IGNORE;",
-        "79e6296e-6df5-4b1f-4b27-e1b37715ce3b",
-        "one",
-        "privatemines 500.5 50.5 -2998.5",
-        "privatemines 488.0 20.0 -2965.0",
-        "privatemines 513.0 48.0 -2993.0",
-        "privatemines 483.0 15.0 -3007.0",
-        "privatemines 518.0 53.0 -2960.0",
-        "privatemines 500.0 50.0 -3000.0",
-        5.0,
-        0,
-        0,
-        0,
-        "{SPONGE=1.0, STONE=1.0, DIRT=1.0}"
-    );
+            + "ON CONFLICT IGNORE;", "79e6296e-6df5-4b1f-4b27-e1b37715ce3b", "one",
+        "privatemines 500.5 50.5 -2998.5", "privatemines 488.0 20.0 -2965.0",
+        "privatemines 513.0 48.0 -2993.0", "privatemines 483.0 15.0 -3007.0",
+        "privatemines 518.0 53.0 -2960.0", "privatemines 500.0 50.0 -3000.0", 5.0, 0, 0, 0,
+        "{SPONGE=1.0, STONE=1.0, DIRT=1.0}");
 
-//    sqlHelper.executeUpdate(insertQuery);
-//    sqlHelper.executeUpdate(insertQuery2);
-
-//    Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
-//    getLogger().info("results " + results);
-//
-//    results.forEach(results1 -> {
-//      String owner = results.getString(1);
-//      String mineType = results.getString(2);
-//      String mineLocation = results.getString(3);
-//      String corner1 = results.getString(4);
-//      String corner2 = results.getString(5);
-//      String fullRegionMin = results.getString(6);
-//      String fullRegionMax = results.getString(7);
-//      String spawn = results.getString(8);
-//      double tax = results.get(9);
-//      int isOpen = results.get(10);
-//      int maxPlayers = results.get(11);
-//      int maxMineSize = results.get(12);
-//      String materials = results.getString(13);
-//
-//      String output = String.format("""
-//              Owner: %s
-//              Mine Type: %s
-//              Mine Location: %s
-//              Corner 1: %s
-//              Corner 2: %s
-//              Full Region Min: %s
-//              Full Region Max: %s
-//              Spawn: %s
-//              Tax: %f
-//              Is Open: %d
-//              Max Players: %d
-//              Max Mine Size: %d
-//              Materials: %s""",
-//          owner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax,
-//          isOpen, maxPlayers, maxMineSize, materials);
-//      getLogger().info("output: " + output);
-//      Mine mine = new Mine(this);
-//
-//      UUID uuid = UUID.fromString(owner);
-//      MineType type = mineTypeManager.getMineType(mineType);
-//      Location minMining = LocationUtils.fromString(corner1);
-//      Location maxMining = LocationUtils.fromString(corner2);
-//      Location fullMin = LocationUtils.fromString(fullRegionMin);
-//      Location fullMax = LocationUtils.fromString(fullRegionMax);
-//      Location location = LocationUtils.fromString(mineLocation);
-//      Location spawnLocation = LocationUtils.fromString(spawn);
-//      boolean open = isOpen != 0;
-//
-//      MineData mineData = new MineData(
-//          uuid,
-//          minMining,
-//          maxMining,
-//          fullMin,
-//          fullMax,
-//          location,
-//          spawnLocation,
-//          type,
-//          open,
-//          tax);
-//      mine.setMineData(mineData);
-//
-//      getLogger().info("minestorage content " + mineStorage.getMines());
-//      mineStorage.addMine(uuid, mine);
-//      getLogger().info("minestorage content " + mineStorage.getMines());
-//
-//      getLogger().info("uuid: " + uuid);
-//      getLogger().info("minMining: " + minMining);
-//      getLogger().info("maxMining: " + maxMining);
-//      getLogger().info("fullMin: " + fullMin);
-//      getLogger().info("fullMax: " + fullMax);
-//      getLogger().info("location: " + location);
-//      getLogger().info("spawnLocation: " + spawnLocation);
-//      getLogger().info("type: " + type);
-//      getLogger().info("open: " + open);
-//      getLogger().info("tax: " + tax);
-//
-//      if (!results1.next()) {
-//        getLogger().info("We're at the last mine!");
-//      }
-//    });
 
     PaperCommandManager paperCommandManager = new PaperCommandManager(this);
     paperCommandManager.registerCommand(new PrivateMinesCommand());
     paperCommandManager.enableUnstableAPI("help");
 
-//    Task.syncDelayed(this::loadMines);
-    Task.asyncDelayed(this::loadSQLMines);
+    switch (Config.storageType) {
+      case YAML -> Task.asyncDelayed(this::loadMines);
+      case SQLLITE -> Task.asyncDelayed(this::loadSQLMines);
+    }
+
     Task.syncDelayed(this::loadPregenMines);
     Task.syncDelayed(this::saveCache);
 
@@ -411,6 +308,7 @@ public class PrivateMines extends JavaPlugin {
     Metrics metrics = new Metrics(this, PLUGIN_ID);
     metrics.addCustomChart(new SingleLineChart("mines", () -> mineStorage.getTotalMines()));
 
+    getLogger().info("Using storage type " + Config.storageType.getName());
     Instant end = Instant.now();
     Duration loadTime = Duration.between(start, end);
     getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
@@ -572,7 +470,6 @@ public class PrivateMines extends JavaPlugin {
 
   public void loadSQLMines() {
     SQLHelper sqlHelper = getSqlHelper();
-    Bukkit.broadcastMessage("sql helper " + sqlHelper);
     Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
 
     results.forEach(result -> {
@@ -600,44 +497,8 @@ public class PrivateMines extends JavaPlugin {
         String matString = parts[0];
         double percent = Double.parseDouble(parts[1].substring(0, parts[1].length() - 1));
         Material material = Material.valueOf(matString);
-
-        privateMines.getLogger().info("material: " + material);
-        privateMines.getLogger().info("percent " + percent);
         materials.put(material, percent);
       }
-
-//      var ref = new Object() {
-//        Material material;
-//      };
-//
-//      resultsMaterial = resultsMaterial.substring(1, resultsMaterial.length() - 1);
-//      String[] pairs = resultsMaterial.split(",");
-//      Pattern materialRegex = Pattern.compile("[a-zA-Z]+_[a-zA-Z]+");
-//      Pattern singleMaterialRegex = Pattern.compile("[a-zA-Z]+");
-//      Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
-//
-//      for (String string : pairs) {
-//        boolean containsUnderscore = string.contains("_");
-//        Matcher materialMatcher = materialRegex.matcher(string);
-//        Matcher singleMaterialMatcher = singleMaterialRegex.matcher(string);
-//        Matcher percentPatcher = percentRegex.matcher(string);
-//        if (containsUnderscore) {
-//          if (materialMatcher.find()) {
-//            matString = materialMatcher.group();
-//            ref.material = Material.valueOf(matString);
-//          }
-//        } else {
-//          if (singleMaterialMatcher.find()) {
-//            matString = singleMaterialMatcher.group();
-//            ref.material = Material.valueOf(matString);
-//          }
-//        }
-//
-//        if (percentPatcher.find()) {
-//          percent = Double.parseDouble(percentPatcher.group());
-//        }
-//        materials.put(ref.material, percent);
-//      }
 
       Mine mine = new Mine(this);
       UUID uuid = UUID.fromString(owner);
@@ -650,17 +511,8 @@ public class PrivateMines extends JavaPlugin {
       Location spawnLocation = LocationUtils.fromString(spawn);
       boolean open = isOpen != 0;
 
-      MineData mineData = new MineData(
-          uuid,
-          minMining,
-          maxMining,
-          fullMin,
-          fullMax,
-          location,
-          spawnLocation,
-          type,
-          open,
-          tax);
+      MineData mineData = new MineData(uuid, minMining, maxMining, fullMin, fullMax, location,
+          spawnLocation, type, open, tax);
       mineData.setMaterials(materials);
 
       mine.setMineData(mineData);

@@ -24,6 +24,7 @@
 
 package me.untouchedodin0.privatemines.config;
 
+import me.untouchedodin0.privatemines.storage.StorageType;
 import org.bukkit.Material;
 import redempt.redlib.config.annotations.Comment;
 
@@ -67,4 +68,6 @@ public class Config {
     public static boolean sendTaxMessages = true;
     @Comment("Should mines be closed by default?")
     public static boolean defaultClosed = true;
+    @Comment("Which storage system should we use?")
+    public static StorageType storageType = StorageType.YAML;
 }
