@@ -69,6 +69,7 @@ dependencies {
     implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
     implementation 'com.github.byteful:MiniMapGUI:1.0.0'
+    implementation 'com.jeff_media:SpigotUpdateChecker:3.0.0'
 
 //    implementation project(':WorldBorder')
 }

@@ -147,7 +147,6 @@ public class SQLUtils {
     UUID owner = mineData.getMineOwner();
 
     Map<Material, Double> mats = mineData.getMaterials();
-    Bukkit.broadcastMessage("mats " + mats);
 
     String command = String.format(
         "UPDATE privatemines SET materials = " + "'%s' " + "WHERE owner = '%s';", mats, owner);

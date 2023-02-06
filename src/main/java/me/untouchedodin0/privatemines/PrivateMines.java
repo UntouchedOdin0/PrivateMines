@@ -24,6 +24,7 @@ package me.untouchedodin0.privatemines;
 import co.aikar.commands.PaperCommandManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.jeff_media.updatechecker.UpdateCheckSource;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -63,6 +64,7 @@ import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.StorageType;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
+import me.untouchedodin0.privatemines.utils.UpdateChecker;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
@@ -128,7 +130,6 @@ public class PrivateMines extends JavaPlugin {
     saveResource("menus.yml", false);
     saveResource("messages.yml", false);
     saveResource("donottouch.json", false);
-    getLogger().info("Plugin licensed to %%__USERNAME__%%");
 
     privateMines = this;
 
@@ -177,7 +178,6 @@ public class PrivateMines extends JavaPlugin {
           .getDescription().getVersion();
 
       getLogger().info(String.format("""
-
           Found Oraxen v%s installed,
           make sure to list the materials under the oraxen section
           within each mine type if you want to use oraxen
@@ -288,6 +288,8 @@ public class PrivateMines extends JavaPlugin {
     }
     Metrics metrics = new Metrics(this, PLUGIN_ID);
     metrics.addCustomChart(new SingleLineChart("mines", () -> mineStorage.getTotalMines()));
+
+    new UpdateChecker(this).fetch();
 
     getLogger().info("Using storage type " + Config.storageType.getName());
     Instant end = Instant.now();

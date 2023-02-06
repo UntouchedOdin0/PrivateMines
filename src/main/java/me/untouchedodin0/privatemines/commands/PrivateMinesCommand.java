@@ -191,6 +191,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("go")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.go")
+  @Syntax("<target>")
   public void go(Player player, OfflinePlayer target) {
     if (target.getPlayer() != null) {
       Player targetPlayer = target.getPlayer();
