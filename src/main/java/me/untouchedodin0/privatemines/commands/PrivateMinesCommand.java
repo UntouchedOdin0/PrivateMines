@@ -128,7 +128,6 @@ public class PrivateMinesCommand extends BaseCommand {
       }
     } else {
       Mine mine = mineStorage.get(target.getUniqueId());
-      Bukkit.broadcastMessage("mine " + mine);
       if (mine != null) {
         SQLUtils.delete(mine);
         mine.upgrade();
@@ -148,9 +147,6 @@ public class PrivateMinesCommand extends BaseCommand {
             players.add(player);
           }
         }
-
-//        SQLUtils.replace(mine);
-//        mine.upgrade();
 
         for (Player toTeleport : players) {
           Bukkit.getServer().dispatchCommand(toTeleport, "spawn");
@@ -175,15 +171,6 @@ public class PrivateMinesCommand extends BaseCommand {
       Mine mine = mineStorage.get(player);
       if (mine != null) {
         mine.handleReset();
-
-        //        player.sendMessage("Next location: " + privateMines.getMineWorldManager().getNextFreeLocation());
-
-//        CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
-//          Bukkit.broadcastMessage("Hi");
-//          return null;
-//        }).thenRun(() -> {
-//          Bukkit.broadcastMessage("finished?");
-//        });
       }
     }
   }
@@ -195,6 +182,19 @@ public class PrivateMinesCommand extends BaseCommand {
       player.sendMessage(ChatColor.RED + "You don't own a mine!");
     } else {
       Mine mine = mineStorage.get(player);
+      if (mine != null) {
+        mine.teleport(player);
+      }
+    }
+  }
+
+  @Subcommand("go")
+  @CommandCompletion("@players")
+  @CommandPermission("privatemines.go")
+  public void go(Player player, OfflinePlayer target) {
+    if (target.getPlayer() != null) {
+      Player targetPlayer = target.getPlayer();
+      Mine mine = mineStorage.get(targetPlayer);
       if (mine != null) {
         mine.teleport(player);
       }
