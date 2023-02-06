@@ -64,7 +64,6 @@ public class MineWorldManager {
   }
 
   public Location getNextFreeLocation() {
-    Bukkit.broadcastMessage("sql location " + SQLUtils.getCurrentLocation());
     Location sqlLocation = SQLUtils.getCurrentLocation();
 
     if (distance == 0) {
@@ -78,7 +77,6 @@ public class MineWorldManager {
     if (sqlLocation == null) {
       setCurrentLocation(direction.addTo(defaultLocation, distance * borderDistance));
     } else {
-//      this.currentLocation = direction.addTo(currentLocation, distance * borderDistance);
       this.nextLocation = direction.addTo(sqlLocation, distance * borderDistance);
     }
 
@@ -99,7 +97,6 @@ public class MineWorldManager {
 
   public void setCurrentLocation(Location currentLocation) {
     this.currentLocation = currentLocation;
-    SQLUtils.setCurrentLocation(currentLocation);
   }
 
   public Location getDefaultLocation() {
