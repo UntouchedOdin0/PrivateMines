@@ -6,6 +6,7 @@ import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
+import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,20 +18,28 @@ import redempt.redlib.sql.SQLHelper.Results;
 public class SQLUtils {
 
   private static final PrivateMines privateMines = PrivateMines.getPrivateMines();
-  private static final SQLHelper sqlHelper = privateMines.getSqlHelper();
 
   public static Location getCurrentLocation() {
+    MineWorldManager mineWorldManager = PrivateMines.getPrivateMines().getMineWorldManager();
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
     Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
+    var ref = new Object() {
+      Location location = null;
+    };
 
-    results.forEach(results1 -> {
-      if (!results1.next()) {
-        privateMines.getLogger().info("The location stopped at " + results1);
-      }
-    });
-    return privateMines.getMineWorldManager().getCurrentLocation();
+    if (results.isEmpty()) {
+      return mineWorldManager.getDefaultLocation();
+    } else {
+      results.forEach(results1 -> {
+        Bukkit.broadcastMessage(results1.getString(3));
+        ref.location = LocationUtils.fromString(results1.getString(3));
+      });
+      return ref.location;
+    }
   }
 
   public static void insert(Mine mine) {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
     MineData mineData = mine.getMineData();
     MineType mineType = mineData.getMineType();
     String owner = mineData.getMineOwner().toString();
@@ -39,27 +48,20 @@ public class SQLUtils {
         "INSERT INTO privatemines (owner, mineType, mineLocation, corner1, corner2,"
             + " fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) "
             + "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, %b, %d, %d, '%s');"
-            + "ON CONFLICT IGNORE;",
-        owner,
-        mineType.getName(),
+            + "ON CONFLICT IGNORE;", owner, mineType.getName(),
         LocationUtils.toString(mineData.getMineLocation()),
         LocationUtils.toString(mineData.getMinimumMining()),
         LocationUtils.toString(mineData.getMaximumMining()),
         LocationUtils.toString(mineData.getMinimumFullRegion()),
         LocationUtils.toString(mineData.getMaximumFullRegion()),
-        LocationUtils.toString(mine.getSpawnLocation()),
-        mineData.getTax(),
-        mineData.isOpen(),
-        mineData.getMaxPlayers(),
-        mineData.getMaxMineSize(),
-        "{SPONGE=1.0, STONE=1.0, DIRT=1.0}"
-    );
+        LocationUtils.toString(mine.getSpawnLocation()), mineData.getTax(), mineData.isOpen(),
+        mineData.getMaxPlayers(), mineData.getMaxMineSize(), "{SPONGE=1.0, STONE=1.0, DIRT=1.0}");
 
     sqlHelper.executeUpdate(insertQuery);
-    sqlHelper.commit();
   }
 
   public static void replace(Mine mine) {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
     MineData mineData = mine.getMineData();
     MineType mineType = mineData.getMineType();
     String owner = mineData.getMineOwner().toString();
@@ -73,42 +75,34 @@ public class SQLUtils {
             + "corner1 = EXCLUDED.corner1, corner2 = EXCLUDED.corner2, fullRegionMin = EXCLUDED.fullRegionMin, "
             + "fullRegionMax = EXCLUDED.fullRegionMax, spawn = EXCLUDED.spawn, tax = EXCLUDED.tax, "
             + "isOpen = EXCLUDED.isOpen, maxPlayers = EXCLUDED.maxPlayers, maxMineSize = EXCLUDED.maxMineSize, "
-            + "materials = '%s';",
-        owner,
-        mineType.getName(),
+            + "materials = '%s';", owner, mineType.getName(),
         LocationUtils.toString(mineData.getMineLocation()),
         LocationUtils.toString(mineData.getMinimumMining()),
         LocationUtils.toString(mineData.getMaximumMining()),
         LocationUtils.toString(mineData.getMinimumFullRegion()),
         LocationUtils.toString(mineData.getMaximumFullRegion()),
-        LocationUtils.toString(mine.getSpawnLocation()),
-        mineData.getTax(),
-        mineData.isOpen(),
-        mineData.getMaxPlayers(),
-        mineData.getMaxMineSize(),
-        "{DIRT=1.0}", //todo replace with actual materials
-        "updateMaterials"
-    );
+        LocationUtils.toString(mine.getSpawnLocation()), mineData.getTax(), mineData.isOpen(),
+        mineData.getMaxPlayers(), mineData.getMaxMineSize(), "{DIRT=1.0}",
+        //todo replace with actual materials
+        "updateMaterials");
     delete(mine);
     Task.asyncDelayed(() -> {
       sqlHelper.executeUpdate(dropQuery);
       sqlHelper.executeUpdate(insertQuery);
-      sqlHelper.commit();
     }, 20L);
   }
 
   public static void delete(Mine mine) {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
     MineData mineData = mine.getMineData();
     String owner = mineData.getMineOwner().toString();
     String dropQuery = String.format("DELETE FROM privatemines WHERE owner = '%s'", owner);
 
-    sqlHelper.execute(dropQuery);
-    sqlHelper.commit();
-
-//    sqlHelper.commit();
+    sqlHelper.executeUpdate(dropQuery);
   }
 
   public static void get(UUID uuid) {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
     String owner = uuid.toString();
     String selectQuery = String.format("SELECT * FROM privatemines WHERE owner = '%s'", owner);
 
@@ -145,20 +139,18 @@ public class SQLUtils {
       privateMines.getLogger().info("maxMineSize: " + maxMineSize);
       privateMines.getLogger().info("materials: " + materials);
     }
-    sqlHelper.commit();
   }
 
   public static void updateMaterials(Mine mine) {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
     MineData mineData = mine.getMineData();
     UUID owner = mineData.getMineOwner();
 
     Map<Material, Double> mats = mineData.getMaterials();
     Bukkit.broadcastMessage("mats " + mats);
 
-    String command = String.format("UPDATE privatemines SET materials = "
-        + "'%s' "
-        + "WHERE owner = '%s';", mats, owner);
+    String command = String.format(
+        "UPDATE privatemines SET materials = " + "'%s' " + "WHERE owner = '%s';", mats, owner);
     sqlHelper.executeUpdate(command);
-    sqlHelper.commit();
   }
 }

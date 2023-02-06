@@ -264,26 +264,7 @@ public class PrivateMines extends JavaPlugin {
         materials VARCHAR(50) NOT NULL,
         PRIMARY KEY (owner)
         );""");
-    sqlHelper.setAutoCommit(false);
-
-    String insertQuery = String.format(
-        "INSERT INTO privatemines (owner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) "
-            + "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, %d, %d, %d, '%s');"
-            + "ON CONFLICT IGNORE;", "79e6296e-6dfb-4b13-9b27-e1b37715ce3b", "one",
-        "privatemines 500.5 50.5 -2998.5", "privatemines 488.0 20.0 -2965.0",
-        "privatemines 513.0 48.0 -2993.0", "privatemines 483.0 15.0 -3007.0",
-        "privatemines 518.0 53.0 -2960.0", "privatemines 500.0 50.0 -3000.0", 5.0, 0, 0, 0,
-        "{SPONGE=1.0, STONE=1.0, DIRT=1.0}");
-
-    String insertQuery2 = String.format(
-        "INSERT INTO privatemines (owner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) "
-            + "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, %d, %d, %d, '%s');"
-            + "ON CONFLICT IGNORE;", "79e6296e-6df5-4b1f-4b27-e1b37715ce3b", "one",
-        "privatemines 500.5 50.5 -2998.5", "privatemines 488.0 20.0 -2965.0",
-        "privatemines 513.0 48.0 -2993.0", "privatemines 483.0 15.0 -3007.0",
-        "privatemines 518.0 53.0 -2960.0", "privatemines 500.0 50.0 -3000.0", 5.0, 0, 0, 0,
-        "{SPONGE=1.0, STONE=1.0, DIRT=1.0}");
-
+    sqlHelper.setAutoCommit(true);
 
     PaperCommandManager paperCommandManager = new PaperCommandManager(this);
     paperCommandManager.registerCommand(new PrivateMinesCommand());
@@ -317,18 +298,9 @@ public class PrivateMines extends JavaPlugin {
 
   @Override
   public void onDisable() {
-    GsonBuilder gsonBuilder = new GsonBuilder();
-    gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
-    gson = gsonBuilder.create();
-
     File file = new File("plugins/PrivateMines/donottouch.json");
-    Location currentLocation = mineWorldManager.getNextFreeLocation();
-    String currentLocationJson = gson.toJson(currentLocation);
-
-    try {
-      Files.writeString(file.toPath(), currentLocationJson);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    if (file.exists()) {
+      file.delete();
     }
 
     if (adventure != null) {

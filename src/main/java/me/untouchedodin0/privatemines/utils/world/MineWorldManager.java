@@ -24,6 +24,7 @@ package me.untouchedodin0.privatemines.utils.world;
 import static me.untouchedodin0.privatemines.utils.world.utils.Direction.NORTH;
 
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.world.utils.Direction;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -35,6 +36,8 @@ public class MineWorldManager {
 
   private final Location defaultLocation;
   private Location currentLocation;
+  private Location nextLocation;
+
   private final int borderDistance;
   private int distance = 0;
   private Direction direction;
@@ -61,6 +64,9 @@ public class MineWorldManager {
   }
 
   public Location getNextFreeLocation() {
+    Bukkit.broadcastMessage("sql location " + SQLUtils.getCurrentLocation());
+    Location sqlLocation = SQLUtils.getCurrentLocation();
+
     if (distance == 0) {
       distance++;
       return defaultLocation;
@@ -69,17 +75,18 @@ public class MineWorldManager {
     if (direction == null) {
       direction = NORTH;
     }
-    if (currentLocation == null) {
+    if (sqlLocation == null) {
       setCurrentLocation(direction.addTo(defaultLocation, distance * borderDistance));
     } else {
-      this.currentLocation = direction.addTo(currentLocation, distance * borderDistance);
+//      this.currentLocation = direction.addTo(currentLocation, distance * borderDistance);
+      this.nextLocation = direction.addTo(sqlLocation, distance * borderDistance);
     }
 
     direction = direction.next();
     if (direction == NORTH) {
       distance++;
     }
-    return currentLocation;
+    return nextLocation;
   }
 
   public World getMinesWorld() {
@@ -92,5 +99,16 @@ public class MineWorldManager {
 
   public void setCurrentLocation(Location currentLocation) {
     this.currentLocation = currentLocation;
+    SQLUtils.setCurrentLocation(currentLocation);
+  }
+
+  public Location getDefaultLocation() {
+    return defaultLocation;
+  }
+
+  public Location getSQLLocation() {
+    Location sqlUtilsLocation = SQLUtils.getCurrentLocation();
+    Bukkit.broadcastMessage("sqlUtilsLocation " + sqlUtilsLocation);
+    return sqlUtilsLocation;
   }
 }

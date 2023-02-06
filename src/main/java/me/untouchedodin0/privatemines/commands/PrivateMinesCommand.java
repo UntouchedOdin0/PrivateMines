@@ -67,11 +67,13 @@ public class PrivateMinesCommand extends BaseCommand {
   @CommandCompletion("@players")
   @CommandPermission("privatemines.give")
   public void give(CommandSender sender, OfflinePlayer target) {
+    Bukkit.broadcastMessage("" + privateMines.getSqlHelper());
 
     MineFactory mineFactory = new MineFactory();
     MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
     Location location = mineWorldManager.getNextFreeLocation();
     mineWorldManager.setCurrentLocation(location);
+
     MineType defaultMineType = mineTypeManager.getDefaultMineType();
 
     if (target.getPlayer() != null) {
@@ -170,7 +172,7 @@ public class PrivateMinesCommand extends BaseCommand {
       if (mine != null) {
         mine.handleReset();
 
-        SQLUtils.get(player.getUniqueId());
+        //        player.sendMessage("Next location: " + privateMines.getMineWorldManager().getNextFreeLocation());
 
 //        CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
 //          Bukkit.broadcastMessage("Hi");
