@@ -6,6 +6,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'org.jetbrains.kotlin.jvm' version '1.7.22'
     id 'org.ajoberstar.grgit' version '4.0.1'
+    id 'net.dumbcode.gradlehook' version '1.2.0'
 }
 
 group 'me.untouchedodin0.privatemines'
@@ -82,79 +83,12 @@ shadowJar {
     relocate 'co.aikar.commands', 'me.untouchedodin0.privatemines.acf'
 }
 
-task copyTo_DevServerOld(type: Copy) {
-    from shadowJar
-    into "E:/Coding/Spigot Test Servers/1.18 Private Mines (Paper and FAWE)/plugins"
-}
 
 task copyTo_DevServer(type: Copy) {
-    from shadowJar
-    into "E:/Coding/Spigot Test Servers/1.18.2 Privates Mines (Paper)/plugins"
-}
-
-
-task copyTo_DevServer1_19(type: Copy) {
     from shadowJar
     into "E:/Coding/Spigot Test Servers/1.19.2 Privates Mines (Paper)/plugins"
 }
 
-
-task copyTo_SWM(type: Copy) {
-    from shadowJar
-    into "E:/Coding/Spigot Test Servers/1.18 Slime World Manager (Paper)/plugins"
-}
-
-
-//publishing {
-//    repositories {
-//        maven {
-//            var releasesRepoUrl = "https://repo.bristermitten.me/repository/maven-releases"
-//            var snapshotsRepoUrl = "https://repo.bristermitten.me/repository/maven-snapshots"
-//
-//            if (version.toString().endsWith("SNAPSHOT")) {
-//                url = uri(snapshotsRepoUrl)
-//            } else {
-//                url = uri(releasesRepoUrl)
-//            }
-//
-//            credentials {
-//                username = project.findProperty("mavenUser")?.toString() ?: System.getenv("MAVEN_USER")
-//                password = project.findProperty("mavenPassword")?.toString() ?: System.getenv("MAVEN_PASSWORD")
-//            }
-//        }
-//
-//        publications {
-//                from components.java
-//            }
-//        }
-//    }
-
-//
-//publishing {
-//    repositories {
-//        maven {
-//            url = ""
-////            def releasesRepoUrl = "https://repo.bristermitten.me/repository/maven-public/"
-//            //"https://s01.oss.sonatype.org/"
-////            def snapshotsRepoUrl = "https://repo.bristermitten.me/repository/maven-public/"
-////            url = releasesRepoUrl // version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-//
-//            credentials {
-//                username = "odin"//System.getenv('MAVEN_USER')
-//                password = "kj;BP{}`[mF\\5x&2" //System.getenv('MAVEN_PASSWORD')
-//            }
-//        }
-//    }
-//    publications {
-////        shadow(MavenPublication) {
-////            publication -> project.shadow.component(publication)
-////        }
-//        mavenJava(MavenPublication) {
-//            from components.java
-////                artifact sourceJar
-//        }
-//    }
-//}
 
 test {
     useJUnitPlatform()

@@ -67,8 +67,6 @@ public class PrivateMinesCommand extends BaseCommand {
   @CommandCompletion("@players")
   @CommandPermission("privatemines.give")
   public void give(CommandSender sender, OfflinePlayer target) {
-    long before = System.currentTimeMillis();
-
     MineFactory mineFactory = new MineFactory();
     MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
     Location location = mineWorldManager.getNextFreeLocation();
@@ -86,9 +84,6 @@ public class PrivateMinesCommand extends BaseCommand {
       } else {
         sender.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a mine!");
         mineFactory.create(target.getPlayer(), location, defaultMineType, true);
-        long after = System.currentTimeMillis();
-        long timeTaken = after - before;
-        Bukkit.broadcastMessage("time taken " + timeTaken);
 
         if (sender instanceof Player player) {
           audienceUtils.sendMessage(player, target, MessagesConfig.gavePlayerMine.replace("{name}",

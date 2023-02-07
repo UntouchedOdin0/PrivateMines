@@ -98,7 +98,7 @@ public class SQLUtils {
     String owner = mineData.getMineOwner().toString();
     String dropQuery = String.format("DELETE FROM privatemines WHERE owner = '%s'", owner);
 
-    sqlHelper.executeUpdate(dropQuery);
+    Task.asyncDelayed(() -> sqlHelper.executeUpdate(dropQuery));
   }
 
   public static void get(UUID uuid) {
