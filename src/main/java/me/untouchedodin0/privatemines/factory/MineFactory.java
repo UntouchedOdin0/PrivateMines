@@ -285,7 +285,11 @@ public class MineFactory {
             mineData.setOpen(!Config.defaultClosed);
 
             mine.setMineData(mineData);
-            //mine.saveMineData(player, mineData);
+
+            switch (Config.storageType) {
+              case YAML -> mine.saveMineData(player, mineData);
+              case SQLLITE -> SQLUtils.insert(mine);
+            }
           } catch (IncompleteRegionException e) {
             e.printStackTrace();
           }
@@ -326,7 +330,6 @@ public class MineFactory {
             Bukkit.getPluginManager().callEvent(privateMineCreationEvent);
           });
           privateMines.getLogger().info("Mine creation time: " + microseconds + " milliseconds");
-          SQLUtils.insert(mine);
         } catch (IOException ioException) {
           ioException.printStackTrace();
         }
