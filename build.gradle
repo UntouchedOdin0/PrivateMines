@@ -36,6 +36,7 @@ repositories {
     maven { url = 'https://repo.minebench.de/' }
     maven { url = 'https://repo.dmulloy2.net/repository/public/' }
     maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+    maven { url = 'https://repo.mineinabyss.com/releases' }
 }
 
 dependencies {
@@ -54,13 +55,15 @@ dependencies {
 
     compileOnly 'me.clip:placeholderapi:2.11.2'
     compileOnly 'com.github.LoneDev6:api-itemsadder:3.0.0'
-    compileOnly 'com.github.oraxen:oraxen:-SNAPSHOT'
+    compileOnly 'com.oraxen:oraxen:1.151.1'
+//    compileOnly 'com.github.oraxen:oraxen:-86bffe910f-1'
     compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.2.5'
     compileOnly 'com.google.code.gson:gson:2.10'
     compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.14.1' // i think this is the big thing?
 
     compileOnly files('libs/UltraPrisonCore-1.12.7.14-RELEASE.jar')
     compileOnly files('libs/AutoSellAPI-1.2.0.jar')
+//    compileOnly files('libs/oraxen-1.151.1.jar')
 
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation 'com.github.Redempt:RedLib:6.5.8'
