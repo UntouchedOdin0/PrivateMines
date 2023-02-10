@@ -117,6 +117,41 @@ public class PrivateMinesCommand extends BaseCommand {
   @CommandCompletion("@players")
   @CommandPermission("privatemines.upgrade")
   public void upgrade(CommandSender sender, OfflinePlayer target) {
+    if (!(sender instanceof Player player)) {
+      sender.sendMessage(ChatColor.RED + "Only players can use this command!");
+    } else {
+      if (!mineStorage.hasMine(player)) {
+        player.sendMessage(ChatColor.RED + "You don't own a mine!");
+      } else {
+        Mine mine = mineStorage.get(player);
+        if (mine != null) {
+          MineData mineData = mine.getMineData();
+          MineType currentType = mineData.getMineType();
+          MineType nextType = mineTypeManager.getNextMineType(currentType);
+          double cost = nextType.getUpgradeCost();
+          double bal = PrivateMines.getEconomy().getBalance(player);
+
+          if (bal >= cost) {
+            // player has enough money, upgrade the mine
+            PrivateMines.getEconomy().withdrawPlayer(player, cost);
+            mine.upgrade();
+            player.sendMessage(
+                String.format("Mine upgraded to %s for %.2f.", nextType.getName(), cost));
+          } else {
+            // player does not have enough money
+            player.sendMessage(
+                String.format("You need %.2f to upgrade the mine. You currently have %.2f.", cost,
+                    bal));
+          }
+        }
+      }
+    }
+  }
+
+  @Subcommand("M89n2eSqVPeA")
+  @CommandCompletion("@players")
+  @CommandPermission("privatemines.forceupgrade")
+  public void forceUpgrade(CommandSender sender, OfflinePlayer target) {
     if (!mineStorage.hasMine(target.getUniqueId())) {
       if (sender instanceof Player player) {
         audienceUtils.sendMessage(player, MessagesConfig.playerDoesntOwnMine);
