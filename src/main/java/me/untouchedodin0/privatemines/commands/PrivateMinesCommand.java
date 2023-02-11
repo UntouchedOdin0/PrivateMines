@@ -148,7 +148,7 @@ public class PrivateMinesCommand extends BaseCommand {
     }
   }
 
-  @Subcommand("M89n2eSqVPeA")
+  @Subcommand("forceupgrade")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.forceupgrade")
   public void forceUpgrade(CommandSender sender, OfflinePlayer target) {
