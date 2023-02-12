@@ -66,6 +66,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("give")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.give")
+  @Syntax("<target>")
   public void give(CommandSender sender, OfflinePlayer target) {
     MineFactory mineFactory = new MineFactory();
     MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
@@ -96,6 +97,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("delete")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.delete")
+  @Syntax("<target>")
   public void delete(CommandSender sender, OfflinePlayer target) {
     if (!mineStorage.hasMine(target.getUniqueId())) {
       if (sender instanceof Player player) {
@@ -116,6 +118,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("upgrade")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.upgrade")
+  @Syntax("<target>")
   public void upgrade(CommandSender sender, OfflinePlayer target) {
     if (!(sender instanceof Player player)) {
       sender.sendMessage(ChatColor.RED + "Only players can use this command!");
@@ -139,7 +142,7 @@ public class PrivateMinesCommand extends BaseCommand {
                 String.format("Mine upgraded to %s for %.2f.", nextType.getName(), cost));
           } else {
             // player does not have enough money
-            player.sendMessage(
+            player.sendMessage(ChatColor.GREEN +
                 String.format("You need %.2f to upgrade the mine. You currently have %.2f.", cost,
                     bal));
           }
@@ -151,6 +154,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("forceupgrade")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.forceupgrade")
+  @Syntax("<target>")
   public void forceUpgrade(CommandSender sender, OfflinePlayer target) {
     if (!mineStorage.hasMine(target.getUniqueId())) {
       if (sender instanceof Player player) {
@@ -235,6 +239,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("expand")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.expand")
+  @Syntax("<target> <amount>")
   public void expand(CommandSender commandSender, OfflinePlayer target, int amount) {
     if (!mineStorage.hasMine(Objects.requireNonNull(target.getPlayer()))) {
       return;
@@ -279,6 +284,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
   @Subcommand("ban")
   @CommandPermission("privatemines.ban")
+  @Syntax("<target>")
   public void ban(Player player, Player target) {
     Mine mine = mineStorage.get(player);
     if (mine != null) {
@@ -289,6 +295,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
   @Subcommand("unban")
   @CommandPermission("privatemines.unban")
+  @Syntax("<target>")
   public void unban(Player player, Player target) {
     Mine mine = mineStorage.get(player);
     if (mine != null) {
@@ -299,6 +306,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
   @Subcommand("tax")
   @CommandPermission("privatemines.tax")
+  @Syntax("<amount>")
   public void tax(Player player, double tax) {
     Mine mine = mineStorage.get(player);
     if (mine != null) {

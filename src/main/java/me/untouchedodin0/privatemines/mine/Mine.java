@@ -120,7 +120,6 @@ public class Mine {
     }
   }
 
-
   public void delete(boolean removeStructure) {
     UUID uuid = getMineData().getMineOwner();
     PrivateMineDeleteEvent privateMineDeleteEvent = new PrivateMineDeleteEvent(uuid, this);
@@ -136,6 +135,18 @@ public class Mine {
     if (percentageTask != null) {
       percentageTask.cancel();
     }
+
+    switch (Config.storageType) {
+      case YAML -> {
+        String fileName = String.format("/%s.yml", uuid);
+        File minesDirectory = privateMines.getMinesDirectory().toFile();
+        File file = new File(minesDirectory + fileName);
+
+        boolean delete = file.delete();
+      }
+      case SQLLITE -> SQLUtils.delete(this);
+    }
+
     MineData mineData = getMineData();
 
     Location corner1 = mineData.getMinimumFullRegion();
@@ -181,56 +192,6 @@ public class Mine {
       privateMines.getLogger().info(String.format("It took %dms to delete the mine", durationInMS));
     }
 
-    privateMines.getMineStorage().removeMine(uuid);
-    String fileName = String.format("/%s.yml", uuid);
-    File minesDirectory = privateMines.getMinesDirectory().toFile();
-    File file = new File(minesDirectory + fileName);
-
-    boolean delete = file.delete();
-  }
-
-  /**
-   * This isn't really used anymore.
-   */
-  @Deprecated(since = "5.0", forRemoval = true)
-  public void replace(UUID uuid) {
-    MineData mineData = getMineData();
-
-    Location cornerA = mineData.getMinimumFullRegion();
-    Location cornerB = mineData.getMaximumFullRegion();
-
-    Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
-    String regionName = String.format("mine-%s", Objects.requireNonNull(player).getUniqueId());
-
-    World world = cornerA.getWorld();
-    RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-    RegionManager regionManager = container.get(BukkitAdapter.adapt(Objects.requireNonNull(world)));
-    Objects.requireNonNull(regionManager).removeRegion(regionName);
-
-    int blocks = 0;
-
-    int xMax = Integer.max(cornerA.getBlockX(), cornerB.getBlockX());
-    int xMin = Integer.min(cornerA.getBlockX(), cornerB.getBlockX());
-    int yMax = Integer.max(cornerA.getBlockY(), cornerB.getBlockY());
-    int yMin = Integer.min(cornerA.getBlockY(), cornerB.getBlockY());
-    int zMax = Integer.max(cornerA.getBlockZ(), cornerB.getBlockZ());
-    int zMin = Integer.min(cornerA.getBlockZ(), cornerB.getBlockZ());
-
-    Instant start = Instant.now();
-
-    for (int x = xMin; x <= xMax; x++) {
-      for (int y = yMin; y <= yMax; y++) {
-        for (int z = zMin; z <= zMax; z++) {
-          world.getBlockAt(x, y, z).setType(Material.AIR);
-          blocks++;
-        }
-      }
-    }
-
-    Instant filled = Instant.now();
-    Duration durationToFill = Duration.between(start, filled);
-    privateMines.getLogger()
-        .info(String.format("Time took to fill %d blocks %dms", blocks, durationToFill.toMillis()));
     privateMines.getMineStorage().removeMine(uuid);
   }
 
@@ -875,13 +836,14 @@ public class Mine {
         Mine mine = mineStorage.get(player);
         if (mine != null) {
           mine.handleReset();
-          SQLUtils.replace(mine);
 
-          if (!toTeleport.isEmpty()) {
-            for (Player player1 : toTeleport) {
-              teleport(player1);
+          Task.syncDelayed(() -> {
+            if (!toTeleport.isEmpty()) {
+              for (Player player1 : toTeleport) {
+                teleport(player1);
+              }
             }
-          }
+          }, 40L);
         }
       } else {
         double balance = economy.getBalance(player);
@@ -889,7 +851,6 @@ public class Mine {
           player.sendMessage(
               "" + ChatColor.RED + "You don't have enough money to upgrade your mine!");
         } else {
-
           Location fullMin = mineData.getMinimumFullRegion();
           Location fullMax = mineData.getMaximumFullRegion();
           redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
@@ -909,9 +870,13 @@ public class Mine {
             mine.handleReset();
             SQLUtils.replace(mine);
 
-            for (Player player1 : toTeleport) {
-              teleport(player1);
-            }
+            Task.syncDelayed(() -> {
+              if (!toTeleport.isEmpty()) {
+                for (Player player1 : toTeleport) {
+                  teleport(player1);
+                }
+              }
+            }, 40L);
           }
         }
         economy.withdrawPlayer(player, upgradeCost);

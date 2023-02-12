@@ -10,7 +10,7 @@ plugins {
 }
 
 group 'me.untouchedodin0.privatemines'
-version '5.3.4'
+version '5.3.5'
 
 def devBuild = false
 
@@ -89,7 +89,6 @@ task copyTo_DevServer(type: Copy) {
     from shadowJar
     into "E:/Coding/Spigot Test Servers/1.19.2 Privates Mines (Paper)/plugins"
 }
-
 
 test {
     useJUnitPlatform()
