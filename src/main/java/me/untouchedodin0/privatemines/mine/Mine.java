@@ -144,7 +144,7 @@ public class Mine {
 
         boolean delete = file.delete();
       }
-      case SQLLITE -> SQLUtils.delete(this);
+      case SQLite -> SQLUtils.delete(this);
     }
 
     MineData mineData = getMineData();

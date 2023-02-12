@@ -106,6 +106,8 @@ public class PrivateMinesExpansion extends PlaceholderExpansion {
           }
         case "inqueue":
           return String.valueOf(queueUtils.isInQueue(player.getUniqueId()));
+        case "hasmine":
+          return String.valueOf(mineStorage.hasMine(player));
       }
     }
 

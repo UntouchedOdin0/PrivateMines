@@ -272,7 +272,7 @@ public class PrivateMines extends JavaPlugin {
 
     switch (Config.storageType) {
       case YAML -> Task.asyncDelayed(this::loadMines);
-      case SQLLITE -> Task.asyncDelayed(this::loadSQLMines);
+      case SQLite -> Task.asyncDelayed(this::loadSQLMines);
     }
 
     Task.syncDelayed(this::loadPregenMines);

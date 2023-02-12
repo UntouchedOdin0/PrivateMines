@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public enum StorageType {
   YAML("YAML"),
-  SQLLITE("SQLLITE");
+  SQLite("SQLite");
 
   private final String name;
 

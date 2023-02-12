@@ -288,7 +288,7 @@ public class MineFactory {
 
             switch (Config.storageType) {
               case YAML -> mine.saveMineData(player, mineData);
-              case SQLLITE -> SQLUtils.insert(mine);
+              case SQLite -> SQLUtils.insert(mine);
             }
           } catch (IncompleteRegionException e) {
             e.printStackTrace();

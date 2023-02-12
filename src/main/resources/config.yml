@@ -20,27 +20,27 @@ enableMenu: true
 enableTax: true
 sendTaxMessages: true
 defaultClosed: true
-storageType: YAML # Supports YAML, SQLLITE (Important: DO NOT CHANGE ONCE YOU START USING ONE)
+storageType: YAML # Supports YAML, SQLite (Important: DO NOT CHANGE ONCE YOU START USING ONE)
 
 mineTypes:
   Test:
     file: minewithgap.schem
     resetTime: 5
     expand: 1
-    resetPercentage: 50.0
+    resetPercentage: 15
     upgradeCost: 1.0
     upgradeCurrency: VAULT # Supported currencies: VAULT, ULTRAPRISONCORE (Coming soon, hopefully...)
-    useOraxen: true
+    useOraxen: false
     useItemsAdder: false
     materials:
-      STONE: 0.9
-      COBBLESTONE: 0.1
+      COBBLESTONE: 100.0
     oraxen:
-      orax_ore: 1.0
+      orax_ore: 0.5
+      ruby_ore: 0.5
     itemsAdder:
       nice_stone: 1.0
-    maxPlayers: 1
     flags:
       block-break: true
+      upc-enchants: true
     fullFlags:
       block-place: false
