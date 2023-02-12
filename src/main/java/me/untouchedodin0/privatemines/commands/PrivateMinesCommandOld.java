@@ -150,7 +150,7 @@ public class PrivateMinesCommandOld {
       Mine mine = mineStorage.get(player);
       if (mine != null) {
         MineData mineData = mine.getMineData();
-        mine.upgrade();
+        mine.upgrade(false);
         audienceUtils.sendMessage(player, MessagesConfig.mineUpgraded);
       }
     }

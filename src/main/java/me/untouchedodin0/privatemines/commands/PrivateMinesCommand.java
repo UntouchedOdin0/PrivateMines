@@ -118,8 +118,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("upgrade")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.upgrade")
-  @Syntax("<target>")
-  public void upgrade(CommandSender sender, OfflinePlayer target) {
+  public void upgrade(CommandSender sender) {
     if (!(sender instanceof Player player)) {
       sender.sendMessage(ChatColor.RED + "Only players can use this command!");
     } else {
@@ -137,7 +136,7 @@ public class PrivateMinesCommand extends BaseCommand {
           if (bal >= cost) {
             // player has enough money, upgrade the mine
             PrivateMines.getEconomy().withdrawPlayer(player, cost);
-            mine.upgrade();
+            mine.upgrade(false);
             player.sendMessage(
                 String.format("Mine upgraded to %s for %.2f.", nextType.getName(), cost));
           } else {
@@ -164,7 +163,7 @@ public class PrivateMinesCommand extends BaseCommand {
       Mine mine = mineStorage.get(target.getUniqueId());
       if (mine != null) {
         SQLUtils.delete(mine);
-        mine.upgrade();
+        mine.upgrade(true);
 
         List<Player> players = new ArrayList<>();
 
