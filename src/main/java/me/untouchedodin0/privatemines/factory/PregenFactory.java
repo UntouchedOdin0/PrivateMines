@@ -53,7 +53,7 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
-import me.untouchedodin0.privatemines.utils.ChunkUtils;
+import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -99,7 +99,7 @@ public class PregenFactory {
         .get(schematicFile);
 
     for (Location location : generatedLocations) {
-      Collection<Chunk> chunks = ChunkUtils.around(location.getChunk(), 25);
+      Collection<Chunk> chunks = Utils.around(location.getChunk(), 25);
 
       chunks.forEach(chunk -> {
         chunk.load(true);

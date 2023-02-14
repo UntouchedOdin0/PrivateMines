@@ -30,10 +30,13 @@ import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import org.apache.commons.lang.WordUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -41,8 +44,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 
 public class Utils {
 
@@ -117,9 +122,9 @@ public class Utils {
     }
   }
 
-  public static String mapToString(Map<String, Double> map) {
+  public static String mapToString(Map<Material, Double> map) {
     StringBuilder stringBuilder = new StringBuilder("{");
-    for (Entry<String, Double> entry : map.entrySet()) {
+    for (Entry<Material, Double> entry : map.entrySet()) {
       stringBuilder.append(entry.getKey());
       stringBuilder.append("=");
       stringBuilder.append(entry.getValue());
@@ -128,5 +133,22 @@ public class Utils {
     stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
     stringBuilder.append("}");
     return stringBuilder.toString();
+  }
+
+  public static Collection<Chunk> around(Chunk origin, int radius) {
+    World world = origin.getWorld();
+
+    int length = (radius * 2) + 1;
+    Set<Chunk> chunks = new HashSet<>(length * length);
+
+    int cX = origin.getX();
+    int cZ = origin.getZ();
+
+    for (int x = -radius; x <= radius; x++) {
+      for (int z = -radius; z <= radius; z++) {
+        chunks.add(world.getChunkAt(cX + x, cZ + z));
+      }
+    }
+    return chunks;
   }
 }

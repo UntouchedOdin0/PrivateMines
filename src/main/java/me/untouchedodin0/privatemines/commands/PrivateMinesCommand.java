@@ -135,13 +135,10 @@ public class PrivateMinesCommand extends BaseCommand {
 
           if (bal >= cost) {
             // player has enough money, upgrade the mine
-            PrivateMines.getEconomy().withdrawPlayer(player, cost);
             mine.upgrade(false);
-            player.sendMessage(
-                String.format("Mine upgraded to %s for %.2f.", nextType.getName(), cost));
           } else {
             // player does not have enough money
-            player.sendMessage(ChatColor.GREEN +
+            player.sendMessage(ChatColor.RED +
                 String.format("You need %.2f to upgrade the mine. You currently have %.2f.", cost,
                     bal));
           }
@@ -230,7 +227,14 @@ public class PrivateMinesCommand extends BaseCommand {
       Player targetPlayer = target.getPlayer();
       Mine mine = mineStorage.get(targetPlayer);
       if (mine != null) {
-        mine.teleport(player);
+        MineData mineData = mine.getMineData();
+        if (mineData != null) {
+          if (mineData.isOpen()) {
+            mine.teleport(player);
+          } else {
+            player.sendMessage(ChatColor.RED + "Target mine closed!");
+          }
+        }
       }
     }
   }
@@ -336,6 +340,10 @@ public class PrivateMinesCommand extends BaseCommand {
     Map<Material, Double> map = new HashMap<>();
 
     for (String s : materials) {
+      if (Material.getMaterial(s.toUpperCase()) == null) {
+        sender.sendMessage(ChatColor.RED + "Failed to find Material: " + s);
+        return;
+      }
       Material material = Material.valueOf(s.toUpperCase());
       map.put(material, 1.0);
     }

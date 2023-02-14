@@ -88,6 +88,7 @@ public class Mine {
   private boolean canExpand = true;
   private Task task;
   private Task percentageTask;
+  private int airBlocks = 0;
 
   public Mine(PrivateMines privateMines) {
     this.privateMines = privateMines;
@@ -503,7 +504,7 @@ public class Mine {
   }
 
   public void startPercentageTask() {
-    this.percentageTask = Task.syncRepeating(() -> {
+    this.percentageTask = Task.asyncRepeating(() -> {
       double percentage = getPercentage();
       MineType mineType = getMineData().getMineType();
       double resetPercentage = mineType.getResetPercentage();
@@ -511,11 +512,6 @@ public class Mine {
           mineData.getMinimumMining(), mineData.getMaximumMining());
 
       if (percentage > resetPercentage) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-          if (cuboidRegion.contains(player.getLocation())) {
-            player.teleport(getSpawnLocation());
-          }
-        }
         handleReset();
       }
     }, 0L, 20L);
@@ -540,6 +536,7 @@ public class Mine {
   }
 
   public double getPercentage() {
+
     CuboidRegion region = new CuboidRegion(BlockVector3.at(mineData.getMinimumMining().getBlockX(),
         mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()),
         BlockVector3.at(mineData.getMaximumMining().getBlockX(),
@@ -552,16 +549,20 @@ public class Mine {
     }
 
     long total = region.getVolume();
-    int airBlocks = 0;
-    Set<BaseBlock> blocks = new HashSet<>();
-    if (BlockTypes.AIR != null) {
-      blocks.add(BlockTypes.AIR.getDefaultState().toBaseBlock());
-      try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
-          .world(BukkitAdapter.adapt(mineData.getMinimumMining().getWorld())).fastMode(true)
-          .build()) {
-        airBlocks = editSession.countBlocks(region, blocks);
+
+    Task.asyncDelayed(() -> {
+      Set<BaseBlock> blocks = new HashSet<>();
+      if (BlockTypes.AIR != null) {
+        blocks.add(BlockTypes.AIR.getDefaultState().toBaseBlock());
+        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
+            .world(BukkitAdapter.adapt(mineData.getMinimumMining().getWorld())).fastMode(true)
+            .build()) {
+          airBlocks = editSession.countBlocks(region, blocks);
+
+          Bukkit.broadcastMessage("airblocks " + airBlocks);
+        }
       }
-    }
+    });
     return (float) airBlocks * 100L / total;
   }
 
@@ -985,7 +986,6 @@ public class Mine {
 
 
   public void forceUpgrade() {
-    Bukkit.broadcastMessage("aaaa");
     MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
     MineFactory mineFactory = privateMines.getMineFactory();
     MineStorage mineStorage = privateMines.getMineStorage();
@@ -996,7 +996,6 @@ public class Mine {
     MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
     MineType nextType = mineTypeManager.getNextMineType(currentType);
     Location mineLocation = mineData.getMineLocation();
-
 
     PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this,
         currentType, nextType);

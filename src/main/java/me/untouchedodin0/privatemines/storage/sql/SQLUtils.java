@@ -6,6 +6,7 @@ import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
+import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -82,9 +83,11 @@ public class SQLUtils {
         LocationUtils.toString(mineData.getMinimumFullRegion()),
         LocationUtils.toString(mineData.getMaximumFullRegion()),
         LocationUtils.toString(mine.getSpawnLocation()), mineData.getTax(), mineData.isOpen(),
-        mineData.getMaxPlayers(), mineData.getMaxMineSize(), "{DIRT=1.0}",
+        mineData.getMaxPlayers(), mineData.getMaxMineSize(),
+        Utils.mapToString(mineData.getMaterials()),
         //todo replace with actual materials
-        "updateMaterials");
+        Utils.mapToString(mineData.getMaterials()));
+
     delete(mine);
     Task.asyncDelayed(() -> {
       sqlHelper.executeUpdate(dropQuery);
