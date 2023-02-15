@@ -32,7 +32,6 @@ public class SQLUtils {
       return mineWorldManager.getDefaultLocation();
     } else {
       results.forEach(results1 -> {
-        Bukkit.broadcastMessage(results1.getString(3));
         ref.location = LocationUtils.fromString(results1.getString(3));
       });
       return ref.location;
