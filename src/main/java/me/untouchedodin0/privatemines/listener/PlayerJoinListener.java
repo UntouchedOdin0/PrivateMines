@@ -64,8 +64,6 @@ public class PlayerJoinListener implements Listener {
         return;
       }
       queueUtils.claim(player);
-
-//      mineFactory.create(player, location, defaultMineType, true);
     }
   }
 }

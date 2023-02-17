@@ -81,11 +81,15 @@ class MineStorage {
         // Iterate over all the mines calculating the distance
         // from the location then add the mine, and it's distance
         // into the map.
-        mines.forEach {
-            val mineLocation = it.value.mineData.mineLocation
-            val distance = location.distance(mineLocation)
-            distances.putIfAbsent(it.value, distance)
+
+        mines.forEach { (uuid, mine) ->
+            run {
+                val mineLocation = mine.mineData.mineLocation
+                val distance = location.distance(mineLocation)
+                distances.putIfAbsent(mine, distance)
+            }
         }
+
         return distances.entries.minByOrNull {
             it.value
         }?.key
