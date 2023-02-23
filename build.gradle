@@ -37,6 +37,7 @@ repositories {
     maven { url = 'https://repo.dmulloy2.net/repository/public/' }
     maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
     maven { url = 'https://repo.mineinabyss.com/releases' }
+    maven { url = "https://repo.mattstudios.me/artifactory/public/" }
 }
 
 dependencies {
@@ -73,6 +74,7 @@ dependencies {
     implementation 'com.github.byteful:MiniMapGUI:1.0.0'
     implementation 'com.jeff_media:SpigotUpdateChecker:3.0.0'
     implementation 'me.lucko:helper:5.6.13'
+    implementation "dev.triumphteam:triumph-gui:3.1.2" // Replace version here
 //    implementation project(':WorldBorder')
 }
 
@@ -82,6 +84,7 @@ shadowJar {
     relocate 'org.bstats', 'me.untouchedodin0.bstats'
     relocate 'net.kyori', 'me.untouchedodin0.adventure'
     relocate 'co.aikar.commands', 'me.untouchedodin0.privatemines.acf'
+    relocate 'dev.triumphteam.gui', 'me.untouchedodin0.privatemines.gui'
 }
 
 

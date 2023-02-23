@@ -500,7 +500,7 @@ public class Mine {
     MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
     MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
     int resetTime = mineType.getResetTime();
-    Bukkit.getScheduler().scheduleAsyncRepeatingTask(privateMines, this::handleReset, 0L, resetTime * 20L);
+    int task = Bukkit.getScheduler().scheduleAsyncRepeatingTask(privateMines, this::handleReset, 0L, resetTime * 20L);
   }
 
   public void startPercentageTask() {
