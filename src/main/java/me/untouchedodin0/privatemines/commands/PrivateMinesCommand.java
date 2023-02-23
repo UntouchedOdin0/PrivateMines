@@ -19,12 +19,14 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.AudienceUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
+import me.untouchedodin0.privatemines.utils.CooldownManager;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -35,6 +37,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import redempt.redlib.misc.Task;
 import redempt.redlib.region.CuboidRegion;
 
@@ -45,6 +48,7 @@ public class PrivateMinesCommand extends BaseCommand {
   MineStorage mineStorage = privateMines.getMineStorage();
   MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
   AudienceUtils audienceUtils = new AudienceUtils();
+  private final CooldownManager cooldownManager = new CooldownManager();
 
   @Default
   public void defaultCommand(Player player) {
@@ -138,9 +142,8 @@ public class PrivateMinesCommand extends BaseCommand {
             mine.upgrade(false);
           } else {
             // player does not have enough money
-            player.sendMessage(ChatColor.RED +
-                String.format("You need %.2f to upgrade the mine. You currently have %.2f.", cost,
-                    bal));
+            player.sendMessage(ChatColor.RED + String.format(
+                "You need %.2f to upgrade the mine. You currently have %.2f.", cost, bal));
           }
         }
       }
@@ -198,9 +201,33 @@ public class PrivateMinesCommand extends BaseCommand {
     if (!mineStorage.hasMine(player)) {
       player.sendMessage(ChatColor.RED + "You don't own a mine!");
     } else {
+      int timeLeft = cooldownManager.getCooldown(player.getUniqueId());
       Mine mine = mineStorage.get(player);
-      if (mine != null) {
-        mine.handleReset();
+
+      if (!Config.enableResetCooldown) {
+        if (mine != null) {
+          mine.handleReset();
+        }
+      } else {
+
+        if (timeLeft == 0) {
+
+          player.sendMessage(ChatColor.GREEN + "Feature used!");
+          cooldownManager.setCooldown(player.getUniqueId(), Config.resetCooldown);
+          new BukkitRunnable() {
+            @Override
+            public void run() {
+              int timeLeft = cooldownManager.getCooldown(player.getUniqueId());
+              cooldownManager.setCooldown(player.getUniqueId(), --timeLeft);
+              if (timeLeft == 0) {
+                this.cancel();
+              }
+            }
+          }.runTaskTimerAsynchronously(privateMines, 20, 20);
+      } else {
+          //Hasn't expired yet, shows how many seconds left until it does
+          player.sendMessage(String.format(ChatColor.RED + "Please wait %d seconds to reset your mine again!", timeLeft));
+        }
       }
     }
   }

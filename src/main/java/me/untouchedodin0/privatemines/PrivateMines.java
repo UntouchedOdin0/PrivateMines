@@ -117,6 +117,8 @@ public class PrivateMines extends JavaPlugin {
   private Gson gson;
   String matString;
   double percent;
+  public HashMap<UUID, Long> cooldowns = new HashMap<>();
+
 
   public static PrivateMines getPrivateMines() {
     return privateMines;
@@ -433,6 +435,7 @@ public class PrivateMines extends JavaPlugin {
           if (owner != null) {
             mineStorage.addMine(owner, mine);
           }
+          mine.startResetTask();
           getLogger().info("Loaded file " + file.getName() + "!");
         }
       });
@@ -637,5 +640,17 @@ public class PrivateMines extends JavaPlugin {
 
   public QueueUtils getQueueUtils() {
     return queueUtils;
+  }
+
+  public HashMap<UUID, Long> getCooldowns() {
+    return cooldowns;
+  }
+
+  public void addCooldown(UUID uuid, long time) {
+    cooldowns.put(uuid, time);
+  }
+
+  public long getCooldown(UUID uuid) {
+    return cooldowns.get(uuid);
   }
 }

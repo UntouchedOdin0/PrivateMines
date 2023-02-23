@@ -482,7 +482,7 @@ public class Mine {
       boolean inWorld = online.getWorld().equals(world);
 
       if (isPlayerInRegion && inWorld) {
-        teleport(online);
+        Task.syncDelayed(() -> teleport(online));
       }
     }
 
@@ -491,7 +491,7 @@ public class Mine {
           owner.getLocation().getBlockY(), owner.getLocation().getBlockZ());
       boolean inWorld = owner.getWorld().equals(world);
       if (isPlayerInRegion && inWorld) {
-        teleport(owner);
+        Task.syncDelayed(() -> teleport(owner));
       }
     }
   }
@@ -500,7 +500,7 @@ public class Mine {
     MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
     MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
     int resetTime = mineType.getResetTime();
-    this.task = Task.syncRepeating(this::handleReset, 0L, resetTime * 20 * 60L);
+    Bukkit.getScheduler().scheduleAsyncRepeatingTask(privateMines, this::handleReset, 0L, resetTime * 20L);
   }
 
   public void startPercentageTask() {

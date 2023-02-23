@@ -285,6 +285,7 @@ public class MineFactory {
             mineData.setOpen(!Config.defaultClosed);
 
             mine.setMineData(mineData);
+            mine.startResetTask();
 
             switch (Config.storageType) {
               case YAML -> mine.saveMineData(player, mineData);

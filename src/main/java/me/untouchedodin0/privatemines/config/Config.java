@@ -70,4 +70,10 @@ public class Config {
     public static boolean defaultClosed = true;
     @Comment("Which storage system should we use?")
     public static StorageType storageType = StorageType.YAML;
+    @Comment("Should we have a reset cooldown?")
+    public static boolean enableResetCooldown = true;
+    @Comment("Specifies the cooldown for the /privatemines reset command")
+    public static int resetCooldown = 15;
+    @Comment("Should we format the config message?")
+    public static boolean formatResetMessage = true;
 }
