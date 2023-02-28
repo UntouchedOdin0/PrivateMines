@@ -56,6 +56,7 @@ import java.util.concurrent.TimeUnit;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.kotlin.utils.FlagUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.events.PrivateMineDeleteEvent;
@@ -128,13 +129,6 @@ public class Mine {
 
     if (privateMineDeleteEvent.isCancelled()) {
       return;
-    }
-
-    if (task != null) {
-      task.cancel();
-    }
-    if (percentageTask != null) {
-      percentageTask.cancel();
     }
 
     switch (Config.storageType) {
@@ -689,24 +683,8 @@ public class Mine {
         regionManager.addRegion(protectedCuboidRegion);
       }
 
-      if (flags != null) {
-        flags.forEach((string, aBoolean) -> {
-          Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), string);
-          if (aBoolean) {
-            try {
-              Utils.setFlag(protectedCuboidRegion, flag, "allow");
-            } catch (InvalidFlagFormat e) {
-              throw new RuntimeException(e);
-            }
-          } else {
-            try {
-              Utils.setFlag(protectedCuboidRegion, flag, "deny");
-            } catch (InvalidFlagFormat e) {
-              e.printStackTrace();
-            }
-          }
-        });
-      }
+      FlagUtils flagUtils = new FlagUtils();
+      flagUtils.setFlags(this);
 
       setMineData(mineData);
       privateMines.getMineStorage().replaceMineNoLog(mineData.getMineOwner(), this);

@@ -102,10 +102,4 @@ public class MineWorldManager {
   public Location getDefaultLocation() {
     return defaultLocation;
   }
-
-  public Location getSQLLocation() {
-    Location sqlUtilsLocation = SQLUtils.getCurrentLocation();
-    Bukkit.broadcastMessage("sqlUtilsLocation " + sqlUtilsLocation);
-    return sqlUtilsLocation;
-  }
 }

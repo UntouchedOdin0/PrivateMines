@@ -24,9 +24,7 @@ package me.untouchedodin0.privatemines;
 import co.aikar.commands.PaperCommandManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.jeff_media.updatechecker.UpdateCheckSource;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -48,6 +46,7 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
+import me.untouchedodin0.privatemines.commands.PublicMinesCommand;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
@@ -87,10 +86,6 @@ import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
 import redempt.redlib.sql.SQLHelper.Results;
 
-/**
- * TODO Make a way for people to register mines via a discord channel before server launches
- */
-
 public class PrivateMines extends JavaPlugin {
 
   private static PrivateMines privateMines;
@@ -99,7 +94,6 @@ public class PrivateMines extends JavaPlugin {
   public int MINE_DISTANCE = 150;
   private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
   private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
-  private final Path addonsDirectory = getDataFolder().toPath().resolve("addons");
   private final Path pregenMines = getDataFolder().toPath().resolve("pregen");
   private SchematicStorage schematicStorage;
   private SchematicIterator schematicIterator;
@@ -118,7 +112,6 @@ public class PrivateMines extends JavaPlugin {
   String matString;
   double percent;
   public HashMap<UUID, Long> cooldowns = new HashMap<>();
-
 
   public static PrivateMines getPrivateMines() {
     return privateMines;
@@ -146,16 +139,6 @@ public class PrivateMines extends JavaPlugin {
     gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
     gsonBuilder.registerTypeAdapter(Path.class, new PathAdapter());
     this.gson = gsonBuilder.create();
-
-    File file = new File("plugins/PrivateMines/donottouch.json");
-    try {
-      try (FileReader fileReader = new FileReader(file)) {
-        Location currentLocation = gson.fromJson(fileReader, Location.class);
-        mineWorldManager.setCurrentLocation(currentLocation);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
 
     if (Config.enableTax) {
       registerSellListener();
@@ -270,14 +253,10 @@ public class PrivateMines extends JavaPlugin {
 
     PaperCommandManager paperCommandManager = new PaperCommandManager(this);
     paperCommandManager.registerCommand(new PrivateMinesCommand());
+    paperCommandManager.registerCommand(new PublicMinesCommand());
     paperCommandManager.enableUnstableAPI("help");
 
-    switch (Config.storageType) {
-      case YAML -> Task.asyncDelayed(this::loadMines);
-      case SQLite -> Task.asyncDelayed(this::loadSQLMines);
-    }
-
-    Task.syncDelayed(this::loadPregenMines);
+    Task.asyncDelayed(this::loadSQLMines);
     Task.syncDelayed(this::saveCache);
 
     getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
@@ -292,8 +271,6 @@ public class PrivateMines extends JavaPlugin {
     metrics.addCustomChart(new SingleLineChart("mines", () -> mineStorage.getTotalMines()));
 
     new UpdateChecker(this).fetch();
-
-    getLogger().info("Using storage type " + Config.storageType.getName());
     Instant end = Instant.now();
     Duration loadTime = Duration.between(start, end);
     getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
@@ -640,17 +617,5 @@ public class PrivateMines extends JavaPlugin {
 
   public QueueUtils getQueueUtils() {
     return queueUtils;
-  }
-
-  public HashMap<UUID, Long> getCooldowns() {
-    return cooldowns;
-  }
-
-  public void addCooldown(UUID uuid, long time) {
-    cooldowns.put(uuid, time);
-  }
-
-  public long getCooldown(UUID uuid) {
-    return cooldowns.get(uuid);
   }
 }

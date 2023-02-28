@@ -43,10 +43,6 @@ import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.Flags;
-import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
-import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
@@ -63,6 +59,7 @@ import java.util.concurrent.TimeUnit;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.kotlin.utils.FlagUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.events.PrivateMineCreationEvent;
@@ -72,7 +69,6 @@ import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
-import me.untouchedodin0.privatemines.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -100,9 +96,6 @@ public class MineFactory {
     UUID uuid = player.getUniqueId();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
     Mine mine = new Mine(privateMines);
-    Map<String, Boolean> flags = mineType.getFlags();
-    Map<String, Boolean> fullFlags = mineType.getFullFlags();
-
     Map<Material, Double> prices = new HashMap<>();
     int maxPlayers = mineType.getMaxPlayers();
 
@@ -232,65 +225,17 @@ public class MineFactory {
               regionManager.addRegion(fullWorldGuardRegion);
             }
 
-            /**
-             This sadly has to be called synchronously else it'll throw a
-             {@link java.lang.IllegalStateException}
-             This is due to how WorldGuard handles their flags...
-             @see com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent
-             */
-            Task.syncDelayed(() -> {
-              FlagRegistry flagRegistry = WorldGuard.getInstance().getFlagRegistry();
-
-              if (flags != null) {
-                flags.forEach((s, aBoolean) -> {
-                  Flag<?> flag = Flags.fuzzyMatchFlag(flagRegistry, s);
-                  if (aBoolean) {
-                    try {
-                      Utils.setFlag(miningWorldGuardRegion, flag, "allow");
-                    } catch (InvalidFlagFormat e) {
-                      e.printStackTrace();
-                    }
-                  } else {
-                    try {
-                      Utils.setFlag(miningWorldGuardRegion, flag, "deny");
-                    } catch (InvalidFlagFormat e) {
-                      e.printStackTrace();
-                    }
-                  }
-                });
-              }
-              if (fullFlags != null) {
-                fullFlags.forEach((string, aBoolean) -> {
-                  Flag<?> flag = Flags.fuzzyMatchFlag(flagRegistry, string);
-                  if (aBoolean) {
-                    try {
-                      Utils.setFlag(fullWorldGuardRegion, flag, "allow");
-                    } catch (InvalidFlagFormat e) {
-                      e.printStackTrace();
-                    }
-                  } else {
-                    try {
-                      Utils.setFlag(fullWorldGuardRegion, flag, "deny");
-                    } catch (InvalidFlagFormat e) {
-                      throw new RuntimeException(e);
-                    }
-                  }
-                });
-              }
-            });
-
             MineData mineData = new MineData(uuid, urailsL, lrailsL, fullMin, fullMax, location,
                 spawnL, mineType, shop);
             mineData.setMaxPlayers(maxPlayers);
             mineData.setOpen(!Config.defaultClosed);
 
             mine.setMineData(mineData);
-            mine.startResetTask();
-
-            switch (Config.storageType) {
-              case YAML -> mine.saveMineData(player, mineData);
-              case SQLite -> SQLUtils.insert(mine);
-            }
+            SQLUtils.insert(mine);
+            Task.syncDelayed(() -> {
+              FlagUtils flagUtils = new FlagUtils();
+              flagUtils.setFlags(mine);
+            });
           } catch (IncompleteRegionException e) {
             e.printStackTrace();
           }
@@ -308,9 +253,6 @@ public class MineFactory {
           } else {
             privateMines.getMineStorage().addMine(uuid, mine);
           }
-
-          boolean useOraxen = mineType.getUseOraxen();
-          boolean useItemsAdder = mineType.getUseItemsAdder();
 
           Task.syncDelayed(mine::handleReset);
 
@@ -343,7 +285,6 @@ public class MineFactory {
     UUID uuid = player.getUniqueId();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
     Mine mine = new Mine(privateMines);
-    Map<String, Boolean> flags = mineType.getFlags();
     Map<Material, Double> prices = new HashMap<>();
     int maxPlayers = mineType.getMaxPlayers();
 
@@ -426,10 +367,6 @@ public class MineFactory {
           RegionSelector regionSelector = new CuboidRegionSelector(world, realTo.toBlockPoint(),
               max.toBlockPoint());
 
-          localSession.setRegionSelector(world, regionSelector);
-          regionSelector.learnChanges();
-
-          //noinspection DanglingJavadoc
           try {
             newRegion = regionSelector.getRegion();
 
@@ -449,43 +386,18 @@ public class MineFactory {
               regionManager.addRegion(fullWorldGuardRegion);
             }
 
-            /**
-             This sadly has to be called synchronously else it'll throw a
-             {@link java.lang.IllegalStateException}
-             This is due to how WorldGuard handles their flags...
-             @see com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent
-             */
-            Task.syncDelayed(() -> {
-              if (flags != null) {
-                flags.forEach((s, aBoolean) -> {
-                  Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(),
-                      s);
-                  if (aBoolean) {
-                    try {
-                      Utils.setFlag(miningWorldGuardRegion, flag, "allow");
-                    } catch (InvalidFlagFormat e) {
-                      e.printStackTrace();
-                    }
-                  } else {
-                    try {
-                      Utils.setFlag(miningWorldGuardRegion, flag, "deny");
-                    } catch (InvalidFlagFormat e) {
-                      e.printStackTrace();
-                    }
-                  }
-                });
-              }
-            });
-
             MineData mineData = new MineData(uuid, urailsL, lrailsL, fullMin, fullMax, location,
                 spongeL, mineType, shop);
 
             mineData.setMaxPlayers(maxPlayers);
             mine.setLocation(vector);
-//            mine.setLocation(BukkitAdapter.asBlockVector(location));
             mine.setMineData(mineData);
             mine.saveMineData(player, mineData);
             SQLUtils.insert(mine);
+            Task.syncDelayed(() -> {
+              FlagUtils flagUtils = new FlagUtils();
+              flagUtils.setFlags(mine);
+            });
           } catch (IncompleteRegionException e) {
             e.printStackTrace();
           }
@@ -505,7 +417,6 @@ public class MineFactory {
           }
 
           mine.handleReset();
-//          mine.reset();
           TextComponent teleportMessage = new TextComponent(
               ChatColor.GREEN + "Click me to teleport to your mine!");
           teleportMessage.setClickEvent(

@@ -119,7 +119,6 @@ public class SchematicIterator {
   }
 
   public static class MineBlocks {
-
     public BlockVector3 spawnLocation;
     public BlockVector3 npcLocation;
     public BlockVector3 quarryLocation;

@@ -82,7 +82,7 @@ class MineStorage {
         // from the location then add the mine, and it's distance
         // into the map.
 
-        mines.forEach { (uuid, mine) ->
+        mines.forEach { (_, mine) ->
             run {
                 val mineLocation = mine.mineData.mineLocation
                 val distance = location.distance(mineLocation)
