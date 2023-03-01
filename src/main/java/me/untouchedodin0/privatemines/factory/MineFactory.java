@@ -205,7 +205,6 @@ public class MineFactory {
           localSession.setRegionSelector(world, regionSelector);
           regionSelector.learnChanges();
 
-          //noinspection DanglingJavadoc
           try {
             newRegion = regionSelector.getRegion();
 
