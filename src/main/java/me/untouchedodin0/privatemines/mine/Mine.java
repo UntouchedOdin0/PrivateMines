@@ -896,58 +896,6 @@ public class Mine {
     }
   }
 
-  public void forceUpgrade() {
-    MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
-    MineFactory mineFactory = privateMines.getMineFactory();
-    MineStorage mineStorage = privateMines.getMineStorage();
-    MineData mineData = getMineData();
-    UUID mineOwner = mineData.getMineOwner();
-    Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
-    List<Player> toTeleport = new ArrayList<>();
-    MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
-    MineType nextType = mineTypeManager.getNextMineType(currentType);
-    Location mineLocation = mineData.getMineLocation();
-
-    PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this,
-        currentType, nextType);
-    Bukkit.getPluginManager().callEvent(privateMineUpgradeEvent);
-    if (privateMineUpgradeEvent.isCancelled()) {
-      return;
-    }
-    if (player != null) {
-      if (currentType == nextType) {
-        privateMines.getLogger()
-            .info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
-        Location fullMin = mineData.getMinimumFullRegion();
-        Location fullMax = mineData.getMaximumFullRegion();
-        redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
-            fullMin, fullMax);
-
-        for (Player online : Bukkit.getOnlinePlayers()) {
-          if (cuboidRegion.contains(online.getLocation())) {
-            toTeleport.add(online);
-          }
-        }
-
-        delete(true);
-        mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
-        Mine mine = mineStorage.get(player);
-        if (mine != null) {
-          mine.handleReset();
-          SQLUtils.replace(mine);
-
-          Task.syncDelayed(() -> {
-            if (!toTeleport.isEmpty()) {
-              for (Player player1 : toTeleport) {
-                teleport(player1);
-              }
-            }
-          }, 40L);
-        }
-      }
-    }
-  }
-
   public void createWorldGuardRegions() {
 
     String mineRegionName = String.format("mine-%s", getMineData().getMineOwner());
