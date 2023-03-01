@@ -893,75 +893,8 @@ public class Mine {
           economy.withdrawPlayer(player, upgradeCost);
         }
       }
-
-//      if (currentType == nextType) {
-//        privateMines.getLogger()
-//            .info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
-//      } else if (upgradeCost == 0.0D) {
-//        Location fullMin = mineData.getMinimumFullRegion();
-//        Location fullMax = mineData.getMaximumFullRegion();
-//        redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
-//            fullMin, fullMax);
-//
-//        for (Player online : Bukkit.getOnlinePlayers()) {
-//          if (cuboidRegion.contains(online.getLocation())) {
-//            toTeleport.add(online);
-//          }
-//        }
-//
-//        delete(true);
-//        mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
-//        Mine mine = mineStorage.get(player);
-//        if (mine != null) {
-//          mine.handleReset();
-//
-//          Task.syncDelayed(() -> {
-//            if (!toTeleport.isEmpty()) {
-//              for (Player player1 : toTeleport) {
-//                teleport(player1);
-//              }
-//            }
-//          }, 40L);
-//        }
-//      } else {
-//        double balance = economy.getBalance(player);
-//        if (balance < upgradeCost) {
-//          player.sendMessage(
-//              "" + ChatColor.RED + "You don't have enough money to upgrade your mine!");
-//        } else {
-//          Location fullMin = mineData.getMinimumFullRegion();
-//          Location fullMax = mineData.getMaximumFullRegion();
-//          redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
-//              fullMin, fullMax);
-//
-//          for (Player online : Bukkit.getOnlinePlayers()) {
-//            if (cuboidRegion.contains(online.getLocation())) {
-//              toTeleport.add(online);
-//            }
-//          }
-//
-//          delete(true);
-//          mineFactory.create(Objects.requireNonNull(player), mineLocation.subtract(0, 0, 1),
-//              nextType, true);
-//          Mine mine = mineStorage.get(player);
-//          if (mine != null) {
-//            mine.handleReset();
-//            SQLUtils.replace(mine);
-//
-//            Task.syncDelayed(() -> {
-//              if (!toTeleport.isEmpty()) {
-//                for (Player player1 : toTeleport) {
-//                  teleport(player1);
-//                }
-//              }
-//            }, 40L);
-//          }
-//        }
-//        economy.withdrawPlayer(player, upgradeCost);
-//      }
     }
   }
-
 
   public void forceUpgrade() {
     MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
@@ -1014,7 +947,6 @@ public class Mine {
       }
     }
   }
-
 
   public void createWorldGuardRegions() {
 

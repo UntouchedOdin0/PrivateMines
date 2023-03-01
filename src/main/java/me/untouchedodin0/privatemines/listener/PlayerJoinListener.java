@@ -45,7 +45,6 @@ public class PlayerJoinListener implements Listener {
   MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
   MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
 
-
   @EventHandler(priority = EventPriority.HIGHEST)
   public void onJoin(PlayerJoinEvent playerJoinEvent) {
 
