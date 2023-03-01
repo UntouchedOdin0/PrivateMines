@@ -25,10 +25,6 @@ public class QueueUtils {
   public Queue<UUID> queue = new LinkedList<>();
   public List<UUID> waitingInQueue = new ArrayList<>();
 
-  public Queue<UUID> getQueue() {
-    return queue;
-  }
-
   public void add(UUID uuid) {
     if (!queue.contains(uuid)) {
       queue.add(uuid);

@@ -30,7 +30,6 @@ public class SchematicStorage {
 
   private final Map<File, MineBlocks> mineBlocksMap = new HashMap<>();
 
-
   public void addSchematic(File file, MineBlocks mineBlocks) {
     mineBlocksMap.putIfAbsent(file, mineBlocks);
   }

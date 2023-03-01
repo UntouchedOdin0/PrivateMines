@@ -20,6 +20,9 @@ public class SQLite extends Database {
     if (!dataFolder.exists()) {
       try {
         boolean created = dataFolder.createNewFile();
+        if (created) {
+          privateMines.getLogger().info("Created the privatemines.db file successfully!");
+        }
       } catch (IOException e) {
         privateMines.getLogger().log(Level.SEVERE, "File write error: " + databaseName + ".db");
       }

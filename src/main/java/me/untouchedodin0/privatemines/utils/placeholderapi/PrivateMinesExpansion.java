@@ -36,12 +36,6 @@ import redempt.redlib.misc.LocationUtils;
 
 public class PrivateMinesExpansion extends PlaceholderExpansion {
 
-  private final PrivateMines plugin;
-
-  public PrivateMinesExpansion(PrivateMines plugin) {
-    this.plugin = plugin;
-  }
-
   @Override
   public @NotNull String getAuthor() {
     return "UntouchedOdin0";

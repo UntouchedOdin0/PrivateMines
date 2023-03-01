@@ -111,8 +111,6 @@ public class PrivateMines extends JavaPlugin {
   private Gson gson;
   String matString;
   double percent;
-  public HashMap<UUID, Long> cooldowns = new HashMap<>();
-
   public static PrivateMines getPrivateMines() {
     return privateMines;
   }
@@ -147,7 +145,7 @@ public class PrivateMines extends JavaPlugin {
     setupSchematicUtils();
 
     if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-      boolean registered = new PrivateMinesExpansion(this).register();
+      boolean registered = new PrivateMinesExpansion().register();
       if (registered) {
         privateMines.getLogger().info("Registered the PlaceholderAPI expansion!");
       }
@@ -225,6 +223,7 @@ public class PrivateMines extends JavaPlugin {
     if (!dataFolder.exists()) {
       try {
         boolean created = dataFolder.createNewFile();
+        if (created) return;
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
@@ -281,7 +280,8 @@ public class PrivateMines extends JavaPlugin {
   public void onDisable() {
     File file = new File("plugins/PrivateMines/donottouch.json");
     if (file.exists()) {
-      file.delete();
+      boolean deleted = file.delete();
+      if (deleted) return;
     }
 
     if (adventure != null) {
@@ -317,6 +317,7 @@ public class PrivateMines extends JavaPlugin {
     return true;
   }
 
+  @Deprecated(since = "5.3.5", forRemoval = true)
   public void loadMines() {
     final PathMatcher jsonMatcher = FileSystems.getDefault()
         .getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
@@ -474,6 +475,7 @@ public class PrivateMines extends JavaPlugin {
     });
   }
 
+  @Deprecated(since = "5.3.5", forRemoval = true)
   public void loadPregenMines() {
     final PathMatcher jsonMatcher = FileSystems.getDefault()
         .getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
