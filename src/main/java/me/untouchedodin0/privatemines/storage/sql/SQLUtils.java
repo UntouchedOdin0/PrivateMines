@@ -8,6 +8,7 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import redempt.redlib.misc.LocationUtils;
@@ -54,6 +55,7 @@ public class SQLUtils {
         LocationUtils.toString(mine.getSpawnLocation()), mineData.getTax(), mineData.isOpen(),
         mineData.getMaxPlayers(), mineData.getMaxMineSize(), "{SPONGE=1.0, STONE=1.0, DIRT=1.0}");
 
+    Bukkit.broadcastMessage("materials " + mineData.getMaterials().toString());
     sqlHelper.executeUpdate(insertQuery);
   }
 

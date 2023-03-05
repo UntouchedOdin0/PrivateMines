@@ -469,7 +469,6 @@ public class PrivateMines extends JavaPlugin {
       MineData mineData = new MineData(uuid, minMining, maxMining, fullMin, fullMax, location,
           spawnLocation, type, open, tax);
       mineData.setMaterials(materials);
-
       mine.setMineData(mineData);
       mineStorage.addMine(uuid, mine);
     });

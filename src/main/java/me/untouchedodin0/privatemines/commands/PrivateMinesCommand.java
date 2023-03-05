@@ -1,6 +1,7 @@
 package me.untouchedodin0.privatemines.commands;
 
 import co.aikar.commands.BaseCommand;
+import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
@@ -51,9 +52,8 @@ public class PrivateMinesCommand extends BaseCommand {
   private final CooldownManager cooldownManager = new CooldownManager();
 
   @Default
-  public void defaultCommand(Player player) {
-    Menu mainMenu = MenuConfig.getMenus().get("mainMenu");
-    mainMenu.open(player);
+  public void defaultCommand(Player player, CommandHelp commandHelp) {
+    commandHelp.showHelp();
   }
 
   @Subcommand("version")
@@ -296,6 +296,7 @@ public class PrivateMinesCommand extends BaseCommand {
       mineData.setOpen(true);
       mine.setMineData(mineData);
       mineStorage.replaceMineNoLog(player, mine);
+      SQLUtils.replace(mine);
     }
   }
 
@@ -309,6 +310,7 @@ public class PrivateMinesCommand extends BaseCommand {
       mineData.setOpen(false);
       mine.setMineData(mineData);
       mineStorage.replaceMineNoLog(player, mine);
+      SQLUtils.replace(mine);
     }
   }
 
