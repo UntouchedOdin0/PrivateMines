@@ -47,6 +47,7 @@ import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.privatemines.commands.AddonsCommand;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.commands.PublicMinesCommand;
 import me.untouchedodin0.privatemines.config.Config;
@@ -262,6 +263,7 @@ public class PrivateMines extends JavaPlugin {
     PaperCommandManager paperCommandManager = new PaperCommandManager(this);
     paperCommandManager.registerCommand(new PrivateMinesCommand());
     paperCommandManager.registerCommand(new PublicMinesCommand());
+    paperCommandManager.registerCommand(new AddonsCommand());
     paperCommandManager.enableUnstableAPI("help");
 
     Task.asyncDelayed(this::loadSQLMines);
