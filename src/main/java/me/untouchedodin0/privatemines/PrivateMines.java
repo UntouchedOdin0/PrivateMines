@@ -26,6 +26,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,6 +68,11 @@ import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
+import me.untouchedodin0.privatemines.utils.addon.Addon;
+import me.untouchedodin0.privatemines.utils.addon.AddonAPI;
+import me.untouchedodin0.privatemines.utils.addon.AddonsManager;
+import me.untouchedodin0.privatemines.utils.addon.Enable;
+import me.untouchedodin0.privatemines.utils.addon.Test;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -103,6 +110,7 @@ public class PrivateMines extends JavaPlugin {
   private MineWorldManager mineWorldManager;
   private MineTypeManager mineTypeManager;
   private ConfigManager configManager;
+  private AddonsManager addonsManager;
   private SlimeUtils slimeUtils;
   private QueueUtils queueUtils;
   private static Economy econ = null;
@@ -132,6 +140,7 @@ public class PrivateMines extends JavaPlugin {
     this.pregenStorage = new PregenStorage();
     this.mineTypeManager = new MineTypeManager(this);
     this.queueUtils = new QueueUtils();
+    this.addonsManager = new AddonsManager();
 
     GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
@@ -270,6 +279,37 @@ public class PrivateMines extends JavaPlugin {
     metrics.addCustomChart(new SingleLineChart("mines", () -> mineStorage.getTotalMines()));
 
     new UpdateChecker(this).fetch();
+
+    getLogger().info("---- Annotation Debug ----");
+    getLogger().info("Name " + Test.class.getAnnotation(Addon.class).name());
+    getLogger().info("Author " + Test.class.getAnnotation(Addon.class).author());
+
+    AddonAPI.load(Test.class);
+
+//    Method[] methods = Test.class.getMethods();
+//    getLogger().info("methods " + methods);
+
+//    for (Method method : methods) {
+//      if (method.isAnnotationPresent(Enable.class)) {
+//        Enable enable = method.getAnnotation(Enable.class);
+//        Class<?> c = Test.class;
+//
+//        try {
+//          method.invoke(c.newInstance());
+//        } catch (InvocationTargetException e) {
+//          throw new RuntimeException(e);
+//        } catch (IllegalAccessException e) {
+//          throw new RuntimeException(e);
+//        } catch (InstantiationException e) {
+//          throw new RuntimeException(e);
+//        }
+//        getLogger().info("c? " + c);
+//      }
+//    }
+
+    getLogger().info("---- Annotation Debug ----");
+
+
     Instant end = Instant.now();
     Duration loadTime = Duration.between(start, end);
     getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
@@ -618,5 +658,9 @@ public class PrivateMines extends JavaPlugin {
 
   public QueueUtils getQueueUtils() {
     return queueUtils;
+  }
+
+  public AddonsManager getAddonsManager() {
+    return addonsManager;
   }
 }

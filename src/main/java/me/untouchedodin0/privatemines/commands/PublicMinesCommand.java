@@ -15,6 +15,7 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -66,7 +67,7 @@ public class PublicMinesCommand extends BaseCommand {
 
         GuiItem guiItem;
         if (name != null) {
-          guiItem = ItemBuilder.from(Material.EMERALD).name(Component.text(name))
+          guiItem = ItemBuilder.from(Material.EMERALD).name(Component.text(name).color(NamedTextColor.GREEN))
               .lore(Component.text(ChatColor.GREEN + "Click to teleport")).asGuiItem(event -> {
                 event.setCancelled(true);
                 mine.teleport(player);
