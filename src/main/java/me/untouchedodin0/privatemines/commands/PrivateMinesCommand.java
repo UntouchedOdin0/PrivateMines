@@ -207,9 +207,10 @@ public class PrivateMinesCommand extends BaseCommand {
           mine.handleReset();
         }
       } else {
-
         if (timeLeft == 0) {
-
+          if (mine != null) {
+            mine.handleReset();
+          }
           player.sendMessage(ChatColor.GREEN + "You've reset your mine!");
           cooldownManager.setCooldown(player.getUniqueId(), Config.resetCooldown);
           new BukkitRunnable() {

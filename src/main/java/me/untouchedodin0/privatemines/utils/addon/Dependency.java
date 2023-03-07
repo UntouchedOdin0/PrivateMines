@@ -4,8 +4,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Addon {
+public @interface Dependency {
   String name();
-  String author();
   String version();
 }

@@ -11,7 +11,7 @@ public class AddonsManager {
     return addons;
   }
 
-  private void addAddon(String string, Addon addon) {
+  public void addAddon(String string, Addon addon) {
     addons.putIfAbsent(string, addon);
   }
 

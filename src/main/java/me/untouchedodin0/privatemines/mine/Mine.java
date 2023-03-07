@@ -235,6 +235,7 @@ public class Mine {
           region.contract(ExpansionUtils.contractVectors(1));
         }
       }
+      Bukkit.broadcastMessage("region " + region);
       editSession.setBlocks(region, randomPattern);
       editSession.flushQueue();
     }

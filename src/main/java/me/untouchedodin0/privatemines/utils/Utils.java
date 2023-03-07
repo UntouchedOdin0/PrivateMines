@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang.WordUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -50,6 +52,8 @@ import org.bukkit.Material;
 import org.bukkit.World;
 
 public class Utils {
+
+  private static final Pattern VERSION_REGEX = Pattern.compile("(\\d+)\\.(\\d+)(\\.(\\d+))?");
 
   public static Location toLocation(BlockVector3 vector3, org.bukkit.World world) {
     return new Location(world, vector3.getX(), vector3.getY(), vector3.getZ());
@@ -150,5 +154,18 @@ public class Utils {
       }
     }
     return chunks;
+  }
+
+  public static int[] parseVersion(String version) {
+    Matcher matcher = VERSION_REGEX.matcher(version);
+    if (!matcher.matches()) {
+      throw new IllegalArgumentException("invalid version string: \"" + version + "\"");
+    }
+    String revision = matcher.group(4);
+    return new int[] {
+        Integer.parseInt(matcher.group(1)), // major version number
+        Integer.parseInt(matcher.group(2)), // minor version number
+        Integer.parseInt(revision)          // revision version number
+    };
   }
 }
