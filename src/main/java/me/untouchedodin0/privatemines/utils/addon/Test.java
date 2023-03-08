@@ -1,11 +1,11 @@
 package me.untouchedodin0.privatemines.utils.addon;
 
-import java.util.Arrays;
 import me.untouchedodin0.privatemines.PrivateMines;
 import org.bukkit.Bukkit;
 
 @Addon(name = "TestAddon", author = "DevTest", version = "1.0")
-@Dependency(name = "PluginA", version = "1.5.6")
+@Dependency(name = "test", version = "1.1", isAddon = false)
+//@Dependency(name = "test2", version = "1.1", isAddon = true)
 public class Test {
 
   PrivateMines privateMines = PrivateMines.getPrivateMines();
@@ -13,22 +13,15 @@ public class Test {
   @Enable
   public void onEnable() {
     Bukkit.getLogger().info("i'm doubting this will work sadly!");
+    Addon addon = getClass().getAnnotation(Addon.class);
     Dependency dependency = getClass().getAnnotation(Dependency.class);
     Dependency[] dependencies = getClass().getAnnotationsByType(Dependency.class);
-    Bukkit.getLogger().info("dependency? " + dependency);
-    Bukkit.getLogger().info("dependencies? " + Arrays.toString(dependencies));
-
-    for (Dependency dependency1 : dependencies) {
-      String name = dependency1.name();
-      String version = dependency1.version();
-
-      Bukkit.getLogger().info("name: " + dependency1.name());
-      Bukkit.getLogger().info("version: " + dependency1.version());
-    }
+    privateMines.getLogger().info("Loading addon " + addon.name());
   }
 
   @Disable
   public void onDisable() {
-    Bukkit.getLogger().info("Disabling the addon!");
+    Addon addon = getClass().getAnnotation(Addon.class);
+    privateMines.getLogger().info("Disabling addon " + addon.name());
   }
 }
