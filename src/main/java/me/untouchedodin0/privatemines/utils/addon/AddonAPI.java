@@ -3,12 +3,17 @@ package me.untouchedodin0.privatemines.utils.addon;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import me.untouchedodin0.privatemines.PrivateMines;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 
 public class AddonAPI {
 
   static PrivateMines privateMines = PrivateMines.getPrivateMines();
-  private static AddonsManager addonsManager = privateMines.getAddonsManager();
+  private static final AddonsManager addonsManager = privateMines.getAddonsManager();
+  private static Map<String, Class<?>> classMap = new HashMap<>();
 
   public static void load(Class<?> clazz) {
     Addon addon = clazz.getAnnotation(Addon.class);
@@ -52,6 +57,36 @@ public class AddonAPI {
 //        }
 //      }
     }
+    classMap.put(name, clazz);
     addonsManager.addAddon(name, addon);
+  }
+
+  public static void reload(CommandSender commandSender, String string) {
+    Addon addon = addonsManager.getAddon(string);
+    Class<?> clazz = classMap.get(string);
+
+    if (clazz == null) {
+      privateMines.getLogger().warning(
+          String.format("Unable to find class %s, are you sure you specified the correct name?",
+          string));
+      commandSender.sendMessage(String.format("Unable to find class %s, are you sure you specified the correct name?",
+          string));
+      return;
+    } else {
+      Method[] methods = clazz.getMethods();
+
+      Bukkit.broadcastMessage("clazz " + clazz);
+
+      for (Method method : methods) {
+        if (method.isAnnotationPresent(Reload.class)) {
+          privateMines.getLogger().info("Found reload on method " + method);
+          try {
+            method.invoke(clazz.newInstance());
+          } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            throw new RuntimeException(e);
+          }
+        }
+      }
+    }
   }
 }

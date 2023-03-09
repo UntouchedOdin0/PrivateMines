@@ -1,13 +1,16 @@
-package me.untouchedodin0.privatemines.utils.addon;
+package me.untouchedodin0.privatemines.utils.addon.test;
 
 import me.untouchedodin0.privatemines.PrivateMines;
+import me.untouchedodin0.privatemines.utils.addon.Addon;
+import me.untouchedodin0.privatemines.utils.addon.Dependency;
+import me.untouchedodin0.privatemines.utils.addon.Disable;
+import me.untouchedodin0.privatemines.utils.addon.Enable;
+import me.untouchedodin0.privatemines.utils.addon.Reload;
 import org.bukkit.Bukkit;
 
-@Addon(name = "TestAddon", author = "DevTest", version = "1.0")
+@Addon(name = "TestAddon", author = "DevTest", version = "1.0", description = "Addon Description Test")
 @Dependency(name = "test", version = "1.1", isAddon = false)
-//@Dependency(name = "test2", version = "1.1", isAddon = true)
 public class Test {
-
   PrivateMines privateMines = PrivateMines.getPrivateMines();
 
   @Enable
@@ -23,5 +26,10 @@ public class Test {
   public void onDisable() {
     Addon addon = getClass().getAnnotation(Addon.class);
     privateMines.getLogger().info("Disabling addon " + addon.name());
+  }
+
+  @Reload
+  public void onReload() {
+    Bukkit.broadcastMessage("reloading the addon! :)");
   }
 }
