@@ -67,7 +67,6 @@ import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
-import me.untouchedodin0.privatemines.utils.addon.Addon;
 import me.untouchedodin0.privatemines.utils.addon.AddonAPI;
 import me.untouchedodin0.privatemines.utils.addon.AddonsManager;
 import me.untouchedodin0.privatemines.utils.addon.test.Test;
@@ -100,6 +99,7 @@ public class PrivateMines extends JavaPlugin {
   private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
   private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
   private final Path pregenMines = getDataFolder().toPath().resolve("pregen");
+  private final Path addonsDirectory = getDataFolder().toPath().resolve("addons");
   private SchematicStorage schematicStorage;
   private SchematicIterator schematicIterator;
   private MineFactory mineFactory;
@@ -190,6 +190,7 @@ public class PrivateMines extends JavaPlugin {
       Files.createDirectories(minesDirectory);
       Files.createDirectories(schematicsDirectory);
       Files.createDirectories(pregenMines);
+      Files.createDirectories(addonsDirectory);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -279,34 +280,17 @@ public class PrivateMines extends JavaPlugin {
 
     new UpdateChecker(this).fetch();
 
-    getLogger().info("---- Annotation Debug ----");
-    getLogger().info("Name " + Test.class.getAnnotation(Addon.class).name());
-    getLogger().info("Author " + Test.class.getAnnotation(Addon.class).author());
+    File file = new File(getDataFolder() + "/addons/PrivateMinesAddon2-1.0-SNAPSHOT.jar");
+//    getLogger().info("file: " + file);
+//    AddonAPI.load(file);
+//    getLogger().info("---- Annotation Debug ----");
+//    getLogger().info("Name " + Test.class.getAnnotation(Addon.class).name());
+//    getLogger().info("Author " + Test.class.getAnnotation(Addon.class).author());
+//
+//    getLogger().info("---- Annotation Debug ----");
 
     AddonAPI.load(Test.class);
-
-//    Method[] methods = Test.class.getMethods();
-//    getLogger().info("methods " + methods);
-
-//    for (Method method : methods) {
-//      if (method.isAnnotationPresent(Enable.class)) {
-//        Enable enable = method.getAnnotation(Enable.class);
-//        Class<?> c = Test.class;
-//
-//        try {
-//          method.invoke(c.newInstance());
-//        } catch (InvocationTargetException e) {
-//          throw new RuntimeException(e);
-//        } catch (IllegalAccessException e) {
-//          throw new RuntimeException(e);
-//        } catch (InstantiationException e) {
-//          throw new RuntimeException(e);
-//        }
-//        getLogger().info("c? " + c);
-//      }
-//    }
-
-    getLogger().info("---- Annotation Debug ----");
+    AddonAPI.load(file);
 
 
     Instant end = Instant.now();

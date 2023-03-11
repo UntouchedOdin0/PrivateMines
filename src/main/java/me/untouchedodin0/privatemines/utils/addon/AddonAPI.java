@@ -1,10 +1,14 @@
 package me.untouchedodin0.privatemines.utils.addon;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import me.untouchedodin0.privatemines.PrivateMines;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -13,32 +17,18 @@ public class AddonAPI {
 
   static PrivateMines privateMines = PrivateMines.getPrivateMines();
   private static final AddonsManager addonsManager = privateMines.getAddonsManager();
-  private static Map<String, Class<?>> classMap = new HashMap<>();
+  private static final Map<String, Class<?>> classMap = new HashMap<>();
+  static boolean foundAddon = false;
 
   public static void load(Class<?> clazz) {
-    Addon addon = clazz.getAnnotation(Addon.class);
-    String name = addon.name();
-    String author = addon.author();
+//    Addon addon = clazz.getAnnotation(Addon.class);
+//    privateMines.getLogger().info("addon " + addon);
+    privateMines.getLogger().info("clazz " + clazz);
+
+//    String name = addon.name();
+//    String author = addon.author();
 
     Method[] methods = clazz.getMethods();
-    Dependency[] dependencies = clazz.getDeclaredAnnotationsByType(Dependency.class);
-
-    if (clazz.isAnnotationPresent(Dependency.class)) {
-      for (Dependency dependency : dependencies) {
-        privateMines.getLogger().info("dependency? " + dependency);
-        String dependencyName = dependency.name();
-        String dependencyVersion = dependency.version();
-        boolean isAddon = dependency.isAddon();
-
-        privateMines.getLogger().info("dependencyName: " + dependencyName);
-        privateMines.getLogger().info("dependencyVersion: " + dependencyVersion);
-        privateMines.getLogger().info("isAddon: " + isAddon);
-      }
-    }
-    privateMines.getLogger().info("addon annotation " + addon);
-    privateMines.getLogger().info("methods: " + Arrays.toString(methods));
-    privateMines.getLogger().info("name " + name);
-    privateMines.getLogger().info("author " + author);
 
     for (Method method : methods) {
       if (method.isAnnotationPresent(Enable.class)) {
@@ -48,17 +38,26 @@ public class AddonAPI {
           throw new RuntimeException(e);
         }
       }
-
-//      if (method.isAnnotationPresent(Disable.class)) {
-//        try {
-//          method.invoke(clazz.newInstance());
-//        } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
-//          throw new RuntimeException(e);
-//        }
-//      }
     }
-    classMap.put(name, clazz);
-    addonsManager.addAddon(name, addon);
+//    classMap.put(name, clazz);
+//    addonsManager.addAddon(name, addon);
+  }
+
+  public static void load(File file) {
+    try {
+      try (JarFile jarFile = new JarFile(file)) {
+        final Enumeration<JarEntry> entries = jarFile.entries();
+        while (entries.hasMoreElements()) {
+          final JarEntry entry = entries.nextElement();
+            JarEntry jarEntry = jarFile.getJarEntry(entry.getName());
+            Class<?> clazz = jarEntry.getClass();
+            Method[] methods = clazz.getMethods();
+            load(clazz);
+         }
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public static void reload(CommandSender commandSender, String string) {
@@ -68,9 +67,10 @@ public class AddonAPI {
     if (clazz == null) {
       privateMines.getLogger().warning(
           String.format("Unable to find class %s, are you sure you specified the correct name?",
-          string));
-      commandSender.sendMessage(String.format("Unable to find class %s, are you sure you specified the correct name?",
-          string));
+              string));
+      commandSender.sendMessage(
+          String.format("Unable to find class %s, are you sure you specified the correct name?",
+              string));
       return;
     } else {
       Method[] methods = clazz.getMethods();

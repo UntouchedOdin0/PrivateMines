@@ -45,24 +45,28 @@ public class AddonsCommand extends BaseCommand {
 //      this.component = component.append(addonComponent);
     });
 
-    Bukkit.broadcastMessage("addon list " + addonList);
-    Bukkit.broadcastMessage("addon list size " + addonList.size());
 
-    if (addonList.size() < 2) {
-      Addon addon = addonList.get(0);
-      Component singular = miniMessage.deserialize("<green>Addons: ");
-      Component test = miniMessage.deserialize(String.format("<hover:show_text:'<red>%s\n"
-          + "v%s'><yellow>%s", addon.description(), addon.version(), addon.name()));
-      singularAddon = singular.append(test);
-      audience.sendMessage(singularAddon);
+    if (addonList.isEmpty()) {
+      Component noAddons = miniMessage.deserialize("<green>Addons: <red>None");
+      audience.sendMessage(noAddons);
     } else {
-      for (Addon addon : addonList) {
+
+      if (addonList.size() < 2) {
+        Addon addon = addonList.get(0);
+        Component singular = miniMessage.deserialize("<green>Addons: ");
         Component test = miniMessage.deserialize(String.format("<hover:show_text:'<red>%s\n"
             + "v%s'><yellow>%s", addon.description(), addon.version(), addon.name()));
-        component = component.append(test);
-        component = component.append(comma);
+        singularAddon = singular.append(test);
+        audience.sendMessage(singularAddon);
+      } else {
+        for (Addon addon : addonList) {
+          Component test = miniMessage.deserialize(String.format("<hover:show_text:'<red>%s\n"
+              + "v%s'><yellow>%s", addon.description(), addon.version(), addon.name()));
+          component = component.append(test);
+          component = component.append(comma);
+        }
+        audience.sendMessage(component);
       }
-      audience.sendMessage(component);
     }
   }
 

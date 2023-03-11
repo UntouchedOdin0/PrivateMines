@@ -54,8 +54,6 @@ public class SQLUtils {
         LocationUtils.toString(mineData.getMaximumFullRegion()),
         LocationUtils.toString(mine.getSpawnLocation()), mineData.getTax(), mineData.isOpen(),
         mineData.getMaxPlayers(), mineData.getMaxMineSize(), "{SPONGE=1.0, STONE=1.0, DIRT=1.0}");
-
-    Bukkit.broadcastMessage("materials " + mineData.getMaterials().toString());
     sqlHelper.executeUpdate(insertQuery);
   }
 

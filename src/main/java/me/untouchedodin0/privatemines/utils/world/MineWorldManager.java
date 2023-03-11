@@ -37,7 +37,6 @@ public class MineWorldManager {
   private final Location defaultLocation;
   private Location currentLocation;
   private Location nextLocation;
-
   private final int borderDistance;
   private int distance = 0;
   private Direction direction;
