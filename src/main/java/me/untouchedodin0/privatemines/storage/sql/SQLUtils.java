@@ -96,10 +96,23 @@ public class SQLUtils {
     MineData mineData = mine.getMineData();
     MineType mineType = mineData.getMineType();
     UUID owner = mineData.getMineOwner();
+    Location minMining = mineData.getMinimumMining();
+    Location maxMining = mineData.getMaximumMining();
+    Location fullRegionMin = mineData.getMinimumFullRegion();
+    Location fullRegionMax = mineData.getMaximumFullRegion();
 
     SQLHelper sqlHelper = privateMines.getSqlHelper();
     String command = String.format(
-        "UPDATE privatemines SET mineType = " + "'%s' " + "WHERE owner = '%s';", mineType.getName(), owner);
+        "UPDATE privatemines SET mineType = '%s', corner1 = '%s', corner2 = '%s', fullRegionMin = '%s', fullRegionMax = '%s' WHERE owner = '%s';",
+        mineType.getName(),
+        LocationUtils.toString(minMining),
+        LocationUtils.toString(maxMining),
+        LocationUtils.toString(fullRegionMin),
+        LocationUtils.toString(fullRegionMax),
+        owner
+    );
+//    String command = String.format(
+//        "UPDATE privatemines SET mineType = " + "'%s' " + "WHERE owner = '%s';", mineType.getName(), owner);
     sqlHelper.executeUpdate(command);
   }
 

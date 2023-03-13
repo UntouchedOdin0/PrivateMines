@@ -138,6 +138,7 @@ public class PrivateMinesCommand extends BaseCommand {
           if (bal >= cost) {
             // player has enough money, upgrade the mine
             mine.upgrade(false);
+            mine.handleReset();
           } else {
             // player does not have enough money
             player.sendMessage(ChatColor.RED + String.format(
