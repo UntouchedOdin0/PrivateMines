@@ -43,20 +43,17 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
-import me.untouchedodin0.privatemines.factory.PregenFactory;
+import me.untouchedodin0.privatemines.factory.PregenFactoryDeprecated;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopBuilder;
 import me.untouchedodin0.privatemines.utils.inventory.PublicMinesMenu;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.Server;
-import org.bukkit.WorldBorder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redempt.redlib.commandmanager.CommandHook;
@@ -362,7 +359,7 @@ public class PrivateMinesCommandOld {
 
   @CommandHook("pregen")
   public void pregen(Player player, int amount) {
-    PregenFactory pregenFactory = new PregenFactory();
+    PregenFactoryDeprecated pregenFactory = new PregenFactoryDeprecated();
     pregenFactory.generate(player, amount);
   }
 

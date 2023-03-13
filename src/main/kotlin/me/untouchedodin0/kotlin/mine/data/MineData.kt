@@ -35,10 +35,14 @@ data class MineData(
     var maximumFullRegion: Location,
     val mineLocation: Location,
     var spawnLocation: Location,
-    val mineType: MineType,
+    var mineType: MineType,
     var isOpen: Boolean = false,
     var tax: Double = 5.0,
 ) {
+//    fun setMineType(mineType: MineType) {
+//        this.mineType = mineType;
+//    }
+
     private var shop: Shop? = null
 
     var bannedPlayers: MutableList<UUID> = mutableListOf()

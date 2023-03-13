@@ -22,14 +22,13 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
+import me.untouchedodin0.privatemines.factory.PregenFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.CooldownManager;
-import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import nl.kyllian.models.Paste;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -224,9 +223,11 @@ public class PrivateMinesCommand extends BaseCommand {
               }
             }
           }.runTaskTimerAsynchronously(privateMines, 20, 20);
-      } else {
+        } else {
           //Hasn't expired yet, shows how many seconds left until it does
-          player.sendMessage(String.format(ChatColor.RED + "Please wait %d seconds to reset your mine again!", timeLeft));
+          player.sendMessage(
+              String.format(ChatColor.RED + "Please wait %d seconds to reset your mine again!",
+                  timeLeft));
         }
       }
     }
@@ -349,16 +350,16 @@ public class PrivateMinesCommand extends BaseCommand {
     }
   }
 
-  @Subcommand("claim")
-  @CommandPermission("privatemines.claim")
-  public void claim(Player player) {
-    QueueUtils queueUtils = privateMines.getQueueUtils();
-    if (queueUtils.isInQueue(player.getUniqueId())) {
-      player.sendMessage(ChatColor.RED + "You're already in the queue!");
-      return;
-    }
-    queueUtils.claim(player);
-  }
+//  @Subcommand("claim")
+//  @CommandPermission("privatemines.claim")
+//  public void claim(Player player) {
+//    QueueUtils queueUtils = privateMines.getQueueUtils();
+//    if (queueUtils.isInQueue(player.getUniqueId())) {
+//      player.sendMessage(ChatColor.RED + "You're already in the queue!");
+//      return;
+//    }
+//    queueUtils.claim(player);
+//  }
 
   @Subcommand("setblocks")
   @CommandCompletion("@players")
@@ -389,6 +390,20 @@ public class PrivateMinesCommand extends BaseCommand {
           SQLUtils.updateMaterials(mine);
         });
       }
+    }
+  }
+
+  @Subcommand("pregen")
+  public void pregen(Player player, int amount) {
+    PregenFactory.pregen(player, 5);
+  }
+
+  @Subcommand("claim")
+  public void claim(Player player) {
+    if (mineStorage.hasMine(player)) {
+      player.sendMessage(ChatColor.RED + "You already have a mine!");
+    } else {
+
     }
   }
 }

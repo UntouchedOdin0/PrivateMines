@@ -1,8 +1,10 @@
 package me.untouchedodin0.privatemines.storage.sql;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.data.MineData;
+import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
@@ -90,6 +92,17 @@ public class SQLUtils {
     }, 20L);
   }
 
+  public static void update(Mine mine) {
+    MineData mineData = mine.getMineData();
+    MineType mineType = mineData.getMineType();
+    UUID owner = mineData.getMineOwner();
+
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
+    String command = String.format(
+        "UPDATE privatemines SET mineType = " + "'%s' " + "WHERE owner = '%s';", mineType.getName(), owner);
+    sqlHelper.executeUpdate(command);
+  }
+
   public static void delete(Mine mine) {
     SQLHelper sqlHelper = privateMines.getSqlHelper();
     MineData mineData = mine.getMineData();
@@ -109,5 +122,20 @@ public class SQLUtils {
     String command = String.format(
         "UPDATE privatemines SET materials = " + "'%s' " + "WHERE owner = '%s';", mats, owner);
     sqlHelper.executeUpdate(command);
+  }
+
+  public static void insertPregen(PregenMine pregenMine) {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
+
+    String insert = String.format(
+        "INSERT INTO pregenmines (location, min_mining, max_mining, spawn, min_full, max_full) "
+        + "VALUES ('%s', '%s', '%s', '%s', '%s', '%s');",
+        LocationUtils.toString(Objects.requireNonNull(pregenMine.getLocation())),
+        LocationUtils.toString(Objects.requireNonNull(pregenMine.getLowerRails())),
+        LocationUtils.toString(Objects.requireNonNull(pregenMine.getUpperRails())),
+        LocationUtils.toString(Objects.requireNonNull(pregenMine.getSpawnLocation())),
+        LocationUtils.toString(Objects.requireNonNull(pregenMine.getFullMin())),
+        LocationUtils.toString(Objects.requireNonNull(pregenMine.getFullMax())));
+    sqlHelper.executeUpdate(insert);
   }
 }

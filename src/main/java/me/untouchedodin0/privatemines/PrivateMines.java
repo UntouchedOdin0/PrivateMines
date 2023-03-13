@@ -256,6 +256,17 @@ public class PrivateMines extends JavaPlugin {
         materials VARCHAR(50) NOT NULL,
         PRIMARY KEY (owner)
         );""");
+
+    sqlHelper.executeUpdate("""
+        CREATE TABLE IF NOT EXISTS pregenmines (
+            location VARCHAR(255),
+            min_mining VARCHAR(255),
+            max_mining VARCHAR(255),
+            spawn VARCHAR(255),
+            min_full VARCHAR(255),
+            max_full VARCHAR(255)
+        );
+        """);
     sqlHelper.setAutoCommit(true);
 
     PaperCommandManager paperCommandManager = new PaperCommandManager(this);
@@ -291,6 +302,7 @@ public class PrivateMines extends JavaPlugin {
 
     AddonAPI.load(Test.class);
     AddonAPI.load(file);
+//    AddonAPI.load(addonsDirectory);
 
 
     Instant end = Instant.now();

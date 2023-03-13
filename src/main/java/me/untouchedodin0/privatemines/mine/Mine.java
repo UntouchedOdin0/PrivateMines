@@ -22,13 +22,21 @@
 package me.untouchedodin0.privatemines.mine;
 
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
@@ -42,6 +50,7 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import dev.lone.itemsadder.api.CustomBlock;
 import io.th0rgal.oraxen.api.OraxenBlocks;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
@@ -64,6 +73,8 @@ import me.untouchedodin0.privatemines.events.PrivateMineExpandEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineResetEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineUpgradeEvent;
 import me.untouchedodin0.privatemines.factory.MineFactory;
+import me.untouchedodin0.privatemines.iterator.SchematicIterator;
+import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
@@ -494,7 +505,8 @@ public class Mine {
     MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
     MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
     int resetTime = mineType.getResetTime();
-    int task = Bukkit.getScheduler().scheduleAsyncRepeatingTask(privateMines, this::handleReset, 0L, resetTime * 20L);
+    int task = Bukkit.getScheduler()
+        .scheduleAsyncRepeatingTask(privateMines, this::handleReset, 0L, resetTime * 20L);
   }
 
   public void startPercentageTask() {
@@ -775,6 +787,17 @@ public class Mine {
   }
 
   public void upgrade(boolean force) {
+
+    /**
+     * New upgrade system
+     *
+     * Cancel all tasks
+     * Get min + max full location
+     * Clear the whole region
+     * Paste new schematic
+     * Get new locations and update the sql location stuff.
+     */
+
     MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
     MineFactory mineFactory = privateMines.getMineFactory();
     MineStorage mineStorage = privateMines.getMineStorage();
@@ -785,6 +808,8 @@ public class Mine {
     MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
     MineType nextType = mineTypeManager.getNextMineType(currentType);
     Location mineLocation = mineData.getMineLocation();
+    File schematicFile = new File("plugins/PrivateMines/schematics/" + nextType.getFile());
+    mineData.setMineType(nextType);
 
     Economy economy = PrivateMines.getEconomy();
     double upgradeCost = nextType.getUpgradeCost();
@@ -795,104 +820,192 @@ public class Mine {
       return;
     }
     if (player != null) {
-
-      if (force) {
-        if (currentType == nextType) {
-          // warning saying its same
-        } else {
-          Location fullMin = mineData.getMinimumFullRegion();
-          Location fullMax = mineData.getMaximumFullRegion();
-          redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
-              fullMin, fullMax);
-
-          for (Player online : Bukkit.getOnlinePlayers()) {
-            if (cuboidRegion.contains(online.getLocation())) {
-              toTeleport.add(online);
-            }
-          }
-
-          delete(true);
-          mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
-          Mine mine = mineStorage.get(player);
-          if (mine != null) {
-            mine.handleReset();
-
-            Task.syncDelayed(() -> {
-              if (!toTeleport.isEmpty()) {
-                for (Player player1 : toTeleport) {
-                  teleport(player1);
-                }
-              }
-            }, 40L);
-          }
-        }
+      player.sendMessage("new upgrade system");
+      if (Objects.equals(currentType.getFile(), nextType.getFile())) {
+        Bukkit.broadcastMessage("not changing file as the next type matches");
+        SQLUtils.update(this);
       } else {
-        if (currentType == nextType) {
-          privateMines.getLogger()
-              .info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
-        } else if (upgradeCost == 0.0D) {
-          Location fullMin = mineData.getMinimumFullRegion();
-          Location fullMax = mineData.getMaximumFullRegion();
-          redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
-              fullMin, fullMax);
+        Location fullMin = mineData.getMinimumFullRegion();
+        Location fullMax = mineData.getMaximumFullRegion();
+        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(fullMin.getWorld());
+        Region cuboidRegion = new CuboidRegion(BukkitAdapter.asBlockVector(fullMin),
+            BukkitAdapter.asBlockVector(fullMax));
+        final RandomPattern randomPattern = new RandomPattern();
+        Pattern pattern = BukkitAdapter.adapt(Material.AIR.createBlockData());
+        randomPattern.add(pattern, 1.0);
 
-          for (Player online : Bukkit.getOnlinePlayers()) {
-            if (cuboidRegion.contains(online.getLocation())) {
-              toTeleport.add(online);
-            }
-          }
+        Bukkit.broadcastMessage("cuboid region " + cuboidRegion);
+        Bukkit.broadcastMessage("random  " + randomPattern);
 
-          delete(true);
-          mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
-          Mine mine = mineStorage.get(player);
-          if (mine != null) {
-            mine.handleReset();
+        ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
+        BlockVector3 vector = BlockVector3.at(mineLocation.getBlockX(), mineLocation.getBlockY(),
+            mineLocation.getBlockZ());
+        SchematicStorage storage = privateMines.getSchematicStorage();
+        SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
 
-            Task.syncDelayed(() -> {
-              if (!toTeleport.isEmpty()) {
-                for (Player player1 : toTeleport) {
-                  teleport(player1);
-                }
+        Task.asyncDelayed(() -> {
+          if (clipboardFormat != null) {
+            try (ClipboardReader clipboardReader = clipboardFormat.getReader(
+                new FileInputStream(schematicFile))) {
+              EditSession editSession;
+              if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
+                editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world)
+                    .fastMode(true).build();
+              } else {
+                editSession = WorldEdit.getInstance().newEditSession(world);
               }
-            }, 40L);
-          }
-        } else {
-          double balance = economy.getBalance(player);
-          if (balance < upgradeCost) {
-            player.sendMessage(
-                "" + ChatColor.RED + "You don't have enough money to upgrade your mine!");
-          } else {
-            Location fullMin = mineData.getMinimumFullRegion();
-            Location fullMax = mineData.getMaximumFullRegion();
-            redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
-                fullMin, fullMax);
+              LocalSession localSession = new LocalSession();
 
-            for (Player online : Bukkit.getOnlinePlayers()) {
-              if (cuboidRegion.contains(online.getLocation())) {
-                toTeleport.add(online);
+              Clipboard clipboard = clipboardReader.read();
+              ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
+              BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation())
+                  .add(mineBlocks.getCorner2().add(0, 0, 1));
+              BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation())
+                  .add(mineBlocks.getCorner1().add(0, 0, 1));
+
+              Location spongeL = new Location(mineLocation.getWorld(), vector.getBlockX(),
+                  vector.getBlockY(), vector.getBlockZ() + 1);
+
+              Location lrailsL = new Location(mineLocation.getWorld(), lrailsV.getBlockX(),
+                  lrailsV.getBlockY(), lrailsV.getBlockZ());
+              Location urailsL = new Location(mineLocation.getWorld(), urailsV.getBlockX(),
+                  urailsV.getBlockY(), urailsV.getBlockZ());
+
+              editSession.setBlocks(cuboidRegion,
+                  BukkitAdapter.adapt(Material.AIR.createBlockData()));
+              Operation operation = clipboardHolder.createPaste(editSession).to(vector)
+                      .ignoreAirBlocks(true).build();
+              try {
+                Operations.complete(operation);
+              } finally {
+                editSession.flushQueue();
+                mineData.setSpawnLocation(spongeL);
+                mineData.setMinimumMining(lrailsL);
+                mineData.setMaximumMining(urailsL);
+                setMineData(mineData);
               }
-            }
-
-            delete(true);
-            mineFactory.create(Objects.requireNonNull(player), mineLocation.subtract(0, 0, 1),
-                nextType, true);
-            Mine mine = mineStorage.get(player);
-            if (mine != null) {
-              mine.handleReset();
-              SQLUtils.replace(mine);
-
-              Task.syncDelayed(() -> {
-                if (!toTeleport.isEmpty()) {
-                  for (Player player1 : toTeleport) {
-                    teleport(player1);
-                  }
-                }
-              }, 40L);
+            } catch (IOException e) {
+              throw new RuntimeException(e);
             }
           }
-          economy.withdrawPlayer(player, upgradeCost);
-        }
+        });
+
+//        BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation())
+//            .add(mineBlocks.getCorner2().add(0, 0, 1));
+//        BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation())
+//            .add(mineBlocks.getCorner1().add(0, 0, 1));
+//
+//        Location spongeL = new Location(mineLocation.getWorld(), vector.getBlockX(),
+//            vector.getBlockY(), vector.getBlockZ() + 1);
+//
+//        Location lrailsL = new Location(mineLocation.getWorld(), lrailsV.getBlockX(),
+//            lrailsV.getBlockY(), lrailsV.getBlockZ());
+//        Location urailsL = new Location(mineLocation.getWorld(), urailsV.getBlockX(),
+//            urailsV.getBlockY(), urailsV.getBlockZ());
+
+        SQLUtils.update(this);
       }
+//      try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().fastMode(true).build()) {
+//        editSession.setBlocks(cuboidRegion, BukkitAdapter.adapt(Material.AIR.createBlockData()));
+//      }
+
+//      if (force) {
+//        if (currentType == nextType) {
+//          // warning saying its same
+//        } else {
+//          Location fullMin = mineData.getMinimumFullRegion();
+//          Location fullMax = mineData.getMaximumFullRegion();
+//          redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
+//              fullMin, fullMax);
+//
+//          for (Player online : Bukkit.getOnlinePlayers()) {
+//            if (cuboidRegion.contains(online.getLocation())) {
+//              toTeleport.add(online);
+//            }
+//          }
+//
+//          delete(true);
+//          mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
+//          Mine mine = mineStorage.get(player);
+//          if (mine != null) {
+//            mine.handleReset();
+//
+//            Task.syncDelayed(() -> {
+//              if (!toTeleport.isEmpty()) {
+//                for (Player player1 : toTeleport) {
+//                  teleport(player1);
+//                }
+//              }
+//            }, 40L);
+//          }
+//        }
+//      } else {
+//        if (currentType == nextType) {
+//          privateMines.getLogger()
+//              .info("Failed to upgrade " + player.getName() + "'s mine as it was fully upgraded!");
+//        } else if (upgradeCost == 0.0D) {
+//          Location fullMin = mineData.getMinimumFullRegion();
+//          Location fullMax = mineData.getMaximumFullRegion();
+//          redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
+//              fullMin, fullMax);
+//
+//          for (Player online : Bukkit.getOnlinePlayers()) {
+//            if (cuboidRegion.contains(online.getLocation())) {
+//              toTeleport.add(online);
+//            }
+//          }
+//
+//          delete(true);
+//          mineFactory.create(Objects.requireNonNull(player), mineLocation, nextType, true);
+//          Mine mine = mineStorage.get(player);
+//          if (mine != null) {
+//            mine.handleReset();
+//
+//            Task.syncDelayed(() -> {
+//              if (!toTeleport.isEmpty()) {
+//                for (Player player1 : toTeleport) {
+//                  teleport(player1);
+//                }
+//              }
+//            }, 40L);
+//          }
+//        } else {
+//          double balance = economy.getBalance(player);
+//          if (balance < upgradeCost) {
+//            player.sendMessage(
+//                "" + ChatColor.RED + "You don't have enough money to upgrade your mine!");
+//          } else {
+//            Location fullMin = mineData.getMinimumFullRegion();
+//            Location fullMax = mineData.getMaximumFullRegion();
+//            redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
+//                fullMin, fullMax);
+//
+//            for (Player online : Bukkit.getOnlinePlayers()) {
+//              if (cuboidRegion.contains(online.getLocation())) {
+//                toTeleport.add(online);
+//              }
+//            }
+//
+//            delete(true);
+//            mineFactory.create(Objects.requireNonNull(player), mineLocation.subtract(0, 0, 1),
+//                nextType, true);
+//            Mine mine = mineStorage.get(player);
+//            if (mine != null) {
+//              mine.handleReset();
+//              SQLUtils.replace(mine);
+//
+//              Task.syncDelayed(() -> {
+//                if (!toTeleport.isEmpty()) {
+//                  for (Player player1 : toTeleport) {
+//                    teleport(player1);
+//                  }
+//                }
+//              }, 40L);
+//            }
+//          }
+//          economy.withdrawPlayer(player, upgradeCost);
+//        }
+//      }
     }
   }
 
@@ -909,14 +1022,17 @@ public class Mine {
 
     BlockVector3 minMining = BukkitAdapter.asBlockVector(getMineData().getMinimumMining());
     BlockVector3 maxMining = BukkitAdapter.asBlockVector(getMineData().getMaximumMining());
-    BlockVector3 minFull = BukkitAdapter.asBlockVector(getMineData().getMinimumFullRegion());
-    BlockVector3 maxFull = BukkitAdapter.asBlockVector(getMineData().getMaximumFullRegion());
+    BlockVector3 minFull = BukkitAdapter.asBlockVector(
+        getMineData().getMinimumFullRegion());
+    BlockVector3 maxFull = BukkitAdapter.asBlockVector(
+        getMineData().getMaximumFullRegion());
 
     ProtectedCuboidRegion miningWorldGuardRegion = new ProtectedCuboidRegion(mineRegionName,
         minMining, maxMining);
-    ProtectedCuboidRegion fullWorldGuardRegion = new ProtectedCuboidRegion(fullRegionName, minFull,
-        maxFull);
-    RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
+    ProtectedCuboidRegion fullWorldGuardRegion = new ProtectedCuboidRegion(fullRegionName,
+        minFull, maxFull);
+    RegionContainer regionContainer = WorldGuard.getInstance().getPlatform()
+        .getRegionContainer();
     RegionManager regionManager = regionContainer.get(world);
 
     if (regionManager != null) {
@@ -971,4 +1087,5 @@ public class Mine {
       }
     });
   }
+
 }

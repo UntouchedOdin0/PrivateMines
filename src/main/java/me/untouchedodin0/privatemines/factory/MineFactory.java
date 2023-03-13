@@ -447,6 +447,7 @@ public class MineFactory {
     if (mineStorage.hasMine(uuid)) {
       Mine mine = createMine(Objects.requireNonNull(Bukkit.getPlayer(uuid)), location, mineType);
       mineStorage.replaceMine(uuid, mine);
+      SQLUtils.replace(mine);
     }
   }
 }
