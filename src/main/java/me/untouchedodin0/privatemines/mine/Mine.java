@@ -700,8 +700,8 @@ public class Mine {
 
       setMineData(mineData);
       privateMines.getMineStorage().replaceMineNoLog(mineData.getMineOwner(), this);
-      reset();
-      SQLUtils.replace(this);
+      handleReset();
+      SQLUtils.update(this);
     }
     this.canExpand = true;
   }
