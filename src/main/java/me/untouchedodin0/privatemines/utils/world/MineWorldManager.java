@@ -43,8 +43,13 @@ public class MineWorldManager {
   private final World minesWorld;
 
   public MineWorldManager() {
-    minesWorld = Bukkit.createWorld(
-        new WorldCreator("privatemines").type(WorldType.FLAT).generator(new EmptyWorldGenerator()));
+    if (Bukkit.getWorld("privatemines") == null) {
+      this.minesWorld = Bukkit.createWorld(new WorldCreator("privatemines").type(WorldType.FLAT)
+          .generator(new EmptyWorldGenerator()));
+    } else {
+      this.minesWorld = Bukkit.getWorld("privatemines");
+    }
+
     int yLevel = PrivateMines.getPrivateMines().getConfig().getInt("mineYLevel");
     this.borderDistance = PrivateMines.getPrivateMines().getConfig().getInt("mineDistance");
 

@@ -292,16 +292,11 @@ public class PrivateMines extends JavaPlugin {
     new UpdateChecker(this).fetch();
 
     File file = new File(getDataFolder() + "/addons/PrivateMinesAddon2-1.0-SNAPSHOT.jar");
-//    getLogger().info("file: " + file);
-//    AddonAPI.load(file);
-//    getLogger().info("---- Annotation Debug ----");
-//    getLogger().info("Name " + Test.class.getAnnotation(Addon.class).name());
-//    getLogger().info("Author " + Test.class.getAnnotation(Addon.class).author());
-//
-//    getLogger().info("---- Annotation Debug ----");
 
     AddonAPI.load(Test.class);
-    AddonAPI.load(file);
+    if (file.exists()) {
+      AddonAPI.load(file);
+    }
 //    AddonAPI.load(addonsDirectory);
 
 
