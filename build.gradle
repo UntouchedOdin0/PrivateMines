@@ -7,10 +7,13 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.7.22'
     id 'org.ajoberstar.grgit' version '4.0.1'
     id 'net.dumbcode.gradlehook' version '1.2.0'
+    id 'net.minecrell.plugin-yml.bukkit' version '0.5.3'
 }
 
 group 'me.untouchedodin0.privatemines'
-version '5.3.5'
+//version = '5.3.5'
+version = pluginVersion
+
 
 def devBuild = false
 
@@ -85,6 +88,25 @@ shadowJar {
     relocate 'dev.triumphteam.gui', 'me.untouchedodin0.privatemines.gui'
 }
 
+bukkit {
+    // Default values can be overridden if needed
+    // name = 'TestPlugin'
+    // version = '1.0'
+    // description = 'This is a test plugin'
+    // website = 'https://example.com'
+    // author = 'Notch'
+
+    // Plugin main class (required)
+    main = 'me.untouchedodin0.privatemines.PrivateMines'
+    version = pluginVersion
+
+    // API version (should be set for 1.13+)
+    apiVersion = '1.13'
+    authors = ['UntouchedOdin0', 'BristerMitten', 'bobby29831', 'DrZoddiak', 'ComputerNerd100', 'bbSnavy']
+    depend = ['FastAsyncWorldEdit', 'WorldGuard', 'Vault']
+    softDepend = ['AutoSell', 'UltraPrisonCore', 'ProtocolLib', 'PlaceholderAPI', 'Oraxen', 'ItemsAdder']
+//    loadBefore = ['BrokenPlugin']
+}
 
 task copyTo_DevServer(type: Copy) {
     from shadowJar

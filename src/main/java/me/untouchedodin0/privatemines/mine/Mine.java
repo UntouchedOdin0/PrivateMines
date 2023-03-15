@@ -974,5 +974,4 @@ public class Mine {
       }
     });
   }
-
 }

@@ -28,12 +28,8 @@ public class AddonAPI {
   static boolean foundAddon = false;
 
   public static void load(Class<?> clazz) {
-//    Addon addon = clazz.getAnnotation(Addon.class);
-//    privateMines.getLogger().info("addon " + addon);
-    privateMines.getLogger().info("clazz " + clazz);
-
-//    String name = addon.name();
-//    String author = addon.author();
+    Addon addon = clazz.getAnnotation(Addon.class);
+    String name = addon.name();
 
     Method[] methods = clazz.getMethods();
 
@@ -46,8 +42,8 @@ public class AddonAPI {
         }
       }
     }
-//    classMap.put(name, clazz);
-//    addonsManager.addAddon(name, addon);
+    classMap.put(name, clazz);
+    addonsManager.addAddon(name, addon);
   }
 
   public static void load(File file) {
