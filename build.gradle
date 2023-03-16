@@ -61,7 +61,7 @@ dependencies {
     compileOnly 'com.github.LoneDev6:api-itemsadder:3.0.0'
     compileOnly 'com.github.oraxen:oraxen:1.151.1'
     compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.2.5'
-    compileOnly 'com.google.code.gson:gson:2.10'
+    compileOnly 'com.google.code.gson:gson:2.10.1'
     compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.14.1' // i think this is the big thing?
 
     compileOnly files('libs/UltraPrisonCore-1.12.7.14-RELEASE.jar')
