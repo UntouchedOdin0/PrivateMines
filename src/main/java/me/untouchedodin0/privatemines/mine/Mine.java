@@ -893,7 +893,6 @@ public class Mine {
 
     Instant end = Instant.now();
     Duration upgradeTime = Duration.between(start, end);
-    Bukkit.broadcastMessage("upgraded the mine in " + upgradeTime.toMillis() + "ms");
   }
 
   public void createWorldGuardRegions() {

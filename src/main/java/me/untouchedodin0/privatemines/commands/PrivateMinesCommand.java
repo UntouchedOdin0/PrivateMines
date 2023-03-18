@@ -388,7 +388,7 @@ public class PrivateMinesCommand extends BaseCommand {
         mineStorage.replaceMineNoLog(target.getPlayer(), mine);
         mine.handleReset();
         Task.asyncDelayed(() -> {
-          SQLUtils.updateMaterials(mine);
+          SQLUtils.update(mine);
         });
       }
     }
@@ -396,7 +396,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
   @Subcommand("pregen")
   public void pregen(Player player, int amount) {
-    PregenFactory.pregen(player, 5);
+    PregenFactory.pregen(player, amount);
   }
 
   @Subcommand("claim")

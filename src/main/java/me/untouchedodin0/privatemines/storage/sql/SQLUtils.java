@@ -80,9 +80,11 @@ public class SQLUtils {
         LocationUtils.toString(mineData.getMaximumMining()),
         LocationUtils.toString(mineData.getMinimumFullRegion()),
         LocationUtils.toString(mineData.getMaximumFullRegion()),
-        LocationUtils.toString(mine.getSpawnLocation()), mineData.getTax(), mineData.isOpen(),
-        mineData.getMaxPlayers(), mineData.getMaxMineSize(),
-        Utils.mapToString(mineData.getMaterials()),
+        LocationUtils.toString(mine.getSpawnLocation()),
+        mineData.getTax(),
+        mineData.isOpen(),
+        mineData.getMaxPlayers(),
+        mineData.getMaxMineSize(),
         Utils.mapToString(mineData.getMaterials()));
 
     delete(mine);
@@ -100,19 +102,19 @@ public class SQLUtils {
     Location maxMining = mineData.getMaximumMining();
     Location fullRegionMin = mineData.getMinimumFullRegion();
     Location fullRegionMax = mineData.getMaximumFullRegion();
+    Map<Material, Double> materials = mineData.getMaterials();
 
     SQLHelper sqlHelper = privateMines.getSqlHelper();
     String command = String.format(
-        "UPDATE privatemines SET mineType = '%s', corner1 = '%s', corner2 = '%s', fullRegionMin = '%s', fullRegionMax = '%s' WHERE owner = '%s';",
+        "UPDATE privatemines SET mineType = '%s', corner1 = '%s', corner2 = '%s', fullRegionMin = '%s', fullRegionMax = '%s', materials = '%s' WHERE owner = '%s';",
         mineType.getName(),
         LocationUtils.toString(minMining),
         LocationUtils.toString(maxMining),
         LocationUtils.toString(fullRegionMin),
         LocationUtils.toString(fullRegionMax),
+        Utils.mapToString(materials),
         owner
     );
-//    String command = String.format(
-//        "UPDATE privatemines SET mineType = " + "'%s' " + "WHERE owner = '%s';", mineType.getName(), owner);
     sqlHelper.executeUpdate(command);
   }
 

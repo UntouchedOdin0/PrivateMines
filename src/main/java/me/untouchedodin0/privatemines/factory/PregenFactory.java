@@ -50,11 +50,11 @@ public class PregenFactory {
     MineType mineType = mineTypeManager.getDefaultMineType();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
 
-
     location = player.getLocation();
     location.getBlock().setType(Material.GLOWSTONE);
 
     task = Task.asyncRepeating(() -> {
+      PregenMine pregenMine = new PregenMine();
       Bukkit.broadcastMessage("" + atomicInteger.getAndIncrement());
       ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
       BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(),
@@ -82,7 +82,6 @@ public class PregenFactory {
       location.add(0, 0, 100);
       Chunk chunk = location.getChunk();
       Task.syncDelayed(() -> chunk.load(true));
-      PregenMine pregenMine = new PregenMine();
 
       BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation())
           .add(mineBlocks.getCorner2().add(0, 0, 1));

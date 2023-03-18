@@ -58,7 +58,6 @@ dependencies {
     }
 
     compileOnly 'me.clip:placeholderapi:2.11.2'
-    compileOnly 'com.github.LoneDev6:api-itemsadder:3.0.0'
     compileOnly 'com.github.oraxen:oraxen:1.151.1'
     compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.2.5'
     compileOnly 'com.google.code.gson:gson:2.10'
@@ -70,12 +69,11 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation 'com.github.Redempt:RedLib:6.5.8'
     implementation 'org.bstats:bstats-bukkit:3.0.0'
-    implementation 'net.kyori:adventure-text-minimessage:4.12.0'
-    implementation 'net.kyori:adventure-platform-bukkit:4.2.0'
+    implementation 'net.kyori:adventure-text-minimessage:4.13.0'
+    implementation 'net.kyori:adventure-platform-bukkit:4.3.0'
     implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
     implementation "dev.triumphteam:triumph-gui:3.1.2" // Replace version here
-    implementation 'com.github.InstantlyMoist:privatebin-java-api:1.0.2'
 //    implementation project(':WorldBorder')
 }
 
@@ -105,7 +103,6 @@ bukkit {
     authors = ['UntouchedOdin0', 'BristerMitten', 'bobby29831', 'DrZoddiak', 'ComputerNerd100', 'bbSnavy']
     depend = ['FastAsyncWorldEdit', 'WorldGuard', 'Vault']
     softDepend = ['AutoSell', 'UltraPrisonCore', 'ProtocolLib', 'PlaceholderAPI', 'Oraxen', 'ItemsAdder']
-//    loadBefore = ['BrokenPlugin']
 }
 
 task copyTo_DevServer(type: Copy) {
