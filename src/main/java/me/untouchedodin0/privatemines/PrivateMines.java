@@ -117,6 +117,7 @@ public class PrivateMines extends JavaPlugin {
   private Gson gson;
   String matString;
   double percent;
+
   public static PrivateMines getPrivateMines() {
     return privateMines;
   }
@@ -231,7 +232,9 @@ public class PrivateMines extends JavaPlugin {
     if (!dataFolder.exists()) {
       try {
         boolean created = dataFolder.createNewFile();
-        if (created) return;
+        if (created) {
+          return;
+        }
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
@@ -292,13 +295,29 @@ public class PrivateMines extends JavaPlugin {
     new UpdateChecker(this).fetch();
 
     File file = new File(getDataFolder() + "/addons/PrivateMinesAddon2-1.0-SNAPSHOT.jar");
+    File directory = new File(getDataFolder() + "/addons/");
 
     AddonAPI.load(Test.class);
     if (file.exists()) {
-      AddonAPI.load(file);
+//      AddonAPI.load(file);
+    }
+
+    final PathMatcher jarMatcher = FileSystems.getDefault()
+        .getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
+
+    try (Stream<Path> paths = Files.walk(addonsDirectory).filter(jarMatcher::matches)) {
+      paths.forEach(jar -> {
+        getLogger().info("jar path " + jar);
+//        AddonAPI.load(jar);
+      });
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
 //    AddonAPI.load(addonsDirectory);
-
+//    addonsDirectory.forEach(path -> {
+//      File addon = path.toFile();
+//      getLogger().info("attempting to load file " + addon);
+//    });
 
     Instant end = Instant.now();
     Duration loadTime = Duration.between(start, end);
@@ -311,7 +330,9 @@ public class PrivateMines extends JavaPlugin {
     File file = new File("plugins/PrivateMines/donottouch.json");
     if (file.exists()) {
       boolean deleted = file.delete();
-      if (deleted) return;
+      if (deleted) {
+        return;
+      }
     }
 
     if (adventure != null) {

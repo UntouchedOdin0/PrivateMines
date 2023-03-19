@@ -81,13 +81,42 @@ public class MineWorldManager {
     if (sqlLocation == null) {
       setCurrentLocation(direction.addTo(defaultLocation, distance * borderDistance));
     } else {
-      this.nextLocation = direction.addTo(sqlLocation, distance * borderDistance);
+
+      if (nextLocation == null) {
+        this.nextLocation = getDefaultLocation();
+      }
+
+      switch (direction) {
+        case NORTH -> {
+          nextLocation.subtract(0, 0, distance * borderDistance);
+          setCurrentLocation(nextLocation);
+        }
+        case EAST -> {
+          nextLocation.add(distance * borderDistance, 0, 0);
+          setCurrentLocation(nextLocation);
+        }
+        case SOUTH -> {
+          nextLocation.add(0, 0, distance * borderDistance);
+          setCurrentLocation(nextLocation);
+        }
+        case WEST -> {
+          nextLocation.subtract(distance * borderDistance, 0, 0);
+          setCurrentLocation(nextLocation);
+        }
+      }
+//      this.nextLocation = direction.addTo(sqlLocation, distance * borderDistance);
     }
 
-    direction = direction.next();
-    if (direction == NORTH) {
-      distance++;
-    }
+//    direction = direction.next();
+//    if (direction == NORTH) {
+//      distance++;
+//    }
+//    switch (direction) {
+//      case NORTH -> nextLocation.subtract(0, 0, distance);
+//      case EAST -> nextLocation.add(distance, 0, 0);
+//      case SOUTH -> nextLocation.add(0, 0, distance);
+//      case WEST -> nextLocation.subtract(distance, 0, 0);
+//    }
     return nextLocation;
   }
 

@@ -395,11 +395,13 @@ public class PrivateMinesCommand extends BaseCommand {
   }
 
   @Subcommand("pregen")
+  @CommandPermission("privatemines.pregen")
   public void pregen(Player player, int amount) {
     PregenFactory.pregen(player, amount);
   }
 
   @Subcommand("claim")
+  @CommandPermission("privatemines.claim")
   public void claim(Player player) {
     if (mineStorage.hasMine(player)) {
       player.sendMessage(ChatColor.RED + "You already have a mine!");

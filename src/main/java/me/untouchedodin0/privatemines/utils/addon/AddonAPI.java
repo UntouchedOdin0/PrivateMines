@@ -2,20 +2,18 @@ package me.untouchedodin0.privatemines.utils.addon;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.stream.Stream;
 import me.untouchedodin0.privatemines.PrivateMines;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -26,6 +24,8 @@ public class AddonAPI {
   private static final AddonsManager addonsManager = privateMines.getAddonsManager();
   private static final Map<String, Class<?>> classMap = new HashMap<>();
   static boolean foundAddon = false;
+  private static URLClassLoader loader;
+  private static Method addURL;
 
   public static void load(Class<?> clazz) {
     Addon addon = clazz.getAnnotation(Addon.class);
@@ -49,10 +49,9 @@ public class AddonAPI {
   public static void load(File file) {
     try {
       URL url = file.toURI().toURL();
-
       URLClassLoader classLoader = new URLClassLoader(new URL[] {url});
-      Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
       URL[] urls = classLoader.getURLs();
+
       for (URL fileURL : urls) {
         System.out.println("Searching " + fileURL.getFile() + " for classes...");
       }
@@ -60,8 +59,8 @@ public class AddonAPI {
         try (JarFile jarFile = new JarFile(file)) {
           Enumeration<JarEntry> entries = jarFile.entries();
 
-          privateMines.getLogger().info("Jar file " + jarFile);
-          privateMines.getLogger().info("Jar file entries " + entries);
+//          privateMines.getLogger().info("Jar file " + jarFile);
+//          privateMines.getLogger().info("Jar file entries " + entries);
 
           while (entries.hasMoreElements()) {
             JarEntry entry = entries.nextElement();
@@ -70,11 +69,35 @@ public class AddonAPI {
               String className = entry.getName().replaceAll("/", ".").replaceAll(".class", "");
               try {
                 Class<?> clazz = classLoader.loadClass(className);
+                Method[] methods = clazz.getMethods();
+                for (Method method : methods) {
+//                  privateMines.getLogger().info("found method " + method);
+                  Annotation[] annotations = method.getAnnotations();
 
-                privateMines.getLogger().info("className " + className);
-                privateMines.getLogger().info("clazz " + clazz);
+                  for (Annotation annotation : annotations) {
+//                    privateMines.getLogger().info("found annotation " + annotation);
+                    privateMines.getLogger().info("annotation name " + annotation.annotationType().getName());
+                    if (annotation.annotationType().isAnnotationPresent(Enable.class)) {
+                      method.setAccessible(true);
+                      privateMines.getLogger().info("method " + method);
+                    }
+                  }
+                }
+
+//                if (clazz.isAnnotationPresent(Addon.class)) {
+//                  for (Method method : methods) {
+//                    privateMines.getLogger().info("found method " + method.getName());
+//                  }
+////                  load(clazz);
+//                }
+
+
+//                privateMines.getLogger().info("className " + className);
+//                privateMines.getLogger().info("clazz " + clazz);
+//                privateMines.getLogger().info("methods: " + methods);
 
                 privateMines.getLogger().info("Loaded class " + clazz + "!");
+
               } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
               }
@@ -90,7 +113,7 @@ public class AddonAPI {
 //      privateMines.getLogger().info("method " + method);
 //      privateMines.getLogger().info("urls: " + Arrays.toString(urls));
 
-    } catch (MalformedURLException | NoSuchMethodException e) {
+    } catch (MalformedURLException e) {
       throw new RuntimeException(e);
     }
 //    try {
@@ -110,19 +133,16 @@ public class AddonAPI {
   }
 
   public static void load(Path path) {
-    privateMines.getLogger().info("Loading adds from path " + path);
-    File file = path.toFile();
-    File[] files = file.listFiles();
-
-    privateMines.getLogger().info("file: " + file);
-    privateMines.getLogger().info("files: " + Arrays.toString(files));
-
-    if (files != null) {
-      for (File latestFile : files) {
-        privateMines.getLogger().info("latest file " + latestFile);
-        load(latestFile);
-      }
+    loader = (URLClassLoader) privateMines.getClass().getClassLoader();
+    try {
+      addURL = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] {URL.class});
+      addURL.setAccessible(true);
+    } catch (NoSuchMethodException e) {
+      throw new RuntimeException(e);
     }
+    privateMines.getLogger().info("url class loader " + loader);
+    privateMines.getLogger().info("url class loader addURL " + addURL);
+//    load(path.toFile());
   }
 
   public static void reload(CommandSender commandSender, String string) {
