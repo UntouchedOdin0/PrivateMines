@@ -53,7 +53,7 @@ dependencies {
     compileOnly 'com.grinderwolf:slimeworldmanager-api:2.7.0-SNAPSHOT'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
     compileOnly 'com.mojang:authlib:1.11'
-    compileOnly("net.dv8tion:JDA:5.0.0-alpha.12") {
+    compileOnly("net.dv8tion:JDA:5.0.0-beta.6") {
         exclude module: 'opus-java'
     }
 
