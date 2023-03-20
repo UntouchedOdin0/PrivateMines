@@ -67,8 +67,9 @@ import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
-import me.untouchedodin0.privatemines.utils.addon.AddonAPI;
-import me.untouchedodin0.privatemines.utils.addon.AddonsManager;
+import me.untouchedodin0.privatemines.utils.addon.AddonLoader;
+import me.untouchedodin0.privatemines.utils.addon.old.AddonAPI;
+import me.untouchedodin0.privatemines.utils.addon.old.AddonsManager;
 import me.untouchedodin0.privatemines.utils.addon.test.Test;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
@@ -82,6 +83,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.InvalidPluginException;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.config.ConfigManager;
@@ -308,6 +311,13 @@ public class PrivateMines extends JavaPlugin {
     try (Stream<Path> paths = Files.walk(addonsDirectory).filter(jarMatcher::matches)) {
       paths.forEach(jar -> {
         getLogger().info("jar path " + jar);
+//        AddonsManager.loadAddon(jar.toFile());
+
+        try {
+          AddonLoader.loadAddonProperties(file);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
 //        AddonAPI.load(jar);
       });
     } catch (IOException e) {

@@ -1,4 +1,4 @@
-package me.untouchedodin0.privatemines.utils.addon;
+package me.untouchedodin0.privatemines.utils.addon.old;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class AddonAPI {
   private static Method addURL;
 
   public static void load(Class<?> clazz) {
-    Addon addon = clazz.getAnnotation(Addon.class);
+    Addon2 addon = clazz.getAnnotation(Addon2.class);
     String name = addon.name();
 
     Method[] methods = clazz.getMethods();
@@ -74,14 +74,14 @@ public class AddonAPI {
 //                  privateMines.getLogger().info("found method " + method);
                   Annotation[] annotations = method.getAnnotations();
 
-                  for (Annotation annotation : annotations) {
-//                    privateMines.getLogger().info("found annotation " + annotation);
-                    privateMines.getLogger().info("annotation name " + annotation.annotationType().getName());
-                    if (annotation.annotationType().isAnnotationPresent(Enable.class)) {
-                      method.setAccessible(true);
-                      privateMines.getLogger().info("method " + method);
-                    }
-                  }
+//                  for (Annotation annotation : annotations) {
+////                    privateMines.getLogger().info("found annotation " + annotation);
+//                    privateMines.getLogger().info("annotation name " + annotation.annotationType().getName());
+//                    if (annotation.annotationType().isAnnotationPresent(Enable.class)) {
+//                      method.setAccessible(true);
+//                      privateMines.getLogger().info("method " + method);
+//                    }
+//                  }
                 }
 
 //                if (clazz.isAnnotationPresent(Addon.class)) {
@@ -142,11 +142,11 @@ public class AddonAPI {
     }
     privateMines.getLogger().info("url class loader " + loader);
     privateMines.getLogger().info("url class loader addURL " + addURL);
-//    load(path.toFile());
+    load(path.toFile());
   }
 
   public static void reload(CommandSender commandSender, String string) {
-    Addon addon = addonsManager.getAddon(string);
+    Addon2 addon = addonsManager.getAddon(string);
     Class<?> clazz = classMap.get(string);
 
     if (clazz == null) {

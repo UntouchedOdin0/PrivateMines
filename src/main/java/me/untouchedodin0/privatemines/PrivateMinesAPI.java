@@ -21,12 +21,11 @@
 
 package me.untouchedodin0.privatemines;
 
-import java.io.File;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
-import me.untouchedodin0.privatemines.utils.addon.AddonAPI;
+import me.untouchedodin0.privatemines.utils.addon.old.AddonAPI;
 import org.bukkit.Location;
 
 import java.util.Map;
@@ -55,9 +54,14 @@ public class PrivateMinesAPI {
         mineFactory.createUpgraded(uuid, location, mineType);
     }
 
-    public void loadAddon(File file) {
-        AddonAPI.load(file);
-    }
+//    public void loadAddon(File file) {
+//        try {
+//            AddonAPI addonAPI = new AddonAPI(new URL[file.toURI().getClass().getClassLoader()], privateMines.getClass().getClassLoader());
+//        } catch (MalformedURLException e) {
+//            throw new RuntimeException(e);
+//        }
+//        AddonAPI.load(file);
+//    }
 
     public void loadAddon(Class<?> clazz) {
         AddonAPI.load(clazz);

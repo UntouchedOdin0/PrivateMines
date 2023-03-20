@@ -1,4 +1,4 @@
-package me.untouchedodin0.privatemines.utils.addon;
+package me.untouchedodin0.privatemines.utils.addon.old;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,12 +1,17 @@
 package me.untouchedodin0.privatemines.utils.addon;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+public abstract class Addon {
 
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Addon {
-  String name();
-  String author();
-  String version();
-  String description();
+  protected AddonProperty addonProperty;
+
+  public abstract void onEnable();
+  public abstract void onDisable();
+
+  public AddonProperty getAddonProperty() {
+    return addonProperty;
+  }
+
+  public void setAddonProperty(AddonProperty addonProperty) {
+    this.addonProperty = addonProperty;
+  }
 }

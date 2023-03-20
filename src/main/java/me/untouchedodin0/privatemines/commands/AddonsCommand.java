@@ -8,14 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.utils.addon.Addon;
-import me.untouchedodin0.privatemines.utils.addon.AddonAPI;
-import me.untouchedodin0.privatemines.utils.addon.AddonsManager;
+import me.untouchedodin0.privatemines.utils.addon.old.Addon2;
+import me.untouchedodin0.privatemines.utils.addon.old.AddonAPI;
+import me.untouchedodin0.privatemines.utils.addon.old.AddonsManager;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -36,8 +35,8 @@ public class AddonsCommand extends BaseCommand {
     BukkitAudiences bukkitAudiences = privateMines.getAdventure();
     Audience audience = bukkitAudiences.player(player);
 
-    Map<String, Addon> addons = addonsManager.getAddons();
-    List<Addon> addonList = new ArrayList<>();
+    Map<String, Addon2> addons = addonsManager.getAddons();
+    List<Addon2> addonList = new ArrayList<>();
 
     addons.forEach((string, addon) -> {
       addonList.add(addon);
@@ -52,14 +51,14 @@ public class AddonsCommand extends BaseCommand {
     } else {
 
       if (addonList.size() < 2) {
-        Addon addon = addonList.get(0);
+        Addon2 addon = addonList.get(0);
         Component singular = miniMessage.deserialize("<green>Addons: ");
         Component test = miniMessage.deserialize(String.format("<hover:show_text:'<red>%s\n"
             + "v%s'><yellow>%s", addon.description(), addon.version(), addon.name()));
         singularAddon = singular.append(test);
         audience.sendMessage(singularAddon);
       } else {
-        for (Addon addon : addonList) {
+        for (Addon2 addon : addonList) {
           Component test = miniMessage.deserialize(String.format("<hover:show_text:'<red>%s\n"
               + "v%s'><yellow>%s", addon.description(), addon.version(), addon.name()));
           component = component.append(test);
