@@ -67,10 +67,7 @@ import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
-import me.untouchedodin0.privatemines.utils.addon.AddonLoader;
-import me.untouchedodin0.privatemines.utils.addon.old.AddonAPI;
 import me.untouchedodin0.privatemines.utils.addon.old.AddonsManager;
-import me.untouchedodin0.privatemines.utils.addon.test.Test;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -83,8 +80,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.InvalidPluginException;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.config.ConfigManager;
@@ -300,28 +295,10 @@ public class PrivateMines extends JavaPlugin {
     File file = new File(getDataFolder() + "/addons/PrivateMinesAddon2-1.0-SNAPSHOT.jar");
     File directory = new File(getDataFolder() + "/addons/");
 
-    AddonAPI.load(Test.class);
+//    AddonAPI.load(Test.class);
+    loadAddons();
     if (file.exists()) {
 //      AddonAPI.load(file);
-    }
-
-    final PathMatcher jarMatcher = FileSystems.getDefault()
-        .getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
-
-    try (Stream<Path> paths = Files.walk(addonsDirectory).filter(jarMatcher::matches)) {
-      paths.forEach(jar -> {
-        getLogger().info("jar path " + jar);
-//        AddonsManager.loadAddon(jar.toFile());
-
-        try {
-          AddonLoader.loadAddonProperties(file);
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-//        AddonAPI.load(jar);
-      });
-    } catch (IOException e) {
-      throw new RuntimeException(e);
     }
 //    AddonAPI.load(addonsDirectory);
 //    addonsDirectory.forEach(path -> {
@@ -574,6 +551,38 @@ public class PrivateMines extends JavaPlugin {
         throw new RuntimeException(e);
       }
     });
+  }
+
+  public void loadAddons() {
+    final PathMatcher jarMatcher = FileSystems.getDefault()
+        .getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
+
+    try (Stream<Path> paths = Files.walk(addonsDirectory).filter(jarMatcher::matches)) {
+      paths.forEach(jar -> {
+        getLogger().info("jar path " + jar);
+//        AddonsManager.loadAddon(jar.toFile());
+
+//        try {
+//          AddonLoader.loadPlugin(jar.toFile());
+////          AddonLoader.loadAddonProperties(file);
+//        } catch (IOException e) {
+//          throw new RuntimeException(e);
+//        } catch (ClassNotFoundException e) {
+//          throw new RuntimeException(e);
+//        } catch (InvocationTargetException e) {
+//          throw new RuntimeException(e);
+//        } catch (InstantiationException e) {
+//          throw new RuntimeException(e);
+//        } catch (IllegalAccessException e) {
+//          throw new RuntimeException(e);
+//        } catch (NoSuchMethodException e) {
+//          throw new RuntimeException(e);
+//        }
+//        AddonAPI.load(jar);
+      });
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public void saveMines() {
