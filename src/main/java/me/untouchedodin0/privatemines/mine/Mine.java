@@ -516,18 +516,6 @@ public class Mine {
     }
   }
 
-  public void startResetTask() {
-    MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
-    MineType mineType = mineTypeManager.getMineType(mineData.getMineType());
-    int resetTime = mineType.getResetTime();
-    int task = Bukkit.getScheduler()
-        .scheduleAsyncRepeatingTask(privateMines, this::handleReset, 0L, resetTime * 20L);
-  }
-
-  public void startTasks() {
-    startResetTask();
-  }
-
   public void stopTasks() {
     if (task != null && percentageTask != null) {
       if (task.isCurrentlyRunning() && percentageTask.isCurrentlyRunning()) {
