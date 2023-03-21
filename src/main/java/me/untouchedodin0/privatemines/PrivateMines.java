@@ -474,7 +474,7 @@ public class PrivateMines extends JavaPlugin {
           if (owner != null) {
             mineStorage.addMine(owner, mine);
           }
-          mine.startResetTask();
+          mine.handleReset();
           getLogger().info("Loaded file " + file.getName() + "!");
         }
       });
