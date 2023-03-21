@@ -88,6 +88,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitScheduler;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.misc.WeightedRandom;
@@ -499,6 +500,19 @@ public class Mine {
         Task.syncDelayed(() -> teleport(owner));
       }
     }
+
+    if (percentageTask == null) {
+      //Create a new Bukkit task async
+      percentageTask = Task.asyncRepeating(() -> {
+        double percentage = getPercentage();
+        double resetPercentage = mineType.getResetPercentage();
+        redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
+            mineData.getMinimumMining(), mineData.getMaximumMining());
+        if (percentage > resetPercentage) {
+          handleReset();
+        }
+      }, 0, 20);
+    }
   }
 
   public void startResetTask() {
@@ -509,23 +523,8 @@ public class Mine {
         .scheduleAsyncRepeatingTask(privateMines, this::handleReset, 0L, resetTime * 20L);
   }
 
-  public void startPercentageTask() {
-    this.percentageTask = Task.asyncRepeating(() -> {
-      double percentage = getPercentage();
-      MineType mineType = getMineData().getMineType();
-      double resetPercentage = mineType.getResetPercentage();
-      redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
-          mineData.getMinimumMining(), mineData.getMaximumMining());
-
-      if (percentage > resetPercentage) {
-        handleReset();
-      }
-    }, 0L, 20L);
-  }
-
   public void startTasks() {
     startResetTask();
-    startPercentageTask();
   }
 
   public void stopTasks() {
