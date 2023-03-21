@@ -101,7 +101,7 @@ public class Mine {
   private boolean canExpand = true;
   private Task task;
   private Task percentageTask;
-  private int airBlocks = 0;
+  private int airBlocks;
 
   public Mine(PrivateMines privateMines) {
     this.privateMines = privateMines;
@@ -510,6 +510,7 @@ public class Mine {
             mineData.getMinimumMining(), mineData.getMaximumMining());
         if (percentage > resetPercentage) {
           handleReset();
+          airBlocks = 0;
         }
       }, 0, 20);
     }
@@ -541,7 +542,6 @@ public class Mine {
   }
 
   public double getPercentage() {
-
     CuboidRegion region = new CuboidRegion(BlockVector3.at(mineData.getMinimumMining().getBlockX(),
         mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()),
         BlockVector3.at(mineData.getMaximumMining().getBlockX(),
@@ -555,19 +555,17 @@ public class Mine {
 
     long total = region.getVolume();
 
-    Task.asyncDelayed(() -> {
-      Set<BaseBlock> blocks = new HashSet<>();
-      if (BlockTypes.AIR != null) {
-        blocks.add(BlockTypes.AIR.getDefaultState().toBaseBlock());
-        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
-            .world(BukkitAdapter.adapt(mineData.getMinimumMining().getWorld())).fastMode(true)
-            .build()) {
-          airBlocks = editSession.countBlocks(region, blocks);
+   // Calculate the percetage of the region called "region" to then compare with how many blocks have been mined.
 
-          Bukkit.broadcastMessage("airblocks " + airBlocks);
-        }
+    for (BlockVector3 vector : region) {
+      Block block = Bukkit.getWorld(Objects.requireNonNull(Objects.requireNonNull(getSpawnLocation()).getWorld()).getName()).getBlockAt(vector.getBlockX(),
+          vector.getBlockY(), vector.getBlockZ());
+      if (block.getType().equals(Material.AIR)) {
+        this.airBlocks++;
       }
-    });
+    }
+
+
     return (float) airBlocks * 100L / total;
   }
 
