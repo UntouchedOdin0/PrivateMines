@@ -73,7 +73,7 @@ public class PrivateMinesCommand extends BaseCommand {
     MineFactory mineFactory = new MineFactory();
     MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
     Location location = mineWorldManager.getNextFreeLocation();
-    mineWorldManager.setCurrentLocation(location);
+//    mineWorldManager.setCurrentLocation(location);
 
     MineType defaultMineType = mineTypeManager.getDefaultMineType();
 
@@ -87,6 +87,7 @@ public class PrivateMinesCommand extends BaseCommand {
       } else {
         sender.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a mine!");
         mineFactory.create(target.getPlayer(), location, defaultMineType, true);
+        Bukkit.broadcastMessage("location " + location);
 
         if (sender instanceof Player player) {
           audienceUtils.sendMessage(player, target, MessagesConfig.gavePlayerMine.replace("{name}",
@@ -109,6 +110,7 @@ public class PrivateMinesCommand extends BaseCommand {
       Mine mine = mineStorage.get(target.getUniqueId());
       if (mine != null) {
         mine.delete(true);
+        mine.stopTasks();
         SQLUtils.delete(mine);
         if (sender instanceof Player player) {
           audienceUtils.sendMessage(player, target, MessagesConfig.deletedPlayersMine);

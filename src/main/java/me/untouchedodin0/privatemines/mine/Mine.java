@@ -501,19 +501,19 @@ public class Mine {
       }
     }
 
-    if (percentageTask == null) {
-      //Create a new Bukkit task async
-      percentageTask = Task.asyncRepeating(() -> {
-        double percentage = getPercentage();
-        double resetPercentage = mineType.getResetPercentage();
-        redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
-            mineData.getMinimumMining(), mineData.getMaximumMining());
-        if (percentage > resetPercentage) {
-          handleReset();
-          airBlocks = 0;
-        }
-      }, 0, 20);
-    }
+//    if (percentageTask == null) {
+//      //Create a new Bukkit task async
+//      percentageTask = Task.asyncRepeating(() -> {
+//        double percentage = getPercentage();
+//        double resetPercentage = mineType.getResetPercentage();
+//        redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
+//            mineData.getMinimumMining(), mineData.getMaximumMining());
+//        if (percentage > resetPercentage) {
+//          handleReset();
+//          airBlocks = 0;
+//        }
+//      }, 0, 20);
+//    }
   }
 
   public void stopTasks() {

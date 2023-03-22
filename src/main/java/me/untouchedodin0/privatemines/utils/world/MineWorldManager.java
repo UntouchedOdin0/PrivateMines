@@ -81,7 +81,6 @@ public class MineWorldManager {
     if (sqlLocation == null) {
       setCurrentLocation(direction.addTo(defaultLocation, distance * borderDistance));
     } else {
-
       if (nextLocation == null) {
         this.nextLocation = getDefaultLocation();
       }
