@@ -57,7 +57,7 @@ dependencies {
         exclude module: 'opus-java'
     }
 
-    compileOnly 'me.clip:placeholderapi:2.11.2'
+    compileOnly 'me.clip:placeholderapi:2.11.3'
     compileOnly 'com.github.oraxen:oraxen:1.151.1'
     compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.2.5'
     compileOnly 'com.google.code.gson:gson:2.10'
