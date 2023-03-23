@@ -56,8 +56,6 @@ import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.listener.MineResetListener;
 import me.untouchedodin0.privatemines.listener.PlayerJoinListener;
-import me.untouchedodin0.privatemines.listener.sell.AutoSellListener;
-import me.untouchedodin0.privatemines.listener.sell.UPCSellListener;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
@@ -661,11 +659,9 @@ public class PrivateMines extends JavaPlugin {
   public void registerSellListener() {
     if (Bukkit.getPluginManager().isPluginEnabled("UltraPrisonCore")) {
       getLogger().info("Registering Ultra Prison Core as the sell listener...");
-      getServer().getPluginManager().registerEvents(new UPCSellListener(), this);
       return;
     } else if (Bukkit.getPluginManager().isPluginEnabled("AutoSell")) {
       getLogger().info("Registering AutoSell as the sell listener...");
-      getServer().getPluginManager().registerEvents(new AutoSellListener(), this);
       return;
     }
     getLogger().info("Using the internal sell system!");
