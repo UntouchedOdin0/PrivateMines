@@ -502,7 +502,7 @@ public class Mine {
 
     if (percentageTask == null) {
       //Create a new Bukkit task async
-      percentageTask = Task.asyncRepeating(() -> {
+      percentageTask = Task.syncRepeating(() -> {
         double percentage = getPercentage();
         double resetPercentage = mineType.getResetPercentage();
         redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
