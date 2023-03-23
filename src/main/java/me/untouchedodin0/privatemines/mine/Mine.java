@@ -491,7 +491,6 @@ public class Mine {
         Task.syncDelayed(() -> teleport(online));
       }
     }
-
     if (owner != null) {
       boolean isPlayerInRegion = region.contains(owner.getLocation().getBlockX(),
           owner.getLocation().getBlockY(), owner.getLocation().getBlockZ());
@@ -501,19 +500,20 @@ public class Mine {
       }
     }
 
-//    if (percentageTask == null) {
-//      //Create a new Bukkit task async
-//      percentageTask = Task.asyncRepeating(() -> {
-//        double percentage = getPercentage();
-//        double resetPercentage = mineType.getResetPercentage();
-//        redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
-//            mineData.getMinimumMining(), mineData.getMaximumMining());
-//        if (percentage > resetPercentage) {
-//          handleReset();
-//          airBlocks = 0;
-//        }
-//      }, 0, 20);
-//    }
+    if (percentageTask == null) {
+      //Create a new Bukkit task async
+      percentageTask = Task.syncRepeating(() -> {
+        double percentage = getPercentage();
+        double resetPercentage = mineType.getResetPercentage();
+        redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
+            mineData.getMinimumMining(), mineData.getMaximumMining());
+        if (percentage > resetPercentage) {
+          handleReset();
+          airBlocks = 0;
+        }
+      }, 0, 20);
+    }
+    owner.sendMessage(ChatColor.GREEN + "You've reset your mine!");
   }
 
   public void stopTasks() {
@@ -544,7 +544,7 @@ public class Mine {
     long total = region.getVolume();
 
    // Calculate the percetage of the region called "region" to then compare with how many blocks have been mined.
-
+    airBlocks = 0;
     for (BlockVector3 vector : region) {
       Block block = Bukkit.getWorld(Objects.requireNonNull(Objects.requireNonNull(getSpawnLocation()).getWorld()).getName()).getBlockAt(vector.getBlockX(),
           vector.getBlockY(), vector.getBlockZ());
@@ -552,8 +552,6 @@ public class Mine {
         this.airBlocks++;
       }
     }
-
-
     return (float) airBlocks * 100L / total;
   }
 
