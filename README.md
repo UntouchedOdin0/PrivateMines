@@ -11,4 +11,7 @@ types of blocks, including the capability of loading mines from schematics.
 [<img src="https://avatars.githubusercontent.com/u/18754735?v=4" width="100px">](https://github.com/knightzmc)
 [<img src="https://avatars.githubusercontent.com/u/84546230?v=4" width="100px">](https://github.com/bobby29831)
 [<img src="https://avatars.githubusercontent.com/u/46828965?v=4" width="100px">](https://github.com/bbSnavy)
+[<img src="https://avatars.githubusercontent.com/u/63637713?v=4" width="100px">](https://github.com/bbSnavy)
+[<img src="https://avatars.githubusercontent.com/u/9203727?v=4" width="100px">](https://github.com/bbSnavy)
+[<img src="https://avatars.githubusercontent.com/u/7467972?v=4" width="100px">](https://github.com/bbSnavy)
 
