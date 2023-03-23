@@ -659,9 +659,11 @@ public class PrivateMines extends JavaPlugin {
   public void registerSellListener() {
     if (Bukkit.getPluginManager().isPluginEnabled("UltraPrisonCore")) {
       getLogger().info("Registering Ultra Prison Core as the sell listener...");
+      getServer().getPluginManager().registerEvents(new UPCSellListener(), this);
       return;
     } else if (Bukkit.getPluginManager().isPluginEnabled("AutoSell")) {
       getLogger().info("Registering AutoSell as the sell listener...");
+      getServer().getPluginManager().registerEvents(new AutoSellListener(), this);
       return;
     }
     getLogger().info("Using the internal sell system!");

@@ -491,8 +491,6 @@ public class Mine {
         Task.syncDelayed(() -> teleport(online));
       }
     }
-
-    System.out.println("Owner: " + owner + "mine is resetting");
     if (owner != null) {
       boolean isPlayerInRegion = region.contains(owner.getLocation().getBlockX(),
           owner.getLocation().getBlockY(), owner.getLocation().getBlockZ());
