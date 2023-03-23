@@ -106,13 +106,12 @@ public class SQLUtils {
 
     SQLHelper sqlHelper = privateMines.getSqlHelper();
     String command = String.format(
-        "UPDATE privatemines SET mineType = '%s', corner1 = '%s', corner2 = '%s', fullRegionMin = '%s', fullRegionMax = '%s', materials = '%s' WHERE owner = '%s';",
+        "UPDATE privatemines SET mineType = '%s', corner1 = '%s', corner2 = '%s', fullRegionMin = '%s', fullRegionMax = '%s' WHERE owner = '%s';",
         mineType.getName(),
         LocationUtils.toString(minMining),
         LocationUtils.toString(maxMining),
         LocationUtils.toString(fullRegionMin),
         LocationUtils.toString(fullRegionMax),
-        Utils.mapToString(materials),
         owner
     );
     sqlHelper.executeUpdate(command);
