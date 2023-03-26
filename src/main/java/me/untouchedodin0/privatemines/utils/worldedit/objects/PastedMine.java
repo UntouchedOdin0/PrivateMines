@@ -16,8 +16,6 @@ public class PastedMine {
   BlockVector3 lowerRails;
   BlockVector3 upperRails;
   Location location;
-  Location lowerRailsLocation;
-  Location upperRailsLocation;
 
   public PastedMine(BlockVector3 pasteLocation) {
     this.pasteLocation = pasteLocation;
@@ -27,14 +25,6 @@ public class PastedMine {
     this.location = location;
     return this;
   }
-//
-//  public void setLowerRails(Location lowerRailsLocation) {
-//    this.lowerRailsLocation = lowerRailsLocation;
-//  }
-//
-//  public void setUpperRails(Location upperRailsLocation) {
-//    this.upperRailsLocation = upperRailsLocation;
-//  }
 
   public PastedMine setFile(File file) {
     this.file = file;
@@ -64,16 +54,4 @@ public class PastedMine {
   public Location getUpperRailsLocation() {
     return new Location(location.getWorld(), upperRails.getBlockX(), upperRails.getBlockY(), upperRails.getBlockZ());
   }
-
-//  public BlockVector3 getPasteLocation() {
-//    return pasteLocation;
-//  }
-
-//  public BlockVector3 getLowerRails() {
-//    return lowerRails;
-//  }
-//
-//  public BlockVector3 getUpperRails() {
-//    return upperRails;
-//  }
 }
