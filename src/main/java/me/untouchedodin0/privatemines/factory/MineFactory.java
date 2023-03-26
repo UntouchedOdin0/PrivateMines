@@ -69,6 +69,8 @@ import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopBuilder;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
+import me.untouchedodin0.privatemines.utils.worldedit.PasteHelper;
+import me.untouchedodin0.privatemines.utils.worldedit.objects.PastedMine;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -117,8 +119,17 @@ public class MineFactory {
     BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(),
         location.getBlockZ());
 
+    //todo move paste logic into a new class to clean this up a bit
+    // todo make it return a new object containing all the locations
+
     SchematicStorage storage = privateMines.getSchematicStorage();
-    SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
+    SchematicIterator.MineBlocks mineBlocks = storage.get(schematicFile);
+
+//    PastedMine pastedMine = PasteHelper.create(schematicFile, location);
+    PasteHelper pasteHelper = new PasteHelper();
+    PastedMine pastedMine = pasteHelper.paste(schematicFile, location);
+
+    Bukkit.broadcastMessage("pasteHelper " + pasteHelper);
 
     Task.asyncDelayed(() -> {
       if (clipboardFormat != null) {

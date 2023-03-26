@@ -37,4 +37,8 @@ public class SchematicStorage {
   public Map<File, MineBlocks> getMineBlocksMap() {
     return mineBlocksMap;
   }
+
+  public MineBlocks get(File file) {
+    return mineBlocksMap.get(file);
+  }
 }
