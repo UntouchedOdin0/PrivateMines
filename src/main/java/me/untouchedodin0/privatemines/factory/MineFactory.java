@@ -97,7 +97,6 @@ public class MineFactory {
     Instant start = Instant.now();
     UUID uuid = player.getUniqueId();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
-    Mine mine = new Mine(privateMines);
     Map<Material, Double> prices = new HashMap<>();
     int maxPlayers = mineType.getMaxPlayers();
 
@@ -120,14 +119,21 @@ public class MineFactory {
 
     PasteHelper pasteHelper = new PasteHelper();
     PastedMine pastedMine = pasteHelper.paste(schematicFile, location);
+    Location spawn = location.clone();
+    Location corner1 = pastedMine.getLowerRailsLocation();
+    Location corner2 = pastedMine.getUpperRailsLocation();
 
     Bukkit.broadcastMessage("pasteHelper " + pasteHelper);
     Bukkit.broadcastMessage("" + pastedMine);
 
-    Bukkit.broadcastMessage("spawn " + location);
-    Bukkit.broadcastMessage("corner1 " + pastedMine.getLowerRailsLocation());
-    Bukkit.broadcastMessage("corner2 " + pastedMine.getUpperRailsLocation());
+    Bukkit.broadcastMessage("location " + location);
+    Bukkit.broadcastMessage("spawn " + spawn);
+    Bukkit.broadcastMessage("corner1 " + corner1);
+    Bukkit.broadcastMessage("corner2 " + corner2);
 
+    //todo finish this
+    Mine mine = new Mine(privateMines);
+//    MineData mineData = new MineData(uuid, corner1, corner2)
     player.teleport(location);
 
 //    Task.asyncDelayed(() -> {
