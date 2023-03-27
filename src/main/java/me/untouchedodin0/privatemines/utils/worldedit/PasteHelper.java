@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.worldedit.objects.PastedMine;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -28,7 +27,6 @@ import org.bukkit.Location;
 public class PasteHelper {
 
   PrivateMines privateMines = PrivateMines.getPrivateMines();
-  SchematicStorage schematicStorage = privateMines.getSchematicStorage();
   private Location spawn, corner1, corner2, minimum, maximum;
   Region newRegion;
 
@@ -74,18 +72,6 @@ public class PasteHelper {
 
   private PastedMine create(File file, Location location) {
     BlockVector3 blockVector3 = BukkitAdapter.asBlockVector(location);
-
-//    BlockVector3 pasted = BukkitAdapter.asBlockVector(location);
-//    BlockVector3 lowerRails = blockVector3.subtract(pasted)
-//        .add(pastedMine.getLowerRails().add(0, 0, 1));
-//    BlockVector3 upperRails = blockVector3.subtract(pastedMine.getPasteLocation())
-//        .add(pastedMine.getUpperRails().add(0, 0, 1));
-//    Location spawn = new Location(world, pasted.getBlockX(), pasted.getBlockY(),
-//        pasted.getBlockZ());
-//    Location corner1 = new Location(world, lowerRails.getBlockX(), lowerRails.getBlockY(),
-//        lowerRails.getBlockZ());
-//    Location corner2 = new Location(world, upperRails.getBlockX(), upperRails.getBlockY(),
-//        upperRails.getBlockZ());
 
     return new PastedMine(blockVector3)
         .setLocation(location)
@@ -151,10 +137,6 @@ public class PasteHelper {
     setMinimum(fullMin);
     setMaximum(fullMax);
 
-
-//    setMinimum(BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMinimumPoint()));
-//    setMaximum(BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMaximumPoint()));
-    //todo need to finish this.
     return pastedMine;
   }
 }
