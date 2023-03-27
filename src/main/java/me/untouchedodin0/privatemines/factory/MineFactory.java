@@ -27,7 +27,6 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.adapter.UnsupportedVersionEditException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
@@ -61,7 +60,6 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.FlagUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.events.PrivateMineCreationEvent;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.Mine;
@@ -119,6 +117,7 @@ public class MineFactory {
 
     PasteHelper pasteHelper = new PasteHelper();
     PastedMine pastedMine = pasteHelper.paste(schematicFile, location);
+
     Location spawn = location.clone();
     Location corner1 = pastedMine.getLowerRailsLocation();
     Location corner2 = pastedMine.getUpperRailsLocation();
@@ -127,12 +126,15 @@ public class MineFactory {
     Bukkit.broadcastMessage("" + pastedMine);
 
     Bukkit.broadcastMessage("location " + location);
-    Bukkit.broadcastMessage("spawn " + spawn);
-    Bukkit.broadcastMessage("corner1 " + corner1);
-    Bukkit.broadcastMessage("corner2 " + corner2);
+    Bukkit.broadcastMessage("spawn " + pasteHelper.getSpawn());
+    Bukkit.broadcastMessage("corner1 " + pasteHelper.getCorner1());
+    Bukkit.broadcastMessage("corner2 " + pasteHelper.getCorner2());
+
+    Shop shop1 = new Shop();
 
     //todo finish this
     Mine mine = new Mine(privateMines);
+//    MineData mineData = new MineData(uuid, corner2, corner1, null, null, spawn, mineType, shop1);
 //    MineData mineData = new MineData(uuid, corner1, corner2)
     player.teleport(location);
 

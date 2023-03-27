@@ -37,7 +37,7 @@ public class PasteHelper {
   }
 
   public Location getSpawn() {
-    return spawn;
+    return spawn.add(0, 0, 1);
   }
 
   public void setCorner1(Location corner1) {
@@ -137,14 +137,23 @@ public class PasteHelper {
       }
     }
 
+    Location fullMin = BukkitAdapter.adapt(BukkitAdapter.adapt(world),
+        newRegion.getMinimumPoint());
+    Location fullMax = BukkitAdapter.adapt(BukkitAdapter.adapt(world),
+        newRegion.getMaximumPoint());
+
     Bukkit.broadcastMessage("spawn " + spawn);
     Bukkit.broadcastMessage("upper rails " + upperRails);
     Bukkit.broadcastMessage("lower rails " + lowerRails);
     setSpawn(spawn);
     setCorner1(upperRails);
     setCorner2(lowerRails);
-    setMinimum(BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMinimumPoint()));
-    setMaximum(BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMaximumPoint()));
+    setMinimum(fullMin);
+    setMaximum(fullMax);
+
+
+//    setMinimum(BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMinimumPoint()));
+//    setMaximum(BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMaximumPoint()));
     //todo need to finish this.
     return pastedMine;
   }
