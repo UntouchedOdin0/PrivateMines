@@ -92,7 +92,8 @@ public class MineFactory {
    * @param mineType the type of mine to paste
    */
   public void create(Player player, Location location, MineType mineType, boolean paste) {
-    Instant start = Instant.now();
+    long timeNow = System.currentTimeMillis();
+
     UUID uuid = player.getUniqueId();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
     Map<Material, Double> prices = new HashMap<>();
@@ -118,17 +119,24 @@ public class MineFactory {
     PasteHelper pasteHelper = new PasteHelper();
     PastedMine pastedMine = pasteHelper.paste(schematicFile, location);
 
+    Instant finished = Instant.now();
+//    Duration creationDuration = Duration.between(start, finished);
+    long done = System.currentTimeMillis();
+    long fin = done - timeNow;
+
+    Bukkit.broadcastMessage("fin " + fin);
+
     Location spawn = location.clone();
     Location corner1 = pastedMine.getLowerRailsLocation();
     Location corner2 = pastedMine.getUpperRailsLocation();
 
-    Bukkit.broadcastMessage("pasteHelper " + pasteHelper);
-    Bukkit.broadcastMessage("" + pastedMine);
-
-    Bukkit.broadcastMessage("location " + location);
-    Bukkit.broadcastMessage("spawn " + pasteHelper.getSpawn());
-    Bukkit.broadcastMessage("corner1 " + pasteHelper.getCorner1());
-    Bukkit.broadcastMessage("corner2 " + pasteHelper.getCorner2());
+//    Bukkit.broadcastMessage("pasteHelper " + pasteHelper);
+//    Bukkit.broadcastMessage("" + pastedMine);
+//
+//    Bukkit.broadcastMessage("location " + location);
+//    Bukkit.broadcastMessage("spawn " + pasteHelper.getSpawn());
+//    Bukkit.broadcastMessage("corner1 " + pasteHelper.getCorner1());
+//    Bukkit.broadcastMessage("corner2 " + pasteHelper.getCorner2());
 
     Shop shop1 = new Shop();
 
