@@ -90,7 +90,7 @@ public class PrivateMinesCommandOld {
         }
       } else {
         mineFactory.create(target.getPlayer(), location,
-            Objects.requireNonNullElse(mineType, defaultMineType), true);
+            Objects.requireNonNullElse(mineType, defaultMineType));
         if (commandSender instanceof Player player) {
           audienceUtils.sendMessage(player, target, MessagesConfig.gavePlayerMine);
         }

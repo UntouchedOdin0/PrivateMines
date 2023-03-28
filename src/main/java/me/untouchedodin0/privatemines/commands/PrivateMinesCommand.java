@@ -86,8 +86,7 @@ public class PrivateMinesCommand extends BaseCommand {
         }
       } else {
         sender.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a mine!");
-        mineFactory.create(target.getPlayer(), location, defaultMineType, true);
-//        Bukkit.broadcastMessage("location " + location);
+        mineFactory.create(target.getPlayer(), location, defaultMineType);
 
         if (sender instanceof Player player) {
           audienceUtils.sendMessage(player, target, MessagesConfig.gavePlayerMine.replace("{name}",

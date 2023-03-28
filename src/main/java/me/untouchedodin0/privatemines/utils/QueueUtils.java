@@ -86,7 +86,7 @@ public class QueueUtils {
       if (poll == null) return;
       if (poll.equals(player.getUniqueId())) {
         player.sendMessage(ChatColor.GREEN + "Creating your mine.....");
-        mineFactory.create(player, location, defaultMineType, true);
+        mineFactory.create(player, location, defaultMineType);
       }
     }, 0L, 120L);
   }

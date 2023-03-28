@@ -81,8 +81,8 @@ import redempt.redlib.misc.Task;
 public class MineFactory {
 
   PrivateMines privateMines = PrivateMines.getPrivateMines();
+  MineStorage mineStorage = privateMines.getMineStorage();
   EditSession editSession;
-  Location quarryL;
 
   /**
    * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
@@ -91,13 +91,12 @@ public class MineFactory {
    * @param location the location of the mine
    * @param mineType the type of mine to paste
    */
-  public void create(Player player, Location location, MineType mineType, boolean paste) {
-    long timeNow = System.currentTimeMillis();
-
+  public void create(Player player, Location location, MineType mineType) {
     UUID uuid = player.getUniqueId();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
     Map<Material, Double> prices = new HashMap<>();
-    int maxPlayers = mineType.getMaxPlayers();
+    RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+    RegionManager regionManager = container.get(BukkitAdapter.adapt(location.getWorld()));
 
     Map<Material, Double> materials = mineType.getMaterials();
     if (materials != null) {
@@ -113,40 +112,42 @@ public class MineFactory {
     String mineRegionName = String.format("mine-%s", player.getUniqueId());
     String fullRegionName = String.format("full-mine-%s", player.getUniqueId());
 
-    //todo move paste logic into a new class to clean this up a bit
-    // todo make it return a new object containing all the locations
+    Task.asyncDelayed(() -> {
+      PasteHelper pasteHelper = new PasteHelper();
+      PastedMine pastedMine = pasteHelper.paste(schematicFile, location);
 
-    PasteHelper pasteHelper = new PasteHelper();
-    PastedMine pastedMine = pasteHelper.paste(schematicFile, location);
+      Location spawn = location.clone().add(0, 0, 1);
+      Location corner1 = pastedMine.getLowerRailsLocation();
+      Location corner2 = pastedMine.getUpperRailsLocation();
+      Location minimum = pasteHelper.getMinimum();
+      Location maximum = pasteHelper.getMaximum();
+      BlockVector3 miningRegionMin = BukkitAdapter.asBlockVector(corner1);
+      BlockVector3 miningRegionMax = BukkitAdapter.asBlockVector(corner2);
+      BlockVector3 fullRegionMin = BukkitAdapter.asBlockVector(minimum);
+      BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(maximum);
 
-    Instant finished = Instant.now();
-//    Duration creationDuration = Duration.between(start, finished);
-    long done = System.currentTimeMillis();
-    long fin = done - timeNow;
+      ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName, miningRegionMin, miningRegionMax);
+      ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName, fullRegionMin, fullRegionMax);
 
-    Bukkit.broadcastMessage("fin " + fin);
+      if (regionManager != null) {
+        regionManager.addRegion(miningRegion);
+        regionManager.addRegion(fullRegion);
+      }
 
-    Location spawn = location.clone();
-    Location corner1 = pastedMine.getLowerRailsLocation();
-    Location corner2 = pastedMine.getUpperRailsLocation();
+      Mine mine = new Mine(privateMines);
+      MineData mineData = new MineData(uuid, corner2, corner1, minimum, maximum, location, spawn,
+          mineType, false, 5.0);
+      mine.setMineData(mineData);
+      SQLUtils.insert(mine);
+      mineStorage.addMine(uuid, mine);
+      mine.handleReset();
+      Task.syncDelayed(() -> {
+        spawn.getBlock().setType(Material.AIR);
+        player.teleport(spawn);
+      });
+    });
 
-//    Bukkit.broadcastMessage("pasteHelper " + pasteHelper);
-//    Bukkit.broadcastMessage("" + pastedMine);
-//
-//    Bukkit.broadcastMessage("location " + location);
-//    Bukkit.broadcastMessage("spawn " + pasteHelper.getSpawn());
-//    Bukkit.broadcastMessage("corner1 " + pasteHelper.getCorner1());
-//    Bukkit.broadcastMessage("corner2 " + pasteHelper.getCorner2());
-
-    Shop shop1 = new Shop();
-
-    //todo finish this
-    Mine mine = new Mine(privateMines);
-//    MineData mineData = new MineData(uuid, corner2, corner1, null, null, spawn, mineType, shop1);
-//    MineData mineData = new MineData(uuid, corner1, corner2)
-    player.teleport(location);
-
-//    Task.asyncDelayed(() -> {
+    //    Task.asyncDelayed(() -> {
 //      if (clipboardFormat != null) {
 //        try (ClipboardReader clipboardReader = clipboardFormat.getReader(
 //            new FileInputStream(schematicFile))) {
