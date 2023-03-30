@@ -27,6 +27,7 @@ import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -56,7 +57,11 @@ public class MineResetListener implements Listener {
     Mine mine = mineStorage.get(uuid);
 
     if (mine != null) {
-      mine.stopTasks();
+      Bukkit.getScheduler().runTaskLater(privateMines, () -> {
+        if (mineStorage.get(uuid) != null) {
+          mine.stopTasks();
+        }
+      }, 60L);
     }
   }
 }
