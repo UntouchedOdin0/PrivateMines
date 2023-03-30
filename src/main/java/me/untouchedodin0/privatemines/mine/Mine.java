@@ -100,7 +100,7 @@ public class Mine {
   private MineData mineData;
   private boolean canExpand = true;
   private Task task;
-  private Task percentageTask;
+  private Task percentageTask = null;
   private int airBlocks;
 
   public Mine(PrivateMines privateMines) {
@@ -500,35 +500,31 @@ public class Mine {
       }
     }
 
-//    if (percentageTask == null) {
-//      //Create a new Bukkit task async
-//      percentageTask = Task.syncRepeating(() -> {
-//        double percentage = getPercentage();
-//        double resetPercentage = mineType.getResetPercentage();
-//        redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
-//            mineData.getMinimumMining(), mineData.getMaximumMining());
-//        if (percentage > resetPercentage) {
-//          handleReset();
-//          airBlocks = 0;
-//        }
-//      }, 0, 20);
-//    }
-    owner.sendMessage(ChatColor.GREEN + "You've reset your mine!");
+    if (percentageTask == null) {
+      //Create a new Bukkit task async
+      percentageTask = Task.syncRepeating(() -> {
+        double percentage = getPercentage();
+        double resetPercentage = mineType.getResetPercentage();
+        redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
+            mineData.getMinimumMining(), mineData.getMaximumMining());
+        if (percentage > resetPercentage) {
+          handleReset();
+          airBlocks = 0;
+        }
+      }, 0, 80);
+    }
+    if (owner != null)
+        owner.sendMessage(ChatColor.GREEN + "You've reset your mine!");
   }
 
   public void stopTasks() {
-    if (task != null && percentageTask != null) {
+    if (task != null) {
       task.cancel();
-      percentageTask.cancel();
-//      if (task.isCurrentlyRunning() && percentageTask.isCurrentlyRunning()) {
-//        task.cancel();
-//        percentageTask.cancel();
-//      }
     }
-  }
-
-  public List<Task> getTasks() {
-    return List.of(task, percentageTask);
+    if (percentageTask != null) {
+      percentageTask.cancel();
+    }
+    privateMines.getLogger().info("Stopped tasks for mine " + mineData.getMineOwner());
   }
 
   public double getPercentage() {
