@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
+import redempt.redlib.sql.SQLCache;
 import redempt.redlib.sql.SQLHelper;
 import redempt.redlib.sql.SQLHelper.Results;
 
@@ -115,6 +116,14 @@ public class SQLUtils {
         owner
     );
     sqlHelper.executeUpdate(command);
+  }
+
+  public static void updateCache(Mine mine) {
+    Map<String, SQLCache> caches = privateMines.getCaches();
+
+    SQLCache ownerCache = caches.get("owner");
+
+    Bukkit.broadcastMessage("owner cache " + ownerCache);
   }
 
   public static void delete(Mine mine) {

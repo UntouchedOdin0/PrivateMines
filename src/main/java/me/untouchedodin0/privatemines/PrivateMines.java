@@ -32,7 +32,9 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -85,6 +87,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
+import redempt.redlib.sql.SQLCache;
 import redempt.redlib.sql.SQLHelper;
 import redempt.redlib.sql.SQLHelper.Results;
 
@@ -111,6 +114,7 @@ public class PrivateMines extends JavaPlugin {
   private QueueUtils queueUtils;
   private static Economy econ = null;
   private SQLHelper sqlHelper;
+  private Map<String, SQLCache> caches;
   private BukkitAudiences adventure;
   private Gson gson;
   String matString;
@@ -197,8 +201,7 @@ public class PrivateMines extends JavaPlugin {
     configManager = ConfigManager.create(this)
         .addConverter(Material.class, Material::valueOf, Material::toString)
         .addConverter(StorageType.class, StorageType::valueOf, StorageType::toString)
-        .target(Config.class)
-        .saveDefaults().load();
+        .target(Config.class).saveDefaults().load();
     //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
     ConfigManager mineConfig = ConfigManager.create(this)
         .addConverter(Material.class, Material::valueOf, Material::toString)
@@ -239,7 +242,9 @@ public class PrivateMines extends JavaPlugin {
     }
 
     SQLite sqlite = new SQLite();
+    sqlite.load();
     this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
+
     sqlHelper.executeUpdate("""
         CREATE TABLE IF NOT EXISTS privatemines (
         owner VARCHAR(36) NOT NULL,
@@ -254,21 +259,83 @@ public class PrivateMines extends JavaPlugin {
         isOpen INT NOT NULL,
         maxPlayers INT NOT NULL,
         maxMineSize INT NOT NULL,
-        materials VARCHAR(50) NOT NULL,
-        PRIMARY KEY (owner)
+        materials VARCHAR(50) NOT NULL
         );""");
 
-    sqlHelper.executeUpdate("""
-        CREATE TABLE IF NOT EXISTS pregenmines (
-            location VARCHAR(255),
-            min_mining VARCHAR(255),
-            max_mining VARCHAR(255),
-            spawn VARCHAR(255),
-            min_full VARCHAR(255),
-            max_full VARCHAR(255)
-        );
-        """);
+//    sqlHelper.executeUpdate("""
+//        CREATE TABLE IF NOT EXISTS pregenmines (
+//            location VARCHAR(255),
+//            min_mining VARCHAR(255),
+//            max_mining VARCHAR(255),
+//            spawn VARCHAR(255),
+//            min_full VARCHAR(255),
+//            max_full VARCHAR(255)
+//        );
+//        """);
     sqlHelper.setAutoCommit(true);
+    this.caches = new HashMap<>();
+
+    /**
+     *         owner VARCHAR(36) NOT NULL,
+     *         mineType VARCHAR(10) NOT NULL,
+     *         mineLocation VARCHAR(30) NOT NULL,
+     *         corner1 VARCHAR(30) NOT NULL,
+     *         corner2 VARCHAR(30) NOT NULL,
+     *         fullRegionMin VARCHAR(30) NOT NULL,
+     *         fullRegionMax VARCHAR(30) NOT NULL,
+     *         spawn VARCHAR(30) NOT NULL,
+     *         tax FLOAT NOT NULL,
+     *         isOpen INT NOT NULL,
+     *         maxPlayers INT NOT NULL,
+     *         maxMineSize INT NOT NULL,
+     *         materials VARCHAR(50) NOT NULL
+     */
+    String databaseName = "privatemines";
+    List<String> cacheNames = List.of("owner", "mineType", "mineLocation", "corner1", "corner2");
+
+    privateMines.getLogger().info("caches " + caches);
+    cacheNames.forEach(string -> {
+      SQLCache sqlCache = sqlHelper.createCache(databaseName, string);
+      caches.put(string, sqlCache);
+      privateMines.getLogger().info("caches " + caches);
+    });
+
+//    SQLCache ownerCache = sqlHelper.createCache(databaseName, "owner");
+//    SQLCache mineTypeCache = sqlHelper.createCache(databaseName, "mineType");
+//    SQLCache locationCache = sqlHelper.createCache(databaseName, "mineLocation");
+//    SQLCache corner1Cache = sqlHelper.createCache(databaseName, "corner1");
+//    SQLCache corner2Cache = sqlHelper.createCache(databaseName, "corner2");
+//    SQLCache fullRegionMinCache = sqlHelper.createCache(databaseName, "fullRegionMin");
+//    SQLCache fullRegionMaxCache = sqlHelper.createCache(databaseName, "fullRegionMax");
+//    SQLCache spawnCache = sqlHelper.createCache(databaseName, "spawn");
+//    SQLCache taxCache = sqlHelper.createCache(databaseName, "tax");
+//    SQLCache isOpenCache = sqlHelper.createCache(databaseName, "isOpen");
+//    SQLCache maxPlayersCache = sqlHelper.createCache(databaseName, "maxPlayers");
+//    SQLCache maxMineSizeCache = sqlHelper.createCache(databaseName, "maxMineSize");
+//    SQLCache materialsCache = sqlHelper.createCache(databaseName, "materials");
+
+
+    Results results = sqlHelper.queryResults("SELECT * FROM " + databaseName);
+    privateMines.getLogger().info("results " + results);
+
+
+//    sqlHelper.getCaches().forEach(sqlCache -> {
+//      String tableName = sqlCache.getTableName();
+//      String columnName = sqlCache.getColumnName();
+//
+//      privateMines.getLogger().info("tableName " + tableName);
+//      privateMines.getLogger().info("columnName " + columnName);
+//      caches.put(columnName, sqlCache);
+//    });
+
+//
+//    String test = ownerCache.selectString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b");
+//
+//    privateMines.getLogger().info("sqlHelper " + sqlHelper);
+//    privateMines.getLogger().info("ownerCache " + ownerCache);
+//    privateMines.getLogger().info("mineTypeCache " + mineTypeCache);
+//
+//    privateMines.getLogger().info("test? " + test);
 
     PaperCommandManager paperCommandManager = new PaperCommandManager(this);
     paperCommandManager.registerCommand(new PrivateMinesCommand());
@@ -476,8 +543,6 @@ public class PrivateMines extends JavaPlugin {
       String spawn = result.getString(8);
       double tax = result.get(9);
       int isOpen = result.get(10);
-      int maxPlayers = result.get(11);
-      int maxMineSize = result.get(12);
       String resultsMaterial = result.getString(13);
       resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
 
@@ -677,6 +742,10 @@ public class PrivateMines extends JavaPlugin {
 
   public SQLHelper getSqlHelper() {
     return sqlHelper;
+  }
+
+  public Map<String, SQLCache> getCaches() {
+    return caches;
   }
 
   public BukkitAudiences getAdventure() {

@@ -869,6 +869,7 @@ public class Mine {
           }
         });
         SQLUtils.update(this);
+        SQLUtils.updateCache(this);
       }
     }
 
