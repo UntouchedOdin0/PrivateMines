@@ -103,19 +103,7 @@ public class MineWorldManager {
           setCurrentLocation(nextLocation);
         }
       }
-//      this.nextLocation = direction.addTo(sqlLocation, distance * borderDistance);
     }
-
-//    direction = direction.next();
-//    if (direction == NORTH) {
-//      distance++;
-//    }
-//    switch (direction) {
-//      case NORTH -> nextLocation.subtract(0, 0, distance);
-//      case EAST -> nextLocation.add(distance, 0, 0);
-//      case SOUTH -> nextLocation.add(0, 0, distance);
-//      case WEST -> nextLocation.subtract(distance, 0, 0);
-//    }
     return nextLocation;
   }
 

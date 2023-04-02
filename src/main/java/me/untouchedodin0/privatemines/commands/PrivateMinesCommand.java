@@ -73,7 +73,6 @@ public class PrivateMinesCommand extends BaseCommand {
     MineFactory mineFactory = new MineFactory();
     MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
     Location location = mineWorldManager.getNextFreeLocation();
-//    mineWorldManager.setCurrentLocation(location);
 
     MineType defaultMineType = mineTypeManager.getDefaultMineType();
 

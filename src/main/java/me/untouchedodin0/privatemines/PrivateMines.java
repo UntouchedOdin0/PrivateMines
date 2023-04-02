@@ -130,7 +130,6 @@ public class PrivateMines extends JavaPlugin {
     saveDefaultConfig();
     saveResource("menus.yml", false);
     saveResource("messages.yml", false);
-    saveResource("donottouch.json", false);
 
     privateMines = this;
 
@@ -279,7 +278,6 @@ public class PrivateMines extends JavaPlugin {
     paperCommandManager.enableUnstableAPI("help");
 
     Task.asyncDelayed(this::loadSQLMines);
-    Task.syncDelayed(this::saveCache);
 
     getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
     if (!setupEconomy()) {
@@ -307,14 +305,6 @@ public class PrivateMines extends JavaPlugin {
 
   @Override
   public void onDisable() {
-    File file = new File("plugins/PrivateMines/donottouch.json");
-    if (file.exists()) {
-      boolean deleted = file.delete();
-      if (deleted) {
-        return;
-      }
-    }
-
     if (adventure != null) {
       getLogger().info(String.format("Disabling adventure for %s", getDescription().getName()));
       adventure.close();
@@ -588,25 +578,6 @@ public class PrivateMines extends JavaPlugin {
 
   public void savePregenMines() {
     getPregenStorage().getMines().forEach(PregenMine::save);
-  }
-
-  public void saveCache() {
-    Task.asyncRepeating(() -> {
-
-      GsonBuilder gsonBuilder = new GsonBuilder();
-      gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
-      gson = gsonBuilder.create();
-
-      File file = new File("plugins/PrivateMines/donottouch.json");
-      Location currentLocation = mineWorldManager.getCurrentLocation();
-      String currentLocationJson = gson.toJson(currentLocation);
-
-      try {
-        Files.writeString(file.toPath(), currentLocationJson);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }, 100L, 100L);
   }
 
   public SchematicStorage getSchematicStorage() {
