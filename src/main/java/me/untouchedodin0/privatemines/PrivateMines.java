@@ -260,6 +260,7 @@ public class PrivateMines extends JavaPlugin {
         maxMineSize INT NOT NULL,
         materials VARCHAR(50) NOT NULL
         );""");
+    sqlHelper.setAutoCommit(true);
 
     this.caches = new HashMap<>();
 
@@ -292,6 +293,9 @@ public class PrivateMines extends JavaPlugin {
     metrics.addCustomChart(new SingleLineChart("mines", () -> mineStorage.getTotalMines()));
 
     new UpdateChecker(this).fetch();
+
+    File file = new File(getDataFolder() + "/addons/PrivateMinesAddon2-1.0-SNAPSHOT.jar");
+    File directory = new File(getDataFolder() + "/addons/");
 
 //    AddonAPI.load(Test.class);
     loadAddons();
