@@ -803,7 +803,7 @@ public class Mine {
     }
     if (player != null) {
       if (Objects.equals(currentType.getFile(), nextType.getFile())) {
-        SQLUtils.update(this);
+//        SQLUtils.update(this);
       } else {
         Location fullMin = mineData.getMinimumFullRegion();
         Location fullMax = mineData.getMaximumFullRegion();
@@ -868,8 +868,18 @@ public class Mine {
             }
           }
         });
-        SQLUtils.update(this);
+//        long now = System.currentTimeMillis();
+//        SQLUtils.update(this);
+//        long afterUpdate = System.currentTimeMillis();
+
+        long nowCache = System.currentTimeMillis();
         SQLUtils.updateCache(this);
+        long afterCache = System.currentTimeMillis();
+
+//        long finUpdate = afterUpdate - now;
+        long finCache = afterCache - nowCache;
+
+        Bukkit.broadcastMessage("fin update " + finCache);
       }
     }
 

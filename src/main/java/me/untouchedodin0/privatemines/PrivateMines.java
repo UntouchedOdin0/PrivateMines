@@ -262,17 +262,6 @@ public class PrivateMines extends JavaPlugin {
         materials VARCHAR(50) NOT NULL
         );""");
 
-//    sqlHelper.executeUpdate("""
-//        CREATE TABLE IF NOT EXISTS pregenmines (
-//            location VARCHAR(255),
-//            min_mining VARCHAR(255),
-//            max_mining VARCHAR(255),
-//            spawn VARCHAR(255),
-//            min_full VARCHAR(255),
-//            max_full VARCHAR(255)
-//        );
-//        """);
-    sqlHelper.setAutoCommit(true);
     this.caches = new HashMap<>();
 
     /**
@@ -293,49 +282,10 @@ public class PrivateMines extends JavaPlugin {
     String databaseName = "privatemines";
     List<String> cacheNames = List.of("owner", "mineType", "mineLocation", "corner1", "corner2");
 
-    privateMines.getLogger().info("caches " + caches);
     cacheNames.forEach(string -> {
       SQLCache sqlCache = sqlHelper.createCache(databaseName, string);
       caches.put(string, sqlCache);
-      privateMines.getLogger().info("caches " + caches);
     });
-
-//    SQLCache ownerCache = sqlHelper.createCache(databaseName, "owner");
-//    SQLCache mineTypeCache = sqlHelper.createCache(databaseName, "mineType");
-//    SQLCache locationCache = sqlHelper.createCache(databaseName, "mineLocation");
-//    SQLCache corner1Cache = sqlHelper.createCache(databaseName, "corner1");
-//    SQLCache corner2Cache = sqlHelper.createCache(databaseName, "corner2");
-//    SQLCache fullRegionMinCache = sqlHelper.createCache(databaseName, "fullRegionMin");
-//    SQLCache fullRegionMaxCache = sqlHelper.createCache(databaseName, "fullRegionMax");
-//    SQLCache spawnCache = sqlHelper.createCache(databaseName, "spawn");
-//    SQLCache taxCache = sqlHelper.createCache(databaseName, "tax");
-//    SQLCache isOpenCache = sqlHelper.createCache(databaseName, "isOpen");
-//    SQLCache maxPlayersCache = sqlHelper.createCache(databaseName, "maxPlayers");
-//    SQLCache maxMineSizeCache = sqlHelper.createCache(databaseName, "maxMineSize");
-//    SQLCache materialsCache = sqlHelper.createCache(databaseName, "materials");
-
-
-    Results results = sqlHelper.queryResults("SELECT * FROM " + databaseName);
-    privateMines.getLogger().info("results " + results);
-
-
-//    sqlHelper.getCaches().forEach(sqlCache -> {
-//      String tableName = sqlCache.getTableName();
-//      String columnName = sqlCache.getColumnName();
-//
-//      privateMines.getLogger().info("tableName " + tableName);
-//      privateMines.getLogger().info("columnName " + columnName);
-//      caches.put(columnName, sqlCache);
-//    });
-
-//
-//    String test = ownerCache.selectString("79e6296e-6dfb-4b13-9b27-e1b37715ce3b");
-//
-//    privateMines.getLogger().info("sqlHelper " + sqlHelper);
-//    privateMines.getLogger().info("ownerCache " + ownerCache);
-//    privateMines.getLogger().info("mineTypeCache " + mineTypeCache);
-//
-//    privateMines.getLogger().info("test? " + test);
 
     PaperCommandManager paperCommandManager = new PaperCommandManager(this);
     paperCommandManager.registerCommand(new PrivateMinesCommand());
