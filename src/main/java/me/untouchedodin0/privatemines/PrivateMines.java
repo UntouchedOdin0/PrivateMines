@@ -32,7 +32,6 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -264,21 +263,6 @@ public class PrivateMines extends JavaPlugin {
 
     this.caches = new HashMap<>();
 
-    /**
-     *         owner VARCHAR(36) NOT NULL,
-     *         mineType VARCHAR(10) NOT NULL,
-     *         mineLocation VARCHAR(30) NOT NULL,
-     *         corner1 VARCHAR(30) NOT NULL,
-     *         corner2 VARCHAR(30) NOT NULL,
-     *         fullRegionMin VARCHAR(30) NOT NULL,
-     *         fullRegionMax VARCHAR(30) NOT NULL,
-     *         spawn VARCHAR(30) NOT NULL,
-     *         tax FLOAT NOT NULL,
-     *         isOpen INT NOT NULL,
-     *         maxPlayers INT NOT NULL,
-     *         maxMineSize INT NOT NULL,
-     *         materials VARCHAR(50) NOT NULL
-     */
     String databaseName = "privatemines";
     List<String> cacheNames = List.of("owner", "mineType", "mineLocation", "corner1", "corner2");
 
@@ -309,20 +293,8 @@ public class PrivateMines extends JavaPlugin {
 
     new UpdateChecker(this).fetch();
 
-    File file = new File(getDataFolder() + "/addons/PrivateMinesAddon2-1.0-SNAPSHOT.jar");
-    File directory = new File(getDataFolder() + "/addons/");
-
 //    AddonAPI.load(Test.class);
     loadAddons();
-    if (file.exists()) {
-//      AddonAPI.load(file);
-    }
-//    AddonAPI.load(addonsDirectory);
-//    addonsDirectory.forEach(path -> {
-//      File addon = path.toFile();
-//      getLogger().info("attempting to load file " + addon);
-//    });
-
     Instant end = Instant.now();
     Duration loadTime = Duration.between(start, end);
     getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");

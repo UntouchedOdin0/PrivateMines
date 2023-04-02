@@ -141,20 +141,7 @@ public class SQLUtils {
     corner1Cache.update(LocationUtils.toString(minMining));
     corner2Cache.update(LocationUtils.toString(maxMining));
 
-//    sqlHelper.commit();
-    sqlHelper.flushAllCaches();
-//    ownerCache.flush();
-//    mineTypeCache.flush();
-//    mineLocationCache.flush();
-//    corner1Cache.flush();
-//    corner2Cache.flush();
-
-
-    Bukkit.broadcastMessage("owner cache " + ownerCache);
-    Bukkit.broadcastMessage("mine type cache " + mineTypeCache);
-    Bukkit.broadcastMessage("mine location cache " + mineLocationCache);
-    Bukkit.broadcastMessage("corner 1 cache " + corner1Cache);
-    Bukkit.broadcastMessage("corner 2 cache " + corner2Cache);
+    Task.asyncDelayed(sqlHelper::flushAllCaches);
   }
 
   public static void delete(Mine mine) {

@@ -138,7 +138,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
           if (bal >= cost) {
             // player has enough money, upgrade the mine
-            mine.upgrade(false);
+            mine.upgrade();
             mine.handleReset();
           } else {
             // player does not have enough money
@@ -162,8 +162,7 @@ public class PrivateMinesCommand extends BaseCommand {
     } else {
       Mine mine = mineStorage.get(target.getUniqueId());
       if (mine != null) {
-        SQLUtils.delete(mine);
-        mine.upgrade(true);
+        mine.upgrade();
 
         List<Player> players = new ArrayList<>();
 
