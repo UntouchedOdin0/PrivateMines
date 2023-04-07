@@ -31,24 +31,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class MineResetListener implements Listener {
 
   PrivateMines privateMines = PrivateMines.getPrivateMines();
   MineStorage mineStorage = privateMines.getMineStorage();
-
-  @EventHandler
-  public void onJoin(AsyncPlayerPreLoginEvent event) {
-    if (event.getLoginResult().equals(ALLOWED)) {
-      UUID uuid = event.getUniqueId();
-      Mine mine = mineStorage.get(uuid);
-//      if (mine != null) {
-//        mine.startTasks();
-//      }
-    }
-  }
 
   @EventHandler
   public void onQuit(PlayerQuitEvent event) {

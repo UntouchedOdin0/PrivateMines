@@ -52,8 +52,6 @@ public class PlayerJoinListener implements Listener {
 
     if (Config.giveMineOnFirstJoin) {
       Player player = playerJoinEvent.getPlayer();
-      Location location = mineWorldManager.getNextFreeLocation();
-      MineType defaultMineType = mineTypeManager.getDefaultMineType();
 
       if (mineStorage.hasMine(player)) {
         return;

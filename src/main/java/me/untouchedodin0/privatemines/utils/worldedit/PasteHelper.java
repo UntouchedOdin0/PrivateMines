@@ -128,9 +128,6 @@ public class PasteHelper {
     Location fullMax = BukkitAdapter.adapt(BukkitAdapter.adapt(world),
         newRegion.getMaximumPoint());
 
-    Bukkit.broadcastMessage("spawn " + spawn);
-    Bukkit.broadcastMessage("upper rails " + upperRails);
-    Bukkit.broadcastMessage("lower rails " + lowerRails);
     setSpawn(spawn);
     setCorner1(upperRails);
     setCorner2(lowerRails);

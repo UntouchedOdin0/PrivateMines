@@ -119,13 +119,7 @@ public class SQLUtils {
     Location location = mineData.getMineLocation();
     Location minMining = mineData.getMinimumMining();
     Location maxMining = mineData.getMaximumMining();
-    Location fullRegionMin = mineData.getMinimumFullRegion();
-    Location fullRegionMax = mineData.getMaximumFullRegion();
-    Map<Material, Double> materials = mineData.getMaterials();
 
-    /**
-     *     List<String> cacheNames = List.of("owner", "mineType", "mineLocation", "corner1", "corner2");
-     */
     Map<String, SQLCache> caches = privateMines.getCaches();
 
     SQLCache ownerCache = caches.get("owner");
@@ -134,7 +128,6 @@ public class SQLUtils {
     SQLCache corner1Cache = caches.get("corner1");
     SQLCache corner2Cache = caches.get("corner2");
 
-    // value - name
     ownerCache.update(owner.toString());
     mineTypeCache.update(mineType.getName());
     mineLocationCache.update(LocationUtils.toString(location));

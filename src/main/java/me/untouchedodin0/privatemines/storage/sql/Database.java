@@ -14,18 +14,6 @@ public abstract class Database {
   String databaseName = "privatemines";
 
   public abstract Connection getSQLConnection();
-//  public void initialize() {
-//    connection = getSQLConnection();
-//    try {
-//      PreparedStatement preparedStatement = connection.prepareStatement(
-//          "SELECT * FROM " + databaseName + " WHERE owner = ?");
-//      ResultSet resultSet = preparedStatement.executeQuery();
-//      close(preparedStatement, resultSet);
-//
-//    } catch (SQLException ex) {
-//      privateMines.getLogger().log(Level.SEVERE, "Unable to retrieve connection", ex);
-//    }
-//  }
 
   public void close(PreparedStatement preparedStatement, ResultSet resultSet) {
     try {
