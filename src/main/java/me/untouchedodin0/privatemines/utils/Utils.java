@@ -30,15 +30,10 @@ import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang.WordUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -46,14 +41,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 
 public class Utils {
-
-  private static final Pattern VERSION_REGEX = Pattern.compile("(\\d+)\\.(\\d+)(\\.(\\d+))?");
 
   public static Location toLocation(BlockVector3 vector3, org.bukkit.World world) {
     return new Location(world, vector3.getX(), vector3.getY(), vector3.getZ());

@@ -19,14 +19,11 @@ import com.sk89q.worldedit.world.World;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.utils.worldedit.objects.PastedMine;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 public class PasteHelper {
 
-  PrivateMines privateMines = PrivateMines.getPrivateMines();
   private Location spawn, corner1, corner2, minimum, maximum;
   Region newRegion;
 
@@ -97,8 +94,6 @@ public class PasteHelper {
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
-
-      Bukkit.broadcastMessage("" + to);
 
       Region region = clipboard.getRegion();
 

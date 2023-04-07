@@ -21,8 +21,6 @@
 
 package me.untouchedodin0.privatemines.listener;
 
-import static org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result.ALLOWED;
-
 import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;

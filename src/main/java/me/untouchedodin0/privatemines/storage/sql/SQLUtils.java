@@ -100,7 +100,6 @@ public class SQLUtils {
     Location maxMining = mineData.getMaximumMining();
     Location fullRegionMin = mineData.getMinimumFullRegion();
     Location fullRegionMax = mineData.getMaximumFullRegion();
-    Map<Material, Double> materials = mineData.getMaterials();
 
     SQLHelper sqlHelper = privateMines.getSqlHelper();
     String command = String.format(
