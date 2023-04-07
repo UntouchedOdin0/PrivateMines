@@ -91,9 +91,7 @@ public class PrivateMines extends JavaPlugin {
   private static final int PLUGIN_ID = 11413;
   public int Y_LEVEL = 50;
   public int MINE_DISTANCE = 150;
-  private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
   private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
-  private final Path pregenMines = getDataFolder().toPath().resolve("pregen");
   private final Path addonsDirectory = getDataFolder().toPath().resolve("addons");
   private SchematicStorage schematicStorage;
   private SchematicIterator schematicIterator;
@@ -102,7 +100,6 @@ public class PrivateMines extends JavaPlugin {
   private PregenStorage pregenStorage;
   private MineWorldManager mineWorldManager;
   private MineTypeManager mineTypeManager;
-  private ConfigManager configManager;
   private AddonsManager addonsManager;
   private QueueUtils queueUtils;
   private static Economy econ = null;
@@ -179,7 +176,7 @@ public class PrivateMines extends JavaPlugin {
       e.printStackTrace();
     }
 
-    configManager = ConfigManager.create(this)
+    ConfigManager configManager = ConfigManager.create(this)
         .addConverter(Material.class, Material::valueOf, Material::toString)
         .addConverter(StorageType.class, StorageType::valueOf, StorageType::toString)
         .target(Config.class).saveDefaults().load();

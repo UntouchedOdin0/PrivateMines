@@ -21,7 +21,6 @@
 
 package me.untouchedodin0.privatemines.factory;
 
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
@@ -39,8 +38,6 @@ import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.mine.Mine;
-import me.untouchedodin0.privatemines.playershops.Shop;
-import me.untouchedodin0.privatemines.playershops.ShopBuilder;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.worldedit.PasteHelper;
 import me.untouchedodin0.privatemines.utils.worldedit.objects.PastedMine;
