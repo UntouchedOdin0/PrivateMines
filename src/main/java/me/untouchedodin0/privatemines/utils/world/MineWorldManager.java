@@ -35,7 +35,6 @@ import org.bukkit.WorldType;
 public class MineWorldManager {
 
   private final Location defaultLocation;
-  private Location currentLocation;
   private Location nextLocation;
   private final int borderDistance;
   private int distance = 0;
@@ -79,7 +78,8 @@ public class MineWorldManager {
       direction = NORTH;
     }
     if (sqlLocation == null) {
-      setCurrentLocation(direction.addTo(defaultLocation, distance * borderDistance));
+      sqlLocation = direction.addTo(defaultLocation, distance * borderDistance);
+      return sqlLocation;
     } else {
       if (nextLocation == null) {
         this.nextLocation = getDefaultLocation();
@@ -88,19 +88,15 @@ public class MineWorldManager {
       switch (direction) {
         case NORTH -> {
           nextLocation.subtract(0, 0, distance * borderDistance);
-          setCurrentLocation(nextLocation);
         }
         case EAST -> {
           nextLocation.add(distance * borderDistance, 0, 0);
-          setCurrentLocation(nextLocation);
         }
         case SOUTH -> {
           nextLocation.add(0, 0, distance * borderDistance);
-          setCurrentLocation(nextLocation);
         }
         case WEST -> {
           nextLocation.subtract(distance * borderDistance, 0, 0);
-          setCurrentLocation(nextLocation);
         }
       }
     }
@@ -109,10 +105,6 @@ public class MineWorldManager {
 
   public World getMinesWorld() {
     return minesWorld;
-  }
-
-  public void setCurrentLocation(Location currentLocation) {
-    this.currentLocation = currentLocation;
   }
 
   public Location getDefaultLocation() {
