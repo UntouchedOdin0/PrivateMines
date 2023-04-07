@@ -116,7 +116,6 @@ public class PasteHelper {
     setCorner2(lowerRails);
     setMinimum(fullMin);
     setMaximum(fullMax);
-
     return pastedMine;
   }
 }

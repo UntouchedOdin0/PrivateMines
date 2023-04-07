@@ -50,7 +50,7 @@ public class PrivateMinesCommand extends BaseCommand {
   private final CooldownManager cooldownManager = new CooldownManager();
 
   @Default
-  public void defaultCommand(Player player, CommandHelp commandHelp) {
+  public void defaultCommand(CommandHelp commandHelp) {
     commandHelp.showHelp();
   }
 
