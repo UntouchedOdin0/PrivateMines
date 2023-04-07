@@ -62,13 +62,12 @@ public class MineFactory {
   public void create(Player player, Location location, MineType mineType) {
     UUID uuid = player.getUniqueId();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
-    Map<Material, Double> prices = new HashMap<>();
     RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
     RegionManager regionManager = container.get(BukkitAdapter.adapt(location.getWorld()));
 
     Map<Material, Double> materials = mineType.getMaterials();
     if (materials != null) {
-      prices.putAll(materials);
+      Map<Material, Double> prices = new HashMap<>(materials);
     }
 
     if (!schematicFile.exists()) {
@@ -122,13 +121,12 @@ public class MineFactory {
     Mine mine = new Mine(privateMines);
     UUID uuid = player.getUniqueId();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
-    Map<Material, Double> prices = new HashMap<>();
     RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
     RegionManager regionManager = container.get(BukkitAdapter.adapt(location.getWorld()));
 
     Map<Material, Double> materials = mineType.getMaterials();
     if (materials != null) {
-      prices.putAll(materials);
+      Map<Material, Double> prices = new HashMap<>(materials);
     }
 
     if (!schematicFile.exists()) {
