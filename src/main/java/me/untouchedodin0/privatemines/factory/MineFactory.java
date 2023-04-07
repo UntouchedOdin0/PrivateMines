@@ -22,56 +22,28 @@
 package me.untouchedodin0.privatemines.factory;
 
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.RegionSelector;
-import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
-import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
-import me.untouchedodin0.kotlin.utils.FlagUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.events.PrivateMineCreationEvent;
-import me.untouchedodin0.privatemines.iterator.SchematicIterator;
+import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopBuilder;
-import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.worldedit.PasteHelper;
 import me.untouchedodin0.privatemines.utils.worldedit.objects.PastedMine;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -137,6 +109,9 @@ public class MineFactory {
       Mine mine = new Mine(privateMines);
       MineData mineData = new MineData(uuid, corner2, corner1, minimum, maximum, location, spawn,
           mineType, false, 5.0);
+      if (!Config.defaultClosed) {
+        mineData.setOpen(true);
+      }
       mine.setMineData(mineData);
       SQLUtils.insert(mine);
       mineStorage.addMine(uuid, mine);
@@ -194,6 +169,9 @@ public class MineFactory {
 
       MineData mineData = new MineData(uuid, corner2, corner1, minimum, maximum, location, spawn,
           mineType, false, 5.0);
+      if (!Config.defaultClosed) {
+        mineData.setOpen(true);
+      }
       mine.setMineData(mineData);
       SQLUtils.insert(mine);
       mineStorage.addMine(uuid, mine);
