@@ -1,6 +1,0 @@
-youHaveBeenGivenAMine:Has recibido una mina privada.
-yourMineHasBeenDeleted:Tus minas privadas han sido eliminadas.
-yourMineHasBeenReset:Tu mina privada ha sido reiniciada.
-youHaveBeenTeleportedToYourMine:Has sido transportado a tu mina privada.
-youDontOwnAMine:¡El jugador no tiene una mina!
-youHaveGivenPlayerAMine:Has dado a {name} una mina privada.
