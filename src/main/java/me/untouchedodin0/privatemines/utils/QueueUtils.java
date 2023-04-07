@@ -45,7 +45,6 @@ public class QueueUtils {
     MineFactory mineFactory = new MineFactory();
     MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
     Location location = mineWorldManager.getNextFreeLocation();
-    mineWorldManager.setCurrentLocation(location);
     MineType defaultMineType = mineTypeManager.getDefaultMineType();
 
     if (mineStorage.hasMine(player)) {

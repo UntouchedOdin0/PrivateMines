@@ -1,18 +1,18 @@
 /**
  * MIT License
- *
+ * <p>
  * Copyright (c) 2021 - 2023 Kyle Hicks
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,6 @@
 
 package me.untouchedodin0.privatemines.config;
 
-import me.untouchedodin0.privatemines.storage.StorageType;
 import org.bukkit.Material;
 import redempt.redlib.config.annotations.Comment;
 
@@ -40,14 +39,10 @@ public class Config {
     public static Material upgradeMaterial = Material.OBSIDIAN;
     @Comment("The template material for quarries")
     public static Material quarryMaterial = Material.SHULKER_BOX;
-//    @Comment("Check for any spigot updates")
-//    public static boolean notifyForUpdates = true;
     @Comment("The distance between the private mines")
     public static int mineDistance = 150;
     @Comment("The height of where the private mines are pasted")
     public static int mineYLevel = 50;
-    @Comment("The delay until a player is teleported to the private mine")
-    public static int teleportDelay = 5;
     @Comment("Should there be a gap between the wall and the mine?")
     public static boolean addWallGap = true;
     @Comment("The gap between the walls and the mine")
@@ -56,24 +51,16 @@ public class Config {
     public static boolean shouldWallsGoUp = false;
     @Comment("Should we give players a mine when they first join?")
     public static boolean giveMineOnFirstJoin = false;
-    @Comment("Used for giving mines before the server has released")
-    public static boolean preLoginGiveMine = false;
     @Comment("Should we upgrade the mine upon reaching the outside border?")
     public static boolean borderUpgrade = true;
-    @Comment("Should the menu be enabled?")
-    public static boolean enableMenu = true;
     @Comment("Should the tax feature be enabled?")
     public static boolean enableTax = true;
     @Comment("Should we send tax messages to the owner of the mine?")
     public static boolean sendTaxMessages = true;
     @Comment("Should mines be closed by default?")
     public static boolean defaultClosed = true;
-    @Comment("Which storage system should we use?")
-    public static StorageType storageType = StorageType.YAML;
     @Comment("Should we have a reset cooldown?")
     public static boolean enableResetCooldown = true;
     @Comment("Specifies the cooldown for the /privatemines reset command")
     public static int resetCooldown = 15;
-    @Comment("Should we format the config message?")
-    public static boolean formatResetMessage = true;
 }

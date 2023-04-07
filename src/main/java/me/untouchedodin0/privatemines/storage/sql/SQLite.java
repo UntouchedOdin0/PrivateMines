@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import me.untouchedodin0.privatemines.PrivateMines;
 
@@ -32,7 +31,7 @@ public class SQLite extends Database {
         return connection;
       }
       Class.forName("org.sqlite.JDBC");
-      connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
+      this.connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
       return connection;
     } catch (SQLException ex) {
       privateMines.getLogger().log(Level.SEVERE, "SQLite exception on initialize", ex);
@@ -46,23 +45,5 @@ public class SQLite extends Database {
   public void load() {
     privateMines.getLogger().log(Level.INFO, "Loading SQLite database...");
     connection = getSQLConnection();
-    try {
-      Statement s = connection.createStatement();
-      s.executeUpdate("""
-          CREATE TABLE IF NOT EXISTS `privatemines` (
-          `owner` TEXT NOT NULL,
-          `mineType` TEXT,
-          `corner1` TEXT,
-          `corner2` TEXT,
-          `fullMin` TEXT,
-          `fullMax` TEXT,
-          `spawn` TEXT,
-          `open` BOOLEAN
-          );""");
-      s.close();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-    initialize();
   }
 }

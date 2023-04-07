@@ -22,7 +22,6 @@
 package me.untouchedodin0.privatemines.mine;
 
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -37,7 +36,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -54,16 +52,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import me.untouchedodin0.kotlin.mine.data.MineData;
-import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.FlagUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -72,24 +65,19 @@ import me.untouchedodin0.privatemines.events.PrivateMineDeleteEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineExpandEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineResetEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineUpgradeEvent;
-import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitScheduler;
-import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.misc.WeightedRandom;
 
@@ -143,17 +131,6 @@ public class Mine {
       return;
     }
 
-    switch (Config.storageType) {
-      case YAML -> {
-        String fileName = String.format("/%s.yml", uuid);
-        File minesDirectory = privateMines.getMinesDirectory().toFile();
-        File file = new File(minesDirectory + fileName);
-
-        boolean delete = file.delete();
-      }
-      case SQLite -> SQLUtils.delete(this);
-    }
-
     MineData mineData = getMineData();
 
     Location corner1 = mineData.getMinimumFullRegion();
@@ -200,6 +177,7 @@ public class Mine {
     }
 
     privateMines.getMineStorage().removeMine(uuid);
+    SQLUtils.delete(this);
   }
 
   public void reset() {
@@ -505,8 +483,6 @@ public class Mine {
       percentageTask = Task.syncRepeating(() -> {
         double percentage = getPercentage();
         double resetPercentage = mineType.getResetPercentage();
-        redempt.redlib.region.CuboidRegion cuboidRegion = new redempt.redlib.region.CuboidRegion(
-            mineData.getMinimumMining(), mineData.getMaximumMining());
         if (percentage > resetPercentage) {
           handleReset();
           airBlocks = 0;
@@ -544,7 +520,9 @@ public class Mine {
    // Calculate the percetage of the region called "region" to then compare with how many blocks have been mined.
     airBlocks = 0;
     for (BlockVector3 vector : region) {
-      Block block = Bukkit.getWorld(Objects.requireNonNull(Objects.requireNonNull(getSpawnLocation()).getWorld()).getName()).getBlockAt(vector.getBlockX(),
+      Block block = Objects.requireNonNull(Bukkit.getWorld(
+              Objects.requireNonNull(Objects.requireNonNull(getSpawnLocation()).getWorld()).getName()))
+          .getBlockAt(vector.getBlockX(),
           vector.getBlockY(), vector.getBlockZ());
       if (block.getType().equals(Material.AIR)) {
         this.airBlocks++;
@@ -566,7 +544,7 @@ public class Mine {
             + "'s mine!");
     mineData.getBannedPlayers().add(player.getUniqueId());
     setMineData(mineData);
-    saveMineData(Objects.requireNonNull(owner), mineData);
+    SQLUtils.update(this);
   }
 
   public void unban(Player player) {
@@ -576,7 +554,7 @@ public class Mine {
             + "'s mine!");
     mineData.getBannedPlayers().remove(player.getUniqueId());
     setMineData(mineData);
-    saveMineData(Objects.requireNonNull(owner), mineData);
+    SQLUtils.update(this);
   }
 
   public boolean canExpand(final int amount) {
@@ -593,7 +571,7 @@ public class Mine {
       if (type.equals(Config.upgradeMaterial)) {
         canExpand = false;
         if (borderUpgrade) {
-          upgrade(false);
+          upgrade();
         }
       }
     });
@@ -603,7 +581,6 @@ public class Mine {
   public void expand() {
     final World world = privateMines.getMineWorldManager().getMinesWorld();
     boolean canExpand = canExpand(1);
-    Map<String, Boolean> flags = mineData.getMineType().getFlags();
 
     if (!canExpand) {
       privateMines.getLogger().info("Failed to expand the mine due to the mine being too large");
@@ -687,114 +664,17 @@ public class Mine {
     this.canExpand = true;
   }
 
-  public void saveMineData(Player player, MineData mineData) {
-    String uuidString = String.valueOf(player.getUniqueId());
-    String fileName = String.format("/%s.yml", uuidString);
-
-    File minesDirectory = privateMines.getMinesDirectory().toFile();
-    File file = new File(minesDirectory + fileName);
-    privateMines.getLogger().info("Saving file " + file.getName() + "...");
-    YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
-
-    MineType mineType = mineData.getMineType();
-    String mineTypeName = mineType.getName();
-
-    UUID owner = player.getUniqueId();
-    Location mineLocation = mineData.getMineLocation();
-    Location corner1 = mineData.getMinimumMining();
-    Location corner2 = mineData.getMaximumMining();
-    Location fullRegionMin = mineData.getMinimumFullRegion();
-    Location fullRegionMax = mineData.getMaximumFullRegion();
-
-    Location spawn = mineData.getSpawnLocation();
-    double tax = mineData.getTax();
-    boolean open = mineData.isOpen();
-    int maxPlayers = mineData.getMaxPlayers();
-    int maxMineSize = mineData.getMaxMineSize();
-
-    List<UUID> bannedPlayers = mineData.getBannedPlayers();
-    List<UUID> friends = mineData.getFriends();
-
-    Map<Material, Double> materials = mineData.getMaterials();
-
-    if (!file.exists()) {
-      try {
-        boolean createdNewFile = file.createNewFile();
-        if (createdNewFile) {
-          privateMines.getLogger().info("Created new file " + file.getName());
-        }
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-      yml.set("mineOwner", owner.toString());
-      yml.set("mineType", mineTypeName);
-      yml.set("mineLocation", LocationUtils.toString(mineLocation));
-      yml.set("corner1", LocationUtils.toString(corner1));
-      yml.set("corner2", LocationUtils.toString(corner2));
-      yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
-      yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
-      yml.set("spawn", LocationUtils.toString(spawn));
-      yml.set("tax", tax);
-      yml.set("isOpen", open);
-      yml.set("maxPlayers", maxPlayers);
-      yml.set("maxMineSize", maxMineSize);
-
-      if (!materials.isEmpty()) {
-        yml.set("materials", materials.toString());
-      }
-
-      try {
-        yml.save(file);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    } else {
-      yml.set("corner1", LocationUtils.toString(mineData.getMinimumMining()));
-      yml.set("corner2", LocationUtils.toString(mineData.getMaximumMining()));
-      yml.set("tax", tax);
-      yml.set("isOpen", open);
-      yml.set("maxPlayers", maxPlayers);
-      yml.set("maxMineSize", maxMineSize);
-//            yml.set("bannedPlayers", bannedPlayers);
-      if (!materials.isEmpty()) {
-        yml.set("materials", materials.toString());
-      }
-      try {
-        yml.save(file);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
-
-  public void upgrade(boolean force) {
-    Instant start = Instant.now();
-
-    /**
-     * New upgrade system
-     *
-     * Cancel all tasks
-     * Get min + max full location
-     * Clear the whole region
-     * Paste new schematic
-     * Get new locations and update the sql location stuff.
-     */
-
+  public void upgrade() {
     MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
-    MineFactory mineFactory = privateMines.getMineFactory();
-    MineStorage mineStorage = privateMines.getMineStorage();
     MineData mineData = getMineData();
     UUID mineOwner = mineData.getMineOwner();
     Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
-    List<Player> toTeleport = new ArrayList<>();
     MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
     MineType nextType = mineTypeManager.getNextMineType(currentType);
     Location mineLocation = mineData.getMineLocation();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + nextType.getFile());
     mineData.setMineType(nextType);
 
-    Economy economy = PrivateMines.getEconomy();
-    double upgradeCost = nextType.getUpgradeCost();
     PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this,
         currentType, nextType);
     Bukkit.getPluginManager().callEvent(privateMineUpgradeEvent);
@@ -803,7 +683,6 @@ public class Mine {
     }
     if (player != null) {
       if (Objects.equals(currentType.getFile(), nextType.getFile())) {
-        SQLUtils.update(this);
       } else {
         Location fullMin = mineData.getMinimumFullRegion();
         Location fullMax = mineData.getMaximumFullRegion();
@@ -831,7 +710,6 @@ public class Mine {
               } else {
                 editSession = WorldEdit.getInstance().newEditSession(world);
               }
-              LocalSession localSession = new LocalSession();
 
               Clipboard clipboard = clipboardReader.read();
               ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
@@ -868,16 +746,12 @@ public class Mine {
             }
           }
         });
-        SQLUtils.update(this);
+        SQLUtils.updateCache(this);
       }
     }
-
-    Instant end = Instant.now();
-    Duration upgradeTime = Duration.between(start, end);
   }
 
   public void createWorldGuardRegions() {
-
     String mineRegionName = String.format("mine-%s", getMineData().getMineOwner());
     String fullRegionName = String.format("full-mine-%s", getMineData().getMineOwner());
     com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(

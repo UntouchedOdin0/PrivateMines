@@ -10,11 +10,11 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
+import redempt.redlib.sql.SQLCache;
 import redempt.redlib.sql.SQLHelper;
 import redempt.redlib.sql.SQLHelper.Results;
 
@@ -80,11 +80,8 @@ public class SQLUtils {
         LocationUtils.toString(mineData.getMaximumMining()),
         LocationUtils.toString(mineData.getMinimumFullRegion()),
         LocationUtils.toString(mineData.getMaximumFullRegion()),
-        LocationUtils.toString(mine.getSpawnLocation()),
-        mineData.getTax(),
-        mineData.isOpen(),
-        mineData.getMaxPlayers(),
-        mineData.getMaxMineSize(),
+        LocationUtils.toString(mine.getSpawnLocation()), mineData.getTax(), mineData.isOpen(),
+        mineData.getMaxPlayers(), mineData.getMaxMineSize(),
         Utils.mapToString(mineData.getMaterials()));
 
     delete(mine);
@@ -102,19 +99,40 @@ public class SQLUtils {
     Location maxMining = mineData.getMaximumMining();
     Location fullRegionMin = mineData.getMinimumFullRegion();
     Location fullRegionMax = mineData.getMaximumFullRegion();
-    Map<Material, Double> materials = mineData.getMaterials();
 
     SQLHelper sqlHelper = privateMines.getSqlHelper();
     String command = String.format(
         "UPDATE privatemines SET mineType = '%s', corner1 = '%s', corner2 = '%s', fullRegionMin = '%s', fullRegionMax = '%s' WHERE owner = '%s';",
-        mineType.getName(),
-        LocationUtils.toString(minMining),
-        LocationUtils.toString(maxMining),
-        LocationUtils.toString(fullRegionMin),
-        LocationUtils.toString(fullRegionMax),
-        owner
-    );
+        mineType.getName(), LocationUtils.toString(minMining), LocationUtils.toString(maxMining),
+        LocationUtils.toString(fullRegionMin), LocationUtils.toString(fullRegionMax), owner);
     sqlHelper.executeUpdate(command);
+  }
+
+  public static void updateCache(Mine mine) {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
+
+    MineData mineData = mine.getMineData();
+    MineType mineType = mineData.getMineType();
+    UUID owner = mineData.getMineOwner();
+    Location location = mineData.getMineLocation();
+    Location minMining = mineData.getMinimumMining();
+    Location maxMining = mineData.getMaximumMining();
+
+    Map<String, SQLCache> caches = privateMines.getCaches();
+
+    SQLCache ownerCache = caches.get("owner");
+    SQLCache mineTypeCache = caches.get("mineType");
+    SQLCache mineLocationCache = caches.get("mineLocation");
+    SQLCache corner1Cache = caches.get("corner1");
+    SQLCache corner2Cache = caches.get("corner2");
+
+    ownerCache.update(owner.toString());
+    mineTypeCache.update(mineType.getName());
+    mineLocationCache.update(LocationUtils.toString(location));
+    corner1Cache.update(LocationUtils.toString(minMining));
+    corner2Cache.update(LocationUtils.toString(maxMining));
+
+    Task.asyncDelayed(sqlHelper::flushAllCaches);
   }
 
   public static void delete(Mine mine) {
@@ -143,7 +161,7 @@ public class SQLUtils {
 
     String insert = String.format(
         "INSERT INTO pregenmines (location, min_mining, max_mining, spawn, min_full, max_full) "
-        + "VALUES ('%s', '%s', '%s', '%s', '%s', '%s');",
+            + "VALUES ('%s', '%s', '%s', '%s', '%s', '%s');",
         LocationUtils.toString(Objects.requireNonNull(pregenMine.getLocation())),
         LocationUtils.toString(Objects.requireNonNull(pregenMine.getLowerRails())),
         LocationUtils.toString(Objects.requireNonNull(pregenMine.getUpperRails())),

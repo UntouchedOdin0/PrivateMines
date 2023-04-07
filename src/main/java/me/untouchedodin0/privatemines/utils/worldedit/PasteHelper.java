@@ -19,14 +19,11 @@ import com.sk89q.worldedit.world.World;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.utils.worldedit.objects.PastedMine;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 public class PasteHelper {
 
-  PrivateMines privateMines = PrivateMines.getPrivateMines();
   private Location spawn, corner1, corner2, minimum, maximum;
   Region newRegion;
 
@@ -34,24 +31,12 @@ public class PasteHelper {
     this.spawn = spawn;
   }
 
-  public Location getSpawn() {
-    return spawn.add(0, 0, 1);
-  }
-
   public void setCorner1(Location corner1) {
     this.corner1 = corner1;
   }
 
-  public Location getCorner1() {
-    return corner1;
-  }
-
   public void setCorner2(Location corner2) {
     this.corner2 = corner2;
-  }
-
-  public Location getCorner2() {
-    return corner2;
   }
 
   public void setMinimum(Location minimum) {
@@ -98,8 +83,6 @@ public class PasteHelper {
         throw new RuntimeException(e);
       }
 
-      Bukkit.broadcastMessage("" + to);
-
       Region region = clipboard.getRegion();
 
       BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint()
@@ -128,15 +111,11 @@ public class PasteHelper {
     Location fullMax = BukkitAdapter.adapt(BukkitAdapter.adapt(world),
         newRegion.getMaximumPoint());
 
-    Bukkit.broadcastMessage("spawn " + spawn);
-    Bukkit.broadcastMessage("upper rails " + upperRails);
-    Bukkit.broadcastMessage("lower rails " + lowerRails);
     setSpawn(spawn);
     setCorner1(upperRails);
     setCorner2(lowerRails);
     setMinimum(fullMin);
     setMaximum(fullMax);
-
     return pastedMine;
   }
 }

@@ -4,14 +4,11 @@ plugins {
     id 'maven-publish'
     id 'io.github.gradle-nexus.publish-plugin' version "1.1.0"
     id 'com.github.johnrengelman.shadow' version '7.1.2'
-    id 'org.jetbrains.kotlin.jvm' version '1.8.20'
-    id 'org.ajoberstar.grgit' version '4.0.1'
-    id 'net.dumbcode.gradlehook' version '1.2.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.22'
     id 'net.minecrell.plugin-yml.bukkit' version '0.5.3'
 }
 
 group 'me.untouchedodin0.privatemines'
-//version = '5.3.5'
 version = pluginVersion
 
 
@@ -76,8 +73,6 @@ dependencies {
     implementation "dev.triumphteam:triumph-gui:3.1.2" // Replace version here
 
     implementation files('libs/PrivateMinesAPI-1.3-SNAPSHOT.jar')
-
-//    implementation project(':WorldBorder')
 }
 
 shadowJar {
@@ -90,13 +85,6 @@ shadowJar {
 }
 
 bukkit {
-    // Default values can be overridden if needed
-    // name = 'TestPlugin'
-    // version = '1.0'
-    // description = 'This is a test plugin'
-    // website = 'https://example.com'
-    // author = 'Notch'
-
     // Plugin main class (required)
     main = 'me.untouchedodin0.privatemines.PrivateMines'
     version = pluginVersion
@@ -108,7 +96,7 @@ bukkit {
     softDepend = ['AutoSell', 'UltraPrisonCore', 'ProtocolLib', 'PlaceholderAPI', 'Oraxen', 'ItemsAdder']
 }
 
-task copyTo_DevServer(type: Copy) {
+tasks.register('copyTo_DevServer', Copy) {
     from shadowJar
     into "E:/Coding/Spigot Test Servers/1.19.2 Privates Mines (Paper)/plugins"
 }

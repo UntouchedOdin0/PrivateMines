@@ -22,7 +22,6 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
@@ -33,12 +32,10 @@ import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
@@ -62,6 +59,7 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.StorageType;
+import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
@@ -69,7 +67,6 @@ import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
 import me.untouchedodin0.privatemines.utils.addon.old.AddonsManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
-import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
@@ -78,13 +75,13 @@ import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
+import redempt.redlib.sql.SQLCache;
 import redempt.redlib.sql.SQLHelper;
 import redempt.redlib.sql.SQLHelper.Results;
 
@@ -94,9 +91,7 @@ public class PrivateMines extends JavaPlugin {
   private static final int PLUGIN_ID = 11413;
   public int Y_LEVEL = 50;
   public int MINE_DISTANCE = 150;
-  private final Path minesDirectory = getDataFolder().toPath().resolve("mines");
   private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
-  private final Path pregenMines = getDataFolder().toPath().resolve("pregen");
   private final Path addonsDirectory = getDataFolder().toPath().resolve("addons");
   private SchematicStorage schematicStorage;
   private SchematicIterator schematicIterator;
@@ -105,16 +100,12 @@ public class PrivateMines extends JavaPlugin {
   private PregenStorage pregenStorage;
   private MineWorldManager mineWorldManager;
   private MineTypeManager mineTypeManager;
-  private ConfigManager configManager;
   private AddonsManager addonsManager;
-  private SlimeUtils slimeUtils;
   private QueueUtils queueUtils;
   private static Economy econ = null;
   private SQLHelper sqlHelper;
+  private Map<String, SQLCache> caches;
   private BukkitAudiences adventure;
-  private Gson gson;
-  String matString;
-  double percent;
 
   public static PrivateMines getPrivateMines() {
     return privateMines;
@@ -127,7 +118,6 @@ public class PrivateMines extends JavaPlugin {
     saveDefaultConfig();
     saveResource("menus.yml", false);
     saveResource("messages.yml", false);
-    saveResource("donottouch.json", false);
 
     privateMines = this;
 
@@ -142,7 +132,6 @@ public class PrivateMines extends JavaPlugin {
     GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
     gsonBuilder.registerTypeAdapter(Path.class, new PathAdapter());
-    this.gson = gsonBuilder.create();
 
     if (Config.enableTax) {
       registerSellListener();
@@ -155,11 +144,6 @@ public class PrivateMines extends JavaPlugin {
       if (registered) {
         privateMines.getLogger().info("Registered the PlaceholderAPI expansion!");
       }
-    }
-
-    if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
-      slimeUtils = new SlimeUtils();
-      Task.asyncDelayed(() -> slimeUtils.setupSlimeWorld(UUID.randomUUID()));
     }
 
     if (Bukkit.getPluginManager().isPluginEnabled("Oraxen")) {
@@ -186,19 +170,16 @@ public class PrivateMines extends JavaPlugin {
     }
 
     try {
-      Files.createDirectories(minesDirectory);
       Files.createDirectories(schematicsDirectory);
-      Files.createDirectories(pregenMines);
       Files.createDirectories(addonsDirectory);
     } catch (IOException e) {
       e.printStackTrace();
     }
 
-    configManager = ConfigManager.create(this)
+    ConfigManager configManager = ConfigManager.create(this)
         .addConverter(Material.class, Material::valueOf, Material::toString)
         .addConverter(StorageType.class, StorageType::valueOf, StorageType::toString)
-        .target(Config.class)
-        .saveDefaults().load();
+        .target(Config.class).saveDefaults().load();
     //noinspection unused - This is the way the config manager is designed so stop complaining pls IntelliJ.
     ConfigManager mineConfig = ConfigManager.create(this)
         .addConverter(Material.class, Material::valueOf, Material::toString)
@@ -239,7 +220,9 @@ public class PrivateMines extends JavaPlugin {
     }
 
     SQLite sqlite = new SQLite();
+    sqlite.load();
     this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
+
     sqlHelper.executeUpdate("""
         CREATE TABLE IF NOT EXISTS privatemines (
         owner VARCHAR(36) NOT NULL,
@@ -254,21 +237,19 @@ public class PrivateMines extends JavaPlugin {
         isOpen INT NOT NULL,
         maxPlayers INT NOT NULL,
         maxMineSize INT NOT NULL,
-        materials VARCHAR(50) NOT NULL,
-        PRIMARY KEY (owner)
+        materials VARCHAR(50) NOT NULL
         );""");
-
-    sqlHelper.executeUpdate("""
-        CREATE TABLE IF NOT EXISTS pregenmines (
-            location VARCHAR(255),
-            min_mining VARCHAR(255),
-            max_mining VARCHAR(255),
-            spawn VARCHAR(255),
-            min_full VARCHAR(255),
-            max_full VARCHAR(255)
-        );
-        """);
     sqlHelper.setAutoCommit(true);
+
+    this.caches = new HashMap<>();
+
+    String databaseName = "privatemines";
+    List<String> cacheNames = List.of("owner", "mineType", "mineLocation", "corner1", "corner2");
+
+    cacheNames.forEach(string -> {
+      SQLCache sqlCache = sqlHelper.createCache(databaseName, string);
+      caches.put(string, sqlCache);
+    });
 
     PaperCommandManager paperCommandManager = new PaperCommandManager(this);
     paperCommandManager.registerCommand(new PrivateMinesCommand());
@@ -277,7 +258,6 @@ public class PrivateMines extends JavaPlugin {
     paperCommandManager.enableUnstableAPI("help");
 
     Task.asyncDelayed(this::loadSQLMines);
-    Task.syncDelayed(this::saveCache);
 
     getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
     if (!setupEconomy()) {
@@ -292,20 +272,7 @@ public class PrivateMines extends JavaPlugin {
 
     new UpdateChecker(this).fetch();
 
-    File file = new File(getDataFolder() + "/addons/PrivateMinesAddon2-1.0-SNAPSHOT.jar");
-    File directory = new File(getDataFolder() + "/addons/");
-
-//    AddonAPI.load(Test.class);
     loadAddons();
-    if (file.exists()) {
-//      AddonAPI.load(file);
-    }
-//    AddonAPI.load(addonsDirectory);
-//    addonsDirectory.forEach(path -> {
-//      File addon = path.toFile();
-//      getLogger().info("attempting to load file " + addon);
-//    });
-
     Instant end = Instant.now();
     Duration loadTime = Duration.between(start, end);
     getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
@@ -314,14 +281,6 @@ public class PrivateMines extends JavaPlugin {
 
   @Override
   public void onDisable() {
-    File file = new File("plugins/PrivateMines/donottouch.json");
-    if (file.exists()) {
-      boolean deleted = file.delete();
-      if (deleted) {
-        return;
-      }
-    }
-
     if (adventure != null) {
       getLogger().info(String.format("Disabling adventure for %s", getDescription().getName()));
       adventure.close();
@@ -355,112 +314,6 @@ public class PrivateMines extends JavaPlugin {
     return true;
   }
 
-  @Deprecated(since = "5.3.5", forRemoval = true)
-  public void loadMines() {
-    final PathMatcher jsonMatcher = FileSystems.getDefault()
-        .getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
-    Path path = getMinesDirectory();
-    Map<Material, Double> customMaterials = new HashMap<>();
-    var ref = new Object() {
-      Material material;
-    };
-
-    try (Stream<Path> paths = Files.walk(path).filter(jsonMatcher::matches)) {
-      paths.forEach(streamPath -> {
-        File file = streamPath.toFile();
-        Mine mine = new Mine(privateMines);
-        getLogger().info("Loading file " + file.getName() + "....");
-        YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
-
-        String ownerString = yml.getString("mineOwner");
-        UUID owner = null;
-        if (ownerString != null) {
-          owner = UUID.fromString(ownerString);
-        }
-        String mineTypeName = yml.getString("mineType");
-        MineType mineType = mineTypeManager.getMineType(mineTypeName);
-        Location corner1 = LocationUtils.fromString(yml.getString("corner1"));
-        Location corner2 = LocationUtils.fromString(yml.getString("corner2"));
-        Location fullRegionMin = LocationUtils.fromString(yml.getString("fullRegionMin"));
-        Location fullRegionMax = LocationUtils.fromString(yml.getString("fullRegionMax"));
-        Location spawn = LocationUtils.fromString(yml.getString("spawn"));
-        Location mineLocation = LocationUtils.fromString(yml.getString("mineLocation"));
-        boolean isOpen = yml.getBoolean("isOpen");
-        double tax = yml.getDouble("tax");
-        String materialsString = yml.getString("materials");
-
-        if (materialsString != null) {
-          materialsString = materialsString.substring(1, materialsString.length() - 1);
-          String[] pairs = materialsString.split(",");
-
-          Pattern materialRegex = Pattern.compile("[a-zA-Z]+_[a-zA-Z]+");
-          Pattern singleMaterialRegex = Pattern.compile("[a-zA-Z]+");
-          Pattern percentRegex = Pattern.compile("[0-9]+.[0-9]+");
-
-          for (String string : pairs) {
-            boolean containsUnderscore = string.contains("_");
-            Matcher materialMatcher = materialRegex.matcher(string);
-            Matcher singleMaterialMatcher = singleMaterialRegex.matcher(string);
-            Matcher percentPatcher = percentRegex.matcher(string);
-            if (containsUnderscore) {
-              if (materialMatcher.find()) {
-                matString = materialMatcher.group();
-                ref.material = Material.valueOf(matString);
-              }
-            } else {
-              if (singleMaterialMatcher.find()) {
-                matString = singleMaterialMatcher.group();
-                ref.material = Material.valueOf(matString);
-              }
-            }
-
-            if (percentPatcher.find()) {
-              percent = Double.parseDouble(percentPatcher.group());
-            }
-            customMaterials.put(ref.material, percent);
-          }
-
-          MineData mineData = null;
-          if (owner != null) {
-            mineData = new MineData(owner, corner1, corner2, fullRegionMin, fullRegionMax,
-                mineLocation, spawn, mineType, isOpen, tax);
-          }
-
-          if (!customMaterials.isEmpty()) {
-            if (mineData != null) {
-              mineData.setMaterials(customMaterials);
-            }
-          }
-          if (mineData != null) {
-            mineData.setMaxMineSize(mineType.getMaxMineSize());
-          }
-          mine.setMineData(mineData);
-          if (owner != null) {
-            mineStorage.addMine(owner, mine);
-          }
-        } else {
-          MineData mineData = null;
-          if (owner != null) {
-            mineData = new MineData(owner, corner1, corner2, fullRegionMin, fullRegionMax,
-                mineLocation, spawn, mineType, isOpen, tax);
-          }
-          if (mineData != null) {
-            mineData.setMaxMineSize(mineType.getMaxMineSize());
-          }
-          mine.setMineData(mineData);
-          if (owner != null) {
-            mineStorage.addMine(owner, mine);
-          }
-          mine.handleReset();
-          getLogger().info("Loaded file " + file.getName() + "!");
-        }
-      });
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
-  }
-
   public void loadSQLMines() {
     SQLHelper sqlHelper = getSqlHelper();
     Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
@@ -476,8 +329,6 @@ public class PrivateMines extends JavaPlugin {
       String spawn = result.getString(8);
       double tax = result.get(9);
       int isOpen = result.get(10);
-      int maxPlayers = result.get(11);
-      int maxMineSize = result.get(12);
       String resultsMaterial = result.getString(13);
       resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
 
@@ -509,47 +360,6 @@ public class PrivateMines extends JavaPlugin {
       mineData.setMaterials(materials);
       mine.setMineData(mineData);
       mineStorage.addMine(uuid, mine);
-    });
-  }
-
-  @Deprecated(since = "5.3.5", forRemoval = true)
-  public void loadPregenMines() {
-    final PathMatcher jsonMatcher = FileSystems.getDefault()
-        .getPathMatcher("glob:**/*.yml"); // Credits to Brister Mitten
-    Path path = getPregenMines();
-
-    CompletableFuture.runAsync(() -> {
-      try (Stream<Path> paths = Files.walk(path).filter(jsonMatcher::matches)) {
-        paths.forEach(streamPath -> {
-          File file = streamPath.toFile();
-          getLogger().info("Loading pregen mine file: " + file);
-          YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
-
-          Location location = LocationUtils.fromString(yml.getString("location"));
-          Location spawnLocation = LocationUtils.fromString(yml.getString("spawnLocation"));
-          Location lowerRails = LocationUtils.fromString(yml.getString("lowerRails"));
-          Location upperRails = LocationUtils.fromString(yml.getString("upperRails"));
-          Location fullMin = LocationUtils.fromString(yml.getString("fullMin"));
-          Location fullMax = LocationUtils.fromString(yml.getString("fullMax"));
-
-          PregenMine pregenMine = new PregenMine();
-          pregenMine.setLocation(location);
-          pregenMine.setSpawnLocation(spawnLocation);
-          pregenMine.setLowerRails(lowerRails);
-          pregenMine.setUpperRails(upperRails);
-          pregenMine.setFullMin(fullMin);
-          pregenMine.setFullMax(fullMax);
-          pregenStorage.addMine(pregenMine);
-
-          try {
-            Files.delete(file.toPath());
-          } catch (IOException e) {
-            throw new RuntimeException(e);
-          }
-        });
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
     });
   }
 
@@ -589,7 +399,7 @@ public class PrivateMines extends JavaPlugin {
     getMineStorage().getMines().forEach((uuid, mine) -> {
       Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
       if (player != null) {
-        mine.saveMineData(player, mine.getMineData());
+        SQLUtils.update(mine);
         mine.stopTasks();
       }
     });
@@ -597,25 +407,6 @@ public class PrivateMines extends JavaPlugin {
 
   public void savePregenMines() {
     getPregenStorage().getMines().forEach(PregenMine::save);
-  }
-
-  public void saveCache() {
-    Task.asyncRepeating(() -> {
-
-      GsonBuilder gsonBuilder = new GsonBuilder();
-      gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
-      gson = gsonBuilder.create();
-
-      File file = new File("plugins/PrivateMines/donottouch.json");
-      Location currentLocation = mineWorldManager.getCurrentLocation();
-      String currentLocationJson = gson.toJson(currentLocation);
-
-      try {
-        Files.writeString(file.toPath(), currentLocationJson);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }, 100L, 100L);
   }
 
   public SchematicStorage getSchematicStorage() {
@@ -636,18 +427,6 @@ public class PrivateMines extends JavaPlugin {
 
   public MineWorldManager getMineWorldManager() {
     return mineWorldManager;
-  }
-
-  public Path getMinesDirectory() {
-    return minesDirectory;
-  }
-
-  public Path getPregenMines() {
-    return pregenMines;
-  }
-
-  public ConfigManager getConfigManager() {
-    return configManager;
   }
 
   public MineTypeManager getMineTypeManager() {
@@ -677,6 +456,10 @@ public class PrivateMines extends JavaPlugin {
 
   public SQLHelper getSqlHelper() {
     return sqlHelper;
+  }
+
+  public Map<String, SQLCache> getCaches() {
+    return caches;
   }
 
   public BukkitAudiences getAdventure() {

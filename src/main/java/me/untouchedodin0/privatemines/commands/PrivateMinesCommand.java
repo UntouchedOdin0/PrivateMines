@@ -50,7 +50,7 @@ public class PrivateMinesCommand extends BaseCommand {
   private final CooldownManager cooldownManager = new CooldownManager();
 
   @Default
-  public void defaultCommand(Player player, CommandHelp commandHelp) {
+  public void defaultCommand(CommandHelp commandHelp) {
     commandHelp.showHelp();
   }
 
@@ -73,7 +73,6 @@ public class PrivateMinesCommand extends BaseCommand {
     MineFactory mineFactory = new MineFactory();
     MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
     Location location = mineWorldManager.getNextFreeLocation();
-//    mineWorldManager.setCurrentLocation(location);
 
     MineType defaultMineType = mineTypeManager.getDefaultMineType();
 
@@ -138,7 +137,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
           if (bal >= cost) {
             // player has enough money, upgrade the mine
-            mine.upgrade(false);
+            mine.upgrade();
             mine.handleReset();
           } else {
             // player does not have enough money
@@ -162,8 +161,7 @@ public class PrivateMinesCommand extends BaseCommand {
     } else {
       Mine mine = mineStorage.get(target.getUniqueId());
       if (mine != null) {
-        SQLUtils.delete(mine);
-        mine.upgrade(true);
+        mine.upgrade();
 
         List<Player> players = new ArrayList<>();
 

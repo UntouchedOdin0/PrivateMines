@@ -35,7 +35,6 @@ import org.bukkit.WorldType;
 public class MineWorldManager {
 
   private final Location defaultLocation;
-  private Location currentLocation;
   private Location nextLocation;
   private final int borderDistance;
   private int distance = 0;
@@ -79,56 +78,25 @@ public class MineWorldManager {
       direction = NORTH;
     }
     if (sqlLocation == null) {
-      setCurrentLocation(direction.addTo(defaultLocation, distance * borderDistance));
+      sqlLocation = direction.addTo(defaultLocation, distance * borderDistance);
+      return sqlLocation;
     } else {
       if (nextLocation == null) {
         this.nextLocation = getDefaultLocation();
       }
 
       switch (direction) {
-        case NORTH -> {
-          nextLocation.subtract(0, 0, distance * borderDistance);
-          setCurrentLocation(nextLocation);
-        }
-        case EAST -> {
-          nextLocation.add(distance * borderDistance, 0, 0);
-          setCurrentLocation(nextLocation);
-        }
-        case SOUTH -> {
-          nextLocation.add(0, 0, distance * borderDistance);
-          setCurrentLocation(nextLocation);
-        }
-        case WEST -> {
-          nextLocation.subtract(distance * borderDistance, 0, 0);
-          setCurrentLocation(nextLocation);
-        }
+        case NORTH -> nextLocation.subtract(0, 0, distance * borderDistance);
+        case EAST -> nextLocation.add(distance * borderDistance, 0, 0);
+        case SOUTH -> nextLocation.add(0, 0, distance * borderDistance);
+        case WEST -> nextLocation.subtract(distance * borderDistance, 0, 0);
       }
-//      this.nextLocation = direction.addTo(sqlLocation, distance * borderDistance);
     }
-
-//    direction = direction.next();
-//    if (direction == NORTH) {
-//      distance++;
-//    }
-//    switch (direction) {
-//      case NORTH -> nextLocation.subtract(0, 0, distance);
-//      case EAST -> nextLocation.add(distance, 0, 0);
-//      case SOUTH -> nextLocation.add(0, 0, distance);
-//      case WEST -> nextLocation.subtract(distance, 0, 0);
-//    }
     return nextLocation;
   }
 
   public World getMinesWorld() {
     return minesWorld;
-  }
-
-  public Location getCurrentLocation() {
-    return currentLocation;
-  }
-
-  public void setCurrentLocation(Location currentLocation) {
-    this.currentLocation = currentLocation;
   }
 
   public Location getDefaultLocation() {
