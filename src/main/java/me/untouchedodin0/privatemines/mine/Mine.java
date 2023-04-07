@@ -52,8 +52,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -73,7 +71,6 @@ import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -136,16 +133,6 @@ public class Mine {
       return;
     }
 
-    switch (Config.storageType) {
-      case YAML -> {
-        String fileName = String.format("/%s.yml", uuid);
-        File minesDirectory = privateMines.getMinesDirectory().toFile();
-        File file = new File(minesDirectory + fileName);
-        file.delete();
-      }
-      case SQLite -> SQLUtils.delete(this);
-    }
-
     MineData mineData = getMineData();
 
     Location corner1 = mineData.getMinimumFullRegion();
@@ -192,6 +179,7 @@ public class Mine {
     }
 
     privateMines.getMineStorage().removeMine(uuid);
+    SQLUtils.delete(this);
   }
 
   public void reset() {

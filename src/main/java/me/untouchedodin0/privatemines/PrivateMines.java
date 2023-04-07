@@ -159,11 +159,6 @@ public class PrivateMines extends JavaPlugin {
       }
     }
 
-    if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager")) {
-      slimeUtils = new SlimeUtils();
-      Task.asyncDelayed(() -> slimeUtils.setupSlimeWorld(UUID.randomUUID()));
-    }
-
     if (Bukkit.getPluginManager().isPluginEnabled("Oraxen")) {
       String oraxenVersion = Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Oraxen"))
           .getDescription().getVersion();
@@ -188,9 +183,7 @@ public class PrivateMines extends JavaPlugin {
     }
 
     try {
-      Files.createDirectories(minesDirectory);
       Files.createDirectories(schematicsDirectory);
-      Files.createDirectories(pregenMines);
       Files.createDirectories(addonsDirectory);
     } catch (IOException e) {
       e.printStackTrace();
@@ -295,7 +288,6 @@ public class PrivateMines extends JavaPlugin {
     File file = new File(getDataFolder() + "/addons/PrivateMinesAddon2-1.0-SNAPSHOT.jar");
     File directory = new File(getDataFolder() + "/addons/");
 
-//    AddonAPI.load(Test.class);
     loadAddons();
     Instant end = Instant.now();
     Duration loadTime = Duration.between(start, end);

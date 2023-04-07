@@ -74,12 +74,11 @@ public class PrivateMinesExpansion extends PlaceholderExpansion {
         case "size":
           if (mine != null) {
             MineData mineData = mine.getMineData();
-            Location minimum = mineData.getMinimumMining();
-            Location maximum = mineData.getMaximumMining();
-            double distance = maximum.distance(minimum);
-            int distanceInt = (int) distance;
+            int minimum = mineData.getMinimumMining().getBlockZ();
+            int maximum = mineData.getMaximumMining().getBlockZ();
+            int distance = maximum - minimum;
 
-            return Integer.toString(distanceInt);
+            return Integer.toString(distance);
           }
         case "owner":
           Mine closest = mineStorage.getClosest(location);

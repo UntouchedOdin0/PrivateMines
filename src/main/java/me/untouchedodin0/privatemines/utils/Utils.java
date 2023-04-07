@@ -138,34 +138,4 @@ public class Utils {
     stringBuilder.append("}");
     return stringBuilder.toString();
   }
-
-  public static Collection<Chunk> around(Chunk origin, int radius) {
-    World world = origin.getWorld();
-
-    int length = (radius * 2) + 1;
-    Set<Chunk> chunks = new HashSet<>(length * length);
-
-    int cX = origin.getX();
-    int cZ = origin.getZ();
-
-    for (int x = -radius; x <= radius; x++) {
-      for (int z = -radius; z <= radius; z++) {
-        chunks.add(world.getChunkAt(cX + x, cZ + z));
-      }
-    }
-    return chunks;
-  }
-
-  public static int[] parseVersion(String version) {
-    Matcher matcher = VERSION_REGEX.matcher(version);
-    if (!matcher.matches()) {
-      throw new IllegalArgumentException("invalid version string: \"" + version + "\"");
-    }
-    String revision = matcher.group(4);
-    return new int[] {
-        Integer.parseInt(matcher.group(1)), // major version number
-        Integer.parseInt(matcher.group(2)), // minor version number
-        Integer.parseInt(revision)          // revision version number
-    };
-  }
 }

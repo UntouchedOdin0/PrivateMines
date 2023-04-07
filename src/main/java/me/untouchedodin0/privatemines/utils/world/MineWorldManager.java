@@ -111,10 +111,6 @@ public class MineWorldManager {
     return minesWorld;
   }
 
-  public Location getCurrentLocation() {
-    return currentLocation;
-  }
-
   public void setCurrentLocation(Location currentLocation) {
     this.currentLocation = currentLocation;
   }
