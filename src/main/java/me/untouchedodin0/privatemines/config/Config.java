@@ -43,8 +43,6 @@ public class Config {
     public static int mineDistance = 150;
     @Comment("The height of where the private mines are pasted")
     public static int mineYLevel = 50;
-    @Comment("The delay until a player is teleported to the private mine")
-    public static int teleportDelay = 5;
     @Comment("Should there be a gap between the wall and the mine?")
     public static boolean addWallGap = true;
     @Comment("The gap between the walls and the mine")
@@ -53,12 +51,8 @@ public class Config {
     public static boolean shouldWallsGoUp = false;
     @Comment("Should we give players a mine when they first join?")
     public static boolean giveMineOnFirstJoin = false;
-    @Comment("Used for giving mines before the server has released")
-    public static boolean preLoginGiveMine = false;
     @Comment("Should we upgrade the mine upon reaching the outside border?")
     public static boolean borderUpgrade = true;
-    @Comment("Should the menu be enabled?")
-    public static boolean enableMenu = true;
     @Comment("Should the tax feature be enabled?")
     public static boolean enableTax = true;
     @Comment("Should we send tax messages to the owner of the mine?")

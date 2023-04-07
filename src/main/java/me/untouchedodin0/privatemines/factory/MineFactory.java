@@ -54,7 +54,6 @@ public class MineFactory {
 
   PrivateMines privateMines = PrivateMines.getPrivateMines();
   MineStorage mineStorage = privateMines.getMineStorage();
-  EditSession editSession;
 
   /**
    * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
@@ -80,7 +79,6 @@ public class MineFactory {
       return;
     }
 
-    Shop shop = new ShopBuilder().setOwner(uuid).setPrices(prices).build();
     String mineRegionName = String.format("mine-%s", player.getUniqueId());
     String fullRegionName = String.format("full-mine-%s", player.getUniqueId());
 
@@ -141,7 +139,6 @@ public class MineFactory {
       return null;
     }
 
-    Shop shop = new ShopBuilder().setOwner(uuid).setPrices(prices).build();
     String mineRegionName = String.format("mine-%s", player.getUniqueId());
     String fullRegionName = String.format("full-mine-%s", player.getUniqueId());
 

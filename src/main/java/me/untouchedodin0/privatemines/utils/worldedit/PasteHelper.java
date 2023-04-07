@@ -31,24 +31,12 @@ public class PasteHelper {
     this.spawn = spawn;
   }
 
-  public Location getSpawn() {
-    return spawn.add(0, 0, 1);
-  }
-
   public void setCorner1(Location corner1) {
     this.corner1 = corner1;
   }
 
-  public Location getCorner1() {
-    return corner1;
-  }
-
   public void setCorner2(Location corner2) {
     this.corner2 = corner2;
-  }
-
-  public Location getCorner2() {
-    return corner2;
   }
 
   public void setMinimum(Location minimum) {

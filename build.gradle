@@ -99,7 +99,7 @@ bukkit {
     softDepend = ['AutoSell', 'UltraPrisonCore', 'ProtocolLib', 'PlaceholderAPI', 'Oraxen', 'ItemsAdder']
 }
 
-task copyTo_DevServer(type: Copy) {
+tasks.register('copyTo_DevServer', Copy) {
     from shadowJar
     into "E:/Coding/Spigot Test Servers/1.19.2 Privates Mines (Paper)/plugins"
 }

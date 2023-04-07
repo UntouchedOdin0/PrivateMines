@@ -22,7 +22,6 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.PaperCommandManager;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
@@ -37,9 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
@@ -71,7 +67,6 @@ import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
 import me.untouchedodin0.privatemines.utils.addon.old.AddonsManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
-import me.untouchedodin0.privatemines.utils.slime.SlimeUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
@@ -80,7 +75,6 @@ import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -110,15 +104,11 @@ public class PrivateMines extends JavaPlugin {
   private MineTypeManager mineTypeManager;
   private ConfigManager configManager;
   private AddonsManager addonsManager;
-  private SlimeUtils slimeUtils;
   private QueueUtils queueUtils;
   private static Economy econ = null;
   private SQLHelper sqlHelper;
   private Map<String, SQLCache> caches;
   private BukkitAudiences adventure;
-  private Gson gson;
-  String matString;
-  double percent;
 
   public static PrivateMines getPrivateMines() {
     return privateMines;
@@ -145,7 +135,6 @@ public class PrivateMines extends JavaPlugin {
     GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
     gsonBuilder.registerTypeAdapter(Path.class, new PathAdapter());
-    this.gson = gsonBuilder.create();
 
     if (Config.enableTax) {
       registerSellListener();
@@ -285,9 +274,6 @@ public class PrivateMines extends JavaPlugin {
     metrics.addCustomChart(new SingleLineChart("mines", () -> mineStorage.getTotalMines()));
 
     new UpdateChecker(this).fetch();
-
-    File file = new File(getDataFolder() + "/addons/PrivateMinesAddon2-1.0-SNAPSHOT.jar");
-    File directory = new File(getDataFolder() + "/addons/");
 
     loadAddons();
     Instant end = Instant.now();
@@ -444,18 +430,6 @@ public class PrivateMines extends JavaPlugin {
 
   public MineWorldManager getMineWorldManager() {
     return mineWorldManager;
-  }
-
-  public Path getMinesDirectory() {
-    return minesDirectory;
-  }
-
-  public Path getPregenMines() {
-    return pregenMines;
-  }
-
-  public ConfigManager getConfigManager() {
-    return configManager;
   }
 
   public MineTypeManager getMineTypeManager() {

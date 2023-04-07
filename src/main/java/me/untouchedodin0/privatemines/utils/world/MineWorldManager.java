@@ -86,18 +86,10 @@ public class MineWorldManager {
       }
 
       switch (direction) {
-        case NORTH -> {
-          nextLocation.subtract(0, 0, distance * borderDistance);
-        }
-        case EAST -> {
-          nextLocation.add(distance * borderDistance, 0, 0);
-        }
-        case SOUTH -> {
-          nextLocation.add(0, 0, distance * borderDistance);
-        }
-        case WEST -> {
-          nextLocation.subtract(distance * borderDistance, 0, 0);
-        }
+        case NORTH -> nextLocation.subtract(0, 0, distance * borderDistance);
+        case EAST -> nextLocation.add(distance * borderDistance, 0, 0);
+        case SOUTH -> nextLocation.add(0, 0, distance * borderDistance);
+        case WEST -> nextLocation.subtract(distance * borderDistance, 0, 0);
       }
     }
     return nextLocation;
