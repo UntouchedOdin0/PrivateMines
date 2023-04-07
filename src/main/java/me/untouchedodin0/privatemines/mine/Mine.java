@@ -546,7 +546,7 @@ public class Mine {
             + "'s mine!");
     mineData.getBannedPlayers().add(player.getUniqueId());
     setMineData(mineData);
-    saveMineData(Objects.requireNonNull(owner), mineData);
+    SQLUtils.update(this);
   }
 
   public void unban(Player player) {
@@ -556,7 +556,7 @@ public class Mine {
             + "'s mine!");
     mineData.getBannedPlayers().remove(player.getUniqueId());
     setMineData(mineData);
-    saveMineData(Objects.requireNonNull(owner), mineData);
+    SQLUtils.update(this);
   }
 
   public boolean canExpand(final int amount) {
@@ -666,84 +666,7 @@ public class Mine {
     this.canExpand = true;
   }
 
-  public void saveMineData(Player player, MineData mineData) {
-    String uuidString = String.valueOf(player.getUniqueId());
-    String fileName = String.format("/%s.yml", uuidString);
-
-    File minesDirectory = privateMines.getMinesDirectory().toFile();
-    File file = new File(minesDirectory + fileName);
-    privateMines.getLogger().info("Saving file " + file.getName() + "...");
-    YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
-
-    MineType mineType = mineData.getMineType();
-    String mineTypeName = mineType.getName();
-
-    UUID owner = player.getUniqueId();
-    Location mineLocation = mineData.getMineLocation();
-    Location corner1 = mineData.getMinimumMining();
-    Location corner2 = mineData.getMaximumMining();
-    Location fullRegionMin = mineData.getMinimumFullRegion();
-    Location fullRegionMax = mineData.getMaximumFullRegion();
-
-    Location spawn = mineData.getSpawnLocation();
-    double tax = mineData.getTax();
-    boolean open = mineData.isOpen();
-    int maxPlayers = mineData.getMaxPlayers();
-    int maxMineSize = mineData.getMaxMineSize();
-    Map<Material, Double> materials = mineData.getMaterials();
-
-    if (!file.exists()) {
-      try {
-        boolean createdNewFile = file.createNewFile();
-        if (createdNewFile) {
-          privateMines.getLogger().info("Created new file " + file.getName());
-        }
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-      yml.set("mineOwner", owner.toString());
-      yml.set("mineType", mineTypeName);
-      yml.set("mineLocation", LocationUtils.toString(mineLocation));
-      yml.set("corner1", LocationUtils.toString(corner1));
-      yml.set("corner2", LocationUtils.toString(corner2));
-      yml.set("fullRegionMin", LocationUtils.toString(fullRegionMin));
-      yml.set("fullRegionMax", LocationUtils.toString(fullRegionMax));
-      yml.set("spawn", LocationUtils.toString(spawn));
-      yml.set("tax", tax);
-      yml.set("isOpen", open);
-      yml.set("maxPlayers", maxPlayers);
-      yml.set("maxMineSize", maxMineSize);
-
-      if (!materials.isEmpty()) {
-        yml.set("materials", materials.toString());
-      }
-
-      try {
-        yml.save(file);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    } else {
-      yml.set("corner1", LocationUtils.toString(mineData.getMinimumMining()));
-      yml.set("corner2", LocationUtils.toString(mineData.getMaximumMining()));
-      yml.set("tax", tax);
-      yml.set("isOpen", open);
-      yml.set("maxPlayers", maxPlayers);
-      yml.set("maxMineSize", maxMineSize);
-//            yml.set("bannedPlayers", bannedPlayers);
-      if (!materials.isEmpty()) {
-        yml.set("materials", materials.toString());
-      }
-      try {
-        yml.save(file);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
-
   public void upgrade() {
-
     MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
     MineData mineData = getMineData();
     UUID mineOwner = mineData.getMineOwner();
@@ -831,7 +754,6 @@ public class Mine {
   }
 
   public void createWorldGuardRegions() {
-
     String mineRegionName = String.format("mine-%s", getMineData().getMineOwner());
     String fullRegionName = String.format("full-mine-%s", getMineData().getMineOwner());
     com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(

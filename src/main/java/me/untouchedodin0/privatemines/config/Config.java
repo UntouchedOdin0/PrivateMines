@@ -40,8 +40,6 @@ public class Config {
     public static Material upgradeMaterial = Material.OBSIDIAN;
     @Comment("The template material for quarries")
     public static Material quarryMaterial = Material.SHULKER_BOX;
-//    @Comment("Check for any spigot updates")
-//    public static boolean notifyForUpdates = true;
     @Comment("The distance between the private mines")
     public static int mineDistance = 150;
     @Comment("The height of where the private mines are pasted")
@@ -68,8 +66,6 @@ public class Config {
     public static boolean sendTaxMessages = true;
     @Comment("Should mines be closed by default?")
     public static boolean defaultClosed = true;
-    @Comment("Which storage system should we use?")
-    public static StorageType storageType = StorageType.YAML;
     @Comment("Should we have a reset cooldown?")
     public static boolean enableResetCooldown = true;
     @Comment("Specifies the cooldown for the /privatemines reset command")

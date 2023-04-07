@@ -63,6 +63,7 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.StorageType;
+import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
@@ -415,7 +416,7 @@ public class PrivateMines extends JavaPlugin {
     getMineStorage().getMines().forEach((uuid, mine) -> {
       Player player = Bukkit.getOfflinePlayer(uuid).getPlayer();
       if (player != null) {
-        mine.saveMineData(player, mine.getMineData());
+        SQLUtils.update(mine);
         mine.stopTasks();
       }
     });
