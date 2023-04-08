@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
@@ -279,10 +280,16 @@ public class PrivateMinesCommand extends BaseCommand {
       if (mine != null) {
         MineData mineData = mine.getMineData();
         if (mineData != null) {
-          if (mineData.isOpen()) {
-            mine.teleport(player);
+          List<UUID> banned = mineData.getBannedPlayers();
+
+          if (banned.contains(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You're banned from this mine!");
           } else {
-            player.sendMessage(ChatColor.RED + "Target mine closed!");
+            if (mineData.isOpen()) {
+              mine.teleport(player);
+            } else {
+              player.sendMessage(ChatColor.RED + "Target mine closed!");
+            }
           }
         }
       }
@@ -400,9 +407,7 @@ public class PrivateMinesCommand extends BaseCommand {
         mine.setMineData(mineData);
         mineStorage.replaceMineNoLog(target.getPlayer(), mine);
         mine.handleReset();
-        Task.asyncDelayed(() -> {
-          SQLUtils.update(mine);
-        });
+        Task.asyncDelayed(() -> SQLUtils.update(mine));
       }
     }
   }
