@@ -24,32 +24,19 @@ package me.untouchedodin0.privatemines.mine;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.Flags;
-import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
-import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import dev.lone.itemsadder.api.CustomBlock;
 import io.th0rgal.oraxen.api.OraxenBlocks;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -65,12 +52,12 @@ import me.untouchedodin0.privatemines.events.PrivateMineDeleteEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineExpandEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineResetEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineUpgradeEvent;
-import me.untouchedodin0.privatemines.iterator.SchematicIterator;
-import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import me.untouchedodin0.privatemines.utils.worldedit.PasteHelper;
+import me.untouchedodin0.privatemines.utils.worldedit.objects.PastedMine;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -489,8 +476,9 @@ public class Mine {
         }
       }, 0, 80);
     }
-    if (owner != null)
-        owner.sendMessage(ChatColor.GREEN + "You've reset your mine!");
+    if (owner != null) {
+      owner.sendMessage(ChatColor.GREEN + "You've reset your mine!");
+    }
   }
 
   public void stopTasks() {
@@ -517,13 +505,12 @@ public class Mine {
 
     long total = region.getVolume();
 
-   // Calculate the percetage of the region called "region" to then compare with how many blocks have been mined.
+    // Calculate the percetage of the region called "region" to then compare with how many blocks have been mined.
     airBlocks = 0;
     for (BlockVector3 vector : region) {
       Block block = Objects.requireNonNull(Bukkit.getWorld(
               Objects.requireNonNull(Objects.requireNonNull(getSpawnLocation()).getWorld()).getName()))
-          .getBlockAt(vector.getBlockX(),
-          vector.getBlockY(), vector.getBlockZ());
+          .getBlockAt(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
       if (block.getType().equals(Material.AIR)) {
         this.airBlocks++;
       }
@@ -674,6 +661,8 @@ public class Mine {
     Location mineLocation = mineData.getMineLocation();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + nextType.getFile());
     mineData.setMineType(nextType);
+    RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+    RegionManager regionManager = container.get(BukkitAdapter.adapt(mineLocation.getWorld()));
 
     PrivateMineUpgradeEvent privateMineUpgradeEvent = new PrivateMineUpgradeEvent(mineOwner, this,
         currentType, nextType);
@@ -682,150 +671,67 @@ public class Mine {
       return;
     }
     if (player != null) {
-      if (Objects.equals(currentType.getFile(), nextType.getFile())) {
-      } else {
-        Location fullMin = mineData.getMinimumFullRegion();
-        Location fullMax = mineData.getMaximumFullRegion();
-        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(fullMin.getWorld());
-        Region cuboidRegion = new CuboidRegion(BukkitAdapter.asBlockVector(fullMin),
-            BukkitAdapter.asBlockVector(fullMax));
+      if (!Objects.equals(currentType.getFile(), nextType.getFile())) {
+        String mineRegionName = String.format("mine-%s", player.getUniqueId());
+        String fullRegionName = String.format("full-mine-%s", player.getUniqueId());
+
+        Region cuboidRegion = new CuboidRegion(
+            BukkitAdapter.asBlockVector(mineData.getMinimumFullRegion()),
+            BukkitAdapter.asBlockVector(mineData.getMaximumFullRegion()));
         final RandomPattern randomPattern = new RandomPattern();
         Pattern pattern = BukkitAdapter.adapt(Material.AIR.createBlockData());
         randomPattern.add(pattern, 1.0);
-
-        ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
-        BlockVector3 vector = BlockVector3.at(mineLocation.getBlockX(), mineLocation.getBlockY(),
-            mineLocation.getBlockZ());
-        SchematicStorage storage = privateMines.getSchematicStorage();
-        SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
-
         Task.asyncDelayed(() -> {
-          if (clipboardFormat != null) {
-            try (ClipboardReader clipboardReader = clipboardFormat.getReader(
-                new FileInputStream(schematicFile))) {
-              EditSession editSession;
-              if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
-                editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world)
-                    .fastMode(true).build();
-              } else {
-                editSession = WorldEdit.getInstance().newEditSession(world);
-              }
-
-              Clipboard clipboard = clipboardReader.read();
-              ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
-              BlockVector3 lrailsV = vector.subtract(mineBlocks.getSpawnLocation())
-                  .add(mineBlocks.getCorner2().add(0, 0, 1));
-              BlockVector3 urailsV = vector.subtract(mineBlocks.getSpawnLocation())
-                  .add(mineBlocks.getCorner1().add(0, 0, 1));
-
-              Location spongeL = new Location(mineLocation.getWorld(), vector.getBlockX(),
-                  vector.getBlockY(), vector.getBlockZ() + 1);
-
-              Location lrailsL = new Location(mineLocation.getWorld(), lrailsV.getBlockX(),
-                  lrailsV.getBlockY(), lrailsV.getBlockZ());
-              Location urailsL = new Location(mineLocation.getWorld(), urailsV.getBlockX(),
-                  urailsV.getBlockY(), urailsV.getBlockZ());
-
-              editSession.setBlocks(cuboidRegion,
-                  BukkitAdapter.adapt(Material.AIR.createBlockData()));
-              Operation operation = clipboardHolder.createPaste(editSession).to(vector)
-                      .ignoreAirBlocks(true).build();
-              try {
-                Operations.complete(operation);
-              } finally {
-                editSession.flushQueue();
-                mineData.setSpawnLocation(spongeL);
-                mineData.setMinimumMining(lrailsL);
-                mineData.setMaximumMining(urailsL);
-                setMineData(mineData);
-                handleReset();
-                Task.syncDelayed(() -> spongeL.getBlock().setType(Material.AIR, false));
-              }
-            } catch (IOException e) {
-              throw new RuntimeException(e);
-            }
+          EditSession editSession;
+          if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
+            editSession = WorldEdit.getInstance().newEditSessionBuilder()
+                .world(BukkitAdapter.adapt(mineLocation.getWorld())).fastMode(true).build();
+          } else {
+            editSession = WorldEdit.getInstance()
+                .newEditSession(BukkitAdapter.adapt(mineLocation.getWorld()));
           }
+          editSession.setBlocks(cuboidRegion, randomPattern);
+
+          PasteHelper pasteHelper = new PasteHelper();
+          PastedMine pastedMine = pasteHelper.paste(schematicFile, mineLocation);
+
+          Location spawn = mineLocation.clone().add(0, 0, 1);
+          Location corner1 = pastedMine.getLowerRailsLocation();
+          Location corner2 = pastedMine.getUpperRailsLocation();
+          Location minimum = pasteHelper.getMinimum();
+          Location maximum = pasteHelper.getMaximum();
+          BlockVector3 miningRegionMin = BukkitAdapter.asBlockVector(corner1);
+          BlockVector3 miningRegionMax = BukkitAdapter.asBlockVector(corner2);
+          BlockVector3 fullRegionMin = BukkitAdapter.asBlockVector(minimum);
+          BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(maximum);
+
+          ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName,
+              miningRegionMin, miningRegionMax);
+          ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName,
+              fullRegionMin, fullRegionMax);
+
+          if (regionManager != null) {
+            regionManager.removeRegion(fullRegionName);
+            regionManager.removeRegion(mineRegionName);
+            regionManager.addRegion(miningRegion);
+            regionManager.addRegion(fullRegion);
+          }
+
+          mineData.setSpawnLocation(spawn);
+          mineData.setMinimumMining(corner1);
+          mineData.setMaximumMining(corner2);
+          mineData.setMinimumFullRegion(minimum);
+          mineData.setMaximumFullRegion(maximum);
+          setMineData(mineData);
+          handleReset();
+
+          Task.asyncDelayed(() -> {
+            SQLUtils.update(this);
+          });
+          Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
         });
-        SQLUtils.updateCache(this);
       }
     }
-  }
-
-  public void createWorldGuardRegions() {
-    String mineRegionName = String.format("mine-%s", getMineData().getMineOwner());
-    String fullRegionName = String.format("full-mine-%s", getMineData().getMineOwner());
-    com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(
-        Objects.requireNonNull(getMineData().getMinimumMining().getWorld()));
-
-    MineType mineType = getMineData().getMineType();
-    Map<String, Boolean> flags = mineType.getFlags();
-    Map<String, Boolean> fullFlags = mineType.getFullFlags();
-
-    BlockVector3 minMining = BukkitAdapter.asBlockVector(getMineData().getMinimumMining());
-    BlockVector3 maxMining = BukkitAdapter.asBlockVector(getMineData().getMaximumMining());
-    BlockVector3 minFull = BukkitAdapter.asBlockVector(
-        getMineData().getMinimumFullRegion());
-    BlockVector3 maxFull = BukkitAdapter.asBlockVector(
-        getMineData().getMaximumFullRegion());
-
-    ProtectedCuboidRegion miningWorldGuardRegion = new ProtectedCuboidRegion(mineRegionName,
-        minMining, maxMining);
-    ProtectedCuboidRegion fullWorldGuardRegion = new ProtectedCuboidRegion(fullRegionName,
-        minFull, maxFull);
-    RegionContainer regionContainer = WorldGuard.getInstance().getPlatform()
-        .getRegionContainer();
-    RegionManager regionManager = regionContainer.get(world);
-
-    if (regionManager != null) {
-      regionManager.addRegion(miningWorldGuardRegion);
-      regionManager.addRegion(fullWorldGuardRegion);
-    }
-
-    /*
-     This sadly has to be called synchronously else it'll throw a
-     {@link java.lang.IllegalStateException}
-     This is due to how WorldGuard handles their flags...
-     @see com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent
-     */
-    Task.syncDelayed(() -> {
-      FlagRegistry flagRegistry = WorldGuard.getInstance().getFlagRegistry();
-
-      if (flags != null) {
-        flags.forEach((s, aBoolean) -> {
-          Flag<?> flag = Flags.fuzzyMatchFlag(flagRegistry, s);
-          if (aBoolean) {
-            try {
-              Utils.setFlag(miningWorldGuardRegion, flag, "allow");
-            } catch (InvalidFlagFormat e) {
-              e.printStackTrace();
-            }
-          } else {
-            try {
-              Utils.setFlag(miningWorldGuardRegion, flag, "deny");
-            } catch (InvalidFlagFormat e) {
-              e.printStackTrace();
-            }
-          }
-        });
-      }
-      if (fullFlags != null) {
-        fullFlags.forEach((string, aBoolean) -> {
-          Flag<?> flag = Flags.fuzzyMatchFlag(flagRegistry, string);
-          if (aBoolean) {
-            try {
-              Utils.setFlag(fullWorldGuardRegion, flag, "allow");
-            } catch (InvalidFlagFormat e) {
-              e.printStackTrace();
-            }
-          } else {
-            try {
-              Utils.setFlag(fullWorldGuardRegion, flag, "deny");
-            } catch (InvalidFlagFormat e) {
-              throw new RuntimeException(e);
-            }
-          }
-        });
-      }
-    });
   }
 }
+

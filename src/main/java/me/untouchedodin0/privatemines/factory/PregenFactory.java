@@ -55,7 +55,6 @@ public class PregenFactory {
 
     task = Task.asyncRepeating(() -> {
       PregenMine pregenMine = new PregenMine();
-      Bukkit.broadcastMessage("" + atomicInteger.getAndIncrement());
       ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
       BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(),
           location.getBlockZ());

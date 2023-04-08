@@ -120,7 +120,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("upgrade")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.upgrade")
-  public void upgrade(CommandSender sender) {
+  public void upgrade(CommandSender sender, int times) {
     if (!(sender instanceof Player player)) {
       sender.sendMessage(ChatColor.RED + "Only players can use this command!");
     } else {
@@ -137,8 +137,13 @@ public class PrivateMinesCommand extends BaseCommand {
 
           if (bal >= cost) {
             // player has enough money, upgrade the mine
-            mine.upgrade();
-            mine.handleReset();
+
+            for (int i = 0; i < times; i++) {
+              mine.upgrade();
+              mine.handleReset();
+            }
+//            mine.upgrade();
+//            mine.handleReset();
           } else {
             // player does not have enough money
             player.sendMessage(ChatColor.RED + String.format(
@@ -340,6 +345,7 @@ public class PrivateMinesCommand extends BaseCommand {
     if (mine != null) {
       mine.ban(target);
       mineStorage.replaceMineNoLog(player, mine);
+      SQLUtils.replace(mine);
     }
   }
 
@@ -351,6 +357,7 @@ public class PrivateMinesCommand extends BaseCommand {
     if (mine != null) {
       mine.unban(target);
       mineStorage.replaceMineNoLog(player, mine);
+      SQLUtils.replace(mine);
     }
   }
 
@@ -364,19 +371,9 @@ public class PrivateMinesCommand extends BaseCommand {
       mineData.setTax(tax);
       mine.setMineData(mineData);
       mineStorage.replaceMineNoLog(player, mine);
+      SQLUtils.update(mine);
     }
   }
-
-//  @Subcommand("claim")
-//  @CommandPermission("privatemines.claim")
-//  public void claim(Player player) {
-//    QueueUtils queueUtils = privateMines.getQueueUtils();
-//    if (queueUtils.isInQueue(player.getUniqueId())) {
-//      player.sendMessage(ChatColor.RED + "You're already in the queue!");
-//      return;
-//    }
-//    queueUtils.claim(player);
-//  }
 
   @Subcommand("setblocks")
   @CommandCompletion("@players")
