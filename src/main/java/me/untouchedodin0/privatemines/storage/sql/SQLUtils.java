@@ -99,12 +99,20 @@ public class SQLUtils {
     Location maxMining = mineData.getMaximumMining();
     Location fullRegionMin = mineData.getMinimumFullRegion();
     Location fullRegionMax = mineData.getMaximumFullRegion();
+    boolean isOpen = mineData.isOpen();
+    int open;
+
+    if (!isOpen) {
+      open = 0;
+    } else {
+      open = 1;
+    }
 
     SQLHelper sqlHelper = privateMines.getSqlHelper();
     String command = String.format(
-        "UPDATE privatemines SET mineType = '%s', corner1 = '%s', corner2 = '%s', fullRegionMin = '%s', fullRegionMax = '%s' WHERE owner = '%s';",
+        "UPDATE privatemines SET mineType = '%s', corner1 = '%s', corner2 = '%s', fullRegionMin = '%s', fullRegionMax = '%s', isOpen = '%d' WHERE owner = '%s';",
         mineType.getName(), LocationUtils.toString(minMining), LocationUtils.toString(maxMining),
-        LocationUtils.toString(fullRegionMin), LocationUtils.toString(fullRegionMax), owner);
+        LocationUtils.toString(fullRegionMin), LocationUtils.toString(fullRegionMax), open, owner);
     sqlHelper.executeUpdate(command);
   }
 
