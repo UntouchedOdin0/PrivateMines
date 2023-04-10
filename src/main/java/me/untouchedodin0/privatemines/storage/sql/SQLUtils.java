@@ -55,7 +55,8 @@ public class SQLUtils {
         LocationUtils.toString(mineData.getMinimumFullRegion()),
         LocationUtils.toString(mineData.getMaximumFullRegion()),
         LocationUtils.toString(mine.getSpawnLocation()), mineData.getTax(), mineData.isOpen(),
-        mineData.getMaxPlayers(), mineData.getMaxMineSize(), "{SPONGE=1.0, STONE=1.0, DIRT=1.0}");
+        mineData.getMaxPlayers(), mineData.getMaxMineSize(), Utils.mapToString(
+            Objects.requireNonNull(mineType.getMaterials())));
     sqlHelper.executeUpdate(insertQuery);
   }
 
