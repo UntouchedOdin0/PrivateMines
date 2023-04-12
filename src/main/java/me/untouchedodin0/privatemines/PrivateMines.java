@@ -377,57 +377,11 @@ public class PrivateMines extends JavaPlugin {
         getLogger().info("jar path " + jar);
         File file = jar.toFile();
         try {
-          FileUtil.findClass(file, Addon.class);
+          Class<? extends Addon> clazz = FileUtil.findClass(file, Addon.class);
+          FileUtil.register(clazz);
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
-//        try {
-//          URL jarUrl = file.toURI().toURL();
-//          String jarPath = jarUrl.getPath();
-//
-//          URLClassLoader classLoader = new URLClassLoader(new URL[]{jarUrl});
-//          URL[] urls = classLoader.getURLs();
-//          try {
-//            Class<?> myClass = classLoader.loadClass("me.untouchedodin0.addon.TestAddon");
-//            getLogger().info("my class " + myClass);
-//          } catch (ClassNotFoundException e) {
-//            throw new RuntimeException(e);
-//          }
-//
-//
-////          getLogger().info("urls " + urls);
-//
-////          for (URL url : urls) {
-////            System.out.println("url " + url.toString());
-////          }
-//
-////          Class<?> clazz = classLoader.loadClass("me.untouchedodin0.addon.TestAddon");
-////          getLogger().info("jarUrl " + jarUrl);
-////          getLogger().info("classLoader " + classLoader);
-////          getLogger().info("clazz " + clazz);
-//        } catch (MalformedURLException e) {
-//          throw new RuntimeException(e);
-//        }
-
-//        AddonsManager.loadAddon(jar.toFile());
-
-//        try {
-//          AddonLoader.loadPlugin(jar.toFile());
-////          AddonLoader.loadAddonProperties(file);
-//        } catch (IOException e) {
-//          throw new RuntimeException(e);
-//        } catch (ClassNotFoundException e) {
-//          throw new RuntimeException(e);
-//        } catch (InvocationTargetException e) {
-//          throw new RuntimeException(e);
-//        } catch (InstantiationException e) {
-//          throw new RuntimeException(e);
-//        } catch (IllegalAccessException e) {
-//          throw new RuntimeException(e);
-//        } catch (NoSuchMethodException e) {
-//          throw new RuntimeException(e);
-//        }
-//        AddonAPI.load(jar);
       });
     } catch (IOException e) {
       throw new RuntimeException(e);
