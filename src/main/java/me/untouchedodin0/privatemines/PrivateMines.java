@@ -25,6 +25,9 @@ import co.aikar.commands.PaperCommandManager;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -65,6 +68,8 @@ import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
+import me.untouchedodin0.privatemines.utils.addon.Addon;
+import me.untouchedodin0.privatemines.utils.addon.FileUtil;
 import me.untouchedodin0.privatemines.utils.addon.old.AddonsManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -370,6 +375,40 @@ public class PrivateMines extends JavaPlugin {
     try (Stream<Path> paths = Files.walk(addonsDirectory).filter(jarMatcher::matches)) {
       paths.forEach(jar -> {
         getLogger().info("jar path " + jar);
+        File file = jar.toFile();
+        try {
+          FileUtil.findClass(file, Addon.class);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+//        try {
+//          URL jarUrl = file.toURI().toURL();
+//          String jarPath = jarUrl.getPath();
+//
+//          URLClassLoader classLoader = new URLClassLoader(new URL[]{jarUrl});
+//          URL[] urls = classLoader.getURLs();
+//          try {
+//            Class<?> myClass = classLoader.loadClass("me.untouchedodin0.addon.TestAddon");
+//            getLogger().info("my class " + myClass);
+//          } catch (ClassNotFoundException e) {
+//            throw new RuntimeException(e);
+//          }
+//
+//
+////          getLogger().info("urls " + urls);
+//
+////          for (URL url : urls) {
+////            System.out.println("url " + url.toString());
+////          }
+//
+////          Class<?> clazz = classLoader.loadClass("me.untouchedodin0.addon.TestAddon");
+////          getLogger().info("jarUrl " + jarUrl);
+////          getLogger().info("classLoader " + classLoader);
+////          getLogger().info("clazz " + clazz);
+//        } catch (MalformedURLException e) {
+//          throw new RuntimeException(e);
+//        }
+
 //        AddonsManager.loadAddon(jar.toFile());
 
 //        try {

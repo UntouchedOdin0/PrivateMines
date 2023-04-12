@@ -17,10 +17,10 @@ import me.untouchedodin0.privatemines.PrivateMines;
  */
 public class AddonClassLoader extends URLClassLoader {
   private final Map<String, Class<?>> classes = new HashMap<>();
-  private final Addon addon;
+  private final Addon3 addon;
   private final AddonsManager loader;
   Class<?> javaClass;
-  Class<? extends Addon> addonClass;
+  Class<? extends Addon3> addonClass;
 
   /**
    * For testing only
@@ -29,7 +29,7 @@ public class AddonClassLoader extends URLClassLoader {
    * @param jarFile Jar File
    * @throws MalformedURLException exception
    */
-  protected AddonClassLoader(Addon addon, AddonsManager loader, File jarFile) throws MalformedURLException {
+  protected AddonClassLoader(Addon3 addon, AddonsManager loader, File jarFile) throws MalformedURLException {
     super(new URL[]{jarFile.toURL()});
     this.addon = addon;
     this.loader = loader;
@@ -58,7 +58,7 @@ public class AddonClassLoader extends URLClassLoader {
     }
 
     try {
-      addonClass = javaClass.asSubclass(Addon.class);
+      addonClass = javaClass.asSubclass(Addon3.class);
     } catch (ClassCastException e) {
 
     }
@@ -110,7 +110,7 @@ public class AddonClassLoader extends URLClassLoader {
   /**
    * @return the addon
    */
-  public Addon getAddon() {
+  public Addon3 getAddon() {
     return addon;
   }
 

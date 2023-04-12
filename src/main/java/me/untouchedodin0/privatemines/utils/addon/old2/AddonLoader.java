@@ -1,4 +1,4 @@
-package me.untouchedodin0.privatemines.utils.addon;
+package me.untouchedodin0.privatemines.utils.addon.old2;
 
 import java.io.File;
 import java.io.IOException;

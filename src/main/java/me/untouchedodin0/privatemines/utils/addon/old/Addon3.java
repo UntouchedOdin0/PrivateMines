@@ -1,6 +1,6 @@
 package me.untouchedodin0.privatemines.utils.addon.old;
 
-public abstract class Addon {
+public abstract class Addon3 {
 
   /**
    * Executes code when enabling the addon.
