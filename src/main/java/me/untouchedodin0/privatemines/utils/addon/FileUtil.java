@@ -72,6 +72,7 @@ public class FileUtil {
       return clazz.getDeclaredConstructor().newInstance();
     } catch (Exception exception) {
       Bukkit.getLogger().info("Error loading expansion.");
+      exception.printStackTrace();
       return null;
     }
   }
@@ -79,6 +80,7 @@ public class FileUtil {
   public static Optional<Addon> register(final Class<? extends Addon> clazz) {
     try {
       {
+        Bukkit.getLogger().info("clazz " + clazz);
         final Addon addon = createInstance(clazz);
 
         if (addon == null) {

@@ -38,7 +38,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
@@ -69,12 +71,14 @@ import me.untouchedodin0.privatemines.utils.UpdateChecker;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
 import me.untouchedodin0.privatemines.utils.addon.Addon;
+import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.addon.FileUtil;
 import me.untouchedodin0.privatemines.utils.addon.old.AddonsManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
+import net.royawesome.jlibnoise.module.combiner.Add;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
@@ -83,6 +87,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
@@ -371,16 +376,20 @@ public class PrivateMines extends JavaPlugin {
   public void loadAddons() {
     final PathMatcher jarMatcher = FileSystems.getDefault()
         .getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
+    AddonManager addonManager = new AddonManager();
 
     try (Stream<Path> paths = Files.walk(addonsDirectory).filter(jarMatcher::matches)) {
       paths.forEach(jar -> {
         getLogger().info("jar path " + jar);
         File file = jar.toFile();
-        try {
-          Class<? extends Addon> clazz = FileUtil.findClass(file, Addon.class);
-          FileUtil.register(clazz);
-        } catch (IOException e) {
-          throw new RuntimeException(e);
+        CompletableFuture<@Nullable Class<? extends Addon>> addon = addonManager.findExpansionInFile(file);
+        getLogger().info("addon " + addon);
+        Optional<Addon> loaded =  addonManager.register(addon);
+        getLogger().info("loaded " + loaded);
+
+        if (loaded.isPresent()) {
+          Addon addonLoaded = loaded.get();
+          addonLoaded.onEnable();
         }
       });
     } catch (IOException e) {

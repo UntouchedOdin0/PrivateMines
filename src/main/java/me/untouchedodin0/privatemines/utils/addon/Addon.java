@@ -1,8 +1,8 @@
 package me.untouchedodin0.privatemines.utils.addon;
 
-public interface Addon {
+public abstract class Addon {
 
-  void onEnable();
+  public abstract void onEnable();
 
   public abstract String getName();
   public abstract String getAuthor();
