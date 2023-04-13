@@ -1,7 +1,6 @@
 package me.untouchedodin0.privatemines.utils.addon;
 
 import java.io.File;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -44,24 +43,6 @@ public class AddonManager {
       if(expansion == null){
         return Optional.empty();
       }
-
-//      Objects.requireNonNull(expansion.getAuthor(), "The expansion author is null!");
-//      Objects.requireNonNull(expansion.getIdentifier(), "The expansion identifier is null!");
-//      Objects.requireNonNull(expansion.getVersion(), "The expansion version is null!");
-
-//      if (expansion.getRequiredPlugin() != null && !expansion.getRequiredPlugin().isEmpty()) {
-//        if (!Bukkit.getPluginManager().isPluginEnabled(expansion.getRequiredPlugin())) {
-//          Msg.warn("Cannot load expansion %s due to a missing plugin: %s", expansion.getIdentifier(),
-//              expansion.getRequiredPlugin());
-//          return Optional.empty();
-//        }
-//      }
-
-//      if (!expansion.register()) {
-//        Msg.warn("Cannot load expansion %s due to an unknown issue.", expansion.getIdentifier());
-//        return Optional.empty();
-//      }
-
       return Optional.of(expansion);
     } catch (LinkageError | NullPointerException ex) {
       final String reason;
