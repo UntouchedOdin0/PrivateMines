@@ -1,6 +1,8 @@
 package me.untouchedodin0.privatemines.utils.addon;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -11,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class AddonManager {
+
+  public static Map<String, Addon> addons = new HashMap<>();
 
   @NotNull
   public CompletableFuture<@Nullable Class<? extends Addon>> findExpansionInFile(
@@ -43,6 +47,7 @@ public class AddonManager {
       if(expansion == null){
         return Optional.empty();
       }
+      addons.put(expansion.getName(), expansion);
       return Optional.of(expansion);
     } catch (LinkageError | NullPointerException ex) {
       final String reason;
@@ -75,5 +80,9 @@ public class AddonManager {
       Msg.warn("There was an issue with loading an expansion.");
       return null;
     }
+  }
+
+  public static Map<String, Addon> getAddons() {
+    return addons;
   }
 }

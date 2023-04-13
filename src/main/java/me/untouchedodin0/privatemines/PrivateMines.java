@@ -25,9 +25,6 @@ import co.aikar.commands.PaperCommandManager;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -72,13 +69,10 @@ import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
 import me.untouchedodin0.privatemines.utils.addon.Addon;
 import me.untouchedodin0.privatemines.utils.addon.AddonManager;
-import me.untouchedodin0.privatemines.utils.addon.FileUtil;
-import me.untouchedodin0.privatemines.utils.addon.old.AddonsManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
-import net.royawesome.jlibnoise.module.combiner.Add;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
@@ -110,7 +104,6 @@ public class PrivateMines extends JavaPlugin {
   private PregenStorage pregenStorage;
   private MineWorldManager mineWorldManager;
   private MineTypeManager mineTypeManager;
-  private AddonsManager addonsManager;
   private QueueUtils queueUtils;
   private static Economy econ = null;
   private SQLHelper sqlHelper;
@@ -137,7 +130,6 @@ public class PrivateMines extends JavaPlugin {
     this.pregenStorage = new PregenStorage();
     this.mineTypeManager = new MineTypeManager(this);
     this.queueUtils = new QueueUtils();
-    this.addonsManager = new AddonsManager();
 
     GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
@@ -473,9 +465,5 @@ public class PrivateMines extends JavaPlugin {
 
   public QueueUtils getQueueUtils() {
     return queueUtils;
-  }
-
-  public AddonsManager getAddonsManager() {
-    return addonsManager;
   }
 }
