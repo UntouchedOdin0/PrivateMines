@@ -10,21 +10,22 @@ import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TextComponent.Builder;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
 @CommandAlias("addons")
 public class AddonsCommand extends BaseCommand {
+
   PrivateMines privateMines = PrivateMines.getPrivateMines();
   Component component;
 
   @Default
   public void send(Player player) {
     MiniMessage miniMessage = MiniMessage.miniMessage();
-    Component two = miniMessage.deserialize("<yellow>Test");
-    Component comma = miniMessage.deserialize(", ");
     this.component = miniMessage.deserialize("<green>Addons: ");
-    Component singularAddon;
     BukkitAudiences bukkitAudiences = privateMines.getAdventure();
     Audience audience = bukkitAudiences.player(player);
 
@@ -36,21 +37,23 @@ public class AddonsCommand extends BaseCommand {
     } else {
 
       if (addons.size() < 2) {
-        Addon addon = addons.values().stream().findFirst().get();
-        Component singular = miniMessage.deserialize("<green>Addons: ");
-        Component test = miniMessage.deserialize(String.format("<hover:show_text:'<red>%s\n"
-            + "v%s'><yellow>%s", addon, addon.getVersion(), addon.getName()));
-        singularAddon = singular.append(test);
-        audience.sendMessage(singularAddon);
-      } else {
-
-        addons.forEach((s, addon) -> {
-          Component addonComponent = miniMessage.deserialize(String.format("<hover:show_text:'<red>%s\n"
-              + "v%s'>", addon.getName(), addon.getVersion()));
-          component = component.append(addonComponent);
-          component = component.append(comma);
-        });
-        audience.sendMessage(component);
+        int count = 0;
+        Builder message = Component.text().content("List of addons: ");
+        for (Map.Entry<String, Addon> entry : addons.entrySet()) {
+          String name = entry.getKey();
+          Addon addon = entry.getValue();
+          TextComponent addonComponent = Component.text().content(name)
+              .hoverEvent(HoverEvent.showText(Component.text()
+                  .content("Name: " + addon.getName() + "\n")
+                  .append(Component.text("Version: " + addon.getVersion() + "\n"))
+                  .append(Component.text("Description: " + addon.getDescription()))))
+              .build();
+          message.append(addonComponent);
+          if (++count < addons.size()) {
+            message.append(Component.text(", "));
+          }
+        }
+        audience.sendMessage(message);
       }
     }
   }

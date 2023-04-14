@@ -7,8 +7,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
-import me.clip.placeholderapi.util.FileUtil;
-import me.clip.placeholderapi.util.Msg;
+import me.untouchedodin0.privatemines.PrivateMines;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,31 +19,35 @@ public class AddonManager {
   public CompletableFuture<@Nullable Class<? extends Addon>> findExpansionInFile(
       @NotNull final File file) {
     return CompletableFuture.supplyAsync(() -> {
+      final PrivateMines privateMines = PrivateMines.getPrivateMines();
+
       try {
         final Class<? extends Addon> expansionClass = FileUtil.findClass(file, Addon.class);
 
         if (expansionClass == null) {
-          Msg.severe("Failed to load expansion %s, as it does not have a class which"
-              + " extends Addon", file.getName());
+          privateMines.getLogger().warning(String.format("Failed to load addon %s, as it does not have a class which extends Addon",
+              file.getName()));
+          privateMines.getLogger().warning(String.format("Failed to load addon %s, as it does not have a class which extends Addon", file.getName()));
           return null;
         }
 
         return expansionClass;
       } catch (VerifyError | NoClassDefFoundError e) {
-        Msg.severe("Failed to load expansion %s (is a dependency missing?)", e, file.getName());
+        privateMines.getLogger().warning(
+            String.format("Failed to load addon %s (is a dependency missing?)", file.getName()));
         return null;
       } catch (Exception e) {
-        throw new CompletionException(e.getMessage() + " (expansion file: " + file.getAbsolutePath() + ")", e);
+        throw new CompletionException(
+            e.getMessage() + " (addon file: " + file.getAbsolutePath() + ")", e);
       }
     });
   }
 
-  public Optional<Addon> register(
-      final CompletableFuture<@Nullable Class<? extends Addon>> clazz) {
+  public Optional<Addon> register(final CompletableFuture<@Nullable Class<? extends Addon>> clazz) {
     try {
       final Addon expansion = createAddonInstance(clazz);
 
-      if(expansion == null){
+      if (expansion == null) {
         return Optional.empty();
       }
       addons.put(expansion.getName(), expansion);
@@ -57,9 +60,12 @@ public class AddonManager {
       } else {
         reason = " - One of its properties is null which is not allowed!";
       }
+      final PrivateMines privateMines = PrivateMines.getPrivateMines();
 
       try {
-        Msg.severe("Failed to load expansion class %s%s", ex, clazz.get().getSimpleName(), reason);
+        privateMines.getLogger().warning(
+            String.format("Failed to load addon class %s %s", clazz.get().getSimpleName(),
+                reason));
       } catch (InterruptedException | ExecutionException e) {
         throw new RuntimeException(e);
       }
@@ -68,8 +74,10 @@ public class AddonManager {
     return Optional.empty();
   }
 
-  public Addon createAddonInstance(
-      final CompletableFuture<@Nullable Class<? extends Addon>> clazz) throws LinkageError {
+  public Addon createAddonInstance(final CompletableFuture<@Nullable Class<? extends Addon>> clazz)
+      throws LinkageError {
+    final PrivateMines privateMines = PrivateMines.getPrivateMines();
+
     try {
       return clazz.get().getDeclaredConstructor().newInstance();
     } catch (final Exception ex) {
@@ -77,7 +85,7 @@ public class AddonManager {
         throw ((LinkageError) ex.getCause());
       }
 
-      Msg.warn("There was an issue with loading an expansion.");
+      privateMines.getLogger().warning("There was an issue with loading an addon.");
       return null;
     }
   }

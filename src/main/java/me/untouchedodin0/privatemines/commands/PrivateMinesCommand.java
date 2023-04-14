@@ -326,7 +326,7 @@ public class PrivateMinesCommand extends BaseCommand {
       mineData.setOpen(true);
       mine.setMineData(mineData);
       mineStorage.replaceMineNoLog(player, mine);
-      SQLUtils.replace(mine);
+      SQLUtils.update(mine);
     }
   }
 
@@ -340,7 +340,7 @@ public class PrivateMinesCommand extends BaseCommand {
       mineData.setOpen(false);
       mine.setMineData(mineData);
       mineStorage.replaceMineNoLog(player, mine);
-      SQLUtils.replace(mine);
+      SQLUtils.update(mine);
     }
   }
 
@@ -352,7 +352,7 @@ public class PrivateMinesCommand extends BaseCommand {
     if (mine != null) {
       mine.ban(target);
       mineStorage.replaceMineNoLog(player, mine);
-      SQLUtils.replace(mine);
+      SQLUtils.update(mine);
     }
   }
 
@@ -364,7 +364,7 @@ public class PrivateMinesCommand extends BaseCommand {
     if (mine != null) {
       mine.unban(target);
       mineStorage.replaceMineNoLog(player, mine);
-      SQLUtils.replace(mine);
+      SQLUtils.update(mine);
     }
   }
 

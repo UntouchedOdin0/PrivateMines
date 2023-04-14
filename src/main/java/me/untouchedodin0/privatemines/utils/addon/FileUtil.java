@@ -31,11 +31,12 @@ import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
 
 public class FileUtil {
 
-  public static <T> Class<? extends T> findClass(final File file,
-      final Class<T> clazz) throws IOException {
+  public static <T> Class<? extends T> findClass(@NotNull final File file,
+      @NotNull final Class<T> clazz) throws IOException, ClassNotFoundException {
     if (!file.exists()) {
       return null;
     }
@@ -46,25 +47,31 @@ public class FileUtil {
     final List<Class<? extends T>> classes = new ArrayList<>();
 
     try (final JarInputStream stream = new JarInputStream(jar.openStream())) {
-      JarEntry jarEntry;
-
-      Bukkit.getLogger().info("loader " + loader);
-      Bukkit.getLogger().info("matches " + matches);
-      Bukkit.getLogger().info("classes " + classes);
-      Bukkit.getLogger().info("stream " + stream);
-
-      while ((jarEntry = stream.getNextJarEntry()) != null) {
-        String name = jarEntry.getName();
-        if (name.isEmpty() | !name.endsWith("class")) {
+      JarEntry entry;
+      while ((entry = stream.getNextJarEntry()) != null) {
+        final String name = entry.getName();
+        if (name.isEmpty() || !name.endsWith(".class")) {
           continue;
         }
-        Bukkit.getLogger().info("jarEntry " + jarEntry);
-        Bukkit.getLogger().info("matches " + matches);
+
         matches.add(name.substring(0, name.lastIndexOf('.')).replace('/', '.'));
-        Bukkit.getLogger().info("matches " + matches);
+      }
+
+      for (final String match : matches) {
+        try {
+          final Class<?> loaded = loader.loadClass(match);
+          if (clazz.isAssignableFrom(loaded)) {
+            classes.add(loaded.asSubclass(clazz));
+          }
+        } catch (final NoClassDefFoundError ignored) {
+        }
       }
     }
-    return null;
+    if (classes.isEmpty()) {
+      loader.close();
+      return null;
+    }
+    return classes.get(0);
   }
 
   public static Addon createInstance(Class<? extends Addon> clazz) throws LinkageError {
