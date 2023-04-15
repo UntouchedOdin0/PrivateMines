@@ -5,6 +5,8 @@ import java.util.List;
 public abstract class Addon {
 
   public abstract void onEnable();
+  public abstract void onDisable();
+  public abstract void onReload();
   public abstract String getName();
   public abstract String getAuthor();
   public abstract String getVersion();

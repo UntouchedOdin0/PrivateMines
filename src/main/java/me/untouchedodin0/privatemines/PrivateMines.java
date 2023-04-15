@@ -31,6 +31,8 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,6 +111,7 @@ public class PrivateMines extends JavaPlugin {
   private SQLHelper sqlHelper;
   private Map<String, SQLCache> caches;
   private BukkitAudiences adventure;
+  private AddonManager addonManager; // = new AddonManager();
 
   public static PrivateMines getPrivateMines() {
     return privateMines;
@@ -130,6 +133,7 @@ public class PrivateMines extends JavaPlugin {
     this.pregenStorage = new PregenStorage();
     this.mineTypeManager = new MineTypeManager(this);
     this.queueUtils = new QueueUtils();
+    this.addonManager = new AddonManager();
 
     GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
@@ -258,6 +262,11 @@ public class PrivateMines extends JavaPlugin {
     paperCommandManager.registerCommand(new PublicMinesCommand());
     paperCommandManager.registerCommand(new AddonsCommand());
     paperCommandManager.enableUnstableAPI("help");
+    paperCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
+      ArrayList<String> addons = new ArrayList<>();
+      AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
+      return addons;
+    });
 
     Task.asyncDelayed(this::loadSQLMines);
 
@@ -368,16 +377,13 @@ public class PrivateMines extends JavaPlugin {
   public void loadAddons() {
     final PathMatcher jarMatcher = FileSystems.getDefault()
         .getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
-    AddonManager addonManager = new AddonManager();
 
     try (Stream<Path> paths = Files.walk(addonsDirectory).filter(jarMatcher::matches)) {
       paths.forEach(jar -> {
-        getLogger().info("jar path " + jar);
         File file = jar.toFile();
-        CompletableFuture<@Nullable Class<? extends Addon>> addon = addonManager.findExpansionInFile(file);
-        getLogger().info("addon " + addon);
-        Optional<Addon> loaded =  addonManager.register(addon);
-        getLogger().info("loaded " + loaded);
+        CompletableFuture<@Nullable Class<? extends Addon>> addon = AddonManager.findExpansionInFile(
+            file);
+        Optional<Addon> loaded = addonManager.register(addon);
 
         if (loaded.isPresent()) {
           Addon addonLoaded = loaded.get();

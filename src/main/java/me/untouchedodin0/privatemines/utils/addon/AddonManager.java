@@ -16,22 +16,22 @@ public class AddonManager {
   public static Map<String, Addon> addons = new HashMap<>();
 
   @NotNull
-  public CompletableFuture<@Nullable Class<? extends Addon>> findExpansionInFile(
+  public static CompletableFuture<@Nullable Class<? extends Addon>> findExpansionInFile(
       @NotNull final File file) {
     return CompletableFuture.supplyAsync(() -> {
       final PrivateMines privateMines = PrivateMines.getPrivateMines();
 
       try {
-        final Class<? extends Addon> expansionClass = FileUtil.findClass(file, Addon.class);
+        final Class<? extends Addon> addonClass = FileUtil.findClass(file, Addon.class);
 
-        if (expansionClass == null) {
+        if (addonClass == null) {
           privateMines.getLogger().warning(String.format("Failed to load addon %s, as it does not have a class which extends Addon",
               file.getName()));
           privateMines.getLogger().warning(String.format("Failed to load addon %s, as it does not have a class which extends Addon", file.getName()));
           return null;
         }
 
-        return expansionClass;
+        return addonClass;
       } catch (VerifyError | NoClassDefFoundError e) {
         privateMines.getLogger().warning(
             String.format("Failed to load addon %s (is a dependency missing?)", file.getName()));
@@ -45,13 +45,13 @@ public class AddonManager {
 
   public Optional<Addon> register(final CompletableFuture<@Nullable Class<? extends Addon>> clazz) {
     try {
-      final Addon expansion = createAddonInstance(clazz);
+      final Addon addon = createAddonInstance(clazz);
 
-      if (expansion == null) {
+      if (addon == null) {
         return Optional.empty();
       }
-      addons.put(expansion.getName(), expansion);
-      return Optional.of(expansion);
+      addons.put(addon.getName(), addon);
+      return Optional.of(addon);
     } catch (LinkageError | NullPointerException ex) {
       final String reason;
 
@@ -92,5 +92,13 @@ public class AddonManager {
 
   public static Map<String, Addon> getAddons() {
     return addons;
+  }
+
+  public static Addon get(String name) {
+    return addons.get(name);
+  }
+
+  public static void remove(String name) {
+    addons.remove(name);
   }
 }
