@@ -37,6 +37,7 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
+import me.untouchedodin0.privatemines.events.PrivateMineCreationEvent;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.worldedit.PasteHelper;
@@ -113,6 +114,9 @@ public class MineFactory {
       Task.syncDelayed(() -> {
         spawn.getBlock().setType(Material.AIR);
         player.teleport(spawn);
+
+        PrivateMineCreationEvent creationEvent = new PrivateMineCreationEvent(uuid, mine);
+        Bukkit.getPluginManager().callEvent(creationEvent);
       });
     });
   }
@@ -171,6 +175,9 @@ public class MineFactory {
       Task.syncDelayed(() -> {
         spawn.getBlock().setType(Material.AIR);
         player.teleport(spawn);
+
+        PrivateMineCreationEvent creationEvent = new PrivateMineCreationEvent(uuid, mine);
+        Bukkit.getPluginManager().callEvent(creationEvent);
       });
     });
     return mine;
@@ -182,6 +189,9 @@ public class MineFactory {
       Mine mine = createMine(Objects.requireNonNull(Bukkit.getPlayer(uuid)), location, mineType);
       mineStorage.replaceMine(uuid, mine);
       SQLUtils.replace(mine);
+
+      PrivateMineCreationEvent creationEvent = new PrivateMineCreationEvent(uuid, mine);
+      Bukkit.getPluginManager().callEvent(creationEvent);
     }
   }
 }

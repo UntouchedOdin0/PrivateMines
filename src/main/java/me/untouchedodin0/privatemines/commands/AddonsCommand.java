@@ -17,7 +17,6 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TextComponent.Builder;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -42,25 +41,26 @@ public class AddonsCommand extends BaseCommand {
       audience.sendMessage(noAddons);
     } else {
 
-      if (addons.size() < 2) {
-        int count = 0;
-        Builder message = Component.text().content(String.format("Addons: (%d): ", addons.size()));
-        for (Map.Entry<String, Addon> entry : addons.entrySet()) {
-          String name = entry.getKey();
-          Addon addon = entry.getValue();
+      int count = 0;
+      Builder message = Component.text().content(String.format("Addons: (%d): ", addons.size()));
+      for (Map.Entry<String, Addon> entry : addons.entrySet()) {
+        String name = entry.getKey();
+        Addon addon = entry.getValue();
 
-          TextComponent addonComponent = Component.text().content(name).color(NamedTextColor.GREEN)
-              .hoverEvent(HoverEvent.showText(
-                  Component.text().content("Name: " + addon.getName() + "\n").color(NamedTextColor.AQUA)
-                      .append(Component.text("Version: " + addon.getVersion() + "\n").color(NamedTextColor.AQUA))
-                      .append(Component.text("Description: " + addon.getDescription()).color(NamedTextColor.AQUA)))).build();
-          message.append(addonComponent);
-          if (++count < addons.size()) {
-            message.append(Component.text(", "));
-          }
+        TextComponent addonComponent = Component.text().content(name).color(NamedTextColor.GREEN)
+            .hoverEvent(HoverEvent.showText(
+                Component.text().content("Name: " + addon.getName() + "\n")
+                    .color(NamedTextColor.AQUA)
+                    .append(Component.text("Version: " + addon.getVersion() + "\n")
+                        .color(NamedTextColor.AQUA))
+                    .append(Component.text("Description: " + addon.getDescription())
+                        .color(NamedTextColor.AQUA)))).build();
+        message.append(addonComponent);
+        if (++count < addons.size()) {
+          message.append(Component.text(", "));
         }
-        audience.sendMessage(message);
       }
+      audience.sendMessage(message);
     }
   }
 
