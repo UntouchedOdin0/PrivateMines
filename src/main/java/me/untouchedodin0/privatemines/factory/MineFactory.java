@@ -35,6 +35,7 @@ import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.kotlin.utils.FlagUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.events.PrivateMineCreationEvent;
@@ -114,7 +115,8 @@ public class MineFactory {
       Task.syncDelayed(() -> {
         spawn.getBlock().setType(Material.AIR);
         player.teleport(spawn);
-
+        FlagUtils flagUtils = new FlagUtils();
+        flagUtils.setFlags(mine);
         PrivateMineCreationEvent creationEvent = new PrivateMineCreationEvent(uuid, mine);
         Bukkit.getPluginManager().callEvent(creationEvent);
       });
@@ -175,6 +177,8 @@ public class MineFactory {
       Task.syncDelayed(() -> {
         spawn.getBlock().setType(Material.AIR);
         player.teleport(spawn);
+        FlagUtils flagUtils = new FlagUtils();
+        flagUtils.setFlags(mine);
 
         PrivateMineCreationEvent creationEvent = new PrivateMineCreationEvent(uuid, mine);
         Bukkit.getPluginManager().callEvent(creationEvent);
