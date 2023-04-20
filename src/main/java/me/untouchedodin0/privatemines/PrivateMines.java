@@ -433,6 +433,10 @@ public class PrivateMines extends JavaPlugin {
     return mineTypeManager;
   }
 
+  public AddonManager getAddonManager() {
+    return addonManager;
+  }
+
   public static Economy getEconomy() {
     return econ;
   }
