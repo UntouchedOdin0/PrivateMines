@@ -10,6 +10,7 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import redempt.redlib.misc.LocationUtils;
@@ -178,5 +179,11 @@ public class SQLUtils {
         LocationUtils.toString(Objects.requireNonNull(pregenMine.getFullMin())),
         LocationUtils.toString(Objects.requireNonNull(pregenMine.getFullMax())));
     sqlHelper.executeUpdate(insert);
+  }
+
+  public static void broadcastPregens() {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
+    Results results = sqlHelper.queryResults("SELECT * FROM pregenmines;");
+    Bukkit.broadcastMessage("pregenmines " + results);
   }
 }

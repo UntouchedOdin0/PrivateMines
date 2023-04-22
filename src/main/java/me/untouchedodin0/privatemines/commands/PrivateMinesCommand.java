@@ -424,7 +424,7 @@ public class PrivateMinesCommand extends BaseCommand {
     if (mineStorage.hasMine(player)) {
       player.sendMessage(ChatColor.RED + "You already have a mine!");
     } else {
-
+      SQLUtils.broadcastPregens();
     }
   }
 }

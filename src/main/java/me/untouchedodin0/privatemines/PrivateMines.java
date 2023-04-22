@@ -32,7 +32,6 @@ import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -245,6 +244,16 @@ public class PrivateMines extends JavaPlugin {
         maxMineSize INT NOT NULL,
         materials VARCHAR(50) NOT NULL
         );""");
+    sqlHelper.executeUpdate("""
+        CREATE TABLE pregenmines (
+        location VARCHAR(20),
+        min_mining VARCHAR(20),
+        max_mining VARCHAR(20),
+        spawn VARCHAR(20),
+        min_full VARCHAR(20),
+        max_full VARCHAR(20)
+        );
+        """);
     sqlHelper.setAutoCommit(true);
 
     this.caches = new HashMap<>();
