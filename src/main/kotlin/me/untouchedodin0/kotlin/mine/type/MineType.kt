@@ -45,4 +45,5 @@ class MineType {
     val maxMineSize: Int = 0
     val flags: Map<String, Boolean>? = null
     val fullFlags: Map<String, Boolean>? = null
+    val prices: Map<Material, Double>? = null
 }

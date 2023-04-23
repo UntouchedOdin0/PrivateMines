@@ -245,7 +245,7 @@ public class PrivateMines extends JavaPlugin {
         materials VARCHAR(50) NOT NULL
         );""");
     sqlHelper.executeUpdate("""
-        CREATE TABLE pregenmines (
+        CREATE TABLE IF NOT EXISTS pregenmines (
         location VARCHAR(20),
         min_mining VARCHAR(20),
         max_mining VARCHAR(20),

@@ -118,15 +118,18 @@ public class Utils {
   }
 
   public static String mapToString(Map<Material, Double> map) {
-    StringBuilder stringBuilder = new StringBuilder("{");
-    for (Entry<Material, Double> entry : map.entrySet()) {
-      stringBuilder.append(entry.getKey());
-      stringBuilder.append("=");
-      stringBuilder.append(entry.getValue());
-      stringBuilder.append(", ");
+    if (!map.isEmpty()) {
+      StringBuilder stringBuilder = new StringBuilder("{");
+      for (Entry<Material, Double> entry : map.entrySet()) {
+        stringBuilder.append(entry.getKey());
+        stringBuilder.append("=");
+        stringBuilder.append(entry.getValue());
+        stringBuilder.append(", ");
+      }
+      stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
+      stringBuilder.append("}");
+      return stringBuilder.toString();
     }
-    stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
-    stringBuilder.append("}");
-    return stringBuilder.toString();
+    return "";
   }
 }

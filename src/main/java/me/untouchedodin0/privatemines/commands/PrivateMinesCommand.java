@@ -141,10 +141,9 @@ public class PrivateMinesCommand extends BaseCommand {
 
             for (int i = 0; i < times; i++) {
               mine.upgrade();
+              PrivateMines.getEconomy().withdrawPlayer(player, cost);
               mine.handleReset();
             }
-//            mine.upgrade();
-//            mine.handleReset();
           } else {
             // player does not have enough money
             player.sendMessage(ChatColor.RED + String.format(

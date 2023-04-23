@@ -34,6 +34,9 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import dev.drawethree.xprison.autosell.XPrisonAutoSell;
+import dev.drawethree.xprison.autosell.model.SellRegion;
+import dev.drawethree.xprison.utils.compat.CompMaterial;
 import dev.lone.itemsadder.api.CustomBlock;
 import io.th0rgal.oraxen.api.OraxenBlocks;
 import java.io.File;
@@ -672,6 +675,8 @@ public class Mine {
     }
     if (player != null) {
       if (!Objects.equals(currentType.getFile(), nextType.getFile())) {
+        PrivateMines.getEconomy().withdrawPlayer(player, nextType.getUpgradeCost());
+
         String mineRegionName = String.format("mine-%s", player.getUniqueId());
         String fullRegionName = String.format("full-mine-%s", player.getUniqueId());
 
@@ -724,10 +729,24 @@ public class Mine {
           mineData.setMaximumFullRegion(maximum);
           setMineData(mineData);
           handleReset();
-
           Task.asyncDelayed(() -> {
             SQLUtils.update(this);
           });
+
+          XPrisonAutoSell autoSell = XPrisonAutoSell.getInstance();
+          SellRegion sellRegion = autoSell.getManager().getAutoSellRegion(mineLocation);
+
+          if (nextType.getPrices() != null) {
+            nextType.getPrices().forEach((material, aDouble) -> {
+              CompMaterial compMaterial = CompMaterial.fromMaterial(material);
+              sellRegion.addSellPrice(compMaterial, aDouble);
+            });
+
+            autoSell.getManager().updateSellRegion(sellRegion);
+            autoSell.getAutoSellConfig().saveSellRegion(sellRegion);
+          }
+
+          Bukkit.broadcastMessage("sell region " + sellRegion);
           Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
         });
       }

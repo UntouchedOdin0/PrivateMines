@@ -76,4 +76,8 @@ public class MineTypeManager {
     }
     return null;
   }
+
+  public LinkedHashMap<String, MineType> getMineTypes() {
+    return mineTypes;
+  }
 }

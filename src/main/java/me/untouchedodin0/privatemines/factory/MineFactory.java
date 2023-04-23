@@ -134,9 +134,9 @@ public class MineFactory {
 
         SellRegion sellRegion = new SellRegion(iWrappedRegion, location.getWorld());
 
-        prices.forEach((material, price) -> {
+        mineType.getPrices().forEach((material, aDouble) -> {
           CompMaterial compMaterial = CompMaterial.fromMaterial(material);
-          sellRegion.addSellPrice(compMaterial, price);
+          sellRegion.addSellPrice(compMaterial, aDouble);
         });
         autoSell.getManager().updateSellRegion(sellRegion);
         autoSell.getAutoSellConfig().saveSellRegion(sellRegion);
