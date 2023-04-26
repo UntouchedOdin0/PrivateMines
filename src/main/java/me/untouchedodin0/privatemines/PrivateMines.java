@@ -21,8 +21,10 @@
 
 package me.untouchedodin0.privatemines;
 
+import co.aikar.commands.BukkitCommandManager;
 import co.aikar.commands.PaperCommandManager;
 import com.google.gson.GsonBuilder;
+import io.papermc.lib.PaperLib;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -266,16 +268,30 @@ public class PrivateMines extends JavaPlugin {
       caches.put(string, sqlCache);
     });
 
-    PaperCommandManager paperCommandManager = new PaperCommandManager(this);
-    paperCommandManager.registerCommand(new PrivateMinesCommand());
-    paperCommandManager.registerCommand(new PublicMinesCommand());
-    paperCommandManager.registerCommand(new AddonsCommand());
-    paperCommandManager.enableUnstableAPI("help");
-    paperCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
-      ArrayList<String> addons = new ArrayList<>();
-      AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
-      return addons;
-    });
+    if (PaperLib.isPaper()) {
+      PaperCommandManager paperCommandManager = new PaperCommandManager(this);
+      paperCommandManager.registerCommand(new PrivateMinesCommand());
+      paperCommandManager.registerCommand(new PublicMinesCommand());
+      paperCommandManager.registerCommand(new AddonsCommand());
+      paperCommandManager.enableUnstableAPI("help");
+      paperCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
+        ArrayList<String> addons = new ArrayList<>();
+        AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
+        return addons;
+      });
+    } else {
+      BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
+      bukkitCommandManager.registerCommand(new PrivateMinesCommand());
+      bukkitCommandManager.registerCommand(new PublicMinesCommand());
+      bukkitCommandManager.registerCommand(new AddonsCommand());
+      bukkitCommandManager.enableUnstableAPI("help");
+      bukkitCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
+        ArrayList<String> addons = new ArrayList<>();
+        AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
+        return addons;
+      });
+    }
+
 
     Task.asyncDelayed(this::loadSQLMines);
 

@@ -129,17 +129,20 @@ public class MineFactory {
 
       if (materials != null) {
         Map<Material, Double> prices = new HashMap<>(materials);
-        IWrappedRegion iWrappedRegion = RegionUtils.getFirstRegionAtLocation(location);
-        XPrisonAutoSell autoSell = XPrisonAutoSell.getInstance();
 
-        SellRegion sellRegion = new SellRegion(iWrappedRegion, location.getWorld());
+        if (Bukkit.getPluginManager().isPluginEnabled("XPrison")) {
+          IWrappedRegion iWrappedRegion = RegionUtils.getFirstRegionAtLocation(location);
+          XPrisonAutoSell autoSell = XPrisonAutoSell.getInstance();
 
-        mineType.getPrices().forEach((material, aDouble) -> {
-          CompMaterial compMaterial = CompMaterial.fromMaterial(material);
-          sellRegion.addSellPrice(compMaterial, aDouble);
-        });
-        autoSell.getManager().updateSellRegion(sellRegion);
-        autoSell.getAutoSellConfig().saveSellRegion(sellRegion);
+          SellRegion sellRegion = new SellRegion(iWrappedRegion, location.getWorld());
+
+          Objects.requireNonNull(mineType.getPrices()).forEach((material, aDouble) -> {
+            CompMaterial compMaterial = CompMaterial.fromMaterial(material);
+            sellRegion.addSellPrice(compMaterial, aDouble);
+          });
+          autoSell.getManager().updateSellRegion(sellRegion);
+          autoSell.getAutoSellConfig().saveSellRegion(sellRegion);
+        }
       }
     });
   }
