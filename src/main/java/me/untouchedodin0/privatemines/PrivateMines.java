@@ -268,6 +268,10 @@ public class PrivateMines extends JavaPlugin {
       caches.put(string, sqlCache);
     });
 
+    Task.asyncDelayed(this::loadSQLMines);
+//    loadAddons();
+    Task.asyncDelayed(this::loadAddons);
+
     if (PaperLib.isPaper()) {
       PaperCommandManager paperCommandManager = new PaperCommandManager(this);
       paperCommandManager.registerCommand(new PrivateMinesCommand());
@@ -293,8 +297,6 @@ public class PrivateMines extends JavaPlugin {
     }
 
 
-    Task.asyncDelayed(this::loadSQLMines);
-
     getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
     if (!setupEconomy()) {
       privateMines.getLogger().severe(
@@ -308,7 +310,6 @@ public class PrivateMines extends JavaPlugin {
 
     new UpdateChecker(this).fetch();
 
-    loadAddons();
     Instant end = Instant.now();
     Duration loadTime = Duration.between(start, end);
     getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
