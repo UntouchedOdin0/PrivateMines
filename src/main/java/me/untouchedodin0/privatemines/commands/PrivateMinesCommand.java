@@ -424,6 +424,7 @@ public class PrivateMinesCommand extends BaseCommand {
       player.sendMessage(ChatColor.RED + "You already have a mine!");
     } else {
       SQLUtils.broadcastPregens();
+//      SQLUtils.broadcastPregens();
     }
   }
 }

@@ -109,6 +109,7 @@ public class PrivateMines extends JavaPlugin {
   private MineTypeManager mineTypeManager;
   private QueueUtils queueUtils;
   private static Economy econ = null;
+  private SQLite sqlite;
   private SQLHelper sqlHelper;
   private Map<String, SQLCache> caches;
   private BukkitAudiences adventure;
@@ -226,7 +227,7 @@ public class PrivateMines extends JavaPlugin {
       }
     }
 
-    SQLite sqlite = new SQLite();
+    this.sqlite = new SQLite();
     sqlite.load();
     this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
 
@@ -482,6 +483,10 @@ public class PrivateMines extends JavaPlugin {
 
   private void registerListeners() {
     getServer().getPluginManager().registerEvents(new MineResetListener(), this);
+  }
+
+  public SQLite getSqlite() {
+    return sqlite;
   }
 
   public SQLHelper getSqlHelper() {

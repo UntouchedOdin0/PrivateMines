@@ -1,5 +1,9 @@
 package me.untouchedodin0.privatemines.storage.sql;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -22,6 +26,8 @@ import redempt.redlib.sql.SQLHelper.Results;
 public class SQLUtils {
 
   private static final PrivateMines privateMines = PrivateMines.getPrivateMines();
+  private static final SQLHelper sqlHelper = privateMines.getSqlHelper();
+
 
   public static Location getCurrentLocation() {
     MineWorldManager mineWorldManager = PrivateMines.getPrivateMines().getMineWorldManager();
@@ -56,8 +62,8 @@ public class SQLUtils {
         LocationUtils.toString(mineData.getMinimumFullRegion()),
         LocationUtils.toString(mineData.getMaximumFullRegion()),
         LocationUtils.toString(mine.getSpawnLocation()), mineData.getTax(), mineData.isOpen(),
-        mineData.getMaxPlayers(), mineData.getMaxMineSize(), Utils.mapToString(
-            Objects.requireNonNull(mineType.getMaterials())));
+        mineData.getMaxPlayers(), mineData.getMaxMineSize(),
+        Utils.mapToString(Objects.requireNonNull(mineType.getMaterials())));
     sqlHelper.executeUpdate(insertQuery);
   }
 
@@ -114,7 +120,8 @@ public class SQLUtils {
     String command = String.format(
         "UPDATE privatemines SET mineType = '%s', corner1 = '%s', corner2 = '%s', fullRegionMin = '%s', fullRegionMax = '%s', isOpen = '%d', materials = '%s' WHERE owner = '%s';",
         mineType.getName(), LocationUtils.toString(minMining), LocationUtils.toString(maxMining),
-        LocationUtils.toString(fullRegionMin), LocationUtils.toString(fullRegionMax), open, Utils.mapToString(mineData.getMaterials()), owner);
+        LocationUtils.toString(fullRegionMin), LocationUtils.toString(fullRegionMax), open,
+        Utils.mapToString(mineData.getMaterials()), owner);
     sqlHelper.executeUpdate(command);
   }
 
@@ -167,7 +174,14 @@ public class SQLUtils {
   }
 
   public static void insertPregen(PregenMine pregenMine) {
-    SQLHelper sqlHelper = privateMines.getSqlHelper();
+    Connection connection = sqlHelper.getConnection();
+    SQLHelper sqlHelper = new SQLHelper(connection);
+
+//    Bukkit.broadcastMessage("connection " + sqlHelper.getConnection());
+//    Bukkit.broadcastMessage("connection2 " + PrivateMines.getPrivateMines().getSqlHelper().getConnection());
+    Bukkit.broadcastMessage("sql lite " + privateMines.getSqlite());
+    Bukkit.broadcastMessage("connection " + connection);
+    Bukkit.broadcastMessage("sql helper 2 " + sqlHelper);
 
     String insert = String.format(
         "INSERT INTO pregenmines (location, min_mining, max_mining, spawn, min_full, max_full) "
@@ -179,11 +193,70 @@ public class SQLUtils {
         LocationUtils.toString(Objects.requireNonNull(pregenMine.getFullMin())),
         LocationUtils.toString(Objects.requireNonNull(pregenMine.getFullMax())));
     sqlHelper.executeUpdate(insert);
+    sqlHelper.close();
   }
 
   public static void broadcastPregens() {
-    SQLHelper sqlHelper = privateMines.getSqlHelper();
+    Connection connection = sqlHelper.getConnection();
+    SQLHelper sqlHelper = new SQLHelper(connection);
     Results results = sqlHelper.queryResults("SELECT * FROM pregenmines;");
     Bukkit.broadcastMessage("pregenmines " + results);
+
+    try {
+      if (results.next()) {
+        Bukkit.broadcastMessage(results.getString(1));
+        Bukkit.broadcastMessage(results.getString(2));
+        Bukkit.broadcastMessage(results.getString(3));
+        Bukkit.broadcastMessage(results.getString(4));
+        Bukkit.broadcastMessage(results.getString(5));
+        Bukkit.broadcastMessage(results.getString(6));
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public static void getPregen() {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
+    Connection connection = sqlHelper.getConnection();
+    try {
+      Statement statement = connection.createStatement();
+      String sql = "SELECT * FROM pregenmines";
+      ResultSet resultSet = statement.executeQuery(sql);
+      Bukkit.broadcastMessage(String.valueOf(resultSet));
+
+      while (resultSet.next()) {
+        Location location = LocationUtils.fromString(resultSet.getString("location"));
+        Location minMining = LocationUtils.fromString(resultSet.getString("min_mining"));
+        Location maxMining = LocationUtils.fromString(resultSet.getString("max_mining"));
+        Location spawn = LocationUtils.fromString(resultSet.getString("spawn"));
+        Location minFull = LocationUtils.fromString(resultSet.getString("min_full"));
+        Location maxFull = LocationUtils.fromString(resultSet.getString("max_full"));
+
+        Bukkit.broadcastMessage("" + location);
+        Bukkit.broadcastMessage("" + minMining);
+        Bukkit.broadcastMessage("" + maxMining);
+        Bukkit.broadcastMessage("" + spawn);
+        Bukkit.broadcastMessage("" + minFull);
+        Bukkit.broadcastMessage("" + maxFull);
+
+//        String minMining = resultSet.getString("min_mining");
+//        String maxMining = resultSet.getString("max_mining");
+//        String spawn = resultSet.getString("spawn");
+//        String minFull = resultSet.getString("min_full");
+//        String maxFull = resultSet.getString("max_full");
+
+//        Bukkit.broadcastMessage("location " + location);
+      }
+      connection.close();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+
+//    Results results = sqlHelper.queryResults("SELECT * FROM pregenmines;");
+
+//    results.forEach(results1 -> {
+//
+//    });
   }
 }
