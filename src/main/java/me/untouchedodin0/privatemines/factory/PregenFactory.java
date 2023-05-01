@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
+import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
@@ -50,6 +51,7 @@ public class PregenFactory {
     AtomicInteger atomicInteger = new AtomicInteger(1);
     MineType mineType = mineTypeManager.getDefaultMineType();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
+    PregenStorage pregenStorage = privateMines.getPregenStorage();
 
     location = player.getLocation();
     location.getBlock().setType(Material.GLOWSTONE);
@@ -140,6 +142,7 @@ public class PregenFactory {
           pregenMine.setFullMax(fullMax);
 
           SQLUtils.insertPregen(pregenMine);
+          pregenStorage.addMine(pregenMine);
         }
       }
     }.runTaskTimerAsynchronously(privateMines, 20L, 20L);

@@ -9,6 +9,12 @@ import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Split;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +22,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.data.MineData;
+import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
+import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.AudienceUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -423,8 +431,49 @@ public class PrivateMinesCommand extends BaseCommand {
     if (mineStorage.hasMine(player)) {
       player.sendMessage(ChatColor.RED + "You already have a mine!");
     } else {
-      SQLUtils.broadcastPregens();
-//      SQLUtils.broadcastPregens();
+      String mineRegionName = String.format("mine-%s", player.getUniqueId());
+      String fullRegionName = String.format("full-mine-%s", player.getUniqueId());
+
+      PregenStorage pregenStorage = privateMines.getPregenStorage();
+      if (pregenStorage.isAllRedeemed()) {
+        player.sendMessage(ChatColor.RED + "All the mines have been claimed...");
+      } else {
+        PregenMine pregenMine = pregenStorage.getAndRemove();
+        MineType mineType = mineTypeManager.getDefaultMineType();
+        Location location = pregenMine.getLocation();
+        Location spawn = pregenMine.getSpawnLocation();
+        Location corner1 = pregenMine.getLowerRails();
+        Location corner2 = pregenMine.getUpperRails();
+        Location minimum = pregenMine.getFullMin();
+        Location maximum = pregenMine.getFullMax();
+        BlockVector3 miningRegionMin = BukkitAdapter.asBlockVector(corner1);
+        BlockVector3 miningRegionMax = BukkitAdapter.asBlockVector(corner2);
+        BlockVector3 fullRegionMin = BukkitAdapter.asBlockVector(minimum);
+        BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(maximum);
+
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager regionManager = container.get(BukkitAdapter.adapt(Objects.requireNonNull(spawn).getWorld()));
+
+        ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName, miningRegionMin, miningRegionMax);
+        ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName, fullRegionMin, fullRegionMax);
+
+        if (regionManager != null) {
+          regionManager.addRegion(miningRegion);
+          regionManager.addRegion(fullRegion);
+        }
+
+        Mine mine = new Mine(privateMines);
+        MineData mineData = new MineData(player.getUniqueId(), corner2, corner1, minimum, maximum,
+            Objects.requireNonNull(location), spawn, mineType, false, 5.0);
+        mine.setMineData(mineData);
+        SQLUtils.insert(mine);
+        SQLUtils.claim(location);
+
+        mineStorage.addMine(player.getUniqueId(), mine);
+        pregenMine.teleport(player);
+        player.sendMessage("hi");
+        player.sendMessage("claimed " + pregenMine);
+      }
     }
   }
 }

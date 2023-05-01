@@ -1,19 +1,29 @@
 package me.untouchedodin0.privatemines.storage.sql;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
+import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.inventory.Book;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,7 +37,8 @@ public class SQLUtils {
 
   private static final PrivateMines privateMines = PrivateMines.getPrivateMines();
   private static final SQLHelper sqlHelper = privateMines.getSqlHelper();
-
+  private static List<PregenMine> pregenMines = new ArrayList<>();
+  static PregenStorage pregenStorage = privateMines.getPregenStorage();
 
   public static Location getCurrentLocation() {
     MineWorldManager mineWorldManager = PrivateMines.getPrivateMines().getMineWorldManager();
@@ -193,27 +204,49 @@ public class SQLUtils {
         LocationUtils.toString(Objects.requireNonNull(pregenMine.getFullMin())),
         LocationUtils.toString(Objects.requireNonNull(pregenMine.getFullMax())));
     sqlHelper.executeUpdate(insert);
-    sqlHelper.close();
   }
 
-  public static void broadcastPregens() {
+  public static void loadPregens() {
     Connection connection = sqlHelper.getConnection();
     SQLHelper sqlHelper = new SQLHelper(connection);
     Results results = sqlHelper.queryResults("SELECT * FROM pregenmines;");
+
     Bukkit.broadcastMessage("pregenmines " + results);
+    Bukkit.broadcastMessage("linked pregen mines " + pregenMines);
 
     try {
-      if (results.next()) {
-        Bukkit.broadcastMessage(results.getString(1));
-        Bukkit.broadcastMessage(results.getString(2));
-        Bukkit.broadcastMessage(results.getString(3));
-        Bukkit.broadcastMessage(results.getString(4));
-        Bukkit.broadcastMessage(results.getString(5));
-        Bukkit.broadcastMessage(results.getString(6));
-      }
+      results.forEach(results1 -> {
+        Bukkit.broadcastMessage("pregen storage before " + pregenStorage.getMines());
+
+        PregenMine pregenMine = new PregenMine();
+        Location location = LocationUtils.fromString(results1.getString(1));
+        Location minMining = LocationUtils.fromString(results1.getString(2));
+        Location maxMining = LocationUtils.fromString(results1.getString(3));
+        Location spawn = LocationUtils.fromString(results1.getString(4));
+        Location minFull = LocationUtils.fromString(results1.getString(5));
+        Location maxFull = LocationUtils.fromString(results1.getString(6));
+
+        pregenMine.setLocation(location);
+        pregenMine.setLowerRails(minMining);
+        pregenMine.setUpperRails(maxMining);
+        pregenMine.setSpawnLocation(spawn);
+        pregenMine.setFullMin(minFull);
+        pregenMine.setFullMax(maxFull);
+        pregenStorage.addMine(pregenMine);
+
+        Bukkit.broadcastMessage("pregen storage after " + pregenStorage.getMines() + " size: " + pregenStorage.getMines().size());
+      });
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public static void claim(Location location) {
+    Connection connection = sqlHelper.getConnection();
+    SQLHelper sqlHelper = new SQLHelper(connection);
+    String loc = LocationUtils.toString(location);
+
+    sqlHelper.executeUpdate(String.format("DELETE FROM pregenmines WHERE location = '%s';", loc));
   }
 
   public static void getPregen() {

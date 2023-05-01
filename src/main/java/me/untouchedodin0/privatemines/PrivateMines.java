@@ -270,6 +270,7 @@ public class PrivateMines extends JavaPlugin {
     });
 
     Task.asyncDelayed(this::loadSQLMines);
+    Task.asyncDelayed(SQLUtils::loadPregens);
 //    loadAddons();
     Task.asyncDelayed(this::loadAddons);
 
@@ -330,7 +331,7 @@ public class PrivateMines extends JavaPlugin {
         String.format("%s v%s has successfully been Disabled", getDescription().getName(),
             getDescription().getVersion()));
     saveMines();
-    savePregenMines();
+//    savePregenMines();
     sqlHelper.close();
   }
 
@@ -432,9 +433,9 @@ public class PrivateMines extends JavaPlugin {
     });
   }
 
-  public void savePregenMines() {
-    getPregenStorage().getMines().forEach(PregenMine::save);
-  }
+//  public void savePregenMines() {
+//    getPregenStorage().getMines().forEach(PregenMine::save);
+//  }
 
   public SchematicStorage getSchematicStorage() {
     return schematicStorage;

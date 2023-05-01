@@ -23,23 +23,35 @@ package me.untouchedodin0.kotlin.mine.storage
 
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import java.io.File
 
 class PregenStorage {
 
-    private var pregenMines: MutableList<PregenMine> = ArrayList()
+    private var pregenMines: MutableMap<PregenMine, Location> = HashMap()
+
     private var files: MutableMap<PregenMine, File> = HashMap()
 
     fun addMine(pregenMine: PregenMine) {
-        pregenMines.add(pregenMine)
+//        pregenMines.add(pregenMine)
+        pregenMines.put(pregenMine, pregenMine.location!!)
     }
 
-    fun getMines(): MutableList<PregenMine> {
+    //    fun getMines(): MutableList<PregenMine> {
+//        return pregenMines
+//    }
+    fun getMines(): MutableMap<PregenMine, Location> {
         return pregenMines
     }
 
-    fun getAndRemove(): PregenMine? {
-        return pregenMines.removeFirstOrNull()
+    fun getAndRemove(): PregenMine {
+        val oldestEntry = pregenMines.entries.first()
+        oldestEntry.let {
+            return oldestEntry.key.also {
+                pregenMines.remove(oldestEntry.key)
+                Bukkit.broadcastMessage("total left ${pregenMines.keys}")
+            }
+        }
     }
 
     fun isAllRedeemed(): Boolean {
