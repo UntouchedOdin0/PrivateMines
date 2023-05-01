@@ -266,6 +266,8 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("teleport")
   @CommandPermission("privatemines.teleport")
   public void teleport(Player player) {
+    Bukkit.broadcastMessage("" + mineStorage.getMines());
+
     if (!mineStorage.hasMine(player)) {
       player.sendMessage(ChatColor.RED + "You don't own a mine!");
     } else {
@@ -466,11 +468,15 @@ public class PrivateMinesCommand extends BaseCommand {
         MineData mineData = new MineData(player.getUniqueId(), corner2, corner1, minimum, maximum,
             Objects.requireNonNull(location), spawn, mineType, false, 5.0);
         mine.setMineData(mineData);
-        SQLUtils.insert(mine);
         SQLUtils.claim(location);
+        SQLUtils.insert(mine);
 
         mineStorage.addMine(player.getUniqueId(), mine);
+
+        Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
         pregenMine.teleport(player);
+        mine.handleReset();
+
         player.sendMessage("hi");
         player.sendMessage("claimed " + pregenMine);
       }

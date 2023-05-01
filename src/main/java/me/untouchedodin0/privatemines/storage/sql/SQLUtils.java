@@ -1,12 +1,10 @@
 package me.untouchedodin0.privatemines.storage.sql;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,11 +17,6 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.inventory.Book;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -75,7 +68,8 @@ public class SQLUtils {
         LocationUtils.toString(mine.getSpawnLocation()), mineData.getTax(), mineData.isOpen(),
         mineData.getMaxPlayers(), mineData.getMaxMineSize(),
         Utils.mapToString(Objects.requireNonNull(mineType.getMaterials())));
-    sqlHelper.executeUpdate(insertQuery);
+
+    Task.asyncDelayed(() -> sqlHelper.executeUpdate(insertQuery));
   }
 
   public static void replace(Mine mine) {
@@ -211,13 +205,8 @@ public class SQLUtils {
     SQLHelper sqlHelper = new SQLHelper(connection);
     Results results = sqlHelper.queryResults("SELECT * FROM pregenmines;");
 
-    Bukkit.broadcastMessage("pregenmines " + results);
-    Bukkit.broadcastMessage("linked pregen mines " + pregenMines);
-
     try {
       results.forEach(results1 -> {
-        Bukkit.broadcastMessage("pregen storage before " + pregenStorage.getMines());
-
         PregenMine pregenMine = new PregenMine();
         Location location = LocationUtils.fromString(results1.getString(1));
         Location minMining = LocationUtils.fromString(results1.getString(2));
@@ -233,8 +222,6 @@ public class SQLUtils {
         pregenMine.setFullMin(minFull);
         pregenMine.setFullMax(maxFull);
         pregenStorage.addMine(pregenMine);
-
-        Bukkit.broadcastMessage("pregen storage after " + pregenStorage.getMines() + " size: " + pregenStorage.getMines().size());
       });
     } catch (Exception e) {
       throw new RuntimeException(e);
