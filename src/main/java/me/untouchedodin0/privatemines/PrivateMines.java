@@ -43,7 +43,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import me.untouchedodin0.kotlin.mine.data.MineData;
-import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
@@ -113,7 +112,7 @@ public class PrivateMines extends JavaPlugin {
   private SQLHelper sqlHelper;
   private Map<String, SQLCache> caches;
   private BukkitAudiences adventure;
-  private AddonManager addonManager; // = new AddonManager();
+  private AddonManager addonManager;
 
   public static PrivateMines getPrivateMines() {
     return privateMines;
@@ -271,7 +270,6 @@ public class PrivateMines extends JavaPlugin {
 
     Task.asyncDelayed(this::loadSQLMines);
     Task.asyncDelayed(SQLUtils::loadPregens);
-//    loadAddons();
     Task.asyncDelayed(this::loadAddons);
 
     if (PaperLib.isPaper()) {
