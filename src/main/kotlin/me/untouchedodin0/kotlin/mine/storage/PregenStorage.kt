@@ -33,13 +33,9 @@ class PregenStorage {
     private var files: MutableMap<PregenMine, File> = HashMap()
 
     fun addMine(pregenMine: PregenMine) {
-//        pregenMines.add(pregenMine)
-        pregenMines.put(pregenMine, pregenMine.location!!)
+        pregenMines[pregenMine] = pregenMine.location!!
     }
 
-    //    fun getMines(): MutableList<PregenMine> {
-//        return pregenMines
-//    }
     fun getMines(): MutableMap<PregenMine, Location> {
         return pregenMines
     }

@@ -4,9 +4,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.data.MineData;
@@ -19,10 +16,8 @@ import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
-import redempt.redlib.sql.SQLCache;
 import redempt.redlib.sql.SQLHelper;
 import redempt.redlib.sql.SQLHelper.Results;
 
@@ -30,7 +25,6 @@ public class SQLUtils {
 
   private static final PrivateMines privateMines = PrivateMines.getPrivateMines();
   private static final SQLHelper sqlHelper = privateMines.getSqlHelper();
-  private static List<PregenMine> pregenMines = new ArrayList<>();
   static PregenStorage pregenStorage = privateMines.getPregenStorage();
 
   public static Location getCurrentLocation() {
@@ -130,33 +124,6 @@ public class SQLUtils {
     sqlHelper.executeUpdate(command);
   }
 
-  public static void updateCache(Mine mine) {
-    SQLHelper sqlHelper = privateMines.getSqlHelper();
-
-    MineData mineData = mine.getMineData();
-    MineType mineType = mineData.getMineType();
-    UUID owner = mineData.getMineOwner();
-    Location location = mineData.getMineLocation();
-    Location minMining = mineData.getMinimumMining();
-    Location maxMining = mineData.getMaximumMining();
-
-    Map<String, SQLCache> caches = privateMines.getCaches();
-
-    SQLCache ownerCache = caches.get("owner");
-    SQLCache mineTypeCache = caches.get("mineType");
-    SQLCache mineLocationCache = caches.get("mineLocation");
-    SQLCache corner1Cache = caches.get("corner1");
-    SQLCache corner2Cache = caches.get("corner2");
-
-    ownerCache.update(owner.toString());
-    mineTypeCache.update(mineType.getName());
-    mineLocationCache.update(LocationUtils.toString(location));
-    corner1Cache.update(LocationUtils.toString(minMining));
-    corner2Cache.update(LocationUtils.toString(maxMining));
-
-    Task.asyncDelayed(sqlHelper::flushAllCaches);
-  }
-
   public static void delete(Mine mine) {
     SQLHelper sqlHelper = privateMines.getSqlHelper();
     MineData mineData = mine.getMineData();
@@ -166,28 +133,9 @@ public class SQLUtils {
     Task.asyncDelayed(() -> sqlHelper.executeUpdate(dropQuery));
   }
 
-  public static void updateMaterials(Mine mine) {
-    SQLHelper sqlHelper = privateMines.getSqlHelper();
-    MineData mineData = mine.getMineData();
-    UUID owner = mineData.getMineOwner();
-
-    Map<Material, Double> mats = mineData.getMaterials();
-
-    String command = String.format(
-        "UPDATE privatemines SET materials = " + "'%s' " + "WHERE owner = '%s';", mats, owner);
-    sqlHelper.executeUpdate(command);
-  }
-
   public static void insertPregen(PregenMine pregenMine) {
     Connection connection = sqlHelper.getConnection();
     SQLHelper sqlHelper = new SQLHelper(connection);
-
-//    Bukkit.broadcastMessage("connection " + sqlHelper.getConnection());
-//    Bukkit.broadcastMessage("connection2 " + PrivateMines.getPrivateMines().getSqlHelper().getConnection());
-    Bukkit.broadcastMessage("sql lite " + privateMines.getSqlite());
-    Bukkit.broadcastMessage("connection " + connection);
-    Bukkit.broadcastMessage("sql helper 2 " + sqlHelper);
-
     String insert = String.format(
         "INSERT INTO pregenmines (location, min_mining, max_mining, spawn, min_full, max_full) "
             + "VALUES ('%s', '%s', '%s', '%s', '%s', '%s');",

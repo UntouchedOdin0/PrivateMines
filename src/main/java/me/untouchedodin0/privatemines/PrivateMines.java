@@ -22,11 +22,10 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.BukkitCommandManager;
-import co.aikar.commands.PaperCommandManager;
 import com.google.gson.GsonBuilder;
-import io.papermc.lib.PaperLib;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -80,8 +79,11 @@ import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 import redempt.redlib.config.ConfigManager;
@@ -272,30 +274,41 @@ public class PrivateMines extends JavaPlugin {
     Task.asyncDelayed(SQLUtils::loadPregens);
     Task.asyncDelayed(this::loadAddons);
 
-    if (PaperLib.isPaper()) {
-      PaperCommandManager paperCommandManager = new PaperCommandManager(this);
-      paperCommandManager.registerCommand(new PrivateMinesCommand());
-      paperCommandManager.registerCommand(new PublicMinesCommand());
-      paperCommandManager.registerCommand(new AddonsCommand());
-      paperCommandManager.enableUnstableAPI("help");
-      paperCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
-        ArrayList<String> addons = new ArrayList<>();
-        AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
-        return addons;
-      });
-    } else {
-      BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
-      bukkitCommandManager.registerCommand(new PrivateMinesCommand());
-      bukkitCommandManager.registerCommand(new PublicMinesCommand());
-      bukkitCommandManager.registerCommand(new AddonsCommand());
-      bukkitCommandManager.enableUnstableAPI("help");
-      bukkitCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
-        ArrayList<String> addons = new ArrayList<>();
-        AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
-        return addons;
-      });
-    }
+    BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
+    bukkitCommandManager.registerCommand(new PrivateMinesCommand());
+    bukkitCommandManager.registerCommand(new PublicMinesCommand());
+    bukkitCommandManager.registerCommand(new AddonsCommand());
+    bukkitCommandManager.enableUnstableAPI("help");
+    bukkitCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
+      ArrayList<String> addons = new ArrayList<>();
+      AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
+      return addons;
+    });
 
+//    Bukkit.broadcastMessage("is registered " + Bukkit.getServer().getPluginCommand("privatemines").isRegistered());
+//    if (PaperLib.isPaper()) {
+//      PaperCommandManager paperCommandManager = new PaperCommandManager(this);
+//      paperCommandManager.registerCommand(new PrivateMinesCommand());
+//      paperCommandManager.registerCommand(new PublicMinesCommand());
+//      paperCommandManager.registerCommand(new AddonsCommand());
+//      paperCommandManager.enableUnstableAPI("help");
+//      paperCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
+//        ArrayList<String> addons = new ArrayList<>();
+//        AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
+//        return addons;
+//      });
+//    } else {
+//      BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
+//      bukkitCommandManager.registerCommand(new PrivateMinesCommand());
+//      bukkitCommandManager.registerCommand(new PublicMinesCommand());
+//      bukkitCommandManager.registerCommand(new AddonsCommand());
+//      bukkitCommandManager.enableUnstableAPI("help");
+//      bukkitCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
+//        ArrayList<String> addons = new ArrayList<>();
+//        AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
+//        return addons;
+//      });
+//    }
 
     getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
     if (!setupEconomy()) {

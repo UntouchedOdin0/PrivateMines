@@ -266,8 +266,6 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("teleport")
   @CommandPermission("privatemines.teleport")
   public void teleport(Player player) {
-    Bukkit.broadcastMessage("" + mineStorage.getMines());
-
     if (!mineStorage.hasMine(player)) {
       player.sendMessage(ChatColor.RED + "You don't own a mine!");
     } else {
@@ -448,10 +446,10 @@ public class PrivateMinesCommand extends BaseCommand {
         Location corner2 = pregenMine.getUpperRails();
         Location minimum = pregenMine.getFullMin();
         Location maximum = pregenMine.getFullMax();
-        BlockVector3 miningRegionMin = BukkitAdapter.asBlockVector(corner1);
-        BlockVector3 miningRegionMax = BukkitAdapter.asBlockVector(corner2);
-        BlockVector3 fullRegionMin = BukkitAdapter.asBlockVector(minimum);
-        BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(maximum);
+        BlockVector3 miningRegionMin = BukkitAdapter.asBlockVector(Objects.requireNonNull(corner1));
+        BlockVector3 miningRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(corner2));
+        BlockVector3 fullRegionMin = BukkitAdapter.asBlockVector(Objects.requireNonNull(minimum));
+        BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(maximum));
 
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionManager regionManager = container.get(BukkitAdapter.adapt(Objects.requireNonNull(spawn).getWorld()));
