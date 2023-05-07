@@ -1,7 +1,5 @@
 package me.untouchedodin0.privatemines.utils.addon;
 
-import java.util.List;
-
 public abstract class Addon {
 
   public abstract void onEnable();

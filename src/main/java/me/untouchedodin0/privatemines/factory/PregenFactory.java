@@ -65,8 +65,6 @@ public class PregenFactory {
           cancel();
         } else {
           i++;
-          Bukkit.broadcastMessage("i " + i);
-
           PregenMine pregenMine = new PregenMine();
           ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
           BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(),
@@ -127,13 +125,6 @@ public class PregenFactory {
               newRegion.getMinimumPoint());
           Location fullMax = BukkitAdapter.adapt(location.getWorld(),
               newRegion.getMaximumPoint());
-
-          Bukkit.broadcastMessage("lraisv " + lrailsV);
-          Bukkit.broadcastMessage("urailsV " + urailsV);
-          Bukkit.broadcastMessage("spongeL " + LocationUtils.toString(spongeL));
-          Bukkit.broadcastMessage("lrailsL " + LocationUtils.toString(lrailsL));
-          Bukkit.broadcastMessage("urailsL " + LocationUtils.toString(urailsL));
-
           pregenMine.setLocation(location);
           pregenMine.setSpawnLocation(spongeL);
           pregenMine.setLowerRails(lrailsL);
@@ -143,6 +134,8 @@ public class PregenFactory {
 
           SQLUtils.insertPregen(pregenMine);
           pregenStorage.addMine(pregenMine);
+
+          Task.syncDelayed(() -> spongeL.getBlock().setType(Material.AIR, false));
         }
       }
     }.runTaskTimerAsynchronously(privateMines, 20L, 20L);

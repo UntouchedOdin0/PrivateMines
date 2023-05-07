@@ -474,9 +474,6 @@ public class PrivateMinesCommand extends BaseCommand {
         Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
         pregenMine.teleport(player);
         mine.handleReset();
-
-        player.sendMessage("hi");
-        player.sendMessage("claimed " + pregenMine);
       }
     }
   }

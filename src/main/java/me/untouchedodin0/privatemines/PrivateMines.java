@@ -285,31 +285,6 @@ public class PrivateMines extends JavaPlugin {
       return addons;
     });
 
-//    Bukkit.broadcastMessage("is registered " + Bukkit.getServer().getPluginCommand("privatemines").isRegistered());
-//    if (PaperLib.isPaper()) {
-//      PaperCommandManager paperCommandManager = new PaperCommandManager(this);
-//      paperCommandManager.registerCommand(new PrivateMinesCommand());
-//      paperCommandManager.registerCommand(new PublicMinesCommand());
-//      paperCommandManager.registerCommand(new AddonsCommand());
-//      paperCommandManager.enableUnstableAPI("help");
-//      paperCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
-//        ArrayList<String> addons = new ArrayList<>();
-//        AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
-//        return addons;
-//      });
-//    } else {
-//      BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
-//      bukkitCommandManager.registerCommand(new PrivateMinesCommand());
-//      bukkitCommandManager.registerCommand(new PublicMinesCommand());
-//      bukkitCommandManager.registerCommand(new AddonsCommand());
-//      bukkitCommandManager.enableUnstableAPI("help");
-//      bukkitCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
-//        ArrayList<String> addons = new ArrayList<>();
-//        AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
-//        return addons;
-//      });
-//    }
-
     getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
     if (!setupEconomy()) {
       privateMines.getLogger().severe(
