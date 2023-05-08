@@ -141,7 +141,6 @@ public class QueueUtils {
         Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
         pregenMine.teleport(player);
         mine.handleReset();
-//        mineFactory.create(player, location, defaultMineType);
       }
     }, 0L, 120L);
   }
