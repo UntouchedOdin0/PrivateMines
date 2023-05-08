@@ -22,37 +22,46 @@
 package me.untouchedodin0.kotlin.mine.storage
 
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine
-import org.bukkit.Bukkit
-import java.io.File
+import org.bukkit.Location
 
+/**
+ * PregenStorage is a class that stores pregenerated mines and their locations.
+ * The mines are stored as key-value pairs in a MutableMap, where the key is a PregenMine
+ * object and the value is its location.
+ */
 class PregenStorage {
 
-    private var pregenMines: MutableList<PregenMine> = ArrayList()
-    private var files: MutableMap<PregenMine, File> = HashMap()
+    // Initialize an empty MutableMap to store the pregenerated mines
+    private var pregenMines: MutableMap<PregenMine, Location> = HashMap()
 
+    /**
+     * Adds a pregenerated mine to the storage.
+     * @param pregenMine The pregenerated mine to add.
+     */
     fun addMine(pregenMine: PregenMine) {
-        pregenMines.add(pregenMine)
+        pregenMines[pregenMine] = pregenMine.location!!
     }
 
-    fun getMines(): MutableList<PregenMine> {
-        return pregenMines
+    /**
+     * Gets and removes the oldest pregenerated mine from the storage.
+     * @return The oldest pregenerated mine.
+     */
+    fun getAndRemove(): PregenMine {
+        // Get the oldest entry in the map (which is the first entry)
+        val oldestEntry = pregenMines.entries.first()
+        // Use a let block to avoid nullable warnings and return the oldest pregenerated mine
+        oldestEntry.let {
+            return oldestEntry.key.also {
+                pregenMines.remove(oldestEntry.key)
+            }
+        }
     }
 
-    fun getAndRemove(): PregenMine? {
-        return pregenMines.removeFirstOrNull()
-    }
-
+    /**
+     * Checks if all pregenerated mines in the storage have been redeemed.
+     * @return True if there are no more pregenerated mines in the storage, false otherwise.
+     */
     fun isAllRedeemed(): Boolean {
         return pregenMines.isEmpty()
-    }
-
-    fun addFile(pregenMine: PregenMine, file: File) {
-        files[pregenMine] = file
-    }
-
-    fun removeFile(pregenMine: PregenMine) {
-        Bukkit.broadcastMessage("File ${pregenMine.file?.name}")
-        pregenMine.file?.delete()
-        files.keys.removeIf { it.equals(pregenMine.file) }
     }
 }

@@ -46,3 +46,5 @@ mineTypes:
       upc-enchants: true
     fullFlags:
       block-place: false
+    prices:
+      COBBLESTONE: 1.0

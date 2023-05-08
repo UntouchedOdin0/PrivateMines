@@ -21,7 +21,7 @@
 
 package me.untouchedodin0.privatemines;
 
-import co.aikar.commands.PaperCommandManager;
+import co.aikar.commands.BukkitCommandManager;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
@@ -31,14 +31,16 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import me.untouchedodin0.kotlin.mine.data.MineData;
-import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
@@ -65,7 +67,8 @@ import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
 import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
-import me.untouchedodin0.privatemines.utils.addon.old.AddonsManager;
+import me.untouchedodin0.privatemines.utils.addon.Addon;
+import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -78,6 +81,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
@@ -100,12 +104,13 @@ public class PrivateMines extends JavaPlugin {
   private PregenStorage pregenStorage;
   private MineWorldManager mineWorldManager;
   private MineTypeManager mineTypeManager;
-  private AddonsManager addonsManager;
   private QueueUtils queueUtils;
   private static Economy econ = null;
+  private SQLite sqlite;
   private SQLHelper sqlHelper;
   private Map<String, SQLCache> caches;
   private BukkitAudiences adventure;
+  private AddonManager addonManager;
 
   public static PrivateMines getPrivateMines() {
     return privateMines;
@@ -127,11 +132,7 @@ public class PrivateMines extends JavaPlugin {
     this.pregenStorage = new PregenStorage();
     this.mineTypeManager = new MineTypeManager(this);
     this.queueUtils = new QueueUtils();
-    this.addonsManager = new AddonsManager();
-
-    GsonBuilder gsonBuilder = new GsonBuilder();
-    gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
-    gsonBuilder.registerTypeAdapter(Path.class, new PathAdapter());
+    this.addonManager = new AddonManager();
 
     if (Config.enableTax) {
       registerSellListener();
@@ -219,13 +220,13 @@ public class PrivateMines extends JavaPlugin {
       }
     }
 
-    SQLite sqlite = new SQLite();
+    this.sqlite = new SQLite();
     sqlite.load();
     this.sqlHelper = new SQLHelper(sqlite.getSQLConnection());
 
     sqlHelper.executeUpdate("""
         CREATE TABLE IF NOT EXISTS privatemines (
-        owner VARCHAR(36) NOT NULL,
+        owner VARCHAR(36) UNIQUE NOT NULL,
         mineType VARCHAR(10) NOT NULL,
         mineLocation VARCHAR(30) NOT NULL,
         corner1 VARCHAR(30) NOT NULL,
@@ -239,6 +240,16 @@ public class PrivateMines extends JavaPlugin {
         maxMineSize INT NOT NULL,
         materials VARCHAR(50) NOT NULL
         );""");
+    sqlHelper.executeUpdate("""
+        CREATE TABLE IF NOT EXISTS pregenmines (
+        location VARCHAR(20),
+        min_mining VARCHAR(20),
+        max_mining VARCHAR(20),
+        spawn VARCHAR(20),
+        min_full VARCHAR(20),
+        max_full VARCHAR(20)
+        );
+        """);
     sqlHelper.setAutoCommit(true);
 
     this.caches = new HashMap<>();
@@ -251,13 +262,20 @@ public class PrivateMines extends JavaPlugin {
       caches.put(string, sqlCache);
     });
 
-    PaperCommandManager paperCommandManager = new PaperCommandManager(this);
-    paperCommandManager.registerCommand(new PrivateMinesCommand());
-    paperCommandManager.registerCommand(new PublicMinesCommand());
-    paperCommandManager.registerCommand(new AddonsCommand());
-    paperCommandManager.enableUnstableAPI("help");
-
     Task.asyncDelayed(this::loadSQLMines);
+    Task.asyncDelayed(SQLUtils::loadPregens);
+    Task.asyncDelayed(this::loadAddons);
+
+    BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
+    bukkitCommandManager.registerCommand(new PrivateMinesCommand());
+    bukkitCommandManager.registerCommand(new PublicMinesCommand());
+    bukkitCommandManager.registerCommand(new AddonsCommand());
+    bukkitCommandManager.enableUnstableAPI("help");
+    bukkitCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
+      ArrayList<String> addons = new ArrayList<>();
+      AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
+      return addons;
+    });
 
     getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
     if (!setupEconomy()) {
@@ -272,7 +290,6 @@ public class PrivateMines extends JavaPlugin {
 
     new UpdateChecker(this).fetch();
 
-    loadAddons();
     Instant end = Instant.now();
     Duration loadTime = Duration.between(start, end);
     getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
@@ -292,7 +309,7 @@ public class PrivateMines extends JavaPlugin {
         String.format("%s v%s has successfully been Disabled", getDescription().getName(),
             getDescription().getVersion()));
     saveMines();
-    savePregenMines();
+//    savePregenMines();
     sqlHelper.close();
   }
 
@@ -329,20 +346,20 @@ public class PrivateMines extends JavaPlugin {
       String spawn = result.getString(8);
       double tax = result.get(9);
       int isOpen = result.get(10);
-      String resultsMaterial = result.getString(13);
-      resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
+//      String resultsMaterial = result.getString(13);
+//      resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
 
-      Map<Material, Double> materials = new HashMap<>();
-
-      String[] pairs = resultsMaterial.split("\\s*,\\s*");
-
-      for (String string : pairs) {
-        String[] parts = string.split("=");
-        String matString = parts[0];
-        double percent = Double.parseDouble(parts[1].substring(0, parts[1].length() - 1));
-        Material material = Material.valueOf(matString);
-        materials.put(material, percent);
-      }
+//      Map<Material, Double> materials = new HashMap<>();
+//
+//      String[] pairs = resultsMaterial.split("\\s*,\\s*");
+//
+//      for (String string : pairs) {
+//        String[] parts = string.split("=");
+//        String matString = parts[0];
+//        double percent = Double.parseDouble(parts[1].substring(0, parts[1].length() - 1));
+//        Material material = Material.valueOf(matString);
+//        materials.put(material, percent);
+//      }
 
       Mine mine = new Mine(this);
       UUID uuid = UUID.fromString(owner);
@@ -357,7 +374,7 @@ public class PrivateMines extends JavaPlugin {
 
       MineData mineData = new MineData(uuid, minMining, maxMining, fullMin, fullMax, location,
           spawnLocation, type, open, tax);
-      mineData.setMaterials(materials);
+//      mineData.setMaterials(materials);
       mine.setMineData(mineData);
       mineStorage.addMine(uuid, mine);
     });
@@ -369,26 +386,15 @@ public class PrivateMines extends JavaPlugin {
 
     try (Stream<Path> paths = Files.walk(addonsDirectory).filter(jarMatcher::matches)) {
       paths.forEach(jar -> {
-        getLogger().info("jar path " + jar);
-//        AddonsManager.loadAddon(jar.toFile());
+        File file = jar.toFile();
+        CompletableFuture<@Nullable Class<? extends Addon>> addon = AddonManager.findExpansionInFile(
+            file);
+        Optional<Addon> loaded = addonManager.register(addon);
 
-//        try {
-//          AddonLoader.loadPlugin(jar.toFile());
-////          AddonLoader.loadAddonProperties(file);
-//        } catch (IOException e) {
-//          throw new RuntimeException(e);
-//        } catch (ClassNotFoundException e) {
-//          throw new RuntimeException(e);
-//        } catch (InvocationTargetException e) {
-//          throw new RuntimeException(e);
-//        } catch (InstantiationException e) {
-//          throw new RuntimeException(e);
-//        } catch (IllegalAccessException e) {
-//          throw new RuntimeException(e);
-//        } catch (NoSuchMethodException e) {
-//          throw new RuntimeException(e);
-//        }
-//        AddonAPI.load(jar);
+        if (loaded.isPresent()) {
+          Addon addonLoaded = loaded.get();
+          addonLoaded.onEnable();
+        }
       });
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -405,9 +411,9 @@ public class PrivateMines extends JavaPlugin {
     });
   }
 
-  public void savePregenMines() {
-    getPregenStorage().getMines().forEach(PregenMine::save);
-  }
+//  public void savePregenMines() {
+//    getPregenStorage().getMines().forEach(PregenMine::save);
+//  }
 
   public SchematicStorage getSchematicStorage() {
     return schematicStorage;
@@ -433,6 +439,10 @@ public class PrivateMines extends JavaPlugin {
     return mineTypeManager;
   }
 
+  public AddonManager getAddonManager() {
+    return addonManager;
+  }
+
   public static Economy getEconomy() {
     return econ;
   }
@@ -454,6 +464,10 @@ public class PrivateMines extends JavaPlugin {
     getServer().getPluginManager().registerEvents(new MineResetListener(), this);
   }
 
+  public SQLite getSqlite() {
+    return sqlite;
+  }
+
   public SQLHelper getSqlHelper() {
     return sqlHelper;
   }
@@ -471,9 +485,5 @@ public class PrivateMines extends JavaPlugin {
 
   public QueueUtils getQueueUtils() {
     return queueUtils;
-  }
-
-  public AddonsManager getAddonsManager() {
-    return addonsManager;
   }
 }

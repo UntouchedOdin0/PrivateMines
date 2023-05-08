@@ -50,26 +50,6 @@ public class Utils {
     return new Location(world, vector3.getX(), vector3.getY(), vector3.getZ());
   }
 
-  /**
-   * Utility method to set a flag.
-   * <p>
-   * Borrowed from <a
-   * href="https://github.com/EngineHub/WorldGuard/blob/bc63119373d4603e5b040460c41e712275a4d062/worldguard-core/src/main/java/com/sk89q/worldguard/commands/region/RegionCommandsBase.java#L414-L427">...</a>
-   *
-   * @param region the region
-   * @param flag   the flag
-   * @param value  the value
-   * @throws InvalidFlagFormat thrown if the value is invalid
-   */
-  public static <V> void setFlag(ProtectedRegion region, Flag<V> flag, String value)
-      throws InvalidFlagFormat {
-    if (flag != null) {
-      V val = flag.parseInput(
-          FlagContext.create().setInput(value).setObject("region", region).build());
-      region.setFlag(flag, val);
-    }
-  }
-
   public static String color(String string) {
     return ChatColor.translateAlternateColorCodes('&', string);
   }
@@ -86,17 +66,6 @@ public class Utils {
 
   public static String format(Material material) {
     return WordUtils.capitalize(material.name().toLowerCase().replaceAll("_", " "));
-  }
-
-  public static String getRandom(int digits) {
-    Random rand = new Random(); //instance of random class
-    String total_characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    StringBuilder randomString = new StringBuilder();
-    for (int i = 0; i < digits; i++) {
-      int index = rand.nextInt(total_characters.length() - 1);
-      randomString.append(total_characters.charAt(index));
-    }
-    return randomString.toString();
   }
 
   public static String getGit() {
@@ -118,15 +87,18 @@ public class Utils {
   }
 
   public static String mapToString(Map<Material, Double> map) {
-    StringBuilder stringBuilder = new StringBuilder("{");
-    for (Entry<Material, Double> entry : map.entrySet()) {
-      stringBuilder.append(entry.getKey());
-      stringBuilder.append("=");
-      stringBuilder.append(entry.getValue());
-      stringBuilder.append(", ");
+    if (!map.isEmpty()) {
+      StringBuilder stringBuilder = new StringBuilder("{");
+      for (Entry<Material, Double> entry : map.entrySet()) {
+        stringBuilder.append(entry.getKey());
+        stringBuilder.append("=");
+        stringBuilder.append(entry.getValue());
+        stringBuilder.append(", ");
+      }
+      stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
+      stringBuilder.append("}");
+      return stringBuilder.toString();
     }
-    stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
-    stringBuilder.append("}");
-    return stringBuilder.toString();
+    return "";
   }
 }

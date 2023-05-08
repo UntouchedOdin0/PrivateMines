@@ -44,19 +44,4 @@ class PregenMine {
     fun teleport(player: Player) {
         spawnLocation?.let(player::teleport)
     }
-
-    fun save() {
-        file = File("plugins/PrivateMines/pregen/" + Utils.getRandom(10) + ".yml")
-
-        val yml = YamlConfiguration.loadConfiguration(file!!)
-
-        yml.set("location", LocationUtils.toString(location))
-        yml.set("spawnLocation", LocationUtils.toString(spawnLocation))
-        yml.set("lowerRails", LocationUtils.toString(lowerRails))
-        yml.set("upperRails", LocationUtils.toString(upperRails))
-        yml.set("fullMin", LocationUtils.toString(fullMin))
-        yml.set("fullMax", LocationUtils.toString(fullMax))
-
-        yml.save(file!!)
-    }
 }

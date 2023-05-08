@@ -51,7 +51,7 @@ class FlagUtils {
                         } else {
                             val fuzzyFlag =
                                 Flags.fuzzyMatchFlag(WorldGuard.getInstance().flagRegistry, flag)
-                            setFlag(mineRegion, fuzzyFlag, "false")
+                            setFlag(mineRegion, fuzzyFlag, "deny")
                         }
                     }
                 }
@@ -68,7 +68,7 @@ class FlagUtils {
                         } else {
                             val fuzzyFlag =
                                 Flags.fuzzyMatchFlag(WorldGuard.getInstance().flagRegistry, flag)
-                            setFlag(fullRegion, fuzzyFlag, "false")
+                            setFlag(fullRegion, fuzzyFlag, "deny")
                         }
                     }
                 }

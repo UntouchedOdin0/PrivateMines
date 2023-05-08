@@ -1,3 +1,26 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2021 - 2023 Kyle Hicks
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package me.untouchedodin0.privatemines.commands;
 
 import co.aikar.commands.BaseCommand;
@@ -9,13 +32,22 @@ import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Split;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.data.MineData;
+import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
+import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.AudienceUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
@@ -120,7 +152,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("upgrade")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.upgrade")
-  public void upgrade(CommandSender sender) {
+  public void upgrade(CommandSender sender, int times) {
     if (!(sender instanceof Player player)) {
       sender.sendMessage(ChatColor.RED + "Only players can use this command!");
     } else {
@@ -137,8 +169,12 @@ public class PrivateMinesCommand extends BaseCommand {
 
           if (bal >= cost) {
             // player has enough money, upgrade the mine
-            mine.upgrade();
-            mine.handleReset();
+
+            for (int i = 0; i < times; i++) {
+              mine.upgrade();
+              PrivateMines.getEconomy().withdrawPlayer(player, cost);
+              mine.handleReset();
+            }
           } else {
             // player does not have enough money
             player.sendMessage(ChatColor.RED + String.format(
@@ -274,10 +310,16 @@ public class PrivateMinesCommand extends BaseCommand {
       if (mine != null) {
         MineData mineData = mine.getMineData();
         if (mineData != null) {
-          if (mineData.isOpen()) {
-            mine.teleport(player);
+          List<UUID> banned = mineData.getBannedPlayers();
+
+          if (banned.contains(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You're banned from this mine!");
           } else {
-            player.sendMessage(ChatColor.RED + "Target mine closed!");
+            if (mineData.isOpen()) {
+              mine.teleport(player);
+            } else {
+              player.sendMessage(ChatColor.RED + "Target mine closed!");
+            }
           }
         }
       }
@@ -314,7 +356,7 @@ public class PrivateMinesCommand extends BaseCommand {
       mineData.setOpen(true);
       mine.setMineData(mineData);
       mineStorage.replaceMineNoLog(player, mine);
-      SQLUtils.replace(mine);
+      SQLUtils.update(mine);
     }
   }
 
@@ -328,7 +370,7 @@ public class PrivateMinesCommand extends BaseCommand {
       mineData.setOpen(false);
       mine.setMineData(mineData);
       mineStorage.replaceMineNoLog(player, mine);
-      SQLUtils.replace(mine);
+      SQLUtils.update(mine);
     }
   }
 
@@ -340,6 +382,7 @@ public class PrivateMinesCommand extends BaseCommand {
     if (mine != null) {
       mine.ban(target);
       mineStorage.replaceMineNoLog(player, mine);
+      SQLUtils.update(mine);
     }
   }
 
@@ -351,6 +394,7 @@ public class PrivateMinesCommand extends BaseCommand {
     if (mine != null) {
       mine.unban(target);
       mineStorage.replaceMineNoLog(player, mine);
+      SQLUtils.update(mine);
     }
   }
 
@@ -364,19 +408,9 @@ public class PrivateMinesCommand extends BaseCommand {
       mineData.setTax(tax);
       mine.setMineData(mineData);
       mineStorage.replaceMineNoLog(player, mine);
+      SQLUtils.update(mine);
     }
   }
-
-//  @Subcommand("claim")
-//  @CommandPermission("privatemines.claim")
-//  public void claim(Player player) {
-//    QueueUtils queueUtils = privateMines.getQueueUtils();
-//    if (queueUtils.isInQueue(player.getUniqueId())) {
-//      player.sendMessage(ChatColor.RED + "You're already in the queue!");
-//      return;
-//    }
-//    queueUtils.claim(player);
-//  }
 
   @Subcommand("setblocks")
   @CommandCompletion("@players")
@@ -403,9 +437,7 @@ public class PrivateMinesCommand extends BaseCommand {
         mine.setMineData(mineData);
         mineStorage.replaceMineNoLog(target.getPlayer(), mine);
         mine.handleReset();
-        Task.asyncDelayed(() -> {
-          SQLUtils.update(mine);
-        });
+        Task.asyncDelayed(() -> SQLUtils.update(mine));
       }
     }
   }
@@ -422,7 +454,50 @@ public class PrivateMinesCommand extends BaseCommand {
     if (mineStorage.hasMine(player)) {
       player.sendMessage(ChatColor.RED + "You already have a mine!");
     } else {
+      String mineRegionName = String.format("mine-%s", player.getUniqueId());
+      String fullRegionName = String.format("full-mine-%s", player.getUniqueId());
 
+      PregenStorage pregenStorage = privateMines.getPregenStorage();
+      if (pregenStorage.isAllRedeemed()) {
+        player.sendMessage(ChatColor.RED + "All the mines have been claimed...");
+      } else {
+        PregenMine pregenMine = pregenStorage.getAndRemove();
+        MineType mineType = mineTypeManager.getDefaultMineType();
+        Location location = pregenMine.getLocation();
+        Location spawn = pregenMine.getSpawnLocation();
+        Location corner1 = pregenMine.getLowerRails();
+        Location corner2 = pregenMine.getUpperRails();
+        Location minimum = pregenMine.getFullMin();
+        Location maximum = pregenMine.getFullMax();
+        BlockVector3 miningRegionMin = BukkitAdapter.asBlockVector(Objects.requireNonNull(corner1));
+        BlockVector3 miningRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(corner2));
+        BlockVector3 fullRegionMin = BukkitAdapter.asBlockVector(Objects.requireNonNull(minimum));
+        BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(maximum));
+
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager regionManager = container.get(BukkitAdapter.adapt(Objects.requireNonNull(spawn).getWorld()));
+
+        ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName, miningRegionMin, miningRegionMax);
+        ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName, fullRegionMin, fullRegionMax);
+
+        if (regionManager != null) {
+          regionManager.addRegion(miningRegion);
+          regionManager.addRegion(fullRegion);
+        }
+
+        Mine mine = new Mine(privateMines);
+        MineData mineData = new MineData(player.getUniqueId(), corner2, corner1, minimum, maximum,
+            Objects.requireNonNull(location), spawn, mineType, false, 5.0);
+        mine.setMineData(mineData);
+        SQLUtils.claim(location);
+        SQLUtils.insert(mine);
+
+        mineStorage.addMine(player.getUniqueId(), mine);
+
+        Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
+        pregenMine.teleport(player);
+        mine.handleReset();
+      }
     }
   }
 }

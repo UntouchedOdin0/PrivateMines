@@ -27,6 +27,11 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import dev.drawethree.xprison.autosell.XPrisonAutoSell;
+import dev.drawethree.xprison.autosell.model.SellRegion;
+import dev.drawethree.xprison.libs.worldguardwrapper.region.IWrappedRegion;
+import dev.drawethree.xprison.utils.compat.CompMaterial;
+import dev.drawethree.xprison.utils.misc.RegionUtils;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +40,10 @@ import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.kotlin.utils.FlagUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
+import me.untouchedodin0.privatemines.events.PrivateMineCreationEvent;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.worldedit.PasteHelper;
@@ -113,7 +120,27 @@ public class MineFactory {
       Task.syncDelayed(() -> {
         spawn.getBlock().setType(Material.AIR);
         player.teleport(spawn);
+        FlagUtils flagUtils = new FlagUtils();
+        flagUtils.setFlags(mine);
+        PrivateMineCreationEvent creationEvent = new PrivateMineCreationEvent(uuid, mine);
+        Bukkit.getPluginManager().callEvent(creationEvent);
       });
+
+      if (materials != null) {
+        if (Bukkit.getPluginManager().isPluginEnabled("XPrison")) {
+          IWrappedRegion iWrappedRegion = RegionUtils.getFirstRegionAtLocation(location);
+          XPrisonAutoSell autoSell = XPrisonAutoSell.getInstance();
+
+          SellRegion sellRegion = new SellRegion(iWrappedRegion, location.getWorld());
+
+          Objects.requireNonNull(mineType.getPrices()).forEach((material, aDouble) -> {
+            CompMaterial compMaterial = CompMaterial.fromMaterial(material);
+            sellRegion.addSellPrice(compMaterial, aDouble);
+          });
+          autoSell.getManager().updateSellRegion(sellRegion);
+          autoSell.getAutoSellConfig().saveSellRegion(sellRegion);
+        }
+      }
     });
   }
 
@@ -125,9 +152,6 @@ public class MineFactory {
     RegionManager regionManager = container.get(BukkitAdapter.adapt(location.getWorld()));
 
     Map<Material, Double> materials = mineType.getMaterials();
-    if (materials != null) {
-      Map<Material, Double> prices = new HashMap<>(materials);
-    }
 
     if (!schematicFile.exists()) {
       privateMines.getLogger().warning("Schematic file does not exist: " + schematicFile.getName());
@@ -159,6 +183,7 @@ public class MineFactory {
         regionManager.addRegion(fullRegion);
       }
 
+
       MineData mineData = new MineData(uuid, corner2, corner1, minimum, maximum, location, spawn,
           mineType, false, 5.0);
       if (!Config.defaultClosed) {
@@ -171,7 +196,27 @@ public class MineFactory {
       Task.syncDelayed(() -> {
         spawn.getBlock().setType(Material.AIR);
         player.teleport(spawn);
+        FlagUtils flagUtils = new FlagUtils();
+        flagUtils.setFlags(mine);
+
+        PrivateMineCreationEvent creationEvent = new PrivateMineCreationEvent(uuid, mine);
+        Bukkit.getPluginManager().callEvent(creationEvent);
       });
+
+      if (materials != null) {
+        Map<Material, Double> prices = new HashMap<>(materials);
+        IWrappedRegion iWrappedRegion = RegionUtils.getFirstRegionAtLocation(location);
+        XPrisonAutoSell autoSell = XPrisonAutoSell.getInstance();
+
+        SellRegion sellRegion = new SellRegion(iWrappedRegion, location.getWorld());
+
+        prices.forEach((material, price) -> {
+          CompMaterial compMaterial = CompMaterial.fromMaterial(material);
+          sellRegion.addSellPrice(compMaterial, price);
+        });
+        autoSell.getManager().updateSellRegion(sellRegion);
+        autoSell.getAutoSellConfig().saveSellRegion(sellRegion);
+      }
     });
     return mine;
   }
@@ -182,6 +227,9 @@ public class MineFactory {
       Mine mine = createMine(Objects.requireNonNull(Bukkit.getPlayer(uuid)), location, mineType);
       mineStorage.replaceMine(uuid, mine);
       SQLUtils.replace(mine);
+
+      PrivateMineCreationEvent creationEvent = new PrivateMineCreationEvent(uuid, mine);
+      Bukkit.getPluginManager().callEvent(creationEvent);
     }
   }
 }

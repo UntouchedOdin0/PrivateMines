@@ -30,8 +30,10 @@ import com.sk89q.worldedit.world.block.BlockType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
+import me.untouchedodin0.privatemines.utils.Utils;
 import org.bukkit.Material;
 
 public class SchematicIterator {
@@ -48,7 +50,7 @@ public class SchematicIterator {
   }
 
   public MineBlocks findRelativePoints(File file) {
-
+    PrivateMines privateMines = PrivateMines.getPrivateMines();
     MineBlocks mineBlocks = new MineBlocks();
     mineBlocks.corners = new BlockVector3[2];
 
@@ -96,6 +98,20 @@ public class SchematicIterator {
           }
         });
 
+        if (spawn == null) {
+          privateMines.getLogger().info(String.format("Failed to find a spawn block in the mine\nhave you placed a %s block?",
+              Utils.format(spawnMaterial)));
+          return null;
+        } else if (corner1 == null) {
+          privateMines.getLogger().info(String.format("Failed to find corner 1 in the mine\nhave you placed 2 %s blocks in the mining region?",
+              Utils.format(cornerMaterial)));
+          return null;
+        } else if (corner2 == null) {
+          privateMines.getLogger().info(String.format("Failed to find corner 2 in the mine\nhave you placed 2 %s blocks in the mining region?",
+              Utils.format(cornerMaterial)));
+          return null;
+        }
+
         mineBlocks.spawnLocation = BlockVector3.at(spawn.getX(), spawn.getY(), spawn.getZ());
         if (npc != null) {
           mineBlocks.npcLocation = BlockVector3.at(npc.getX(), npc.getY(), npc.getZ());
@@ -119,6 +135,7 @@ public class SchematicIterator {
   }
 
   public static class MineBlocks {
+
     public BlockVector3 spawnLocation;
     public BlockVector3 npcLocation;
     public BlockVector3 quarryLocation;
