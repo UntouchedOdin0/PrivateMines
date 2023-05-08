@@ -25,7 +25,6 @@ import co.aikar.commands.BukkitCommandManager;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,11 +78,8 @@ import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.command.CommandMap;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 import redempt.redlib.config.ConfigManager;
@@ -137,10 +133,6 @@ public class PrivateMines extends JavaPlugin {
     this.mineTypeManager = new MineTypeManager(this);
     this.queueUtils = new QueueUtils();
     this.addonManager = new AddonManager();
-
-    GsonBuilder gsonBuilder = new GsonBuilder();
-    gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
-    gsonBuilder.registerTypeAdapter(Path.class, new PathAdapter());
 
     if (Config.enableTax) {
       registerSellListener();

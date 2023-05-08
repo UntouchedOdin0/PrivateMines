@@ -26,11 +26,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 public class FileUtil {
@@ -50,7 +47,7 @@ public class FileUtil {
       JarEntry entry;
       while ((entry = stream.getNextJarEntry()) != null) {
         final String name = entry.getName();
-        if (name.isEmpty() || !name.endsWith(".class")) {
+        if (!name.endsWith(".class")) {
           continue;
         }
 
@@ -72,36 +69,5 @@ public class FileUtil {
       return null;
     }
     return classes.get(0);
-  }
-
-  public static Addon createInstance(Class<? extends Addon> clazz) throws LinkageError {
-    try {
-      return clazz.getDeclaredConstructor().newInstance();
-    } catch (Exception exception) {
-      Bukkit.getLogger().info("Error loading expansion.");
-      exception.printStackTrace();
-      return null;
-    }
-  }
-
-  public static Optional<Addon> register(final Class<? extends Addon> clazz) {
-    try {
-      {
-        Bukkit.getLogger().info("clazz " + clazz);
-        final Addon addon = createInstance(clazz);
-
-        if (addon == null) {
-          return Optional.empty();
-        }
-
-        Objects.requireNonNull(addon.getName(), "The addon name is null!");
-        Objects.requireNonNull(addon.getAuthor(), "The addon author is null!");
-        Objects.requireNonNull(addon.getVersion(), "The addon version is null!");
-
-        return Optional.of(addon);
-      }
-    } catch (LinkageError e) {
-      throw new RuntimeException(e);
-    }
   }
 }

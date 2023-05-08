@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class AddonManager {
-
   public static Map<String, Addon> addons = new HashMap<>();
 
   @NotNull

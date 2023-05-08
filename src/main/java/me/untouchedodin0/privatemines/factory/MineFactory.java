@@ -27,7 +27,6 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import dev.drawethree.xprison.XPrison;
 import dev.drawethree.xprison.autosell.XPrisonAutoSell;
 import dev.drawethree.xprison.autosell.model.SellRegion;
 import dev.drawethree.xprison.libs.worldguardwrapper.region.IWrappedRegion;
@@ -128,8 +127,6 @@ public class MineFactory {
       });
 
       if (materials != null) {
-        Map<Material, Double> prices = new HashMap<>(materials);
-
         if (Bukkit.getPluginManager().isPluginEnabled("XPrison")) {
           IWrappedRegion iWrappedRegion = RegionUtils.getFirstRegionAtLocation(location);
           XPrisonAutoSell autoSell = XPrisonAutoSell.getInstance();

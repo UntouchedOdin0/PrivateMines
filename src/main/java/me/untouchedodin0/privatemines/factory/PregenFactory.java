@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
@@ -29,13 +28,11 @@ import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 
 public class PregenFactory {
@@ -46,9 +43,7 @@ public class PregenFactory {
   private static ClipboardHolder clipboardHolder;
 
   public static void pregen(Player player, int amount) {
-    Task task;
     Location location;
-    AtomicInteger atomicInteger = new AtomicInteger(1);
     MineType mineType = mineTypeManager.getDefaultMineType();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
     PregenStorage pregenStorage = privateMines.getPregenStorage();
