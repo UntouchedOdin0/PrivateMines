@@ -59,6 +59,8 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.CooldownManager;
+import me.untouchedodin0.privatemines.utils.messages.MessageUtils;
+import me.untouchedodin0.privatemines.utils.messages.Messages;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
@@ -295,6 +297,11 @@ public class PrivateMinesCommand extends BaseCommand {
       Mine mine = mineStorage.get(player);
       if (mine != null) {
         mine.teleport(player);
+
+        String message = Messages.WELCOME.getMessage(player);
+        MessageUtils.send(player, message);
+
+        player.sendMessage(Messages.WELCOME.getMessage(player));
       }
     }
   }

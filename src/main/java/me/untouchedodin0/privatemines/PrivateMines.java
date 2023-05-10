@@ -22,7 +22,10 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.BukkitCommandManager;
-import com.google.gson.GsonBuilder;
+import com.convallyria.languagy.api.HookedPlugin;
+import com.convallyria.languagy.api.language.Language;
+import com.convallyria.languagy.api.language.Translator;
+import com.convallyria.languagy.api.service.LanguageWatchService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -65,8 +68,6 @@ import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
-import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
-import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
 import me.untouchedodin0.privatemines.utils.addon.Addon;
 import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
@@ -111,6 +112,7 @@ public class PrivateMines extends JavaPlugin {
   private Map<String, SQLCache> caches;
   private BukkitAudiences adventure;
   private AddonManager addonManager;
+  private Translator translator;
 
   public static PrivateMines getPrivateMines() {
     return privateMines;
@@ -289,6 +291,8 @@ public class PrivateMines extends JavaPlugin {
     metrics.addCustomChart(new SingleLineChart("mines", () -> mineStorage.getTotalMines()));
 
     new UpdateChecker(this).fetch();
+
+    getLogger().info("translator " + translator);
 
     Instant end = Instant.now();
     Duration loadTime = Duration.between(start, end);
