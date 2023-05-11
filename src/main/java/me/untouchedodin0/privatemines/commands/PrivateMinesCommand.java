@@ -1,25 +1,22 @@
 /**
  * MIT License
- *
+ * <p>
  * Copyright (c) 2021 - 2023 Kyle Hicks
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
+ * <p>
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * <p>
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * <p>
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package me.untouchedodin0.privatemines.commands;
 
@@ -59,8 +56,6 @@ import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.CooldownManager;
-import me.untouchedodin0.privatemines.utils.messages.MessageUtils;
-import me.untouchedodin0.privatemines.utils.messages.Messages;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
@@ -154,7 +149,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("upgrade")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.upgrade")
-  public void upgrade(CommandSender sender, int times) {
+  public void upgrade(CommandSender sender, @Default("1") int times) {
     if (!(sender instanceof Player player)) {
       sender.sendMessage(ChatColor.RED + "Only players can use this command!");
     } else {
@@ -163,24 +158,23 @@ public class PrivateMinesCommand extends BaseCommand {
       } else {
         Mine mine = mineStorage.get(player);
         if (mine != null) {
-          MineData mineData = mine.getMineData();
-          MineType currentType = mineData.getMineType();
-          MineType nextType = mineTypeManager.getNextMineType(currentType);
-          double cost = nextType.getUpgradeCost();
-          double bal = PrivateMines.getEconomy().getBalance(player);
 
-          if (bal >= cost) {
-            // player has enough money, upgrade the mine
+          for (int i = 0; i < times; i++) {
+            MineData mineData = mine.getMineData();
+            MineType currentType = mineData.getMineType();
+            MineType nextType = mineTypeManager.getNextMineType(currentType);
+            double cost = nextType.getUpgradeCost();
+            double bal = PrivateMines.getEconomy().getBalance(player);
 
-            for (int i = 0; i < times; i++) {
-              mine.upgrade();
+            if (bal >= cost) {
+              // player has enough money, upgrade the mine
               PrivateMines.getEconomy().withdrawPlayer(player, cost);
+              mine.upgrade();
               mine.handleReset();
+            } else {
+              player.sendMessage(ChatColor.RED + String.format(
+                  "You need %.2f to upgrade the mine. You currently have %.2f.", cost, bal));
             }
-          } else {
-            // player does not have enough money
-            player.sendMessage(ChatColor.RED + String.format(
-                "You need %.2f to upgrade the mine. You currently have %.2f.", cost, bal));
           }
         }
       }
@@ -297,11 +291,6 @@ public class PrivateMinesCommand extends BaseCommand {
       Mine mine = mineStorage.get(player);
       if (mine != null) {
         mine.teleport(player);
-
-        String message = Messages.WELCOME.getMessage(player);
-        MessageUtils.send(player, message);
-
-        player.sendMessage(Messages.WELCOME.getMessage(player));
       }
     }
   }
@@ -482,10 +471,13 @@ public class PrivateMinesCommand extends BaseCommand {
         BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(maximum));
 
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionManager regionManager = container.get(BukkitAdapter.adapt(Objects.requireNonNull(spawn).getWorld()));
+        RegionManager regionManager = container.get(
+            BukkitAdapter.adapt(Objects.requireNonNull(spawn).getWorld()));
 
-        ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName, miningRegionMin, miningRegionMax);
-        ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName, fullRegionMin, fullRegionMax);
+        ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName,
+            miningRegionMin, miningRegionMax);
+        ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName, fullRegionMin,
+            fullRegionMax);
 
         if (regionManager != null) {
           regionManager.addRegion(miningRegion);

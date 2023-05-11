@@ -732,6 +732,7 @@ public class Mine {
           Task.asyncDelayed(() -> {
             SQLUtils.update(this);
           });
+          Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
 
           XPrisonAutoSell autoSell = XPrisonAutoSell.getInstance();
           SellRegion sellRegion = autoSell.getManager().getAutoSellRegion(mineLocation);
@@ -745,9 +746,6 @@ public class Mine {
             autoSell.getManager().updateSellRegion(sellRegion);
             autoSell.getAutoSellConfig().saveSellRegion(sellRegion);
           }
-
-          Bukkit.broadcastMessage("sell region " + sellRegion);
-          Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
         });
       }
     }
