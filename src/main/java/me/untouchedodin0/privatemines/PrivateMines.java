@@ -22,10 +22,6 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.BukkitCommandManager;
-import com.convallyria.languagy.api.HookedPlugin;
-import com.convallyria.languagy.api.language.Language;
-import com.convallyria.languagy.api.language.Translator;
-import com.convallyria.languagy.api.service.LanguageWatchService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -112,7 +108,6 @@ public class PrivateMines extends JavaPlugin {
   private Map<String, SQLCache> caches;
   private BukkitAudiences adventure;
   private AddonManager addonManager;
-  private Translator translator;
 
   public static PrivateMines getPrivateMines() {
     return privateMines;
@@ -292,8 +287,6 @@ public class PrivateMines extends JavaPlugin {
 
     new UpdateChecker(this).fetch();
 
-    getLogger().info("translator " + translator);
-
     Instant end = Instant.now();
     Duration loadTime = Duration.between(start, end);
     getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
@@ -350,20 +343,20 @@ public class PrivateMines extends JavaPlugin {
       String spawn = result.getString(8);
       double tax = result.get(9);
       int isOpen = result.get(10);
-//      String resultsMaterial = result.getString(13);
-//      resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
+      String resultsMaterial = result.getString(13);
+      resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
 
-//      Map<Material, Double> materials = new HashMap<>();
-//
-//      String[] pairs = resultsMaterial.split("\\s*,\\s*");
-//
-//      for (String string : pairs) {
-//        String[] parts = string.split("=");
-//        String matString = parts[0];
-//        double percent = Double.parseDouble(parts[1].substring(0, parts[1].length() - 1));
-//        Material material = Material.valueOf(matString);
-//        materials.put(material, percent);
-//      }
+      Map<Material, Double> materials = new HashMap<>();
+
+      String[] pairs = resultsMaterial.split("\\s*,\\s*");
+
+      for (String string : pairs) {
+        String[] parts = string.split("=");
+        String matString = parts[0];
+        double percent = Double.parseDouble(parts[1].substring(0, parts[1].length() - 1));
+        Material material = Material.valueOf(matString);
+        materials.put(material, percent);
+      }
 
       Mine mine = new Mine(this);
       UUID uuid = UUID.fromString(owner);
@@ -378,7 +371,7 @@ public class PrivateMines extends JavaPlugin {
 
       MineData mineData = new MineData(uuid, minMining, maxMining, fullMin, fullMax, location,
           spawnLocation, type, open, tax);
-//      mineData.setMaterials(materials);
+      mineData.setMaterials(materials);
       mine.setMineData(mineData);
       mineStorage.addMine(uuid, mine);
     });
