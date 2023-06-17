@@ -47,6 +47,7 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.AudienceUtils;
+import me.untouchedodin0.kotlin.utils.Range;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
@@ -58,6 +59,11 @@ import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.CooldownManager;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -398,13 +404,27 @@ public class PrivateMinesCommand extends BaseCommand {
   @CommandPermission("privatemines.tax")
   @Syntax("<amount>")
   public void tax(Player player, double tax) {
-    Mine mine = mineStorage.get(player);
-    if (mine != null) {
-      MineData mineData = mine.getMineData();
-      mineData.setTax(tax);
-      mine.setMineData(mineData);
-      mineStorage.replaceMineNoLog(player, mine);
-      SQLUtils.update(mine);
+    Range range = new Range(0, 100);
+    BukkitAudiences audiences = privateMines.getAdventure();
+    Audience audience = audiences.player(player);
+
+    if (!range.contains(tax)) {
+      player.sendMessage(ChatColor.RED + "Please enter a number between 0 and 100.");
+    } else {
+      Mine mine = mineStorage.get(player);
+      if (mine != null) {
+        MineData mineData = mine.getMineData();
+        mineData.setTax(tax);
+        mine.setMineData(mineData);
+        mineStorage.replaceMineNoLog(player, mine);
+        SQLUtils.update(mine);
+        Component message = Component.text()
+            .append(Component.text("Successfully updated tax to ", NamedTextColor.GREEN))
+            .append(Component.text(String.format("%.2f%%", tax), NamedTextColor.GOLD))
+            .build();
+
+        audience.sendMessage(message);
+      }
     }
   }
 

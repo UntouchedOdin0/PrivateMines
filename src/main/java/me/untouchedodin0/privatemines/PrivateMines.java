@@ -22,6 +22,7 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.BukkitCommandManager;
+import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -64,6 +65,8 @@ import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
+import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
+import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
 import me.untouchedodin0.privatemines.utils.addon.Addon;
 import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
@@ -343,20 +346,20 @@ public class PrivateMines extends JavaPlugin {
       String spawn = result.getString(8);
       double tax = result.get(9);
       int isOpen = result.get(10);
-      String resultsMaterial = result.getString(13);
-      resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
+//      String resultsMaterial = result.getString(13);
+//      resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
 
-      Map<Material, Double> materials = new HashMap<>();
-
-      String[] pairs = resultsMaterial.split("\\s*,\\s*");
-
-      for (String string : pairs) {
-        String[] parts = string.split("=");
-        String matString = parts[0];
-        double percent = Double.parseDouble(parts[1].substring(0, parts[1].length() - 1));
-        Material material = Material.valueOf(matString);
-        materials.put(material, percent);
-      }
+//      Map<Material, Double> materials = new HashMap<>();
+//
+//      String[] pairs = resultsMaterial.split("\\s*,\\s*");
+//
+//      for (String string : pairs) {
+//        String[] parts = string.split("=");
+//        String matString = parts[0];
+//        double percent = Double.parseDouble(parts[1].substring(0, parts[1].length() - 1));
+//        Material material = Material.valueOf(matString);
+//        materials.put(material, percent);
+//      }
 
       Mine mine = new Mine(this);
       UUID uuid = UUID.fromString(owner);
@@ -371,7 +374,7 @@ public class PrivateMines extends JavaPlugin {
 
       MineData mineData = new MineData(uuid, minMining, maxMining, fullMin, fullMax, location,
           spawnLocation, type, open, tax);
-      mineData.setMaterials(materials);
+//      mineData.setMaterials(materials);
       mine.setMineData(mineData);
       mineStorage.addMine(uuid, mine);
     });
