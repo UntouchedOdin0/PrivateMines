@@ -63,7 +63,6 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -72,8 +71,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.region.CuboidRegion;
+import redempt.redlib.sql.SQLHelper;
 
 @CommandAlias("privatemine|privatemines|pmine")
 public class PrivateMinesCommand extends BaseCommand {
@@ -197,9 +198,12 @@ public class PrivateMinesCommand extends BaseCommand {
         audienceUtils.sendMessage(player, MessagesConfig.playerDoesntOwnMine);
       }
     } else {
+      SQLHelper sqlHelper = privateMines.getSqlHelper();
+
       Mine mine = mineStorage.get(target.getUniqueId());
       if (mine != null) {
         mine.upgrade();
+        mine.reset();
 
         List<Player> players = new ArrayList<>();
 
@@ -227,6 +231,21 @@ public class PrivateMinesCommand extends BaseCommand {
           }
           players.clear();
         }, 20L);
+
+        Task.asyncDelayed(() -> {
+          sqlHelper.executeUpdate(
+              "INSERT INTO privatemines (owner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) "
+                  + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+              String.valueOf(mineData.getMineOwner()), mineData.getMineType(),
+              LocationUtils.toString(mineData.getMineLocation()),
+              LocationUtils.toString(mineData.getMinimumMining()),
+              LocationUtils.toString(mineData.getMaximumMining()),
+              LocationUtils.toString(mineData.getMinimumFullRegion()),
+              LocationUtils.toString(mineData.getMaximumFullRegion()),
+              LocationUtils.toString(mineData.getSpawnLocation()), mineData.getTax(),
+              mineData.isOpen(), mineData.getMaxPlayers(), mineData.getMaxMineSize(),
+              mineData.getMaterials());
+        });
       }
     }
   }
@@ -420,8 +439,7 @@ public class PrivateMinesCommand extends BaseCommand {
         SQLUtils.update(mine);
         Component message = Component.text()
             .append(Component.text("Successfully updated tax to ", NamedTextColor.GREEN))
-            .append(Component.text(String.format("%.2f%%", tax), NamedTextColor.GOLD))
-            .build();
+            .append(Component.text(String.format("%.2f%%", tax), NamedTextColor.GOLD)).build();
 
         audience.sendMessage(message);
       }

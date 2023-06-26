@@ -58,10 +58,7 @@ public class PasteHelper {
   private PastedMine create(File file, Location location) {
     BlockVector3 blockVector3 = BukkitAdapter.asBlockVector(location);
 
-    return new PastedMine(blockVector3)
-        .setLocation(location)
-        .setFile(file)
-        .create();
+    return new PastedMine(blockVector3).setLocation(location).setFile(file).create();
   }
 
   public PastedMine paste(File file, Location location) {
@@ -96,9 +93,7 @@ public class PasteHelper {
       newRegion = regionSelector.getRegion();
 
       try (EditSession editSession = WorldEdit.getInstance().newEditSession(world)) {
-        Operation operation = new ClipboardHolder(clipboard)
-            .createPaste(editSession)
-            .to(to)
+        Operation operation = new ClipboardHolder(clipboard).createPaste(editSession).to(to)
             .ignoreAirBlocks(true)
             // configure here
             .build();
@@ -106,10 +101,8 @@ public class PasteHelper {
       }
     }
 
-    Location fullMin = BukkitAdapter.adapt(BukkitAdapter.adapt(world),
-        newRegion.getMinimumPoint());
-    Location fullMax = BukkitAdapter.adapt(BukkitAdapter.adapt(world),
-        newRegion.getMaximumPoint());
+    Location fullMin = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMinimumPoint());
+    Location fullMax = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMaximumPoint());
 
     setSpawn(spawn);
     setCorner1(upperRails);

@@ -661,6 +661,10 @@ public class Mine {
     Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
     MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
     MineType nextType = mineTypeManager.getNextMineType(currentType);
+
+    Bukkit.broadcastMessage("current " + currentType.getName());
+    Bukkit.broadcastMessage("next " + nextType.getName());
+
     Location mineLocation = mineData.getMineLocation();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + nextType.getFile());
     mineData.setMineType(nextType);

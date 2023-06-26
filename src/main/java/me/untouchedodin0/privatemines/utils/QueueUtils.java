@@ -48,6 +48,7 @@ public class QueueUtils {
     }
     add(uuid);
   }
+  
 
   public boolean isInQueue(UUID uuid) {
     return waitingInQueue.contains(uuid);
