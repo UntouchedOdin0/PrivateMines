@@ -338,6 +338,7 @@ public class PrivateMinesCommand extends BaseCommand {
           } else {
             if (mineData.isOpen()) {
               mine.teleport(player);
+              mine.startTasks();
             } else {
               player.sendMessage(ChatColor.RED + "Target mine closed!");
             }

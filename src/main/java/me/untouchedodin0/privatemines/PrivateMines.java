@@ -346,20 +346,20 @@ public class PrivateMines extends JavaPlugin {
       String spawn = result.getString(8);
       double tax = result.get(9);
       int isOpen = result.get(10);
-      String resultsMaterial = result.getString(13);
-      resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
-
-      Map<Material, Double> materials = new HashMap<>();
-
-      String[] pairs = resultsMaterial.split("\\s*,\\s*");
-
-      for (String string : pairs) {
-        String[] parts = string.split("=");
-        String matString = parts[0];
-        double percent = Double.parseDouble(parts[1].substring(0, parts[1].length() - 1));
-        Material material = Material.valueOf(matString);
-        materials.put(material, percent);
-      }
+//      String resultsMaterial = result.getString(13);
+//      resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
+//
+//      Map<Material, Double> materials = new HashMap<>();
+//
+//      String[] pairs = resultsMaterial.split("\\s*,\\s*");
+//
+//      for (String string : pairs) {
+//        String[] parts = string.split("=");
+//        String matString = parts[0];
+//        double percent = Double.parseDouble(parts[1].substring(0, parts[1].length() - 1));
+//        Material material = Material.valueOf(matString);
+//        materials.put(material, percent);
+//      }
 
       Mine mine = new Mine(this);
       UUID uuid = UUID.fromString(owner);
@@ -374,8 +374,9 @@ public class PrivateMines extends JavaPlugin {
 
       MineData mineData = new MineData(uuid, minMining, maxMining, fullMin, fullMax, location,
           spawnLocation, type, open, tax);
-      mineData.setMaterials(materials);
+//      mineData.setMaterials(materials); - This breaks it for some reason
       mine.setMineData(mineData);
+
       mineStorage.addMine(uuid, mine);
     });
   }
@@ -448,8 +449,8 @@ public class PrivateMines extends JavaPlugin {
   }
 
   public void registerSellListener() {
-    if (Bukkit.getPluginManager().isPluginEnabled("UltraPrisonCore")) {
-      getLogger().info("Registering Ultra Prison Core as the sell listener...");
+    if (Bukkit.getPluginManager().isPluginEnabled("XPrison")) {
+      getLogger().info("Registering XPrison as the sell listener...");
       getServer().getPluginManager().registerEvents(new UPCSellListener(), this);
       return;
     } else if (Bukkit.getPluginManager().isPluginEnabled("AutoSell")) {

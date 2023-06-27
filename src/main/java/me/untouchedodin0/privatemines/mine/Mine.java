@@ -428,6 +428,33 @@ public class Mine {
     }
   }
 
+  public double getPercentage() {
+    CuboidRegion region = new CuboidRegion(BlockVector3.at(mineData.getMinimumMining().getBlockX(),
+        mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()),
+        BlockVector3.at(mineData.getMaximumMining().getBlockX(),
+            mineData.getMaximumMining().getBlockY(), mineData.getMaximumMining().getBlockZ()));
+
+    if (Config.addWallGap) {
+      for (int i = 0; i < Config.wallsGap; i++) {
+        region.contract(ExpansionUtils.contractVectors(1));
+      }
+    }
+
+    long total = region.getVolume();
+
+    // Calculate the percetage of the region called "region" to then compare with how many blocks have been mined.
+    airBlocks = 0;
+    for (BlockVector3 vector : region) {
+      Block block = Objects.requireNonNull(Bukkit.getWorld(
+              Objects.requireNonNull(Objects.requireNonNull(getSpawnLocation()).getWorld()).getName()))
+          .getBlockAt(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+      if (block.getType().equals(Material.AIR)) {
+        this.airBlocks++;
+      }
+    }
+    return (float) airBlocks * 100L / total;
+  }
+
   public void handleReset() {
     MineData mineData = getMineData();
     MineType mineType = mineData.getMineType();
@@ -484,6 +511,26 @@ public class Mine {
     }
   }
 
+  public void startTasks() {
+    MineType mineType = mineData.getMineType();
+
+    if (task == null) {
+      this.task = Task.syncRepeating(this::handleReset, 0L, mineType.getResetTime() * 20L);
+    }
+
+    if (percentageTask == null) {
+      //Create a new Bukkit task async
+      this.percentageTask = Task.syncRepeating(() -> {
+        double percentage = getPercentage();
+        double resetPercentage = mineType.getResetPercentage();
+        if (percentage > resetPercentage) {
+          handleReset();
+          airBlocks = 0;
+        }
+      }, 0, 80);
+    }
+  }
+
   public void stopTasks() {
     if (task != null) {
       task.cancel();
@@ -494,32 +541,6 @@ public class Mine {
     privateMines.getLogger().info("Stopped tasks for mine " + mineData.getMineOwner());
   }
 
-  public double getPercentage() {
-    CuboidRegion region = new CuboidRegion(BlockVector3.at(mineData.getMinimumMining().getBlockX(),
-        mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()),
-        BlockVector3.at(mineData.getMaximumMining().getBlockX(),
-            mineData.getMaximumMining().getBlockY(), mineData.getMaximumMining().getBlockZ()));
-
-    if (Config.addWallGap) {
-      for (int i = 0; i < Config.wallsGap; i++) {
-        region.contract(ExpansionUtils.contractVectors(1));
-      }
-    }
-
-    long total = region.getVolume();
-
-    // Calculate the percetage of the region called "region" to then compare with how many blocks have been mined.
-    airBlocks = 0;
-    for (BlockVector3 vector : region) {
-      Block block = Objects.requireNonNull(Bukkit.getWorld(
-              Objects.requireNonNull(Objects.requireNonNull(getSpawnLocation()).getWorld()).getName()))
-          .getBlockAt(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
-      if (block.getType().equals(Material.AIR)) {
-        this.airBlocks++;
-      }
-    }
-    return (float) airBlocks * 100L / total;
-  }
 
   public void ban(Player player) {
     if (mineData.getBannedPlayers().contains(player.getUniqueId())) {
@@ -662,9 +683,6 @@ public class Mine {
     MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
     MineType nextType = mineTypeManager.getNextMineType(currentType);
 
-    Bukkit.broadcastMessage("current " + currentType.getName());
-    Bukkit.broadcastMessage("next " + nextType.getName());
-
     Location mineLocation = mineData.getMineLocation();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + nextType.getFile());
     mineData.setMineType(nextType);
@@ -738,17 +756,19 @@ public class Mine {
           });
           Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
 
-          XPrisonAutoSell autoSell = XPrisonAutoSell.getInstance();
-          SellRegion sellRegion = autoSell.getManager().getAutoSellRegion(mineLocation);
+          if (Bukkit.getPluginManager().isPluginEnabled("XPrison")) {
+            XPrisonAutoSell autoSell = XPrisonAutoSell.getInstance();
+            SellRegion sellRegion = autoSell.getManager().getAutoSellRegion(mineLocation);
 
-          if (nextType.getPrices() != null) {
-            nextType.getPrices().forEach((material, aDouble) -> {
-              CompMaterial compMaterial = CompMaterial.fromMaterial(material);
-              sellRegion.addSellPrice(compMaterial, aDouble);
-            });
+            if (nextType.getPrices() != null) {
+              nextType.getPrices().forEach((material, aDouble) -> {
+                CompMaterial compMaterial = CompMaterial.fromMaterial(material);
+                sellRegion.addSellPrice(compMaterial, aDouble);
+              });
 
-            autoSell.getManager().updateSellRegion(sellRegion);
-            autoSell.getAutoSellConfig().saveSellRegion(sellRegion);
+              autoSell.getManager().updateSellRegion(sellRegion);
+              autoSell.getAutoSellConfig().saveSellRegion(sellRegion);
+            }
           }
         });
       }

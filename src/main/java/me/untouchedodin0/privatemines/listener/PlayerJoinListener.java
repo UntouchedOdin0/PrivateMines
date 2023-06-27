@@ -24,6 +24,7 @@ package me.untouchedodin0.privatemines.listener;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
+import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -43,7 +44,10 @@ public class PlayerJoinListener implements Listener {
       Player player = playerJoinEvent.getPlayer();
 
       if (mineStorage.hasMine(player)) {
-        return;
+        Mine mine = mineStorage.get(player);
+        if (mine != null) {
+          mine.startTasks();
+        }
       }
 
       QueueUtils queueUtils = privateMines.getQueueUtils();
