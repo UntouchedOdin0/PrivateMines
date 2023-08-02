@@ -25,6 +25,8 @@ import co.aikar.commands.BukkitCommandManager;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,6 +49,7 @@ import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.AddonsCommand;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.commands.PublicMinesCommand;
+import me.untouchedodin0.privatemines.commands.TestCommand;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
@@ -69,6 +72,10 @@ import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
 import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
 import me.untouchedodin0.privatemines.utils.addon.Addon;
 import me.untouchedodin0.privatemines.utils.addon.AddonManager;
+import me.untouchedodin0.privatemines.utils.commands.CommandHandler;
+import me.untouchedodin0.privatemines.utils.commands.annotations.Command;
+import me.untouchedodin0.privatemines.utils.commands.annotations.CommandPermission;
+import me.untouchedodin0.privatemines.utils.commands.annotations.SubCommand;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -208,6 +215,7 @@ public class PrivateMines extends JavaPlugin {
       schematicStorage.addSchematic(schematicFile, mineBlocks);
     });
 
+    
     File dataFolder = new File(privateMines.getDataFolder(), "privatemines.db");
     if (!dataFolder.exists()) {
       try {
@@ -266,16 +274,46 @@ public class PrivateMines extends JavaPlugin {
     Task.asyncDelayed(SQLUtils::loadPregens);
     Task.asyncDelayed(this::loadAddons);
 
-    BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
-    bukkitCommandManager.registerCommand(new PrivateMinesCommand());
-    bukkitCommandManager.registerCommand(new PublicMinesCommand());
-    bukkitCommandManager.registerCommand(new AddonsCommand());
-    bukkitCommandManager.enableUnstableAPI("help");
-    bukkitCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
-      ArrayList<String> addons = new ArrayList<>();
-      AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
-      return addons;
-    });
+    Class<TestCommand> clazz = TestCommand.class;
+    Method[] methods = clazz.getDeclaredMethods();
+
+    Annotation[] annotations = clazz.getAnnotations();
+
+    for (Method method : methods) {
+      Annotation[] methodAnnotations = method.getAnnotations();
+
+      for (Annotation methodAnnotation : methodAnnotations) {
+        if (methodAnnotation instanceof SubCommand) {
+          String subCommandValue = ((SubCommand) methodAnnotation).value();
+
+          System.out.println("Found sub command '" + subCommandValue + "' at method: " + method.getName());
+        } else if (methodAnnotation instanceof CommandPermission) {
+          String permissionValue = ((CommandPermission) methodAnnotation).value();
+
+          System.out.println("Found sub command permission '" + permissionValue + "' at method: " + method.getName());
+        }
+      }
+    }
+
+//    for (Annotation annotation : annotations) {
+//      if (annotation instanceof Command) {
+//        System.out.println("Found annotation at " + clazz.getName());
+//      }
+//      if (annotation instanceof SubCommand) {
+//        System.out.println("Found sub command at " + ((SubCommand) annotation).value());
+//      }
+//    }
+
+//    BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
+//    bukkitCommandManager.registerCommand(new PrivateMinesCommand(), true);
+//    bukkitCommandManager.registerCommand(new PublicMinesCommand(), true);
+//    bukkitCommandManager.registerCommand(new AddonsCommand(), true);
+//    bukkitCommandManager.enableUnstableAPI("help");
+//    bukkitCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
+//      ArrayList<String> addons = new ArrayList<>();
+//      AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
+//      return addons;
+//    });
 
     getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
     if (!setupEconomy()) {

@@ -514,21 +514,21 @@ public class Mine {
   public void startTasks() {
     MineType mineType = mineData.getMineType();
 
-    if (task == null) {
-      this.task = Task.syncRepeating(this::handleReset, 0L, mineType.getResetTime() * 20L);
-    }
+//    if (task == null) {
+//      this.task = Task.syncRepeating(this::handleReset, 0L, mineType.getResetTime() * 20L);
+//    }
 
-    if (percentageTask == null) {
-      //Create a new Bukkit task async
-      this.percentageTask = Task.syncRepeating(() -> {
-        double percentage = getPercentage();
-        double resetPercentage = mineType.getResetPercentage();
-        if (percentage > resetPercentage) {
-          handleReset();
-          airBlocks = 0;
-        }
-      }, 0, 80);
-    }
+//    if (percentageTask == null) {
+//      //Create a new Bukkit task async
+//      this.percentageTask = Task.syncRepeating(() -> {
+//        double percentage = getPercentage();
+//        double resetPercentage = mineType.getResetPercentage();
+//        if (percentage > resetPercentage) {
+//          handleReset();
+//          airBlocks = 0;
+//        }
+//      }, 0, 80);
+//    }
   }
 
   public void stopTasks() {
