@@ -22,6 +22,7 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.BukkitCommandManager;
+import co.aikar.commands.PaperCommandManager;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
@@ -73,7 +74,6 @@ import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
 import me.untouchedodin0.privatemines.utils.addon.Addon;
 import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.commands.CommandHandler;
-import me.untouchedodin0.privatemines.utils.commands.annotations.Command;
 import me.untouchedodin0.privatemines.utils.commands.annotations.CommandPermission;
 import me.untouchedodin0.privatemines.utils.commands.annotations.SubCommand;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
@@ -85,6 +85,8 @@ import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -215,7 +217,13 @@ public class PrivateMines extends JavaPlugin {
       schematicStorage.addSchematic(schematicFile, mineBlocks);
     });
 
-    
+    PaperCommandManager paperCommandManager = new PaperCommandManager(this);
+    paperCommandManager.enableUnstableAPI("help");
+
+    paperCommandManager.registerCommand(new PrivateMinesCommand());
+    paperCommandManager.registerCommand(new PublicMinesCommand());
+    paperCommandManager.registerCommand(new AddonsCommand());
+
     File dataFolder = new File(privateMines.getDataFolder(), "privatemines.db");
     if (!dataFolder.exists()) {
       try {
@@ -274,26 +282,30 @@ public class PrivateMines extends JavaPlugin {
     Task.asyncDelayed(SQLUtils::loadPregens);
     Task.asyncDelayed(this::loadAddons);
 
-    Class<TestCommand> clazz = TestCommand.class;
-    Method[] methods = clazz.getDeclaredMethods();
+    CommandHandler commandHandler = new CommandHandler(this);
+//    CommandMap commandMap = CommandHandler.getCommandMap();
 
-    Annotation[] annotations = clazz.getAnnotations();
+//    commandHandler.registerCommand(TestCommand.class);
 
-    for (Method method : methods) {
-      Annotation[] methodAnnotations = method.getAnnotations();
 
-      for (Annotation methodAnnotation : methodAnnotations) {
-        if (methodAnnotation instanceof SubCommand) {
-          String subCommandValue = ((SubCommand) methodAnnotation).value();
-
-          System.out.println("Found sub command '" + subCommandValue + "' at method: " + method.getName());
-        } else if (methodAnnotation instanceof CommandPermission) {
-          String permissionValue = ((CommandPermission) methodAnnotation).value();
-
-          System.out.println("Found sub command permission '" + permissionValue + "' at method: " + method.getName());
-        }
-      }
-    }
+//    Class<TestCommand> clazz = TestCommand.class;
+//    Method[] methods = clazz.getDeclaredMethods();
+//
+//    for (Method method : methods) {
+//      Annotation[] methodAnnotations = method.getAnnotations();
+//
+//      for (Annotation methodAnnotation : methodAnnotations) {
+//        if (methodAnnotation instanceof SubCommand) {
+//          String subCommandValue = ((SubCommand) methodAnnotation).value();
+//
+//          System.out.println("Found sub command '" + subCommandValue + "' at method: " + method.getName());
+//        } else if (methodAnnotation instanceof CommandPermission) {
+//          String permissionValue = ((CommandPermission) methodAnnotation).value();
+//
+//          System.out.println("Found sub command permission '" + permissionValue + "' at method: " + method.getName());
+//        }
+//      }
+//    }
 
 //    for (Annotation annotation : annotations) {
 //      if (annotation instanceof Command) {
@@ -350,6 +362,8 @@ public class PrivateMines extends JavaPlugin {
 //    savePregenMines();
     sqlHelper.close();
   }
+
+
 
   public void setupSchematicUtils() {
     this.schematicStorage = new SchematicStorage();
