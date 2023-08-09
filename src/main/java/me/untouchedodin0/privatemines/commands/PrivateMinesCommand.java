@@ -411,6 +411,7 @@ public class PrivateMinesCommand extends BaseCommand {
       mine.ban(target);
       mineStorage.replaceMineNoLog(player, mine);
       SQLUtils.update(mine);
+      audienceUtils.sendMessage(player, target, MessagesConfig.successfullyBannedPlayer);
     }
   }
 
@@ -423,6 +424,7 @@ public class PrivateMinesCommand extends BaseCommand {
       mine.unban(target);
       mineStorage.replaceMineNoLog(player, mine);
       SQLUtils.update(mine);
+      audienceUtils.sendMessage(player, target, MessagesConfig.unbannedPlayer);
     }
   }
 
@@ -435,7 +437,7 @@ public class PrivateMinesCommand extends BaseCommand {
     Audience audience = audiences.player(player);
 
     if (!range.contains(tax)) {
-      player.sendMessage(ChatColor.RED + "Please enter a number between 0 and 100.");
+      audienceUtils.sendMessage(player, MessagesConfig.taxLimit);
     } else {
       Mine mine = mineStorage.get(player);
       if (mine != null) {
@@ -447,8 +449,7 @@ public class PrivateMinesCommand extends BaseCommand {
         Component message = Component.text()
             .append(Component.text("Successfully updated tax to ", NamedTextColor.GREEN))
             .append(Component.text(String.format("%.2f%%", tax), NamedTextColor.GOLD)).build();
-
-        audience.sendMessage(message);
+        audienceUtils.sendMessage(player, MessagesConfig.setTax, tax);
       }
     }
   }
@@ -501,7 +502,8 @@ public class PrivateMinesCommand extends BaseCommand {
 
       PregenStorage pregenStorage = privateMines.getPregenStorage();
       if (pregenStorage.isAllRedeemed()) {
-        player.sendMessage(ChatColor.RED + "All the mines have been claimed...");
+//        player.sendMessage(ChatColor.RED + "All the mines have been claimed...");
+        audienceUtils.sendMessage(player, MessagesConfig.allMinesClaimed);
       } else {
         PregenMine pregenMine = pregenStorage.getAndRemove();
         MineType mineType = mineTypeManager.getDefaultMineType();

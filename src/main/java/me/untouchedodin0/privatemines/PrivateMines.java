@@ -170,7 +170,7 @@ public class PrivateMines extends JavaPlugin {
       Files.createDirectories(schematicsDirectory);
       Files.createDirectories(addonsDirectory);
     } catch (IOException e) {
-      e.printStackTrace();
+      getLogger().warning("Error creating directories: " + e.getMessage());
     }
 
     ConfigManager configManager = ConfigManager.create(this)
@@ -200,7 +200,15 @@ public class PrivateMines extends JavaPlugin {
         getLogger().info("File doesn't exist!");
         return;
       }
+
+      long before = System.nanoTime();
+
       SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
+      long after = System.nanoTime();
+      long taken = after - before;
+
+      System.out.println("taken " + taken);
+
       schematicStorage.addSchematic(schematicFile, mineBlocks);
     });
 
@@ -406,10 +414,6 @@ public class PrivateMines extends JavaPlugin {
     });
   }
 
-//  public void savePregenMines() {
-//    getPregenStorage().getMines().forEach(PregenMine::save);
-//  }
-
   public SchematicStorage getSchematicStorage() {
     return schematicStorage;
   }
@@ -438,6 +442,10 @@ public class PrivateMines extends JavaPlugin {
     return addonManager;
   }
 
+  public Path getAddonsDirectory() {
+    return addonsDirectory;
+  }
+
   public static Economy getEconomy() {
     return econ;
   }
@@ -459,16 +467,8 @@ public class PrivateMines extends JavaPlugin {
     getServer().getPluginManager().registerEvents(new MineResetListener(), this);
   }
 
-  public SQLite getSqlite() {
-    return sqlite;
-  }
-
   public SQLHelper getSqlHelper() {
     return sqlHelper;
-  }
-
-  public Map<String, SQLCache> getCaches() {
-    return caches;
   }
 
   public BukkitAudiences getAdventure() {

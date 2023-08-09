@@ -15,3 +15,4 @@ successfullyBannedPlayer: <green>{name} Has been banned from your mine!
 targetIsNotBanned: <red>{name} isn't banned!
 unbannedPlayer: <green>{name} Has been unbanned from your mine!
 targetMineClosed: <red>The mine you were trying to teleport to is closed.
+allMinesClaimed: <red>All the mines have been claimed, please ask an admin to generate more!

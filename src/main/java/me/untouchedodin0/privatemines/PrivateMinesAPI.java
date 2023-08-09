@@ -21,6 +21,7 @@
 
 package me.untouchedodin0.privatemines;
 
+import java.io.File;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.factory.MineFactory;
@@ -53,6 +54,9 @@ public class PrivateMinesAPI {
         mineFactory.createUpgraded(uuid, location, mineType);
     }
 
+    public void loadAddon(File file) {
+
+    }
 //    public void loadAddon(File file) {
 //        try {
 //            AddonAPI addonAPI = new AddonAPI(new URL[file.toURI().getClass().getClassLoader()], privateMines.getClass().getClassLoader());

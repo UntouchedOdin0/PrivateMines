@@ -71,32 +71,31 @@ public class SchematicIterator {
         BlockType npcType = BlockType.REGISTRY.get(npcMaterial.getKey().getKey());
         BlockType quarryType = BlockType.REGISTRY.get(quarryMaterial.getKey().getKey());
 
+
         clipboard.getRegion().forEach(blockVector3 -> {
           BlockType blockType = clipboard.getBlock(blockVector3).getBlockType();
-          int x = blockVector3.getX();
-          int y = blockVector3.getY();
-          int z = blockVector3.getZ();
 
           if (blockType.equals(cornerType)) {
             if (corner1 == null) {
-              corner1 = BlockVector3.at(x, y, z);
+              corner1 = blockVector3;
             } else if (corner2 == null) {
-              corner2 = BlockVector3.at(x, y, z);
+              corner2 = blockVector3;
             }
           } else if (blockType.equals(spawnType)) {
             if (spawn == null) {
-              spawn = BlockVector3.at(x, y, z);
+              spawn = blockVector3;
             }
           } else if (blockType.equals(npcType)) {
             if (npc == null) {
-              npc = BlockVector3.at(x, y, z);
+              npc = blockVector3;
             }
           } else if (blockType.equals(quarryType)) {
             if (quarry == null) {
-              quarry = BlockVector3.at(x, y, z);
+              quarry = blockVector3;
             }
           }
         });
+
 
         if (spawn == null) {
           privateMines.getLogger().info(
