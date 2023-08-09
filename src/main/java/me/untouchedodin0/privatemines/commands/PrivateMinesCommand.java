@@ -142,8 +142,8 @@ public class PrivateMinesCommand extends BaseCommand {
     } else {
       Mine mine = mineStorage.get(target.getUniqueId());
       if (mine != null) {
-        mine.delete(true);
         mine.stopTasks();
+        mine.delete(true);
         SQLUtils.delete(mine);
         if (sender instanceof Player player) {
           audienceUtils.sendMessage(player, target, MessagesConfig.deletedPlayersMine);

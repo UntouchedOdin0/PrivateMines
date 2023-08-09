@@ -169,6 +169,7 @@ public class Mine {
       privateMines.getLogger().info(String.format("It took %dms to delete the mine", durationInMS));
     }
 
+    stopTasks();
     privateMines.getMineStorage().removeMine(uuid);
     SQLUtils.delete(this);
   }
@@ -500,7 +501,7 @@ public class Mine {
 
     if (percentageTask == null) {
       //Create a new Bukkit task async
-      percentageTask = Task.syncRepeating(() -> {
+      this.percentageTask = Task.syncRepeating(() -> {
         double percentage = getPercentage();
         double resetPercentage = mineType.getResetPercentage();
         if (percentage > resetPercentage) {
@@ -526,6 +527,9 @@ public class Mine {
     if (task != null) {
       task.cancel();
     }
+    if (percentageTask != null) {
+      percentageTask.cancel();
+    }
     privateMines.getLogger().info("Stopped tasks for mine " + mineData.getMineOwner());
   }
 
@@ -539,7 +543,8 @@ public class Mine {
       return;
     }
 
-    audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.successfullyBannedPlayer);
+    audienceUtils.sendMessage(player, Objects.requireNonNull(owner),
+        MessagesConfig.successfullyBannedPlayer);
     audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.bannedFromMine);
 
     mineData.getBannedPlayers().add(player.getUniqueId());
@@ -550,7 +555,8 @@ public class Mine {
   public void unban(Player player) {
     Player owner = Bukkit.getPlayer(mineData.getMineOwner());
     audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.unbannedPlayer);
-    audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.unbannedFromMine);
+    audienceUtils.sendMessage(player, Objects.requireNonNull(owner),
+        MessagesConfig.unbannedFromMine);
 
     mineData.getBannedPlayers().remove(player.getUniqueId());
     setMineData(mineData);

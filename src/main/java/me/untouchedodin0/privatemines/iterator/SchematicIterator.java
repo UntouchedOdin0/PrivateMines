@@ -74,24 +74,27 @@ public class SchematicIterator {
 
         clipboard.getRegion().forEach(blockVector3 -> {
           BlockType blockType = clipboard.getBlock(blockVector3).getBlockType();
+          int x = blockVector3.getX();
+          int y = blockVector3.getY();
+          int z = blockVector3.getZ();
 
           if (blockType.equals(cornerType)) {
             if (corner1 == null) {
-              corner1 = blockVector3;
+              corner1 = BlockVector3.at(x, y, z);
             } else if (corner2 == null) {
-              corner2 = blockVector3;
+              corner2 = BlockVector3.at(x, y, z);
             }
           } else if (blockType.equals(spawnType)) {
             if (spawn == null) {
-              spawn = blockVector3;
+              spawn = BlockVector3.at(x, y, z);
             }
           } else if (blockType.equals(npcType)) {
             if (npc == null) {
-              npc = blockVector3;
+              npc = BlockVector3.at(x, y, z);
             }
           } else if (blockType.equals(quarryType)) {
             if (quarry == null) {
-              quarry = blockVector3;
+              quarry = BlockVector3.at(x, y, z);
             }
           }
         });
