@@ -14,3 +14,4 @@ targetAlreadyBanned: <green>The target player is already banned!
 successfullyBannedPlayer: <green>{name} Has been banned from your mine!
 targetIsNotBanned: <red>{name} isn't banned!
 unbannedPlayer: <green>{name} Has been unbanned from your mine!
+targetMineClosed: <red>The mine you were trying to teleport to is closed.

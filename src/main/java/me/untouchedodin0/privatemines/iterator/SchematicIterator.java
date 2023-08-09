@@ -99,15 +99,18 @@ public class SchematicIterator {
         });
 
         if (spawn == null) {
-          privateMines.getLogger().info(String.format("Failed to find a spawn block in the mine\nhave you placed a %s block?",
-              Utils.format(spawnMaterial)));
+          privateMines.getLogger().info(
+              String.format("Failed to find a spawn block in the mine\nhave you placed a %s block?",
+                  Utils.format(spawnMaterial)));
           return null;
         } else if (corner1 == null) {
-          privateMines.getLogger().info(String.format("Failed to find corner 1 in the mine\nhave you placed 2 %s blocks in the mining region?",
+          privateMines.getLogger().info(String.format(
+              "Failed to find corner 1 in the mine\nhave you placed 2 %s blocks in the mining region?",
               Utils.format(cornerMaterial)));
           return null;
         } else if (corner2 == null) {
-          privateMines.getLogger().info(String.format("Failed to find corner 2 in the mine\nhave you placed 2 %s blocks in the mining region?",
+          privateMines.getLogger().info(String.format(
+              "Failed to find corner 2 in the mine\nhave you placed 2 %s blocks in the mining region?",
               Utils.format(cornerMaterial)));
           return null;
         }

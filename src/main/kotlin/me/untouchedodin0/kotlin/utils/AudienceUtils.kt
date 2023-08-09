@@ -25,6 +25,7 @@ import me.clip.placeholderapi.PlaceholderAPI
 import me.untouchedodin0.privatemines.PrivateMines
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.OfflinePlayer
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 class AudienceUtils {
@@ -47,17 +48,29 @@ class AudienceUtils {
         }
     }
 
+    fun sendMessage(commandSender: CommandSender, message: String) {
+        if (privateMines.adventure != null) {
+            val miniMessage = MiniMessage.miniMessage()
+            val audiences = privateMines.adventure
+            val parsed  = miniMessage.deserialize(message)
+            val audience = audiences.sender(commandSender)
+            audience.sendMessage(parsed)
+        } else {
+            commandSender.sendMessage(message)
+        }
+    }
+
     fun sendMessage(player: Player, target: Player, message: String) {
 
         if (privateMines.adventure != null) {
             val miniMessage = MiniMessage.miniMessage()
             val audiences = privateMines.adventure
-            val placeholderAPI = PlaceholderAPI.setPlaceholders(target, message)
+            val placeholderAPI = PlaceholderAPI.setPlaceholders(target, message.replace("{name}", target.name))
             val parsed = miniMessage.deserialize(placeholderAPI)
             val audience = audiences.player(player)
             audience.sendMessage(parsed)
         } else {
-            val placeholderAPI = PlaceholderAPI.setPlaceholders(target, message)
+            val placeholderAPI = PlaceholderAPI.setPlaceholders(target, message.replace("{name}", target.name))
             player.sendMessage(placeholderAPI)
         }
     }

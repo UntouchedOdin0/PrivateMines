@@ -43,4 +43,9 @@ public class MessagesConfig {
     public static String successfullyBannedPlayer = "<green>{name} Has been banned from your mine!";
     public static String targetIsNotBanned = "<red>{name} isn't banned!";
     public static String unbannedPlayer = "<green>{name} Has been unbanned from your mine!";
+    public static String bannedFromMine = "<red>You've been banned from {name}'s mine!";
+    public static String unbannedFromMine = "<green>You've been unbanned from {name}'s mine!";
+    public static String targetMineClosed = "<red>The mine you were trying to teleport to is closed.";
+    public static String mineOpened = "<grey>Your mine has been <green>opened<grey>!";
+    public static String mineClosed = "<grey>Your mine has been <red>closed<grey>!";
 }

@@ -48,9 +48,11 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.kotlin.utils.AudienceUtils;
 import me.untouchedodin0.kotlin.utils.FlagUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
+import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.events.PrivateMineDeleteEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineExpandEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineResetEvent;
@@ -80,6 +82,7 @@ public class Mine {
   private Task task;
   private Task percentageTask = null;
   private int airBlocks;
+  AudienceUtils audienceUtils = new AudienceUtils();
 
   public Mine(PrivateMines privateMines) {
     this.privateMines = privateMines;
@@ -109,6 +112,7 @@ public class Mine {
     if (getSpawnLocation().getBlock().getType().isBlock()) {
       getSpawnLocation().getBlock().setType(Material.AIR, false);
       player.teleport(getSpawnLocation());
+      audienceUtils.sendMessage(player, MessagesConfig.teleportedToOwnMine);
     }
   }
 
@@ -507,36 +511,21 @@ public class Mine {
       }, 0, 80);
     }
     if (owner != null) {
-      owner.sendMessage(ChatColor.GREEN + "You've reset your mine!");
+      audienceUtils.sendMessage(owner, MessagesConfig.mineReset);
     }
   }
 
   public void startTasks() {
     MineType mineType = mineData.getMineType();
 
-//    if (task == null) {
-//      this.task = Task.syncRepeating(this::handleReset, 0L, mineType.getResetTime() * 20L);
-//    }
-
-//    if (percentageTask == null) {
-//      //Create a new Bukkit task async
-//      this.percentageTask = Task.syncRepeating(() -> {
-//        double percentage = getPercentage();
-//        double resetPercentage = mineType.getResetPercentage();
-//        if (percentage > resetPercentage) {
-//          handleReset();
-//          airBlocks = 0;
-//        }
-//      }, 0, 80);
-//    }
+    if (task == null) {
+      this.task = Task.syncRepeating(this::handleReset, 0L, mineType.getResetTime() * 20L);
+    }
   }
 
   public void stopTasks() {
     if (task != null) {
       task.cancel();
-    }
-    if (percentageTask != null) {
-      percentageTask.cancel();
     }
     privateMines.getLogger().info("Stopped tasks for mine " + mineData.getMineOwner());
   }
@@ -550,9 +539,10 @@ public class Mine {
     if (player.equals(owner)) {
       return;
     }
-    player.sendMessage(
-        ChatColor.RED + "You've been banned from " + Objects.requireNonNull(owner).getName()
-            + "'s mine!");
+
+    audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.successfullyBannedPlayer);
+    audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.bannedFromMine);
+
     mineData.getBannedPlayers().add(player.getUniqueId());
     setMineData(mineData);
     SQLUtils.update(this);
@@ -560,9 +550,9 @@ public class Mine {
 
   public void unban(Player player) {
     Player owner = Bukkit.getPlayer(mineData.getMineOwner());
-    player.sendMessage(
-        ChatColor.RED + "You've been unbanned from " + Objects.requireNonNull(owner).getName()
-            + "'s mine!");
+    audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.unbannedPlayer);
+    audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.unbannedFromMine);
+
     mineData.getBannedPlayers().remove(player.getUniqueId());
     setMineData(mineData);
     SQLUtils.update(this);

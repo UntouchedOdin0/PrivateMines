@@ -62,7 +62,7 @@ public class MineFactory {
   /**
    * Creates a mine for the {@link Player} at {@link Location} with {@link MineType}
    *
-   * @param player   the player the mine should be created for
+   * @param player   the player the mine should be created forá
    * @param location the location of the mine
    * @param mineType the type of mine to paste
    */
@@ -73,9 +73,6 @@ public class MineFactory {
     RegionManager regionManager = container.get(BukkitAdapter.adapt(location.getWorld()));
 
     Map<Material, Double> materials = mineType.getMaterials();
-    if (materials != null) {
-      Map<Material, Double> prices = new HashMap<>(materials);
-    }
 
     if (!schematicFile.exists()) {
       privateMines.getLogger().warning("Schematic file does not exist: " + schematicFile.getName());
@@ -99,8 +96,10 @@ public class MineFactory {
       BlockVector3 fullRegionMin = BukkitAdapter.asBlockVector(minimum);
       BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(maximum);
 
-      ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName, miningRegionMin, miningRegionMax);
-      ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName, fullRegionMin, fullRegionMax);
+      ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName,
+          miningRegionMin, miningRegionMax);
+      ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName, fullRegionMin,
+          fullRegionMax);
 
       if (regionManager != null) {
         regionManager.addRegion(miningRegion);
@@ -175,14 +174,15 @@ public class MineFactory {
       BlockVector3 fullRegionMin = BukkitAdapter.asBlockVector(minimum);
       BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(maximum);
 
-      ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName, miningRegionMin, miningRegionMax);
-      ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName, fullRegionMin, fullRegionMax);
+      ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName,
+          miningRegionMin, miningRegionMax);
+      ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName, fullRegionMin,
+          fullRegionMax);
 
       if (regionManager != null) {
         regionManager.addRegion(miningRegion);
         regionManager.addRegion(fullRegion);
       }
-
 
       MineData mineData = new MineData(uuid, corner2, corner1, minimum, maximum, location, spawn,
           mineType, false, 5.0);
