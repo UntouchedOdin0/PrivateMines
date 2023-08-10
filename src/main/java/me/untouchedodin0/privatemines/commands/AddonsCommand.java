@@ -37,6 +37,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import me.untouchedodin0.kotlin.utils.AudienceUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.utils.addon.Addon;
 import me.untouchedodin0.privatemines.utils.addon.AddonManager;
@@ -45,8 +46,10 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TextComponent.Builder;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -132,6 +135,8 @@ public class AddonsCommand extends BaseCommand {
 
   @Subcommand("load")
   public void load(Player player, String string) {
+    AudienceUtils audienceUtils = new AudienceUtils();
+
     final PathMatcher jarMatcher = FileSystems.getDefault()
         .getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
     Path addonsFolder = privateMines.getAddonsDirectory();
@@ -155,7 +160,29 @@ public class AddonsCommand extends BaseCommand {
       throw new RuntimeException(e);
     }
 
-    Bukkit.broadcastMessage("matching files? " + matchingFiles);
+    TextComponent.Builder messageBuilder = Component.text()
+        .append(Component.text("Addon Files:", NamedTextColor.GOLD))
+        .decorate(TextDecoration.BOLD)
+        .append(Component.newline());
+
+    for (Path filePath : matchingFiles) {
+      String fileName = filePath.getFileName().toString();
+      TextComponent fileComponent = Component.text()
+          .append(Component.text("- " + fileName + " ", NamedTextColor.YELLOW)
+              .hoverEvent(Component.text("Click to load " + fileName, NamedTextColor.GREEN)))
+          .append(Component.text("[Load]", NamedTextColor.GREEN))
+          .clickEvent(ClickEvent.suggestCommand("/addons load " + fileName))
+          .append(Component.newline()).build();
+      messageBuilder.append(fileComponent);
+    }
+
+    if (matchingFiles.isEmpty()) {
+      player.sendMessage(ChatColor.RED + "Unable to find any files matching that file name!");
+    } else {
+      TextComponent message = messageBuilder.build();
+      audienceUtils.sendMessage(player, message);
+    }
+
 
 //    AddonManager addonManager = privateMines.getAddonManager();
 //    Path path = addonsFolder.resolve(string);

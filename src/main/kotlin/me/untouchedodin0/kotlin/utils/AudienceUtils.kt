@@ -23,6 +23,7 @@ package me.untouchedodin0.kotlin.utils
 
 import me.clip.placeholderapi.PlaceholderAPI
 import me.untouchedodin0.privatemines.PrivateMines
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
@@ -45,6 +46,15 @@ class AudienceUtils {
         } else {
             val placeholderAPI = PlaceholderAPI.setPlaceholders(player, message)
             player.sendMessage(placeholderAPI)
+        }
+    }
+
+    fun sendMessage(player: Player, textComponent: TextComponent) {
+        if (privateMines.adventure != null) {
+            val miniMessage = MiniMessage.miniMessage()
+            val audiences = privateMines.adventure
+            val audience = audiences.player(player)
+            audience.sendMessage(textComponent)
         }
     }
 
