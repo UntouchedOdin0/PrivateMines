@@ -377,18 +377,12 @@ public class PrivateMines extends JavaPlugin {
   public void loadAddons() {
     final PathMatcher jarMatcher = FileSystems.getDefault()
         .getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
+    PrivateMinesAPI privateMinesAPI = new PrivateMinesAPI();
 
     try (Stream<Path> paths = Files.walk(addonsDirectory).filter(jarMatcher::matches)) {
       paths.forEach(jar -> {
         File file = jar.toFile();
-        CompletableFuture<@Nullable Class<? extends Addon>> addon = AddonManager.findExpansionInFile(
-            file);
-        Optional<Addon> loaded = addonManager.register(addon);
-
-        if (loaded.isPresent()) {
-          Addon addonLoaded = loaded.get();
-          addonLoaded.onEnable();
-        }
+        privateMinesAPI.loadAddon(file);
       });
     } catch (IOException e) {
       throw new RuntimeException(e);

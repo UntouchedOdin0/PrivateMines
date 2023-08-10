@@ -89,6 +89,17 @@ public class AddonManager {
     }
   }
 
+//  public void loadAddon(File file) {
+//    @NotNull CompletableFuture<@Nullable Class<? extends Addon>> addon = findExpansionInFile(file);
+//    try {
+//      addon.get();
+//    } catch (InterruptedException e) {
+//      throw new RuntimeException(e);
+//    } catch (ExecutionException e) {
+//      throw new RuntimeException(e);
+//    }
+//  }
+
   public static Map<String, Addon> getAddons() {
     return addons;
   }

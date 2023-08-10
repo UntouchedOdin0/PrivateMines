@@ -22,10 +22,10 @@ package me.untouchedodin0.privatemines.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Single;
 import co.aikar.commands.annotation.Subcommand;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -49,6 +49,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -96,7 +97,6 @@ public class AddonsCommand extends BaseCommand {
   }
 
   @Subcommand("reload")
-  @CommandCompletion("@addons")
   public void reload(Player player, @Single String addonList) {
     String[] addons = addonList.split(",");
     for (String add : addons) {
@@ -113,20 +113,14 @@ public class AddonsCommand extends BaseCommand {
   }
 
   @Subcommand("disable")
-  @CommandCompletion("@addons")
-  public void disable(Player player, @Single String addonList) {
-    String[] addons = addonList.split(",");
-    for (String add : addons) {
-      String trimmed = add.trim();
-
-      try {
-        Addon addon = AddonManager.get(add);
-        player.sendMessage(ChatColor.GOLD + String.format("Disabling %s..", trimmed));
-        addon.onDisable();
-        AddonManager.remove(add);
-      } finally {
-        player.sendMessage(ChatColor.GREEN + String.format("Successfully disabled %s!", trimmed));
-      }
+  public void disable(Player player, String addonName) {
+    try {
+      Addon addon = AddonManager.get(addonName);
+      player.sendMessage(ChatColor.GOLD + String.format("Disabling %s..", addon.getName()));
+      addon.onDisable();
+      AddonManager.remove(addonName);
+    } finally {
+      player.sendMessage(ChatColor.GREEN + String.format("Successfully disabled %s!", addonName));
     }
   }
 
@@ -154,15 +148,14 @@ public class AddonsCommand extends BaseCommand {
     }
 
     TextComponent.Builder messageBuilder = Component.text()
-        .append(Component.text("Addon Files:", NamedTextColor.GOLD))
-        .decorate(TextDecoration.BOLD)
+        .append(Component.text("Addon Files:", NamedTextColor.GOLD)).decorate(TextDecoration.BOLD)
         .append(Component.newline());
 
     for (Path filePath : matchingFiles) {
       String fileName = filePath.getFileName().toString();
-      TextComponent fileComponent = Component.text()
-          .append(Component.text("- " + fileName + " ", NamedTextColor.YELLOW)
-              .hoverEvent(Component.text("Click to load " + fileName, NamedTextColor.GREEN)))
+      TextComponent fileComponent = Component.text().append(
+              Component.text("- " + fileName + " ", NamedTextColor.YELLOW)
+                  .hoverEvent(Component.text("Click to load " + fileName, NamedTextColor.GREEN)))
           .append(Component.text("[Load]", NamedTextColor.GREEN))
           .clickEvent(ClickEvent.suggestCommand("/addons load " + fileName))
           .append(Component.newline()).build();
@@ -174,6 +167,35 @@ public class AddonsCommand extends BaseCommand {
     } else {
       TextComponent message = messageBuilder.build();
       audienceUtils.sendMessage(player, message);
+    }
+  }
+
+  @Subcommand("loadfile")
+  public void loadfile(Player player, String string) {
+    final String fileRegex = ".+\\.jar$";
+    Path addonsFolder = privateMines.getAddonsDirectory();
+
+    if (!string.matches(fileRegex)) {
+      player.sendMessage(ChatColor.RED + "That's a incorrect file format!");
+      return;
+    }
+
+    try {
+      Files.walkFileTree(addonsFolder, new SimpleFileVisitor<>() {
+        @Override
+        public FileVisitResult visitFile(Path filePath, BasicFileAttributes attributes) {
+          String fileName = filePath.getFileName().toString().toLowerCase(); // Convert to lowercase
+          String search = string.toLowerCase(); // Convert search string to lowercase
+
+          if (fileName.contains(search) && fileName.matches(fileRegex)) {
+            File file = filePath.toFile();
+            Bukkit.broadcastMessage("jar file: " + file);
+          }
+          return FileVisitResult.CONTINUE;
+        }
+      });
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 }
