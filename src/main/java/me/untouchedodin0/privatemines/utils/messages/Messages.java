@@ -18,7 +18,7 @@ public enum Messages {
   private Map<UUID, Map<String, String>> languageMap;
 
   static {
-    File configFile = new File("plugins/PrivateMines/messages.yml");
+    File configFile = new File("plugins/PrivateMines/messages_en.yml");
     MessagesConfig config = new MessagesConfig();
     config.load(configFile);
 

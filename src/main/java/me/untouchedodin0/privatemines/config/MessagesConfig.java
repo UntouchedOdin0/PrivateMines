@@ -34,6 +34,7 @@ public class MessagesConfig {
     public static String deletedPlayersMine = "<green>You have deleted {name}'s mine!";
     public static String gavePlayerMine = "<green>You have given {name} a mine!";
     public static String mineUpgraded = "<green>Your mine has been upgraded!";
+    public static String mineMaxUpgrade = "<red>Your mine is already at the maximum upgrade!";
     public static String playerMineExpanded = "<green>{names}s mine has been expanded by {amount}!";
     public static String ownMineExpanded = "<green>Your mine has been expanded by {amount}!";
     public static String teleportedToOwnMine = "<green>You have been teleported to your mine!";

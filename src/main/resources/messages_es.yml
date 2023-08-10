@@ -1,0 +1,25 @@
+mineReset: <green>¡Tu mina ha sido reseteada!
+resetTargetMine: <green>¡Has reseteado el mío de {name}!
+dontOwnMine: <red>¡No eres dueño de una mina!
+playerDoesntOwnMine: <red>¡Ese jugador no posee una mina!
+playerAlreadyOwnsAMine: <red>¡Ese jugador ya posee una mina!
+deletedPlayersMine: <green>¡Has borrado el mío de {name}!
+gavePlayerMine: <green>¡Le has dado a {name} una mina!
+mineUpgraded: <green>Tu mina ha sido actualizada.
+mineMaxUpgrade: <red>¡Tu mina ya está al máximo de actualización!
+playerMineExpanded: <green>¡La mina de {names} se ha ampliado en {amount}!
+ownMineExpanded: <green>¡Tu mina se ha ampliado en {amount}!
+teleportedToOwnMine: <green>¡Has sido teletransportado a tu mina!
+visitingMine: <green>¡Estás visitando la mina de {name}!
+setTax: <green>¡Ha establecido con éxito su impuesto en {tax}%!
+targetAlreadyBanned: <green>El jugador objetivo ya está expulsado.
+successfullyBannedPlayer: <green>{name} ¡Ha sido expulsado de tu mina!
+targetIsNotBanned: <red>{name} ¡no está prohibido!
+unbannedPlayer: <green>{name} ¡Ha sido desbaneado de tu mina!
+bannedFromMine: <red>¡Has sido expulsado de la mina de {name}!
+unbannedFromMine: <green>¡Has sido expulsado de la mina de {name}!
+targetMineClosed: <red>La mina a la que intentabas teletransportarte está cerrada.
+mineOpened: <grey>¡Tu mina ha sido <verde>abierta<gris>!
+mineClosed: <grey>¡Tu mina ha sido <rojo>cerrada<gris>!
+taxLimit: <red>Usted no puede fijar su impuesto a <gray>{tax} <red>por favor manténgalo entre 0-100
+allMinesClaimed: <red>Todas las minas han sido reclamadas, por favor, ¡pide a un administrador que genere más!

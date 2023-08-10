@@ -118,7 +118,8 @@ public class PrivateMines extends JavaPlugin {
     getLogger().info("Loading Private Mines v" + getDescription().getVersion());
     saveDefaultConfig();
     saveResource("menus.yml", false);
-    saveResource("messages.yml", false);
+//    saveResource("messages_en.yml", false);
+    saveLocales();
 
     privateMines = this;
 
@@ -201,14 +202,7 @@ public class PrivateMines extends JavaPlugin {
         return;
       }
 
-      long before = System.nanoTime();
-
       SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
-      long after = System.nanoTime();
-      long taken = after - before;
-
-      System.out.println("taken " + taken);
-
       schematicStorage.addSchematic(schematicFile, mineBlocks);
     });
 
@@ -295,7 +289,6 @@ public class PrivateMines extends JavaPlugin {
     getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
   }
 
-
   @Override
   public void onDisable() {
     if (adventure != null) {
@@ -309,10 +302,8 @@ public class PrivateMines extends JavaPlugin {
         String.format("%s v%s has successfully been Disabled", getDescription().getName(),
             getDescription().getVersion()));
     saveMines();
-//    savePregenMines();
     sqlHelper.close();
   }
-
 
 
   public void setupSchematicUtils() {
@@ -412,6 +403,12 @@ public class PrivateMines extends JavaPlugin {
         mine.stopTasks();
       }
     });
+  }
+
+  private void saveLocales() {
+    List<String> locales = List.of("en", "es");
+
+    locales.forEach(string -> saveResource(String.format("messages_%s.yml", string), false));
   }
 
   public SchematicStorage getSchematicStorage() {

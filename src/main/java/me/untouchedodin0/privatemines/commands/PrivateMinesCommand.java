@@ -172,6 +172,11 @@ public class PrivateMinesCommand extends BaseCommand {
             double cost = nextType.getUpgradeCost();
             double bal = PrivateMines.getEconomy().getBalance(player);
 
+            if (currentType == nextType) {
+              audienceUtils.sendMessage(player, MessagesConfig.mineMaxUpgrade);
+              return;
+            }
+
             if (bal >= cost) {
               // player has enough money, upgrade the mine
               PrivateMines.getEconomy().withdrawPlayer(player, cost);
@@ -281,13 +286,11 @@ public class PrivateMinesCommand extends BaseCommand {
       if (!Config.enableResetCooldown) {
         if (mine != null) {
           mine.handleReset();
-          audienceUtils.sendMessage(player, MessagesConfig.mineReset);
         }
       } else {
         if (timeLeft == 0) {
           if (mine != null) {
             mine.handleReset();
-            audienceUtils.sendMessage(player, MessagesConfig.mineReset);
           }
           cooldownManager.setCooldown(player.getUniqueId(), Config.resetCooldown);
           new BukkitRunnable() {
@@ -319,7 +322,6 @@ public class PrivateMinesCommand extends BaseCommand {
       Mine mine = mineStorage.get(player);
       if (mine != null) {
         mine.teleport(player);
-        audienceUtils.sendMessage(player, MessagesConfig.teleportedToOwnMine);
       }
     }
   }
