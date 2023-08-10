@@ -27,11 +27,9 @@ import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Single;
 import co.aikar.commands.annotation.Subcommand;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -51,7 +49,6 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -136,17 +133,13 @@ public class AddonsCommand extends BaseCommand {
   @Subcommand("load")
   public void load(Player player, String string) {
     AudienceUtils audienceUtils = new AudienceUtils();
-
-    final PathMatcher jarMatcher = FileSystems.getDefault()
-        .getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
     Path addonsFolder = privateMines.getAddonsDirectory();
     List<Path> matchingFiles = new ArrayList<>();
 
     try {
       Files.walkFileTree(addonsFolder, new SimpleFileVisitor<>() {
         @Override
-        public FileVisitResult visitFile(Path filePath, BasicFileAttributes attributes)
-            throws IOException {
+        public FileVisitResult visitFile(Path filePath, BasicFileAttributes attributes) {
           String fileName = filePath.getFileName().toString().toLowerCase(); // Convert to lowercase
           String search = string.toLowerCase(); // Convert search string to lowercase
 
@@ -182,39 +175,5 @@ public class AddonsCommand extends BaseCommand {
       TextComponent message = messageBuilder.build();
       audienceUtils.sendMessage(player, message);
     }
-
-
-//    AddonManager addonManager = privateMines.getAddonManager();
-//    Path path = addonsFolder.resolve(string);
-//    File file = path.toFile();
-//    CompletableFuture<Class<? extends Addon>> addon =
-//        AddonManager.findExpansionInFile(file);
-//
-//    Bukkit.broadcastMessage("" + path);
-//    Bukkit.broadcastMessage("" + file.exists());
-//    Bukkit.broadcastMessage("" + addon);
-//
-//    Optional<Addon> loadedAddon = addonManager.register(addon);
-//    if (loadedAddon.isPresent()) {
-//      Addon loaded = loadedAddon.get();
-//
-//    }
-
-//    try (Stream<Path> paths = Files.walk(addonsFolder).filter(jarMatcher::matches)) {
-//      paths.forEach(jar -> {
-//        File file = jar.toFile();
-//        CompletableFuture<Class<? extends Addon>> addon = AddonManager.findExpansionInFile(
-//            file
-//        );
-//        Optional<Addon> loaded = addonManager.register(addon);
-//
-//        if (loaded.isPresent()) {
-//          Addon addonLoaded = loaded.get();
-//          addonLoaded.onEnable();
-//        }
-//      });
-//    } catch (IOException e) {
-//      throw new RuntimeException(e);
-//    }
   }
 }
