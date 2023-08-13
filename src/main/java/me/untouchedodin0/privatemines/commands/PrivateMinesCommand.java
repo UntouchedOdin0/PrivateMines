@@ -1,25 +1,22 @@
 /**
  * MIT License
- *
+ * <p>
  * Copyright (c) 2021 - 2023 Kyle Hicks
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
+ * <p>
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * <p>
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * <p>
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package me.untouchedodin0.privatemines.commands;
 
@@ -50,6 +47,7 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.AudienceUtils;
+import me.untouchedodin0.kotlin.utils.Range;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
@@ -61,6 +59,10 @@ import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.CooldownManager;
 import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -69,8 +71,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.region.CuboidRegion;
+import redempt.redlib.sql.SQLHelper;
 
 @CommandAlias("privatemine|privatemines|pmine")
 public class PrivateMinesCommand extends BaseCommand {
@@ -113,10 +117,9 @@ public class PrivateMinesCommand extends BaseCommand {
         if (sender instanceof Player player) {
           audienceUtils.sendMessage(player, MessagesConfig.playerAlreadyOwnsAMine);
         } else {
-          sender.sendMessage(ChatColor.RED + "Player has a mine!");
+          audienceUtils.sendMessage(sender, MessagesConfig.playerAlreadyOwnsAMine);
         }
       } else {
-        sender.sendMessage(ChatColor.GREEN + "Giving " + target.getName() + " a mine!");
         mineFactory.create(target.getPlayer(), location, defaultMineType);
 
         if (sender instanceof Player player) {
@@ -139,8 +142,8 @@ public class PrivateMinesCommand extends BaseCommand {
     } else {
       Mine mine = mineStorage.get(target.getUniqueId());
       if (mine != null) {
-        mine.delete(true);
         mine.stopTasks();
+        mine.delete(true);
         SQLUtils.delete(mine);
         if (sender instanceof Player player) {
           audienceUtils.sendMessage(player, target, MessagesConfig.deletedPlayersMine);
@@ -152,33 +155,38 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("upgrade")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.upgrade")
-  public void upgrade(CommandSender sender, int times) {
+  public void upgrade(CommandSender sender, @Default("1") int times) {
     if (!(sender instanceof Player player)) {
       sender.sendMessage(ChatColor.RED + "Only players can use this command!");
     } else {
       if (!mineStorage.hasMine(player)) {
-        player.sendMessage(ChatColor.RED + "You don't own a mine!");
+        audienceUtils.sendMessage(player, MessagesConfig.dontOwnMine);
       } else {
         Mine mine = mineStorage.get(player);
         if (mine != null) {
-          MineData mineData = mine.getMineData();
-          MineType currentType = mineData.getMineType();
-          MineType nextType = mineTypeManager.getNextMineType(currentType);
-          double cost = nextType.getUpgradeCost();
-          double bal = PrivateMines.getEconomy().getBalance(player);
 
-          if (bal >= cost) {
-            // player has enough money, upgrade the mine
+          for (int i = 0; i < times; i++) {
+            MineData mineData = mine.getMineData();
+            MineType currentType = mineData.getMineType();
+            MineType nextType = mineTypeManager.getNextMineType(currentType);
+            double cost = nextType.getUpgradeCost();
+            double bal = PrivateMines.getEconomy().getBalance(player);
 
-            for (int i = 0; i < times; i++) {
-              mine.upgrade();
-              PrivateMines.getEconomy().withdrawPlayer(player, cost);
-              mine.handleReset();
+            if (currentType == nextType) {
+              audienceUtils.sendMessage(player, MessagesConfig.mineMaxUpgrade);
+              return;
             }
-          } else {
-            // player does not have enough money
-            player.sendMessage(ChatColor.RED + String.format(
-                "You need %.2f to upgrade the mine. You currently have %.2f.", cost, bal));
+
+            if (bal >= cost) {
+              // player has enough money, upgrade the mine
+              PrivateMines.getEconomy().withdrawPlayer(player, cost);
+              mine.upgrade();
+              mine.handleReset();
+              audienceUtils.sendMessage(player, MessagesConfig.mineUpgraded);
+            } else {
+              player.sendMessage(ChatColor.RED + String.format(
+                  "You need %.2f to upgrade the mine. You currently have %.2f.", cost, bal));
+            }
           }
         }
       }
@@ -195,9 +203,13 @@ public class PrivateMinesCommand extends BaseCommand {
         audienceUtils.sendMessage(player, MessagesConfig.playerDoesntOwnMine);
       }
     } else {
+      SQLHelper sqlHelper = privateMines.getSqlHelper();
+
       Mine mine = mineStorage.get(target.getUniqueId());
       if (mine != null) {
         mine.upgrade();
+        mine.reset();
+        audienceUtils.sendMessage(Objects.requireNonNull(target.getPlayer()), MessagesConfig.mineUpgraded);
 
         List<Player> players = new ArrayList<>();
 
@@ -225,6 +237,21 @@ public class PrivateMinesCommand extends BaseCommand {
           }
           players.clear();
         }, 20L);
+
+        Task.asyncDelayed(() -> {
+          sqlHelper.executeUpdate(
+              "INSERT INTO privatemines (owner, mineType, mineLocation, corner1, corner2, fullRegionMin, fullRegionMax, spawn, tax, isOpen, maxPlayers, maxMineSize, materials) "
+                  + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+              String.valueOf(mineData.getMineOwner()), mineData.getMineType(),
+              LocationUtils.toString(mineData.getMineLocation()),
+              LocationUtils.toString(mineData.getMinimumMining()),
+              LocationUtils.toString(mineData.getMaximumMining()),
+              LocationUtils.toString(mineData.getMinimumFullRegion()),
+              LocationUtils.toString(mineData.getMaximumFullRegion()),
+              LocationUtils.toString(mineData.getSpawnLocation()), mineData.getTax(),
+              mineData.isOpen(), mineData.getMaxPlayers(), mineData.getMaxMineSize(),
+              mineData.getMaterials());
+        });
       }
     }
   }
@@ -251,7 +278,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @CommandPermission("privatemines.reset")
   public void reset(Player player) {
     if (!mineStorage.hasMine(player)) {
-      player.sendMessage(ChatColor.RED + "You don't own a mine!");
+      audienceUtils.sendMessage(player, MessagesConfig.dontOwnMine);
     } else {
       int timeLeft = cooldownManager.getCooldown(player.getUniqueId());
       Mine mine = mineStorage.get(player);
@@ -290,7 +317,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @CommandPermission("privatemines.teleport")
   public void teleport(Player player) {
     if (!mineStorage.hasMine(player)) {
-      player.sendMessage(ChatColor.RED + "You don't own a mine!");
+      audienceUtils.sendMessage(player, MessagesConfig.dontOwnMine);
     } else {
       Mine mine = mineStorage.get(player);
       if (mine != null) {
@@ -313,12 +340,13 @@ public class PrivateMinesCommand extends BaseCommand {
           List<UUID> banned = mineData.getBannedPlayers();
 
           if (banned.contains(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You're banned from this mine!");
+            audienceUtils.sendMessage(player, MessagesConfig.bannedFromMine);
           } else {
             if (mineData.isOpen()) {
               mine.teleport(player);
+              mine.startTasks();
             } else {
-              player.sendMessage(ChatColor.RED + "Target mine closed!");
+              audienceUtils.sendMessage(player, MessagesConfig.targetMineClosed);
             }
           }
         }
@@ -357,6 +385,7 @@ public class PrivateMinesCommand extends BaseCommand {
       mine.setMineData(mineData);
       mineStorage.replaceMineNoLog(player, mine);
       SQLUtils.update(mine);
+      audienceUtils.sendMessage(player, MessagesConfig.mineOpened);
     }
   }
 
@@ -371,6 +400,7 @@ public class PrivateMinesCommand extends BaseCommand {
       mine.setMineData(mineData);
       mineStorage.replaceMineNoLog(player, mine);
       SQLUtils.update(mine);
+      audienceUtils.sendMessage(player, MessagesConfig.mineClosed);
     }
   }
 
@@ -383,6 +413,7 @@ public class PrivateMinesCommand extends BaseCommand {
       mine.ban(target);
       mineStorage.replaceMineNoLog(player, mine);
       SQLUtils.update(mine);
+      audienceUtils.sendMessage(player, target, MessagesConfig.successfullyBannedPlayer);
     }
   }
 
@@ -395,6 +426,7 @@ public class PrivateMinesCommand extends BaseCommand {
       mine.unban(target);
       mineStorage.replaceMineNoLog(player, mine);
       SQLUtils.update(mine);
+      audienceUtils.sendMessage(player, target, MessagesConfig.unbannedPlayer);
     }
   }
 
@@ -402,20 +434,32 @@ public class PrivateMinesCommand extends BaseCommand {
   @CommandPermission("privatemines.tax")
   @Syntax("<amount>")
   public void tax(Player player, double tax) {
-    Mine mine = mineStorage.get(player);
-    if (mine != null) {
-      MineData mineData = mine.getMineData();
-      mineData.setTax(tax);
-      mine.setMineData(mineData);
-      mineStorage.replaceMineNoLog(player, mine);
-      SQLUtils.update(mine);
+    Range range = new Range(0, 100);
+    BukkitAudiences audiences = privateMines.getAdventure();
+    Audience audience = audiences.player(player);
+
+    if (!range.contains(tax)) {
+      audienceUtils.sendMessage(player, MessagesConfig.taxLimit);
+    } else {
+      Mine mine = mineStorage.get(player);
+      if (mine != null) {
+        MineData mineData = mine.getMineData();
+        mineData.setTax(tax);
+        mine.setMineData(mineData);
+        mineStorage.replaceMineNoLog(player, mine);
+        SQLUtils.update(mine);
+        Component message = Component.text()
+            .append(Component.text("Successfully updated tax to ", NamedTextColor.GREEN))
+            .append(Component.text(String.format("%.2f%%", tax), NamedTextColor.GOLD)).build();
+        audienceUtils.sendMessage(player, MessagesConfig.setTax, tax);
+      }
     }
   }
 
   @Subcommand("setblocks")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.setblocks")
-  @Syntax("<target> <materials> (DIRT, STONE)")
+  @Syntax("<target> <materials> e.g. DIRT, STONE")
   public void setBlocks(CommandSender sender, OfflinePlayer target,
       @Split(",") String[] materials) {
     Map<Material, Double> map = new HashMap<>();
@@ -444,6 +488,7 @@ public class PrivateMinesCommand extends BaseCommand {
 
   @Subcommand("pregen")
   @CommandPermission("privatemines.pregen")
+  @Syntax("<amount>")
   public void pregen(Player player, int amount) {
     PregenFactory.pregen(player, amount);
   }
@@ -452,14 +497,15 @@ public class PrivateMinesCommand extends BaseCommand {
   @CommandPermission("privatemines.claim")
   public void claim(Player player) {
     if (mineStorage.hasMine(player)) {
-      player.sendMessage(ChatColor.RED + "You already have a mine!");
+      audienceUtils.sendMessage(player, MessagesConfig.playerAlreadyOwnsAMine);
     } else {
       String mineRegionName = String.format("mine-%s", player.getUniqueId());
       String fullRegionName = String.format("full-mine-%s", player.getUniqueId());
 
       PregenStorage pregenStorage = privateMines.getPregenStorage();
       if (pregenStorage.isAllRedeemed()) {
-        player.sendMessage(ChatColor.RED + "All the mines have been claimed...");
+//        player.sendMessage(ChatColor.RED + "All the mines have been claimed...");
+        audienceUtils.sendMessage(player, MessagesConfig.allMinesClaimed);
       } else {
         PregenMine pregenMine = pregenStorage.getAndRemove();
         MineType mineType = mineTypeManager.getDefaultMineType();
@@ -475,10 +521,13 @@ public class PrivateMinesCommand extends BaseCommand {
         BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(maximum));
 
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionManager regionManager = container.get(BukkitAdapter.adapt(Objects.requireNonNull(spawn).getWorld()));
+        RegionManager regionManager = container.get(
+            BukkitAdapter.adapt(Objects.requireNonNull(spawn).getWorld()));
 
-        ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName, miningRegionMin, miningRegionMax);
-        ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName, fullRegionMin, fullRegionMax);
+        ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName,
+            miningRegionMin, miningRegionMax);
+        ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName, fullRegionMin,
+            fullRegionMax);
 
         if (regionManager != null) {
           regionManager.addRegion(miningRegion);

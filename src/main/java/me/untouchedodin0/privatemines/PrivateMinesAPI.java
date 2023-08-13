@@ -21,48 +21,59 @@
 
 package me.untouchedodin0.privatemines;
 
+import java.io.File;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.mine.Mine;
+import me.untouchedodin0.privatemines.utils.addon.Addon;
+import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import org.bukkit.Location;
-
-import java.util.Map;
-import java.util.UUID;
+import org.jetbrains.annotations.Nullable;
 
 public class PrivateMinesAPI {
 
-    PrivateMines privateMines = PrivateMines.getPrivateMines();
-    MineStorage mineStorage = privateMines.getMineStorage();
-    MineFactory mineFactory = privateMines.getMineFactory();
+  PrivateMines privateMines = PrivateMines.getPrivateMines();
+  MineStorage mineStorage = privateMines.getMineStorage();
+  MineFactory mineFactory = privateMines.getMineFactory();
 
-    public Mine getMine(UUID uuid) {
-        if (!mineStorage.hasMine(uuid)) return null;
-        return mineStorage.get(uuid);
+  public Mine getMine(UUID uuid) {
+    if (!mineStorage.hasMine(uuid)) {
+      return null;
     }
-    public Mine getAtLocation(Location location) {
-        return mineStorage.getClosest(location);
-    }
-    public Map<UUID, Mine> getMines() {
-        return mineStorage.getMines();
-    }
-    public boolean hasMine(UUID uuid) {
-        return mineStorage.hasMine(uuid);
-    }
-    public void createMine(UUID uuid, Location location, MineType mineType) {
-        mineFactory.createUpgraded(uuid, location, mineType);
-    }
+    return mineStorage.get(uuid);
+  }
 
-//    public void loadAddon(File file) {
-//        try {
-//            AddonAPI addonAPI = new AddonAPI(new URL[file.toURI().getClass().getClassLoader()], privateMines.getClass().getClassLoader());
-//        } catch (MalformedURLException e) {
-//            throw new RuntimeException(e);
-//        }
-//        AddonAPI.load(file);
-//    }
+  public Mine getAtLocation(Location location) {
+    return mineStorage.getClosest(location);
+  }
 
-//    public void loadAddon(Class<?> clazz) {
-//        AddonAPI.load(clazz);
-//    }
+  public Map<UUID, Mine> getMines() {
+    return mineStorage.getMines();
+  }
+
+  public boolean hasMine(UUID uuid) {
+    return mineStorage.hasMine(uuid);
+  }
+
+  public void createMine(UUID uuid, Location location, MineType mineType) {
+    mineFactory.createUpgraded(uuid, location, mineType);
+  }
+
+  public void loadAddon(File file) {
+    AddonManager addonManager = PrivateMines.getPrivateMines().getAddonManager();
+    CompletableFuture<@Nullable Class<? extends Addon>> addon = AddonManager.findExpansionInFile(
+        file);
+
+    Optional<Addon> loaded = addonManager.register(addon);
+
+    if (loaded.isPresent()) {
+      Addon addonLoaded = loaded.get();
+      addonLoaded.onEnable();
+    }
+  }
 }

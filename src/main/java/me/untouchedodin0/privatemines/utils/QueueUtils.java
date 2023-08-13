@@ -48,6 +48,7 @@ public class QueueUtils {
     }
     add(uuid);
   }
+  
 
   public boolean isInQueue(UUID uuid) {
     return waitingInQueue.contains(uuid);
@@ -87,9 +88,9 @@ public class QueueUtils {
           }
           int estimateSeconds = place.get() * 3;
 
-          player.sendTitle(ChatColor.GREEN + "You're at slot #" + slot.get(),
-              ChatColor.YELLOW + String.format(" Estimated wait time: %d seconds!",
-                  estimateSeconds));
+//          player.sendTitle(ChatColor.GREEN + "You're at slot #" + slot.get(),
+//              ChatColor.YELLOW + String.format(" Estimated wait time: %d seconds!",
+//                  estimateSeconds));
         }
       }
     }, 0L, 60L);

@@ -34,13 +34,21 @@ public class MessagesConfig {
     public static String deletedPlayersMine = "<green>You have deleted {name}'s mine!";
     public static String gavePlayerMine = "<green>You have given {name} a mine!";
     public static String mineUpgraded = "<green>Your mine has been upgraded!";
+    public static String mineMaxUpgrade = "<red>Your mine is already at the maximum upgrade!";
     public static String playerMineExpanded = "<green>{names}s mine has been expanded by {amount}!";
     public static String ownMineExpanded = "<green>Your mine has been expanded by {amount}!";
     public static String teleportedToOwnMine = "<green>You have been teleported to your mine!";
     public static String visitingMine = "<green>You are now visiting {name}'s mine!";
     public static String setTax = "<green>Successfully set your tax to {tax}%!";
+    public static String taxLimit = "<red>You can't set your tax to <gray>{tax} <red>please keep it between 0-100";
     public static String targetAlreadyBanned = "<green>The target player is already banned!";
     public static String successfullyBannedPlayer = "<green>{name} Has been banned from your mine!";
     public static String targetIsNotBanned = "<red>{name} isn't banned!";
     public static String unbannedPlayer = "<green>{name} Has been unbanned from your mine!";
+    public static String bannedFromMine = "<red>You've been banned from {name}'s mine!";
+    public static String unbannedFromMine = "<green>You've been unbanned from {name}'s mine!";
+    public static String targetMineClosed = "<red>The mine you were trying to teleport to is closed.";
+    public static String mineOpened = "<grey>Your mine has been <green>opened<grey>!";
+    public static String mineClosed = "<grey>Your mine has been <red>closed<grey>!";
+    public static String allMinesClaimed = "<red>All the mines have been claimed, please ask an admin to generate more!";
 }

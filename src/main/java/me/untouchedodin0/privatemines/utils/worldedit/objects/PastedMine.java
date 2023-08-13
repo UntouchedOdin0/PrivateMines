@@ -48,10 +48,12 @@ public class PastedMine {
   }
 
   public Location getLowerRailsLocation() {
-    return new Location(location.getWorld(), lowerRails.getBlockX(), lowerRails.getBlockY(), lowerRails.getBlockZ());
+    return new Location(location.getWorld(), lowerRails.getBlockX(), lowerRails.getBlockY(),
+        lowerRails.getBlockZ());
   }
 
   public Location getUpperRailsLocation() {
-    return new Location(location.getWorld(), upperRails.getBlockX(), upperRails.getBlockY(), upperRails.getBlockZ());
+    return new Location(location.getWorld(), upperRails.getBlockX(), upperRails.getBlockY(),
+        upperRails.getBlockZ());
   }
 }

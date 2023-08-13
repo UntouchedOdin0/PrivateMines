@@ -21,8 +21,7 @@
 
 package me.untouchedodin0.privatemines;
 
-import co.aikar.commands.BukkitCommandManager;
-import com.google.gson.GsonBuilder;
+import co.aikar.commands.PaperCommandManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -31,7 +30,6 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,8 +63,6 @@ import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
-import me.untouchedodin0.privatemines.utils.adapter.LocationAdapter;
-import me.untouchedodin0.privatemines.utils.adapter.PathAdapter;
 import me.untouchedodin0.privatemines.utils.addon.Addon;
 import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
@@ -122,7 +118,8 @@ public class PrivateMines extends JavaPlugin {
     getLogger().info("Loading Private Mines v" + getDescription().getVersion());
     saveDefaultConfig();
     saveResource("menus.yml", false);
-    saveResource("messages.yml", false);
+//    saveResource("messages_en.yml", false);
+    saveLocales();
 
     privateMines = this;
 
@@ -174,7 +171,7 @@ public class PrivateMines extends JavaPlugin {
       Files.createDirectories(schematicsDirectory);
       Files.createDirectories(addonsDirectory);
     } catch (IOException e) {
-      e.printStackTrace();
+      getLogger().warning("Error creating directories: " + e.getMessage());
     }
 
     ConfigManager configManager = ConfigManager.create(this)
@@ -204,9 +201,17 @@ public class PrivateMines extends JavaPlugin {
         getLogger().info("File doesn't exist!");
         return;
       }
+
       SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
       schematicStorage.addSchematic(schematicFile, mineBlocks);
     });
+
+    PaperCommandManager paperCommandManager = new PaperCommandManager(this);
+    paperCommandManager.enableUnstableAPI("help");
+
+    paperCommandManager.registerCommand(new PrivateMinesCommand());
+    paperCommandManager.registerCommand(new PublicMinesCommand());
+    paperCommandManager.registerCommand(new AddonsCommand());
 
     File dataFolder = new File(privateMines.getDataFolder(), "privatemines.db");
     if (!dataFolder.exists()) {
@@ -266,17 +271,6 @@ public class PrivateMines extends JavaPlugin {
     Task.asyncDelayed(SQLUtils::loadPregens);
     Task.asyncDelayed(this::loadAddons);
 
-    BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
-    bukkitCommandManager.registerCommand(new PrivateMinesCommand());
-    bukkitCommandManager.registerCommand(new PublicMinesCommand());
-    bukkitCommandManager.registerCommand(new AddonsCommand());
-    bukkitCommandManager.enableUnstableAPI("help");
-    bukkitCommandManager.getCommandCompletions().registerCompletion("addons", context -> {
-      ArrayList<String> addons = new ArrayList<>();
-      AddonManager.getAddons().forEach((s, addon) -> addons.add(s));
-      return addons;
-    });
-
     getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
     if (!setupEconomy()) {
       privateMines.getLogger().severe(
@@ -295,7 +289,6 @@ public class PrivateMines extends JavaPlugin {
     getLogger().info("Successfully loaded private mines in " + loadTime.toMillis() + "ms");
   }
 
-
   @Override
   public void onDisable() {
     if (adventure != null) {
@@ -309,9 +302,9 @@ public class PrivateMines extends JavaPlugin {
         String.format("%s v%s has successfully been Disabled", getDescription().getName(),
             getDescription().getVersion()));
     saveMines();
-//    savePregenMines();
     sqlHelper.close();
   }
+
 
   public void setupSchematicUtils() {
     this.schematicStorage = new SchematicStorage();
@@ -348,7 +341,7 @@ public class PrivateMines extends JavaPlugin {
       int isOpen = result.get(10);
 //      String resultsMaterial = result.getString(13);
 //      resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
-
+//
 //      Map<Material, Double> materials = new HashMap<>();
 //
 //      String[] pairs = resultsMaterial.split("\\s*,\\s*");
@@ -374,8 +367,9 @@ public class PrivateMines extends JavaPlugin {
 
       MineData mineData = new MineData(uuid, minMining, maxMining, fullMin, fullMax, location,
           spawnLocation, type, open, tax);
-//      mineData.setMaterials(materials);
+//      mineData.setMaterials(materials); - This breaks it for some reason
       mine.setMineData(mineData);
+
       mineStorage.addMine(uuid, mine);
     });
   }
@@ -383,18 +377,12 @@ public class PrivateMines extends JavaPlugin {
   public void loadAddons() {
     final PathMatcher jarMatcher = FileSystems.getDefault()
         .getPathMatcher("glob:**/*.jar"); // Credits to Brister Mitten
+    PrivateMinesAPI privateMinesAPI = new PrivateMinesAPI();
 
     try (Stream<Path> paths = Files.walk(addonsDirectory).filter(jarMatcher::matches)) {
       paths.forEach(jar -> {
         File file = jar.toFile();
-        CompletableFuture<@Nullable Class<? extends Addon>> addon = AddonManager.findExpansionInFile(
-            file);
-        Optional<Addon> loaded = addonManager.register(addon);
-
-        if (loaded.isPresent()) {
-          Addon addonLoaded = loaded.get();
-          addonLoaded.onEnable();
-        }
+        privateMinesAPI.loadAddon(file);
       });
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -411,9 +399,11 @@ public class PrivateMines extends JavaPlugin {
     });
   }
 
-//  public void savePregenMines() {
-//    getPregenStorage().getMines().forEach(PregenMine::save);
-//  }
+  private void saveLocales() {
+    List<String> locales = List.of("en", "es");
+
+    locales.forEach(string -> saveResource(String.format("messages_%s.yml", string), false));
+  }
 
   public SchematicStorage getSchematicStorage() {
     return schematicStorage;
@@ -443,13 +433,17 @@ public class PrivateMines extends JavaPlugin {
     return addonManager;
   }
 
+  public Path getAddonsDirectory() {
+    return addonsDirectory;
+  }
+
   public static Economy getEconomy() {
     return econ;
   }
 
   public void registerSellListener() {
-    if (Bukkit.getPluginManager().isPluginEnabled("UltraPrisonCore")) {
-      getLogger().info("Registering Ultra Prison Core as the sell listener...");
+    if (Bukkit.getPluginManager().isPluginEnabled("XPrison")) {
+      getLogger().info("Registering XPrison as the sell listener...");
       getServer().getPluginManager().registerEvents(new UPCSellListener(), this);
       return;
     } else if (Bukkit.getPluginManager().isPluginEnabled("AutoSell")) {
@@ -464,16 +458,8 @@ public class PrivateMines extends JavaPlugin {
     getServer().getPluginManager().registerEvents(new MineResetListener(), this);
   }
 
-  public SQLite getSqlite() {
-    return sqlite;
-  }
-
   public SQLHelper getSqlHelper() {
     return sqlHelper;
-  }
-
-  public Map<String, SQLCache> getCaches() {
-    return caches;
   }
 
   public BukkitAudiences getAdventure() {

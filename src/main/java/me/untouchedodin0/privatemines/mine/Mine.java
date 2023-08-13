@@ -48,9 +48,11 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.type.MineType;
+import me.untouchedodin0.kotlin.utils.AudienceUtils;
 import me.untouchedodin0.kotlin.utils.FlagUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
+import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.events.PrivateMineDeleteEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineExpandEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineResetEvent;
@@ -62,7 +64,6 @@ import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import me.untouchedodin0.privatemines.utils.worldedit.PasteHelper;
 import me.untouchedodin0.privatemines.utils.worldedit.objects.PastedMine;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -80,6 +81,7 @@ public class Mine {
   private Task task;
   private Task percentageTask = null;
   private int airBlocks;
+  AudienceUtils audienceUtils = new AudienceUtils();
 
   public Mine(PrivateMines privateMines) {
     this.privateMines = privateMines;
@@ -109,6 +111,7 @@ public class Mine {
     if (getSpawnLocation().getBlock().getType().isBlock()) {
       getSpawnLocation().getBlock().setType(Material.AIR, false);
       player.teleport(getSpawnLocation());
+      audienceUtils.sendMessage(player, MessagesConfig.teleportedToOwnMine);
     }
   }
 
@@ -166,6 +169,7 @@ public class Mine {
       privateMines.getLogger().info(String.format("It took %dms to delete the mine", durationInMS));
     }
 
+    stopTasks();
     privateMines.getMineStorage().removeMine(uuid);
     SQLUtils.delete(this);
   }
@@ -428,6 +432,33 @@ public class Mine {
     }
   }
 
+  public double getPercentage() {
+    CuboidRegion region = new CuboidRegion(BlockVector3.at(mineData.getMinimumMining().getBlockX(),
+        mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()),
+        BlockVector3.at(mineData.getMaximumMining().getBlockX(),
+            mineData.getMaximumMining().getBlockY(), mineData.getMaximumMining().getBlockZ()));
+
+    if (Config.addWallGap) {
+      for (int i = 0; i < Config.wallsGap; i++) {
+        region.contract(ExpansionUtils.contractVectors(1));
+      }
+    }
+
+    long total = region.getVolume();
+
+    // Calculate the percetage of the region called "region" to then compare with how many blocks have been mined.
+    airBlocks = 0;
+    for (BlockVector3 vector : region) {
+      Block block = Objects.requireNonNull(Bukkit.getWorld(
+              Objects.requireNonNull(Objects.requireNonNull(getSpawnLocation()).getWorld()).getName()))
+          .getBlockAt(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+      if (block.getType().equals(Material.AIR)) {
+        this.airBlocks++;
+      }
+    }
+    return (float) airBlocks * 100L / total;
+  }
+
   public void handleReset() {
     MineData mineData = getMineData();
     MineType mineType = mineData.getMineType();
@@ -470,7 +501,7 @@ public class Mine {
 
     if (percentageTask == null) {
       //Create a new Bukkit task async
-      percentageTask = Task.syncRepeating(() -> {
+      this.percentageTask = Task.syncRepeating(() -> {
         double percentage = getPercentage();
         double resetPercentage = mineType.getResetPercentage();
         if (percentage > resetPercentage) {
@@ -480,7 +511,15 @@ public class Mine {
       }, 0, 80);
     }
     if (owner != null) {
-      owner.sendMessage(ChatColor.GREEN + "You've reset your mine!");
+      audienceUtils.sendMessage(owner, MessagesConfig.mineReset);
+    }
+  }
+
+  public void startTasks() {
+    MineType mineType = mineData.getMineType();
+
+    if (task == null) {
+      this.task = Task.syncRepeating(this::handleReset, 0L, mineType.getResetTime() * 20L);
     }
   }
 
@@ -494,32 +533,6 @@ public class Mine {
     privateMines.getLogger().info("Stopped tasks for mine " + mineData.getMineOwner());
   }
 
-  public double getPercentage() {
-    CuboidRegion region = new CuboidRegion(BlockVector3.at(mineData.getMinimumMining().getBlockX(),
-        mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()),
-        BlockVector3.at(mineData.getMaximumMining().getBlockX(),
-            mineData.getMaximumMining().getBlockY(), mineData.getMaximumMining().getBlockZ()));
-
-    if (Config.addWallGap) {
-      for (int i = 0; i < Config.wallsGap; i++) {
-        region.contract(ExpansionUtils.contractVectors(1));
-      }
-    }
-
-    long total = region.getVolume();
-
-    // Calculate the percetage of the region called "region" to then compare with how many blocks have been mined.
-    airBlocks = 0;
-    for (BlockVector3 vector : region) {
-      Block block = Objects.requireNonNull(Bukkit.getWorld(
-              Objects.requireNonNull(Objects.requireNonNull(getSpawnLocation()).getWorld()).getName()))
-          .getBlockAt(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
-      if (block.getType().equals(Material.AIR)) {
-        this.airBlocks++;
-      }
-    }
-    return (float) airBlocks * 100L / total;
-  }
 
   public void ban(Player player) {
     if (mineData.getBannedPlayers().contains(player.getUniqueId())) {
@@ -529,9 +542,11 @@ public class Mine {
     if (player.equals(owner)) {
       return;
     }
-    player.sendMessage(
-        ChatColor.RED + "You've been banned from " + Objects.requireNonNull(owner).getName()
-            + "'s mine!");
+
+    audienceUtils.sendMessage(player, Objects.requireNonNull(owner),
+        MessagesConfig.successfullyBannedPlayer);
+    audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.bannedFromMine);
+
     mineData.getBannedPlayers().add(player.getUniqueId());
     setMineData(mineData);
     SQLUtils.update(this);
@@ -539,9 +554,10 @@ public class Mine {
 
   public void unban(Player player) {
     Player owner = Bukkit.getPlayer(mineData.getMineOwner());
-    player.sendMessage(
-        ChatColor.RED + "You've been unbanned from " + Objects.requireNonNull(owner).getName()
-            + "'s mine!");
+    audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.unbannedPlayer);
+    audienceUtils.sendMessage(player, Objects.requireNonNull(owner),
+        MessagesConfig.unbannedFromMine);
+
     mineData.getBannedPlayers().remove(player.getUniqueId());
     setMineData(mineData);
     SQLUtils.update(this);
@@ -661,6 +677,7 @@ public class Mine {
     Player player = Bukkit.getOfflinePlayer(mineOwner).getPlayer();
     MineType currentType = mineTypeManager.getMineType(mineData.getMineType());
     MineType nextType = mineTypeManager.getNextMineType(currentType);
+
     Location mineLocation = mineData.getMineLocation();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + nextType.getFile());
     mineData.setMineType(nextType);
@@ -732,22 +749,22 @@ public class Mine {
           Task.asyncDelayed(() -> {
             SQLUtils.update(this);
           });
-
-          XPrisonAutoSell autoSell = XPrisonAutoSell.getInstance();
-          SellRegion sellRegion = autoSell.getManager().getAutoSellRegion(mineLocation);
-
-          if (nextType.getPrices() != null) {
-            nextType.getPrices().forEach((material, aDouble) -> {
-              CompMaterial compMaterial = CompMaterial.fromMaterial(material);
-              sellRegion.addSellPrice(compMaterial, aDouble);
-            });
-
-            autoSell.getManager().updateSellRegion(sellRegion);
-            autoSell.getAutoSellConfig().saveSellRegion(sellRegion);
-          }
-
-          Bukkit.broadcastMessage("sell region " + sellRegion);
           Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
+
+          if (Bukkit.getPluginManager().isPluginEnabled("XPrison")) {
+            XPrisonAutoSell autoSell = XPrisonAutoSell.getInstance();
+            SellRegion sellRegion = autoSell.getManager().getAutoSellRegion(mineLocation);
+
+            if (nextType.getPrices() != null) {
+              nextType.getPrices().forEach((material, aDouble) -> {
+                CompMaterial compMaterial = CompMaterial.fromMaterial(material);
+                sellRegion.addSellPrice(compMaterial, aDouble);
+              });
+
+              autoSell.getManager().updateSellRegion(sellRegion);
+              autoSell.getAutoSellConfig().saveSellRegion(sellRegion);
+            }
+          }
         });
       }
     }

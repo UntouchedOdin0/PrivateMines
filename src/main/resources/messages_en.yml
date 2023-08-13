@@ -1,10 +1,12 @@
 mineReset: <green>Your mine has been reset!
+resetTargetMine: <green>You've reset {name}'s mine!
 dontOwnMine: <red>You don't own a mine!
 playerDoesntOwnMine: <red>That player doesn't own a mine!
 playerAlreadyOwnsAMine: <red>That player already owns a mine!
 deletedPlayersMine: <green>You have deleted {name}'s mine!
 gavePlayerMine: <green>You have given {name} a mine!
 mineUpgraded: <green>Your mine has been upgraded!
+mineMaxUpgrade: <red>Your mine is already at the maximum upgrade!
 playerMineExpanded: <green>{names}s mine has been expanded by {amount}!
 ownMineExpanded: <green>Your mine has been expanded by {amount}!
 teleportedToOwnMine: <green>You have been teleported to your mine!
@@ -14,3 +16,10 @@ targetAlreadyBanned: <green>The target player is already banned!
 successfullyBannedPlayer: <green>{name} Has been banned from your mine!
 targetIsNotBanned: <red>{name} isn't banned!
 unbannedPlayer: <green>{name} Has been unbanned from your mine!
+bannedFromMine: <red>You've been banned from {name}'s mine!
+unbannedFromMine: <green>You've been unbanned from {name}'s mine!
+targetMineClosed: <red>The mine you were trying to teleport to is closed.
+mineOpened: <grey>Your mine has been <green>opened<grey>!
+mineClosed: <grey>Your mine has been <red>closed<grey>!
+taxLimit: <red>You can't set your tax to <gray>{tax} <red>please keep it between 0-100
+allMinesClaimed: <red>All the mines have been claimed, please ask an admin to generate more!

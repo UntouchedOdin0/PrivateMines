@@ -105,9 +105,7 @@ public class PregenFactory {
           Vector3 max = realTo.add(clipboardHolder.getTransform()
               .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
           RegionSelector regionSelector = new CuboidRegionSelector(
-              BukkitAdapter.adapt(location.getWorld()),
-              realTo.toBlockPoint(),
-              max.toBlockPoint());
+              BukkitAdapter.adapt(location.getWorld()), realTo.toBlockPoint(), max.toBlockPoint());
           newRegion = regionSelector.getRegion();
 
           Location spongeL = new Location(location.getWorld(), vector.getBlockX(),
@@ -118,8 +116,7 @@ public class PregenFactory {
               urailsV.getBlockY(), urailsV.getBlockZ());
           Location fullMin = BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld()),
               newRegion.getMinimumPoint());
-          Location fullMax = BukkitAdapter.adapt(location.getWorld(),
-              newRegion.getMaximumPoint());
+          Location fullMax = BukkitAdapter.adapt(location.getWorld(), newRegion.getMaximumPoint());
           pregenMine.setLocation(location);
           pregenMine.setSpawnLocation(spongeL);
           pregenMine.setLowerRails(lrailsL);
