@@ -22,6 +22,7 @@
 package me.untouchedodin0.kotlin.mine.storage
 
 import me.untouchedodin0.kotlin.mine.pregen.PregenMine
+import me.untouchedodin0.privatemines.PrivateMines
 import org.bukkit.Location
 
 /**
@@ -30,6 +31,8 @@ import org.bukkit.Location
  * object and the value is its location.
  */
 class PregenStorage {
+
+    private var privateMines = PrivateMines.getPrivateMines()
 
     // Initialize an empty MutableMap to store the pregenerated mines
     private var pregenMines: MutableMap<PregenMine, Location> = HashMap()
@@ -46,16 +49,30 @@ class PregenStorage {
      * Gets and removes the oldest pregenerated mine from the storage.
      * @return The oldest pregenerated mine.
      */
-    fun getAndRemove(): PregenMine {
-        // Get the oldest entry in the map (which is the first entry)
-        val oldestEntry = pregenMines.entries.first()
-        // Use a let block to avoid nullable warnings and return the oldest pregenerated mine
-        oldestEntry.let {
-            return oldestEntry.key.also {
+    fun getAndRemove(): PregenMine? {
+        return try {
+            // Get the oldest entry in the map (which is the first entry)
+            val oldestEntry = pregenMines.entries.first()
+            // Use a let block to avoid nullable warnings and return the oldest pregenerated mine
+            oldestEntry.key.also {
                 pregenMines.remove(oldestEntry.key)
             }
+        } catch (e: NoSuchElementException) {
+            privateMines.logger.info("No more pregenerated mines available.")
+            null // Return null to indicate no more pregenerated mines
         }
     }
+
+//    fun getAndRemove(): PregenMine {
+//        // Get the oldest entry in the map (which is the first entry)
+//        val oldestEntry = pregenMines.entries.first()
+//        // Use a let block to avoid nullable warnings and return the oldest pregenerated mine
+//        oldestEntry.let {
+//            return oldestEntry.key.also {
+//                pregenMines.remove(oldestEntry.key)
+//            }
+//        }
+//    }
 
     /**
      * Checks if all pregenerated mines in the storage have been redeemed.

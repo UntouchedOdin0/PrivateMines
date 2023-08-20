@@ -20,7 +20,6 @@ enableMenu: true
 enableTax: true
 sendTaxMessages: true
 defaultClosed: true
-storageType: YAML # Supports YAML, SQLite (Important: DO NOT CHANGE ONCE YOU START USING ONE)
 resetCooldown: 15
 formatResetMessage: true
 
