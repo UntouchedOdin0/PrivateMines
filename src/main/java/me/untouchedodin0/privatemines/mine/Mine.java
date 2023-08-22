@@ -519,7 +519,7 @@ public class Mine {
     MineType mineType = mineData.getMineType();
 
     if (task == null) {
-      this.task = Task.syncRepeating(this::handleReset, 0L, mineType.getResetTime() * 20L);
+      this.task = Task.syncRepeating(this::handleReset, 0L, mineType.getResetTime() * 60 * 20L);
     }
   }
 
