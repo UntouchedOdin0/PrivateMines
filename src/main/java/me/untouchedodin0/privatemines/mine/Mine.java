@@ -42,6 +42,7 @@ import io.th0rgal.oraxen.api.OraxenBlocks;
 import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -533,32 +534,38 @@ public class Mine {
     privateMines.getLogger().info("Stopped tasks for mine " + mineData.getMineOwner());
   }
 
-
   public void ban(Player player) {
-    if (mineData.getBannedPlayers().contains(player.getUniqueId())) {
-      return;
-    }
-    Player owner = Bukkit.getPlayer(mineData.getMineOwner());
-    if (player.equals(owner)) {
-      return;
+    UUID uuid = player.getUniqueId();
+    UUID mineOwner = mineData.getMineOwner();
+    List<UUID> bannedPlayers = mineData.getBannedPlayers();
+    if (bannedPlayers.contains(uuid) || uuid.equals(mineOwner)) {
+      return; // Player is already banned or is the mine owner, nothing to do.
     }
 
-    audienceUtils.sendMessage(player, Objects.requireNonNull(owner),
-        MessagesConfig.successfullyBannedPlayer);
-    audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.bannedFromMine);
+    Player owner = Bukkit.getPlayer(mineOwner);
+    if (owner == null) {
+      return; // The mine owner is not online, so we can't proceed.
+    }
+    audienceUtils.sendMessage(player, owner, MessagesConfig.successfullyBannedPlayer);
+    audienceUtils.sendMessage(player, owner, MessagesConfig.bannedFromMine);
 
-    mineData.getBannedPlayers().add(player.getUniqueId());
+    bannedPlayers.add(uuid);
     setMineData(mineData);
     SQLUtils.update(this);
   }
 
   public void unban(Player player) {
+    UUID playerUniqueId = player.getUniqueId();
     Player owner = Bukkit.getPlayer(mineData.getMineOwner());
-    audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.unbannedPlayer);
-    audienceUtils.sendMessage(player, Objects.requireNonNull(owner),
-        MessagesConfig.unbannedFromMine);
 
-    mineData.getBannedPlayers().remove(player.getUniqueId());
+    if (owner == null) {
+      return; // The mine owner is not online, so we can't proceed.
+    }
+
+    audienceUtils.sendMessage(player, owner, MessagesConfig.unbannedPlayer);
+    audienceUtils.sendMessage(player, owner, MessagesConfig.unbannedFromMine);
+
+    mineData.getBannedPlayers().remove(playerUniqueId);
     setMineData(mineData);
     SQLUtils.update(this);
   }
