@@ -47,6 +47,7 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.AudienceUtils;
+import me.untouchedodin0.kotlin.utils.FlagUtils;
 import me.untouchedodin0.kotlin.utils.Range;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
@@ -209,7 +210,8 @@ public class PrivateMinesCommand extends BaseCommand {
       if (mine != null) {
         mine.upgrade();
         mine.reset();
-        audienceUtils.sendMessage(Objects.requireNonNull(target.getPlayer()), MessagesConfig.mineUpgraded);
+        audienceUtils.sendMessage(Objects.requireNonNull(target.getPlayer()),
+            MessagesConfig.mineUpgraded);
 
         List<Player> players = new ArrayList<>();
 
@@ -282,6 +284,12 @@ public class PrivateMinesCommand extends BaseCommand {
     } else {
       int timeLeft = cooldownManager.getCooldown(player.getUniqueId());
       Mine mine = mineStorage.get(player);
+
+      // debug
+      if (mine != null) {
+        mine.getPercentage();
+      }
+
 
       if (!Config.enableResetCooldown) {
         if (mine != null) {
@@ -505,7 +513,6 @@ public class PrivateMinesCommand extends BaseCommand {
 
       PregenStorage pregenStorage = privateMines.getPregenStorage();
       if (pregenStorage.isAllRedeemed()) {
-//        player.sendMessage(ChatColor.RED + "All the mines have been claimed...");
         audienceUtils.sendMessage(player, MessagesConfig.allMinesClaimed);
       } else {
         PregenMine pregenMine = pregenStorage.getAndRemove();
@@ -520,6 +527,7 @@ public class PrivateMinesCommand extends BaseCommand {
         BlockVector3 miningRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(corner2));
         BlockVector3 fullRegionMin = BukkitAdapter.asBlockVector(Objects.requireNonNull(minimum));
         BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(maximum));
+        FlagUtils flagUtils = new FlagUtils();
 
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionManager regionManager = container.get(
@@ -545,6 +553,7 @@ public class PrivateMinesCommand extends BaseCommand {
         mineStorage.addMine(player.getUniqueId(), mine);
 
         Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
+        Task.syncDelayed(() -> flagUtils.setFlags(mine));
         pregenMine.teleport(player);
         mine.handleReset();
       }

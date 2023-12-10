@@ -53,7 +53,8 @@ dependencies {
     compileOnly 'com.mojang:authlib:1.11'
     compileOnly 'me.clip:placeholderapi:2.11.3'
     compileOnly 'com.github.oraxen:oraxen:1.157.2'
-    compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.4.1-r4'
+    compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.6.1'
+//    compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.4.1-r4'
     compileOnly 'com.google.code.gson:gson:2.10'
     compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.15.0' // i think this is the big thing?
 

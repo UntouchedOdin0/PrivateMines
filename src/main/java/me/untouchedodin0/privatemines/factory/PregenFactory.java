@@ -28,6 +28,7 @@ import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
+import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -39,6 +40,7 @@ public class PregenFactory {
 
   public static PrivateMines privateMines = PrivateMines.getPrivateMines();
   public static MineTypeManager mineTypeManager = privateMines.getMineTypeManager();
+  public static MineWorldManager mineWorldManager = privateMines.getMineWorldManager();
   private static Clipboard clipboard;
   private static ClipboardHolder clipboardHolder;
 
@@ -86,7 +88,7 @@ public class PregenFactory {
             }
           }
 
-          location.add(0, 0, 100);
+          location.add(0, 0, mineWorldManager.getBorderDistance());
           Chunk chunk = location.getChunk();
           Task.syncDelayed(() -> chunk.load(true));
 

@@ -22,8 +22,10 @@
 package me.untouchedodin0.privatemines.mine;
 
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -438,6 +440,7 @@ public class Mine {
         mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()),
         BlockVector3.at(mineData.getMaximumMining().getBlockX(),
             mineData.getMaximumMining().getBlockY(), mineData.getMaximumMining().getBlockZ()));
+    World world = getSpawnLocation().getWorld();
 
     if (Config.addWallGap) {
       for (int i = 0; i < Config.wallsGap; i++) {
@@ -447,16 +450,39 @@ public class Mine {
 
     long total = region.getVolume();
 
+    long worldEditBefore = System.currentTimeMillis();
+
     // Calculate the percetage of the region called "region" to then compare with how many blocks have been mined.
     airBlocks = 0;
+
+    try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(world))) {
+      BlockTypeMask mask = new BlockTypeMask(editSession, BukkitAdapter.asBlockType(Material.AIR));
+
+      int airBlocks = editSession.countBlocks(region, mask);
+      Bukkit.broadcastMessage("Air blocks: " + airBlocks);
+    } catch (MaxChangedBlocksException e) {
+      e.printStackTrace(); // Handle the exception appropriately
+    }
+
+    long worldEditAfter = System.currentTimeMillis();
+    long worldEditDone = worldEditAfter - worldEditBefore;
+
+    long forLoopBefore = System.currentTimeMillis();
+
     for (BlockVector3 vector : region) {
-      Block block = Objects.requireNonNull(Bukkit.getWorld(
-              Objects.requireNonNull(Objects.requireNonNull(getSpawnLocation()).getWorld()).getName()))
-          .getBlockAt(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+      Block block = Objects.requireNonNull(Objects.requireNonNull(Bukkit.getWorld(
+              Objects.requireNonNull(Objects.requireNonNull(world).getName())))
+          .getBlockAt(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ()));
       if (block.getType().equals(Material.AIR)) {
         this.airBlocks++;
       }
     }
+    long forLoopAfter = System.currentTimeMillis();
+    long forLoopDone = forLoopAfter - forLoopBefore;
+
+    System.out.println("worldedit time " + worldEditDone);
+    System.out.println("for loop time " + forLoopDone);
+
     return (float) airBlocks * 100L / total;
   }
 
@@ -506,7 +532,7 @@ public class Mine {
         double percentage = getPercentage();
         double resetPercentage = mineType.getResetPercentage();
         if (percentage > resetPercentage) {
-          handleReset();
+          //handleReset();
           airBlocks = 0;
         }
       }, 0, 80);
