@@ -31,6 +31,7 @@ import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -83,7 +84,6 @@ public class Mine {
   private boolean canExpand = true;
   private Task task;
   private Task percentageTask = null;
-  private int airBlocks;
   AudienceUtils audienceUtils = new AudienceUtils();
 
   public Mine(PrivateMines privateMines) {
@@ -448,42 +448,20 @@ public class Mine {
       }
     }
 
-    long total = region.getVolume();
+    double percentage = 0.0;
 
-    long worldEditBefore = System.currentTimeMillis();
-
-    // Calculate the percetage of the region called "region" to then compare with how many blocks have been mined.
-    airBlocks = 0;
-
-    try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(world))) {
-      BlockTypeMask mask = new BlockTypeMask(editSession, BukkitAdapter.asBlockType(Material.AIR));
+    try (EditSession editSession = WorldEdit.getInstance()
+        .newEditSession(BukkitAdapter.adapt(world))) {
+      BlockType air = BukkitAdapter.asBlockType(Material.AIR);
+      BlockTypeMask mask = new BlockTypeMask(editSession, air);
 
       int airBlocks = editSession.countBlocks(region, mask);
-      Bukkit.broadcastMessage("Air blocks: " + airBlocks);
+      int totalBlocks = region.size();
+      percentage = ((double) airBlocks / totalBlocks) * 100;
     } catch (MaxChangedBlocksException e) {
       e.printStackTrace(); // Handle the exception appropriately
     }
-
-    long worldEditAfter = System.currentTimeMillis();
-    long worldEditDone = worldEditAfter - worldEditBefore;
-
-    long forLoopBefore = System.currentTimeMillis();
-
-    for (BlockVector3 vector : region) {
-      Block block = Objects.requireNonNull(Objects.requireNonNull(Bukkit.getWorld(
-              Objects.requireNonNull(Objects.requireNonNull(world).getName())))
-          .getBlockAt(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ()));
-      if (block.getType().equals(Material.AIR)) {
-        this.airBlocks++;
-      }
-    }
-    long forLoopAfter = System.currentTimeMillis();
-    long forLoopDone = forLoopAfter - forLoopBefore;
-
-    System.out.println("worldedit time " + worldEditDone);
-    System.out.println("for loop time " + forLoopDone);
-
-    return (float) airBlocks * 100L / total;
+    return percentage;
   }
 
   public void handleReset() {
@@ -532,8 +510,7 @@ public class Mine {
         double percentage = getPercentage();
         double resetPercentage = mineType.getResetPercentage();
         if (percentage > resetPercentage) {
-          //handleReset();
-          airBlocks = 0;
+          handleReset();
         }
       }, 0, 80);
     }

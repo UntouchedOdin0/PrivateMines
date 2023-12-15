@@ -43,12 +43,12 @@ public class PlayerJoinListener implements Listener {
     if (Config.giveMineOnFirstJoin) {
       Player player = playerJoinEvent.getPlayer();
 
-      if (mineStorage.hasMine(player)) {
-        Mine mine = mineStorage.get(player);
-        if (mine != null) {
-          mine.startTasks();
-        }
-      }
+//      if (mineStorage.hasMine(player)) {
+//        Mine mine = mineStorage.get(player);
+//        if (mine != null) {
+//          mine.startTasks();
+//        }
+//      }
 
       QueueUtils queueUtils = privateMines.getQueueUtils();
       if (queueUtils.isInQueue(player.getUniqueId())) {

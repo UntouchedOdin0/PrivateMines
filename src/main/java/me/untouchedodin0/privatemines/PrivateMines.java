@@ -21,7 +21,7 @@
 
 package me.untouchedodin0.privatemines;
 
-import co.aikar.commands.PaperCommandManager;
+import co.aikar.commands.BukkitCommandManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -34,9 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
@@ -63,7 +61,6 @@ import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
-import me.untouchedodin0.privatemines.utils.addon.Addon;
 import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -77,7 +74,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
@@ -118,7 +114,6 @@ public class PrivateMines extends JavaPlugin {
     getLogger().info("Loading Private Mines v" + getDescription().getVersion());
     saveDefaultConfig();
     saveResource("menus.yml", false);
-//    saveResource("messages_en.yml", false);
     saveLocales();
 
     privateMines = this;
@@ -206,12 +201,11 @@ public class PrivateMines extends JavaPlugin {
       schematicStorage.addSchematic(schematicFile, mineBlocks);
     });
 
-    PaperCommandManager paperCommandManager = new PaperCommandManager(this);
-    paperCommandManager.enableUnstableAPI("help");
+    BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
 
-    paperCommandManager.registerCommand(new PrivateMinesCommand());
-    paperCommandManager.registerCommand(new PublicMinesCommand());
-    paperCommandManager.registerCommand(new AddonsCommand());
+    bukkitCommandManager.registerCommand(new PrivateMinesCommand());
+    bukkitCommandManager.registerCommand(new PublicMinesCommand());
+    bukkitCommandManager.registerCommand(new AddonsCommand());
 
     File dataFolder = new File(privateMines.getDataFolder(), "privatemines.db");
     if (!dataFolder.exists()) {
@@ -344,7 +338,6 @@ public class PrivateMines extends JavaPlugin {
 
       if (!resultsMaterial.isEmpty()) {
         resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
-
 
         String[] pairs = resultsMaterial.split("\\s*,\\s*");
 

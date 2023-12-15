@@ -285,12 +285,6 @@ public class PrivateMinesCommand extends BaseCommand {
       int timeLeft = cooldownManager.getCooldown(player.getUniqueId());
       Mine mine = mineStorage.get(player);
 
-      // debug
-      if (mine != null) {
-        mine.getPercentage();
-      }
-
-
       if (!Config.enableResetCooldown) {
         if (mine != null) {
           mine.handleReset();
