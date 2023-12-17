@@ -30,6 +30,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.logging.Level;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
@@ -71,7 +72,6 @@ public class SchematicIterator {
         BlockType npcType = BlockType.REGISTRY.get(npcMaterial.getKey().getKey());
         BlockType quarryType = BlockType.REGISTRY.get(quarryMaterial.getKey().getKey());
 
-
         clipboard.getRegion().forEach(blockVector3 -> {
           BlockType blockType = clipboard.getBlock(blockVector3).getBlockType();
           int x = blockVector3.getX();
@@ -98,7 +98,6 @@ public class SchematicIterator {
             }
           }
         });
-
 
         if (spawn == null) {
           privateMines.getLogger().info(
@@ -133,7 +132,8 @@ public class SchematicIterator {
         corner1 = null;
         corner2 = null;
       } catch (IOException e) {
-        e.printStackTrace();
+        privateMines.getLogger().log(Level.WARNING,
+            "An error occurred whilst iterating the mine blocks in the schematic", e);
       }
     }
     return mineBlocks;

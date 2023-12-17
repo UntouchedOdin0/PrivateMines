@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.AudienceUtils;
@@ -459,7 +460,7 @@ public class Mine {
       int totalBlocks = region.size();
       percentage = ((double) airBlocks / totalBlocks) * 100;
     } catch (MaxChangedBlocksException e) {
-      e.printStackTrace(); // Handle the exception appropriately
+      privateMines.getLogger().log(Level.WARNING, "An error occurred during the edit session", e);
     }
     return percentage;
   }
@@ -756,9 +757,7 @@ public class Mine {
           mineData.setMaximumFullRegion(maximum);
           setMineData(mineData);
           handleReset();
-          Task.asyncDelayed(() -> {
-            SQLUtils.update(this);
-          });
+          Task.asyncDelayed(() -> SQLUtils.update(this));
           Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
 
           if (Bukkit.getPluginManager().isPluginEnabled("XPrison")) {

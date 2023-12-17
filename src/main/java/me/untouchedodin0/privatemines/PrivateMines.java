@@ -77,7 +77,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
-import redempt.redlib.sql.SQLCache;
 import redempt.redlib.sql.SQLHelper;
 import redempt.redlib.sql.SQLHelper.Results;
 
@@ -100,7 +99,6 @@ public class PrivateMines extends JavaPlugin {
   private static Economy econ = null;
   private SQLite sqlite;
   private SQLHelper sqlHelper;
-  private Map<String, SQLCache> caches;
   private BukkitAudiences adventure;
   private AddonManager addonManager;
 
@@ -250,16 +248,6 @@ public class PrivateMines extends JavaPlugin {
         );
         """);
     sqlHelper.setAutoCommit(true);
-
-    this.caches = new HashMap<>();
-
-    String databaseName = "privatemines";
-    List<String> cacheNames = List.of("owner", "mineType", "mineLocation", "corner1", "corner2");
-
-    cacheNames.forEach(string -> {
-      SQLCache sqlCache = sqlHelper.createCache(databaseName, string);
-      caches.put(string, sqlCache);
-    });
 
     Task.asyncDelayed(this::loadSQLMines);
     Task.asyncDelayed(SQLUtils::loadPregens);
