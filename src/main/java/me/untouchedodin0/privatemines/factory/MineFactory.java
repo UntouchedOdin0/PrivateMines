@@ -109,9 +109,10 @@ public class MineFactory {
       Mine mine = new Mine(privateMines);
       MineData mineData = new MineData(uuid, corner2, corner1, minimum, maximum, location, spawn,
           mineType, false, 5.0);
-      if (!Config.defaultClosed) {
-        mineData.setOpen(true);
+      if (Config.defaultClosed) {
+        mineData.setOpen(false);
       }
+
       mine.setMineData(mineData);
       SQLUtils.insert(mine);
       mineStorage.addMine(uuid, mine);
