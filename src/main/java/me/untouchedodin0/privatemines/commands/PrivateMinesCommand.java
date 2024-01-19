@@ -26,7 +26,6 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
-import co.aikar.commands.annotation.Split;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -462,18 +461,34 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("setblocks")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.setblocks")
-  @Syntax("<target> <materials> e.g. DIRT, STONE")
-  public void setBlocks(CommandSender sender, OfflinePlayer target,
-      @Split(",") String[] materials) {
+  @Syntax("<target> <materials> STONE, DIRT")
+  public void setBlocks(CommandSender sender, OfflinePlayer target, String materials) {
     Map<Material, Double> map = new HashMap<>();
 
-    for (String s : materials) {
-      if (Material.getMaterial(s.toUpperCase()) == null) {
-        sender.sendMessage(ChatColor.RED + "Failed to find Material: " + s);
-        return;
+    // Split the materials string into an array
+    String[] materialArray = materials.split(",");
+
+    Bukkit.broadcastMessage("map keys " + map.keySet());
+
+    for (String string : materialArray) {
+      // Valid format, proceed with getting the material and percent values.
+      String[] parts = string.split(";");
+
+      Bukkit.broadcastMessage("parts size " + parts.length);
+
+      if (parts.length == 1) {
+        Material material = Material.getMaterial(parts[0].toUpperCase());
+        map.put(material, 1.0);
+      } else if (parts.length == 2) {
+        Material material = Material.getMaterial(parts[0].toUpperCase());
+
+        Bukkit.broadcastMessage("parts[1] = " + parts[1]);
+        double percentage = Double.parseDouble(parts[1]);
+        map.put(material, percentage);
       }
-      Material material = Material.valueOf(s.toUpperCase());
-      map.put(material, 1.0);
+
+      Bukkit.broadcastMessage("map keys " + map.keySet());
+
     }
 
     if (target != null) {
