@@ -61,9 +61,11 @@ import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
+import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import me.untouchedodin0.ver.Compat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
@@ -101,6 +103,7 @@ public class PrivateMines extends JavaPlugin {
   private SQLHelper sqlHelper;
   private BukkitAudiences adventure;
   private AddonManager addonManager;
+  private Compat compat;
 
   public static PrivateMines getPrivateMines() {
     return privateMines;
@@ -124,11 +127,14 @@ public class PrivateMines extends JavaPlugin {
     this.queueUtils = new QueueUtils();
     this.addonManager = new AddonManager();
 
+    getLogger().info("Detected NMS version: " + Utils.getNMSVersion());
+
     if (Config.enableTax) {
       registerSellListener();
     }
     registerListeners();
     setupSchematicUtils();
+
 
     if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
       boolean registered = new PrivateMinesExpansion().register();
