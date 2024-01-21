@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'java-library'
     id 'maven-publish'
-    id 'io.github.gradle-nexus.publish-plugin' version "1.1.0"
+    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'org.jetbrains.kotlin.jvm' version '1.8.22'
     id 'net.minecrell.plugin-yml.bukkit' version '0.6.0'
@@ -116,9 +116,3 @@ kotlin {
         languageVersion = JavaLanguageVersion.of(17)
     }
 }
-
-//compileKotlin {
-//    kotlinOptions {
-//        jvmTarget = "17"
-//    }
-//}

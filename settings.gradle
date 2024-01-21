@@ -1,9 +1,3 @@
 rootProject.name = 'PrivateMines'
-include 'nms'
-include 'nms:v1_20_R1'
-findProject(':nms:v1_20_R1')?.name = 'v1_20_R1'
-include 'abstraction'
-include 'Compat'
-include 'V1_19_2'
-include 'V1_19_R1'
+
 
