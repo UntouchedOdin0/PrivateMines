@@ -28,6 +28,11 @@ import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
+import com.comphenix.protocol.PacketType.Play.Server;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.BlockPosition;
+import com.comphenix.protocol.wrappers.WrappedBlockData;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
@@ -71,6 +76,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.region.CuboidRegion;
@@ -274,7 +280,6 @@ public class PrivateMinesCommand extends BaseCommand {
     }
   }
 
-
   @Subcommand("reset")
   @CommandPermission("privatemines.reset")
   public void reset(Player player) {
@@ -468,27 +473,17 @@ public class PrivateMinesCommand extends BaseCommand {
     // Split the materials string into an array
     String[] materialArray = materials.split(",");
 
-    Bukkit.broadcastMessage("map keys " + map.keySet());
-
     for (String string : materialArray) {
       // Valid format, proceed with getting the material and percent values.
       String[] parts = string.split(";");
-
-      Bukkit.broadcastMessage("parts size " + parts.length);
-
       if (parts.length == 1) {
         Material material = Material.getMaterial(parts[0].toUpperCase());
         map.put(material, 1.0);
       } else if (parts.length == 2) {
         Material material = Material.getMaterial(parts[0].toUpperCase());
-
-        Bukkit.broadcastMessage("parts[1] = " + parts[1]);
         double percentage = Double.parseDouble(parts[1]);
         map.put(material, percentage);
       }
-
-      Bukkit.broadcastMessage("map keys " + map.keySet());
-
     }
 
     if (target != null) {
@@ -567,5 +562,47 @@ public class PrivateMinesCommand extends BaseCommand {
         mine.handleReset();
       }
     }
+  }
+
+  @Subcommand("sendpacket")
+  public void sendPacket(Player player) {
+    Map<BlockPosition, Map<Vector, WrappedBlockData>> changes = new HashMap<>();
+
+    // Converts player location to chunk coordinates
+    int x = player.getLocation().getBlockX() >> 4;
+    int y = player.getLocation().getBlockY() >> 4;
+    int z = player.getLocation().getBlockZ() >> 4;
+
+    // Creates a new BlockPosition at chunk coordinate
+    BlockPosition blockPosition = new BlockPosition(x, y, z);
+
+    // Create a map to hold block changes within the chunk
+    Map<Vector, WrappedBlockData> blockChanges = new HashMap<>();
+
+    // Add a sample block change to the map
+    Vector sampleBlockLocation = new Vector(x * 16, y * 16, z * 16); // Adjust this based on your actual block location
+    WrappedBlockData sampleBlockData = WrappedBlockData.createData(Material.ACACIA_LOG);
+    blockChanges.put(sampleBlockLocation, sampleBlockData);
+
+    changes.put(blockPosition, blockChanges);
+
+    // Create a packet for MULTI_BLOCK_CHANGE
+    PacketContainer packet = new PacketContainer(Server.MULTI_BLOCK_CHANGE);
+    packet.getSectionPositions().write(0, blockPosition);
+
+    WrappedBlockData[] data = new WrappedBlockData[1];
+    data[0] = WrappedBlockData.createData(Material.ACACIA_LOG);
+
+    for (Map.Entry<Vector, WrappedBlockData> blockEntry : changes.get(blockPosition).entrySet()) {
+      short[] shortLocation = new short[]{(short) ((blockEntry.getKey().getBlockX() & 0x0F) << 12
+          | (blockEntry.getKey().getBlockZ() & 0x0F) << 8 | (blockEntry.getKey().getBlockY()
+          & 0xFF))};
+
+
+      packet.getShortArrays().writeSafely(0, shortLocation);
+      packet.getBlockDataArrays().writeSafely(0, data);
+    }
+
+    ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
   }
 }

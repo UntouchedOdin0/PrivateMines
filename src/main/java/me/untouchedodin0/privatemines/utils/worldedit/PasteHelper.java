@@ -86,7 +86,7 @@ public class PasteHelper {
       }
 
 
-/*      Region region = clipboard.getRegion();
+      Region region = clipboard.getRegion();
 
       BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint()
           .subtract(clipboard.getOrigin());
@@ -96,13 +96,10 @@ public class PasteHelper {
           .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
       RegionSelector regionSelector = new CuboidRegionSelector(world, realTo.toBlockPoint(),
           max.toBlockPoint());
-      newRegion = regionSelector.getRegion();*/
+      newRegion = regionSelector.getRegion();
 
       try (EditSession editSession = WorldEdit.getInstance().newEditSession(world)) {
 
-        Region region = clipboard.getRegion();
-        BlockVector3 min = region.getMinimumPoint();
-        BlockVector3 max = region.getMaximumPoint();
         Mask mask = BukkitAdapter.adapt(Material.AIR.createBlockData()).toMask();
 
         new MaskTraverser(mask).setNewExtent(editSession);
@@ -121,12 +118,11 @@ public class PasteHelper {
     Location fullMin = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMinimumPoint());
     Location fullMax = BukkitAdapter.adapt(BukkitAdapter.adapt(world), newRegion.getMaximumPoint());
 
-/*    setSpawn(spawn);
+    setSpawn(spawn);
     setCorner1(upperRails);
     setCorner2(lowerRails);
     setMinimum(fullMin);
     setMaximum(fullMax);
-    */
     return pastedMine;
   }
 }

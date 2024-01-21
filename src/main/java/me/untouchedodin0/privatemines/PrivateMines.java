@@ -22,6 +22,8 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.BukkitCommandManager;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -65,7 +67,6 @@ import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
-import me.untouchedodin0.ver.Compat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
@@ -97,13 +98,13 @@ public class PrivateMines extends JavaPlugin {
   private PregenStorage pregenStorage;
   private MineWorldManager mineWorldManager;
   private MineTypeManager mineTypeManager;
+  private ProtocolManager protocolManager;
   private QueueUtils queueUtils;
   private static Economy econ = null;
   private SQLite sqlite;
   private SQLHelper sqlHelper;
   private BukkitAudiences adventure;
   private AddonManager addonManager;
-  private Compat compat;
 
   public static PrivateMines getPrivateMines() {
     return privateMines;
@@ -126,8 +127,9 @@ public class PrivateMines extends JavaPlugin {
     this.mineTypeManager = new MineTypeManager(this);
     this.queueUtils = new QueueUtils();
     this.addonManager = new AddonManager();
+    this.protocolManager = ProtocolLibrary.getProtocolManager();
 
-    getLogger().info("Detected NMS version: " + Utils.getNMSVersion());
+    getLogger().info("protocol manager " + protocolManager);
 
     if (Config.enableTax) {
       registerSellListener();
