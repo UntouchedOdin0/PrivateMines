@@ -26,6 +26,7 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -43,12 +44,7 @@ public class PlayerJoinListener implements Listener {
     if (Config.giveMineOnFirstJoin) {
       Player player = playerJoinEvent.getPlayer();
 
-//      if (mineStorage.hasMine(player)) {
-//        Mine mine = mineStorage.get(player);
-//        if (mine != null) {
-//          mine.startTasks();
-//        }
-//      }
+      Bukkit.broadcastMessage("checking user : " + player);
 
       QueueUtils queueUtils = privateMines.getQueueUtils();
       if (queueUtils.isInQueue(player.getUniqueId())) {

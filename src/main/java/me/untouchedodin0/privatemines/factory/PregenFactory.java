@@ -50,7 +50,7 @@ public class PregenFactory {
     File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
     PregenStorage pregenStorage = privateMines.getPregenStorage();
 
-    location = player.getLocation();
+    location = mineWorldManager.getNextFreeLocation(); //player.getLocation();
     location.getBlock().setType(Material.GLOWSTONE);
 
     new BukkitRunnable() {

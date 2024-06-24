@@ -59,7 +59,6 @@ dependencies {
     compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.6.1'
     compileOnly 'com.google.code.gson:gson:2.10'
     compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.15.0' // i think this is the big thing?
-    compileOnly 'com.comphenix.protocol:ProtocolLib:5.1.0'
 
     compileOnly files('libs/XPrison-1.12.11-RELEASE.jar')
     compileOnly files('libs/AutoSellAPI-1.2.0.jar')

@@ -22,8 +22,6 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.BukkitCommandManager;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -83,7 +81,6 @@ public class PrivateMines extends JavaPlugin {
   private PregenStorage pregenStorage;
   private MineWorldManager mineWorldManager;
   private MineTypeManager mineTypeManager;
-  private ProtocolManager protocolManager;
   private QueueUtils queueUtils;
   private static Economy econ = null;
   private SQLite sqlite;
@@ -112,9 +109,6 @@ public class PrivateMines extends JavaPlugin {
     this.mineTypeManager = new MineTypeManager(this);
     this.queueUtils = new QueueUtils();
     this.addonManager = new AddonManager();
-    this.protocolManager = ProtocolLibrary.getProtocolManager();
-
-    getLogger().info("protocol manager " + protocolManager);
 
     if (Config.enableTax) {
       registerSellListener();
