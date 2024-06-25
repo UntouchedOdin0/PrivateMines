@@ -497,7 +497,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @CommandPermission("privatemines.pregen")
   @Syntax("<amount>")
   public void pregen(Player player, int amount) {
-    PregenFactory.pregen(player, amount);
+    PregenFactory.pregen(amount);
   }
 
   @Subcommand("claim")
@@ -515,46 +515,53 @@ public class PrivateMinesCommand extends BaseCommand {
       } else {
         PregenMine pregenMine = pregenStorage.getAndRemove();
         MineType mineType = mineTypeManager.getDefaultMineType();
-        Location location = pregenMine.getLocation();
-        Location spawn = pregenMine.getSpawnLocation();
-        Location corner1 = pregenMine.getLowerRails();
-        Location corner2 = pregenMine.getUpperRails();
-        Location minimum = pregenMine.getFullMin();
-        Location maximum = pregenMine.getFullMax();
-        BlockVector3 miningRegionMin = BukkitAdapter.asBlockVector(Objects.requireNonNull(corner1));
-        BlockVector3 miningRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(corner2));
-        BlockVector3 fullRegionMin = BukkitAdapter.asBlockVector(Objects.requireNonNull(minimum));
-        BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(maximum));
-        FlagUtils flagUtils = new FlagUtils();
+        Location location;
+        if (pregenMine != null) {
+          location = pregenMine.getLocation();
+          Location spawn = pregenMine.getSpawnLocation();
+          Location corner1 = pregenMine.getLowerRails();
+          Location corner2 = pregenMine.getUpperRails();
+          Location minimum = pregenMine.getFullMin();
+          Location maximum = pregenMine.getFullMax();
+          BlockVector3 miningRegionMin = BukkitAdapter.asBlockVector(
+              Objects.requireNonNull(corner1));
+          BlockVector3 miningRegionMax = BukkitAdapter.asBlockVector(
+              Objects.requireNonNull(corner2));
+          BlockVector3 fullRegionMin = BukkitAdapter.asBlockVector(Objects.requireNonNull(minimum));
+          BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(maximum));
+          FlagUtils flagUtils = new FlagUtils();
 
-        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionManager regionManager = container.get(
-            BukkitAdapter.adapt(Objects.requireNonNull(spawn).getWorld()));
+          RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+          RegionManager regionManager = container.get(
+              BukkitAdapter.adapt(Objects.requireNonNull(spawn).getWorld()));
 
-        ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName,
-            miningRegionMin, miningRegionMax);
-        ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName, fullRegionMin,
-            fullRegionMax);
+          ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName,
+              miningRegionMin, miningRegionMax);
+          ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName,
+              fullRegionMin, fullRegionMax);
 
-        if (regionManager != null) {
-          regionManager.addRegion(miningRegion);
-          regionManager.addRegion(fullRegion);
+          if (regionManager != null) {
+            regionManager.addRegion(miningRegion);
+            regionManager.addRegion(fullRegion);
+          }
+
+          Mine mine = new Mine(privateMines);
+          MineData mineData = new MineData(player.getUniqueId(), corner2, corner1, minimum, maximum,
+              Objects.requireNonNull(location), spawn, mineType, false, 5.0);
+          mine.setMineData(mineData);
+          SQLUtils.claim(location);
+          SQLUtils.insert(mine);
+
+          mineStorage.addMine(player.getUniqueId(), mine);
+
+          Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
+          Task.syncDelayed(() -> flagUtils.setFlags(mine));
+          pregenMine.teleport(player);
+          Task.syncDelayed(
+              () -> Objects.requireNonNull(pregenMine.getSpawnLocation()).subtract(0, 0, 1)
+                  .getBlock().setType(Material.AIR));
+          mine.handleReset();
         }
-
-        Mine mine = new Mine(privateMines);
-        MineData mineData = new MineData(player.getUniqueId(), corner2, corner1, minimum, maximum,
-            Objects.requireNonNull(location), spawn, mineType, false, 5.0);
-        mine.setMineData(mineData);
-        SQLUtils.claim(location);
-        SQLUtils.insert(mine);
-
-        mineStorage.addMine(player.getUniqueId(), mine);
-
-        Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
-        Task.syncDelayed(() -> flagUtils.setFlags(mine));
-        pregenMine.teleport(player);
-        Task.syncDelayed(() -> Objects.requireNonNull(pregenMine.getSpawnLocation()).subtract(0, 0, 1).getBlock().setType(Material.AIR));
-        mine.handleReset();
       }
     }
   }
