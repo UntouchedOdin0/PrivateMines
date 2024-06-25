@@ -29,6 +29,7 @@ import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
+import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,7 +45,7 @@ public class PregenFactory {
   private static Clipboard clipboard;
   private static ClipboardHolder clipboardHolder;
 
-  public static void pregen(int amount) {
+  public static void pregen(Player player, int amount) {
     Location location;
     MineType mineType = mineTypeManager.getDefaultMineType();
     File schematicFile = new File("plugins/PrivateMines/schematics/" + mineType.getFile());
@@ -54,14 +55,14 @@ public class PregenFactory {
     location.getBlock().setType(Material.GLOWSTONE);
 
     new BukkitRunnable() {
-      private int i = 0;
+      private int current = 0;
 
       @Override
       public void run() {
-        if (i == amount) {
+        if (current == amount) {
           cancel();
         } else {
-          i++;
+          current++;
           PregenMine pregenMine = new PregenMine();
           ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(schematicFile);
           BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(),
@@ -130,6 +131,10 @@ public class PregenFactory {
           pregenStorage.addMine(pregenMine);
 
           Task.syncDelayed(() -> spongeL.getBlock().setType(Material.AIR, false));
+
+          double percentage = ((double) current / (double) amount) * 100;
+          String message = String.format("Pregeneration Progress: %d/%d Completed (%.2f%%)", current, amount, percentage);
+          player.sendMessage(ChatColor.GREEN + message);
         }
       }
     }.runTaskTimerAsynchronously(privateMines, 20L, 20L);

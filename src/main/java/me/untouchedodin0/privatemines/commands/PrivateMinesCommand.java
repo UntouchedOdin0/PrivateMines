@@ -497,7 +497,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @CommandPermission("privatemines.pregen")
   @Syntax("<amount>")
   public void pregen(Player player, int amount) {
-    PregenFactory.pregen(amount);
+    PregenFactory.pregen(player, amount);
   }
 
   @Subcommand("claim")
