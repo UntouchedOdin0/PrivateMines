@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
@@ -76,6 +77,10 @@ public class SchematicIterator {
             subRegion.forEach(blockVisitor::visit);
             return blockVisitor;
           });
+        }
+
+        if (executorService instanceof ThreadPoolExecutor threadPoolExecutor) {
+          privateMines.getLogger().info("I'm using " + threadPoolExecutor.getActiveCount() + " Threads to iterate the schematic");
         }
 
         executorService.shutdown();
