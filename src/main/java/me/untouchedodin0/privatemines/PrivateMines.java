@@ -24,16 +24,29 @@ package me.untouchedodin0.privatemines;
 import co.aikar.commands.BukkitCommandManager;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
-import java.time.*;
-import java.util.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Stream;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
-import me.untouchedodin0.privatemines.commands.*;
-import me.untouchedodin0.privatemines.config.*;
+import me.untouchedodin0.privatemines.commands.AddonsCommand;
+import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
+import me.untouchedodin0.privatemines.commands.PublicMinesCommand;
+import me.untouchedodin0.privatemines.config.Config;
+import me.untouchedodin0.privatemines.config.MenuConfig;
+import me.untouchedodin0.privatemines.config.MessagesConfig;
+import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
 import me.untouchedodin0.privatemines.iterator.SchematicIteratorOriginal;
@@ -48,7 +61,8 @@ import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.StorageType;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
-import me.untouchedodin0.privatemines.utils.*;
+import me.untouchedodin0.privatemines.utils.QueueUtils;
+import me.untouchedodin0.privatemines.utils.UpdateChecker;
 import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -119,7 +133,6 @@ public class PrivateMines extends JavaPlugin {
     registerListeners();
     setupSchematicUtils();
 
-
     if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
       boolean registered = new PrivateMinesExpansion().register();
       if (registered) {
@@ -185,30 +198,29 @@ public class PrivateMines extends JavaPlugin {
         return;
       }
 
-      // Measure the time taken to execute the findRelativePoints method on the original
-      long startTime = System.nanoTime();
-      SchematicIteratorOriginal.MineBlocks mineBlocks = schematicIteratorOriginal.findRelativePoints(schematicFile);
-      long endTime = System.nanoTime();
+      if (Config.useNewSchematicLoader) {
+        long startRewrite = System.nanoTime();
+        MineBlocks mineBlocksRewrite = schematicIterator.findRelativePoints(schematicFile);
+        long endRewrite = System.nanoTime();
 
-      // Calculate the duration in milliseconds
-      long durationInMillis = (endTime - startTime) / 1_000_000;
+        // Calculate the duration in milliseconds
+        long durationInMillisRewrite = (endRewrite - startRewrite) / 1_000_000;
 
-      // Output the duration
-      System.out.println("Original Iterator Execution time: " + durationInMillis + " ms");
+        // Output the duration
+        System.out.println("Rewrite Iterator Execution time: " + durationInMillisRewrite + " ms");
+        schematicStorage.addSchematic(schematicFile, mineBlocksRewrite);
+      } else {
+        long startOriginal = System.nanoTime();
+        MineBlocks mineBlocksOriginal = schematicIteratorOriginal.findRelativePoints(schematicFile);
+        long endOriginal = System.nanoTime();
 
+        // Calculate the duration in milliseconds
+        long durationInMillisOriginal = (endOriginal - startOriginal) / 1_000_000;
 
-      // Measure the time taken to execute the findRelativePoints method on the rewrite
-      long startRewrite = System.nanoTime();
-      MineBlocks mineBlocksRewrite = schematicIterator.findRelativePoints(schematicFile);
-      long endRewrite = System.nanoTime();
-
-
-      // Calculate the duration in milliseconds
-      long durationInMillisRewrite = (endRewrite - startRewrite) / 1_000_000;
-
-      // Output the duration
-      System.out.println("Rewrite Iterator Execution time: " + durationInMillisRewrite + " ms");
-      schematicStorage.addSchematic(schematicFile, mineBlocks);
+        // Output the duration
+        System.out.println("Original Iterator Execution time: " + durationInMillisOriginal + " ms");
+        schematicStorage.addSchematic(schematicFile, mineBlocksOriginal);
+      }
     });
 
     BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
