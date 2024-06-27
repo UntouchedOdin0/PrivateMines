@@ -1,3 +1,24 @@
+/**
+ * MIT License
+ * <p>
+ * Copyright (c) 2021 - 2023 Kyle Hicks
+ * <p>
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * <p>
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * <p>
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package me.untouchedodin0.privatemines.iterator;
 
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -5,28 +26,18 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.world.block.BlockType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
-import me.untouchedodin0.privatemines.iterator.SchematicIteratorOriginal.MineBlocks;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.Utils;
 import org.bukkit.Material;
 
-public class SchematicIterator {
+public class SchematicIteratorOriginal {
 
   SchematicStorage schematicStorage;
   BlockVector3 spawn;
@@ -35,7 +46,7 @@ public class SchematicIterator {
   BlockVector3 corner1;
   BlockVector3 corner2;
 
-  public SchematicIterator(SchematicStorage storage) {
+  public SchematicIteratorOriginal(SchematicStorage storage) {
     this.schematicStorage = storage;
   }
 
@@ -61,68 +72,32 @@ public class SchematicIterator {
         BlockType npcType = BlockType.REGISTRY.get(npcMaterial.getKey().getKey());
         BlockType quarryType = BlockType.REGISTRY.get(quarryMaterial.getKey().getKey());
 
-        Region region = clipboard.getRegion();
+        clipboard.getRegion().forEach(blockVector3 -> {
+          BlockType blockType = clipboard.getBlock(blockVector3).getBlockType();
+          int x = blockVector3.getX();
+          int y = blockVector3.getY();
+          int z = blockVector3.getZ();
 
-        // Split the region into four sub-regions
-        int midX = (region.getMinimumPoint().getX() + region.getMaximumPoint().getX()) / 2;
-        int midY = (region.getMinimumPoint().getY() + region.getMaximumPoint().getY()) / 2;
-        int midZ = (region.getMinimumPoint().getZ() + region.getMaximumPoint().getZ()) / 2;
-
-        Region[] subRegions = new Region[]{
-            new CuboidRegion(region.getMinimumPoint(), BlockVector3.at(midX, midY, midZ)),
-            new CuboidRegion(BlockVector3.at(midX + 1, region.getMinimumPoint().getY(),
-                region.getMinimumPoint().getZ()), region.getMaximumPoint()), new CuboidRegion(
-            BlockVector3.at(region.getMinimumPoint().getX(), midY + 1,
-                region.getMinimumPoint().getZ()), region.getMaximumPoint()), new CuboidRegion(
-            BlockVector3.at(region.getMinimumPoint().getX(), region.getMinimumPoint().getY(),
-                midZ + 1), region.getMaximumPoint())};
-
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-        CompletionService<BlockVisitor> completionService = new ExecutorCompletionService<>(
-            executorService);
-
-        for (Region subRegion : subRegions) {
-          privateMines.getLogger().info("Visiting Sub-Region: " + subRegion);
-          completionService.submit(() -> {
-            BlockVisitor blockVisitor = new BlockVisitor(clipboard, cornerType, spawnType, npcType,
-                quarryType);
-            subRegion.forEach(blockVisitor::visit);
-            return blockVisitor;
-          });
-        }
-
-        executorService.shutdown();
-
-        int cornerCount = 0;
-        for (int i = 0; i < subRegions.length; i++) {
-          Future<BlockVisitor> future = completionService.take();
-          BlockVisitor blockVisitor = future.get();
-
-          privateMines.getLogger().info("Sub-Region results: " + blockVisitor);
-
-          if (spawn == null && blockVisitor.getSpawn() != null) {
-            spawn = blockVisitor.getSpawn();
-          }
-
-          if (blockVisitor.getCorner1() != null) {
+          if (blockType.equals(cornerType)) {
             if (corner1 == null) {
-              corner1 = blockVisitor.getCorner1();
-              cornerCount++;
+              corner1 = BlockVector3.at(x, y, z);
             } else if (corner2 == null) {
-              corner2 = blockVisitor.getCorner1();
-              cornerCount++;
+              corner2 = BlockVector3.at(x, y, z);
+            }
+          } else if (blockType.equals(spawnType)) {
+            if (spawn == null) {
+              spawn = BlockVector3.at(x, y, z);
+            }
+          } else if (blockType.equals(npcType)) {
+            if (npc == null) {
+              npc = BlockVector3.at(x, y, z);
+            }
+          } else if (blockType.equals(quarryType)) {
+            if (quarry == null) {
+              quarry = BlockVector3.at(x, y, z);
             }
           }
-          if (blockVisitor.getCorner2() != null) {
-            if (cornerCount == 1 && !blockVisitor.getCorner2().equals(corner1)) {
-              corner2 = blockVisitor.getCorner2();
-              cornerCount++;
-            } else if (cornerCount == 0 && corner1 == null) {
-              corner1 = blockVisitor.getCorner2();
-              cornerCount++;
-            }
-          }
-        }
+        });
 
         if (spawn == null) {
           privateMines.getLogger().info(
@@ -151,24 +126,44 @@ public class SchematicIterator {
         mineBlocks.corners[0] = BlockVector3.at(corner1.getX(), corner1.getY(), corner1.getZ());
         mineBlocks.corners[1] = BlockVector3.at(corner2.getX(), corner2.getY(), corner2.getZ());
 
-        privateMines.getLogger().info("spawn = " + spawn);
-        privateMines.getLogger().info("npc = " + npc);
-        privateMines.getLogger().info("quarry = " + quarry);
-        privateMines.getLogger().info("corner1 = " + corner1);
-        privateMines.getLogger().info("corner2 = " + corner2);
-
-        // Reset the variables
         spawn = null;
         npc = null;
         quarry = null;
         corner1 = null;
         corner2 = null;
-      } catch (IOException | InterruptedException | ExecutionException |
-               RegionOperationException e) {
+      } catch (IOException e) {
         privateMines.getLogger().log(Level.WARNING,
             "An error occurred whilst iterating the mine blocks in the schematic", e);
       }
     }
     return mineBlocks;
+  }
+
+  public static class MineBlocks {
+
+    public BlockVector3 spawnLocation;
+    public BlockVector3 npcLocation;
+    public BlockVector3 quarryLocation;
+    public BlockVector3[] corners;
+
+    public BlockVector3 getSpawnLocation() {
+      return spawnLocation;
+    }
+
+    public BlockVector3 getNpcLocation() {
+      return npcLocation;
+    }
+
+    public BlockVector3 getQuarryLocation() {
+      return quarryLocation;
+    }
+
+    public BlockVector3 getCorner1() {
+      return corners[0];
+    }
+
+    public BlockVector3 getCorner2() {
+      return corners[1];
+    }
   }
 }

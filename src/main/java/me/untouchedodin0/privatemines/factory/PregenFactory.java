@@ -24,7 +24,7 @@ import me.untouchedodin0.kotlin.mine.pregen.PregenMine;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.iterator.SchematicIterator;
+import me.untouchedodin0.privatemines.iterator.SchematicIteratorOriginal;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
@@ -68,7 +68,7 @@ public class PregenFactory {
           BlockVector3 vector = BlockVector3.at(location.getBlockX(), location.getBlockY(),
               location.getBlockZ());
           SchematicStorage storage = privateMines.getSchematicStorage();
-          SchematicIterator.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
+          SchematicIteratorOriginal.MineBlocks mineBlocks = storage.getMineBlocksMap().get(schematicFile);
           if (clipboardFormat != null) {
             try (ClipboardReader clipboardReader = clipboardFormat.getReader(
                 new FileInputStream(schematicFile))) {

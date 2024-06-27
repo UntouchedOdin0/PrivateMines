@@ -24,7 +24,7 @@ package me.untouchedodin0.privatemines.storage;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import me.untouchedodin0.privatemines.iterator.SchematicIterator.MineBlocks;
+import me.untouchedodin0.privatemines.iterator.SchematicIteratorOriginal.MineBlocks;
 
 public class SchematicStorage {
 

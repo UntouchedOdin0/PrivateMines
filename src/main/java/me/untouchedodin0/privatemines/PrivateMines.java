@@ -36,6 +36,8 @@ import me.untouchedodin0.privatemines.commands.*;
 import me.untouchedodin0.privatemines.config.*;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
+import me.untouchedodin0.privatemines.iterator.SchematicIteratorOriginal;
+import me.untouchedodin0.privatemines.iterator.SchematicIteratorOriginal.MineBlocks;
 import me.untouchedodin0.privatemines.listener.MineResetListener;
 import me.untouchedodin0.privatemines.listener.PlayerJoinListener;
 import me.untouchedodin0.privatemines.listener.sell.AutoSellListener;
@@ -75,6 +77,7 @@ public class PrivateMines extends JavaPlugin {
   private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
   private final Path addonsDirectory = getDataFolder().toPath().resolve("addons");
   private SchematicStorage schematicStorage;
+  private SchematicIteratorOriginal schematicIteratorOriginal;
   private SchematicIterator schematicIterator;
   private MineFactory mineFactory;
   private MineStorage mineStorage;
@@ -182,7 +185,29 @@ public class PrivateMines extends JavaPlugin {
         return;
       }
 
-      SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
+      // Measure the time taken to execute the findRelativePoints method on the original
+      long startTime = System.nanoTime();
+      SchematicIteratorOriginal.MineBlocks mineBlocks = schematicIteratorOriginal.findRelativePoints(schematicFile);
+      long endTime = System.nanoTime();
+
+      // Calculate the duration in milliseconds
+      long durationInMillis = (endTime - startTime) / 1_000_000;
+
+      // Output the duration
+      System.out.println("Original Iterator Execution time: " + durationInMillis + " ms");
+
+
+      // Measure the time taken to execute the findRelativePoints method on the rewrite
+      long startRewrite = System.nanoTime();
+      MineBlocks mineBlocksRewrite = schematicIterator.findRelativePoints(schematicFile);
+      long endRewrite = System.nanoTime();
+
+
+      // Calculate the duration in milliseconds
+      long durationInMillisRewrite = (endRewrite - startRewrite) / 1_000_000;
+
+      // Output the duration
+      System.out.println("Rewrite Iterator Execution time: " + durationInMillisRewrite + " ms");
       schematicStorage.addSchematic(schematicFile, mineBlocks);
     });
 
@@ -277,6 +302,7 @@ public class PrivateMines extends JavaPlugin {
 
   public void setupSchematicUtils() {
     this.schematicStorage = new SchematicStorage();
+    this.schematicIteratorOriginal = new SchematicIteratorOriginal(getSchematicStorage());
     this.schematicIterator = new SchematicIterator(getSchematicStorage());
   }
 
