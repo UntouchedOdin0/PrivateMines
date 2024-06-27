@@ -62,22 +62,9 @@ public class SchematicIterator {
         BlockType quarryType = BlockType.REGISTRY.get(quarryMaterial.getKey().getKey());
 
         Region region = clipboard.getRegion();
+        Region[] subRegions = getSubRegions(region);
 
-        // Split the region into four sub-regions
-        int midX = (region.getMinimumPoint().getX() + region.getMaximumPoint().getX()) / 2;
-        int midY = (region.getMinimumPoint().getY() + region.getMaximumPoint().getY()) / 2;
-        int midZ = (region.getMinimumPoint().getZ() + region.getMaximumPoint().getZ()) / 2;
-
-        Region[] subRegions = new Region[]{
-            new CuboidRegion(region.getMinimumPoint(), BlockVector3.at(midX, midY, midZ)),
-            new CuboidRegion(BlockVector3.at(midX + 1, region.getMinimumPoint().getY(),
-                region.getMinimumPoint().getZ()), region.getMaximumPoint()), new CuboidRegion(
-            BlockVector3.at(region.getMinimumPoint().getX(), midY + 1,
-                region.getMinimumPoint().getZ()), region.getMaximumPoint()), new CuboidRegion(
-            BlockVector3.at(region.getMinimumPoint().getX(), region.getMinimumPoint().getY(),
-                midZ + 1), region.getMaximumPoint())};
-
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        ExecutorService executorService = Executors.newFixedThreadPool(Config.schematicThreads);
         CompletionService<BlockVisitor> completionService = new ExecutorCompletionService<>(
             executorService);
 
@@ -170,5 +157,20 @@ public class SchematicIterator {
       }
     }
     return mineBlocks;
+  }
+
+  private Region[] getSubRegions(Region region) {
+    int midX = (region.getMinimumPoint().getX() + region.getMaximumPoint().getX()) / 2;
+    int midY = (region.getMinimumPoint().getY() + region.getMaximumPoint().getY()) / 2;
+    int midZ = (region.getMinimumPoint().getZ() + region.getMaximumPoint().getZ()) / 2;
+
+    return new Region[]{
+        new CuboidRegion(region.getMinimumPoint(), BlockVector3.at(midX, midY, midZ)),
+        new CuboidRegion(BlockVector3.at(midX + 1, region.getMinimumPoint().getY(),
+            region.getMinimumPoint().getZ()), region.getMaximumPoint()), new CuboidRegion(
+        BlockVector3.at(region.getMinimumPoint().getX(), midY + 1, region.getMinimumPoint().getZ()),
+        region.getMaximumPoint()), new CuboidRegion(
+        BlockVector3.at(region.getMinimumPoint().getX(), region.getMinimumPoint().getY(), midZ + 1),
+        region.getMaximumPoint())};
   }
 }

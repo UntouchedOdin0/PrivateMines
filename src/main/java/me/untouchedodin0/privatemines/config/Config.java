@@ -63,4 +63,6 @@ public class Config {
     public static boolean enableResetCooldown = true;
     @Comment("Specifies the cooldown for the /privatemines reset command")
     public static int resetCooldown = 15;
+    @Comment("How many threads should be used for the schematic iterator")
+    public static int schematicThreads = 4;
 }

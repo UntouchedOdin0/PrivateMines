@@ -21,7 +21,7 @@ enableTax: true
 sendTaxMessages: true
 defaultClosed: true
 resetCooldown: 15
-formatResetMessage: true
+schematicThreads: 4
 
 mineTypes:
   Test:
