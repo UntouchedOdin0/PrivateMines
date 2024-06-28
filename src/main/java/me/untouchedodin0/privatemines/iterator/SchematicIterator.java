@@ -5,7 +5,6 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -25,6 +24,7 @@ import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.iterator.SchematicIteratorOriginal.MineBlocks;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.regions.RegionUtils;
 import org.bukkit.Material;
 
 public class SchematicIterator {
@@ -63,7 +63,7 @@ public class SchematicIterator {
         BlockType quarryType = BlockType.REGISTRY.get(quarryMaterial.getKey().getKey());
 
         Region region = clipboard.getRegion();
-        Region[] subRegions = getSubRegions(region);
+        Region[] subRegions = RegionUtils.getSubRegions(region);
 
         ExecutorService executorService = Executors.newFixedThreadPool(Config.schematicThreads);
         CompletionService<BlockVisitor> completionService = new ExecutorCompletionService<>(
@@ -162,20 +162,5 @@ public class SchematicIterator {
       }
     }
     return mineBlocks;
-  }
-
-  private Region[] getSubRegions(Region region) {
-    int midX = (region.getMinimumPoint().getX() + region.getMaximumPoint().getX()) / 2;
-    int midY = (region.getMinimumPoint().getY() + region.getMaximumPoint().getY()) / 2;
-    int midZ = (region.getMinimumPoint().getZ() + region.getMaximumPoint().getZ()) / 2;
-
-    return new Region[]{
-        new CuboidRegion(region.getMinimumPoint(), BlockVector3.at(midX, midY, midZ)),
-        new CuboidRegion(BlockVector3.at(midX + 1, region.getMinimumPoint().getY(),
-            region.getMinimumPoint().getZ()), region.getMaximumPoint()), new CuboidRegion(
-        BlockVector3.at(region.getMinimumPoint().getX(), midY + 1, region.getMinimumPoint().getZ()),
-        region.getMaximumPoint()), new CuboidRegion(
-        BlockVector3.at(region.getMinimumPoint().getX(), region.getMinimumPoint().getY(), midZ + 1),
-        region.getMaximumPoint())};
   }
 }

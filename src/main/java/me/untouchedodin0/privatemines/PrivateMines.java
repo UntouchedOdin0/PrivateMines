@@ -311,7 +311,6 @@ public class PrivateMines extends JavaPlugin {
     sqlHelper.close();
   }
 
-
   public void setupSchematicUtils() {
     this.schematicStorage = new SchematicStorage();
     this.schematicIteratorOriginal = new SchematicIteratorOriginal(getSchematicStorage());
