@@ -199,26 +199,10 @@ public class PrivateMines extends JavaPlugin {
       }
 
       if (Config.useNewSchematicLoader) {
-        long startRewrite = System.nanoTime();
         MineBlocks mineBlocksRewrite = schematicIterator.findRelativePoints(schematicFile);
-        long endRewrite = System.nanoTime();
-
-        // Calculate the duration in milliseconds
-        long durationInMillisRewrite = (endRewrite - startRewrite) / 1_000_000;
-
-        // Output the duration
-        System.out.println("Rewrite Iterator Execution time: " + durationInMillisRewrite + " ms");
         schematicStorage.addSchematic(schematicFile, mineBlocksRewrite);
       } else {
-        long startOriginal = System.nanoTime();
         MineBlocks mineBlocksOriginal = schematicIteratorOriginal.findRelativePoints(schematicFile);
-        long endOriginal = System.nanoTime();
-
-        // Calculate the duration in milliseconds
-        long durationInMillisOriginal = (endOriginal - startOriginal) / 1_000_000;
-
-        // Output the duration
-        System.out.println("Original Iterator Execution time: " + durationInMillisOriginal + " ms");
         schematicStorage.addSchematic(schematicFile, mineBlocksOriginal);
       }
     });
