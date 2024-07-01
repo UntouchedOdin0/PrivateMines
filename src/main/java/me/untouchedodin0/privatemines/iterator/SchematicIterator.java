@@ -17,7 +17,6 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
@@ -70,7 +69,6 @@ public class SchematicIterator {
             executorService);
 
         for (Region subRegion : subRegions) {
-          privateMines.getLogger().info("Visiting Sub-Region: " + subRegion);
           completionService.submit(() -> {
             BlockVisitor blockVisitor = new BlockVisitor(clipboard, cornerType, spawnType, npcType,
                 quarryType);
@@ -79,18 +77,12 @@ public class SchematicIterator {
           });
         }
 
-        if (executorService instanceof ThreadPoolExecutor threadPoolExecutor) {
-          privateMines.getLogger().info("I'm using " + threadPoolExecutor.getActiveCount() + " Threads to iterate the schematic");
-        }
-
         executorService.shutdown();
 
         int cornerCount = 0;
         for (int i = 0; i < subRegions.length; i++) {
           Future<BlockVisitor> future = completionService.take();
           BlockVisitor blockVisitor = future.get();
-
-          privateMines.getLogger().info("Sub-Region results: " + blockVisitor);
 
           if (spawn == null && blockVisitor.getSpawn() != null) {
             spawn = blockVisitor.getSpawn();
