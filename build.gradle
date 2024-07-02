@@ -52,7 +52,7 @@ dependencies {
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
     compileOnly 'com.mojang:authlib:1.11'
     compileOnly 'me.clip:placeholderapi:2.11.6'
-    compileOnly 'com.github.oraxen:oraxen:1.157.2'
+    compileOnly 'com.github.oraxen:oraxen:1.173.0'
     compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.4.1-r4'
     compileOnly 'com.google.code.gson:gson:2.10'
     compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.15.0' // i think this is the big thing?
