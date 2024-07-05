@@ -55,7 +55,7 @@ dependencies {
     compileOnly 'com.github.oraxen:oraxen:1.157.2'
     compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.4.1-r4'
     compileOnly 'com.google.code.gson:gson:2.10'
-    compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.15.0' // i think this is the big thing?
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.17.2' // i think this is the big thing?
 
     compileOnly files('libs/XPrison-1.12.11-RELEASE.jar')
     compileOnly files('libs/AutoSellAPI-1.2.0.jar')
