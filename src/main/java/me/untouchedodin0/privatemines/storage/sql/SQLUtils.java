@@ -1,5 +1,6 @@
 package me.untouchedodin0.privatemines.storage.sql;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +17,7 @@ import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
@@ -26,6 +28,7 @@ public class SQLUtils {
   private static final PrivateMines privateMines = PrivateMines.getPrivateMines();
   private static final SQLHelper sqlHelper = privateMines.getSqlHelper();
   static PregenStorage pregenStorage = privateMines.getPregenStorage();
+  static AtomicDouble atomicDouble = new AtomicDouble();
 
   public static Location getCurrentLocation() {
     MineWorldManager mineWorldManager = PrivateMines.getPrivateMines().getMineWorldManager();
@@ -226,5 +229,24 @@ public class SQLUtils {
 //    results.forEach(results1 -> {
 //
 //    });
+  }
+
+  public static void updatePrice(UUID uuid, Material material, Double price) {
+    String shopOwnerUUID = uuid.toString();
+    String itemName = material.name();
+    Bukkit.broadcastMessage("" + atomicDouble.getAndAdd(1));
+
+    String insertQuery = String.format(
+        "INSERT INTO shops (shop_owner, item, price) "
+            + "VALUES ('%s', '%s', %f) "
+            + "ON CONFLICT(shop_owner, item) DO UPDATE SET price = excluded.price;",
+        shopOwnerUUID, itemName, price);
+
+    Task.asyncDelayed(() -> sqlHelper.executeUpdate(insertQuery));
+
+//     Task.asyncDelayed(() -> sqlHelper.executeUpdate(dropQuery));
+    Bukkit.broadcastMessage("shop owner uuid " + shopOwnerUUID);
+    Bukkit.broadcastMessage("item name " + itemName);
+    Bukkit.broadcastMessage("price " + price);
   }
 }

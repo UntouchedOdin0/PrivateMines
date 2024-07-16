@@ -41,8 +41,10 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.AddonsCommand;
+import me.untouchedodin0.privatemines.commands.PlayerShopCommand;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.commands.PublicMinesCommand;
+import me.untouchedodin0.privatemines.commands.UsePlayerShopCommand;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
@@ -54,6 +56,7 @@ import me.untouchedodin0.privatemines.iterator.SchematicIteratorOriginal.MineBlo
 import me.untouchedodin0.privatemines.listener.MineResetListener;
 import me.untouchedodin0.privatemines.listener.PlayerJoinListener;
 import me.untouchedodin0.privatemines.listener.sell.AutoSellListener;
+import me.untouchedodin0.privatemines.listener.sell.PlayerShopListener;
 import me.untouchedodin0.privatemines.listener.sell.UPCSellListener;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
@@ -212,6 +215,8 @@ public class PrivateMines extends JavaPlugin {
     bukkitCommandManager.registerCommand(new PrivateMinesCommand());
     bukkitCommandManager.registerCommand(new PublicMinesCommand());
     bukkitCommandManager.registerCommand(new AddonsCommand());
+    bukkitCommandManager.registerCommand(new PlayerShopCommand());
+    bukkitCommandManager.registerCommand(new UsePlayerShopCommand());
 
     File dataFolder = new File(privateMines.getDataFolder(), "privatemines.db");
     if (!dataFolder.exists()) {
@@ -255,6 +260,15 @@ public class PrivateMines extends JavaPlugin {
         max_full VARCHAR(20)
         );
         """);
+    sqlHelper.executeUpdate("""
+            CREATE TABLE IF NOT EXISTS shops (
+            shop_owner VARCHAR(36) NOT NULL,
+            item VARCHAR(50) NOT NULL,
+            price DOUBLE NOT NULL,
+            PRIMARY KEY (shop_owner, item)
+            );
+        """);
+
     sqlHelper.setAutoCommit(true);
 
     Task.asyncDelayed(this::loadSQLMines);
@@ -448,6 +462,7 @@ public class PrivateMines extends JavaPlugin {
 
   private void registerListeners() {
     getServer().getPluginManager().registerEvents(new MineResetListener(), this);
+    getServer().getPluginManager().registerEvents(new PlayerShopListener(), this);
   }
 
   public SQLHelper getSqlHelper() {
