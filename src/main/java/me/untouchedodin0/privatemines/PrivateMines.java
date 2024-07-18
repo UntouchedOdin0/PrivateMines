@@ -271,7 +271,8 @@ public class PrivateMines extends JavaPlugin {
 
     sqlHelper.setAutoCommit(true);
 
-    Task.asyncDelayed(this::loadSQLMines);
+    Task.asyncDelayed(this::loadMines);
+    Task.asyncDelayed(this::loadShops);
     Task.asyncDelayed(SQLUtils::loadPregens);
     Task.asyncDelayed(this::loadAddons);
 
@@ -328,7 +329,7 @@ public class PrivateMines extends JavaPlugin {
     return true;
   }
 
-  public void loadSQLMines() {
+  public void loadMines() {
     SQLHelper sqlHelper = getSqlHelper();
     Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
 
@@ -373,10 +374,43 @@ public class PrivateMines extends JavaPlugin {
 
       MineData mineData = new MineData(uuid, minMining, maxMining, fullMin, fullMax, location,
           spawnLocation, type, open, tax);
-      mineData.setMaterials(materials); //- This breaks it for some reason
+      mineData.setMaterials(materials);
       mine.setMineData(mineData);
 
       mineStorage.addMine(uuid, mine);
+    });
+  }
+
+  public void loadShops() {
+    /*
+            sqlHelper.executeUpdate("""
+            CREATE TABLE IF NOT EXISTS shops (
+            shop_owner VARCHAR(36) NOT NULL,
+            item VARCHAR(50) NOT NULL,
+            price DOUBLE NOT NULL,
+            PRIMARY KEY (shop_owner, item)
+            );
+        """);
+     */
+    SQLHelper sqlHelper = getSqlHelper();
+    Results results = sqlHelper.queryResults("SELECT * FROM shops");
+
+    privateMines.getLogger().info("------");
+    privateMines.getLogger().info("- load shops -");
+    privateMines.getLogger().info("sql helper " + sqlHelper);
+    privateMines.getLogger().info("results " + results);
+
+    results.forEach(result -> {
+      String shop_owner = result.getString(1);
+      String item = result.getString(2);
+      double price = result.get(3);
+
+
+
+      privateMines.getLogger().info("result " + result);
+      privateMines.getLogger().info("shop_owner " + shop_owner);
+      privateMines.getLogger().info("item " + item);
+      privateMines.getLogger().info("price " + price);
     });
   }
 

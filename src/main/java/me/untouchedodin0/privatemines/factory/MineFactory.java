@@ -117,6 +117,8 @@ public class MineFactory {
 
       mine.setMineData(mineData);
       SQLUtils.insert(mine);
+      SQLUtils.updatePrice(uuid, Material.COBBLESTONE, 1.0);
+
       mineStorage.addMine(uuid, mine);
       mine.handleReset();
       Task.syncDelayed(() -> {

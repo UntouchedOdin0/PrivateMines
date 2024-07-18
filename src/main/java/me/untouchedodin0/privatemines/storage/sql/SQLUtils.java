@@ -132,8 +132,10 @@ public class SQLUtils {
     MineData mineData = mine.getMineData();
     String owner = mineData.getMineOwner().toString();
     String dropQuery = String.format("DELETE FROM privatemines WHERE owner = '%s'", owner);
+    String dropShopQuery = String.format("DELETE FROM shops WHERE shop_owner = '%s'", owner);
 
     Task.asyncDelayed(() -> sqlHelper.executeUpdate(dropQuery));
+    Task.asyncDelayed(() -> sqlHelper.executeUpdate(dropShopQuery));
   }
 
   public static void insertPregen(PregenMine pregenMine) {
@@ -248,5 +250,13 @@ public class SQLUtils {
     Bukkit.broadcastMessage("shop owner uuid " + shopOwnerUUID);
     Bukkit.broadcastMessage("item name " + itemName);
     Bukkit.broadcastMessage("price " + price);
+  }
+
+  public static void setDefaultPrices(Mine mine) {
+    MineData mineData = mine.getMineData();
+
+    for (Material material : mineData.getMaterials().keySet()) {
+      updatePrice(mineData.getMineOwner(), material, 1.0);
+    }
   }
 }
