@@ -262,10 +262,13 @@ public class PrivateMines extends JavaPlugin {
         """);
     sqlHelper.executeUpdate("""
             CREATE TABLE IF NOT EXISTS shops (
-            shop_owner VARCHAR(36) NOT NULL,
+            owner VARCHAR(36) NOT NULL,
+            seller VARCHAR(36) NOT NULL,
             item VARCHAR(50) NOT NULL,
+            quantity INT NOT NULL,
             price DOUBLE NOT NULL,
-            PRIMARY KEY (shop_owner, item)
+            tax DOUBLE NOT NULL,
+            PRIMARY KEY (owner, item)
             );
         """);
 
@@ -385,10 +388,10 @@ public class PrivateMines extends JavaPlugin {
     /*
             sqlHelper.executeUpdate("""
             CREATE TABLE IF NOT EXISTS shops (
-            shop_owner VARCHAR(36) NOT NULL,
+            owner VARCHAR(36) NOT NULL,
             item VARCHAR(50) NOT NULL,
             price DOUBLE NOT NULL,
-            PRIMARY KEY (shop_owner, item)
+            PRIMARY KEY (owner, item)
             );
         """);
      */
@@ -401,15 +404,15 @@ public class PrivateMines extends JavaPlugin {
     privateMines.getLogger().info("results " + results);
 
     results.forEach(result -> {
-      String shop_owner = result.getString(1);
+      String owner = result.getString(1);
       String item = result.getString(2);
-      double price = result.get(3);
-
-
+      int quantity = result.get(3);
+      double price = result.get(4);
 
       privateMines.getLogger().info("result " + result);
-      privateMines.getLogger().info("shop_owner " + shop_owner);
+      privateMines.getLogger().info("owner " + owner);
       privateMines.getLogger().info("item " + item);
+      privateMines.getLogger().info("quantity " + quantity);
       privateMines.getLogger().info("price " + price);
     });
   }

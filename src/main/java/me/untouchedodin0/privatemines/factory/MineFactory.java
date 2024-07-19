@@ -47,6 +47,7 @@ import me.untouchedodin0.privatemines.events.PrivateMineCreationEvent;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopBuilder;
+import me.untouchedodin0.privatemines.playershops.ShopUtils;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.worldedit.PasteHelper;
 import me.untouchedodin0.privatemines.utils.worldedit.objects.PastedMine;
@@ -111,16 +112,17 @@ public class MineFactory {
       Mine mine = new Mine(privateMines);
       MineData mineData = new MineData(uuid, corner2, corner1, minimum, maximum, location, spawn,
           mineType, Config.defaultClosed, 5.0);
-      Shop shop = new ShopBuilder().setOwner(uuid).setPrices(Map.of()).setRegion(miningRegion)
+      Shop shop = new ShopBuilder().setOwner(uuid).setPrices(materials).setRegion(miningRegion)
           .build();
       mineData.setShop(shop);
 
       mine.setMineData(mineData);
       SQLUtils.insert(mine);
-      SQLUtils.updatePrice(uuid, Material.COBBLESTONE, 1.0);
 
       mineStorage.addMine(uuid, mine);
       mine.handleReset();
+//      ShopUtils.setDefaultPrices(mine);
+
       Task.syncDelayed(() -> {
         spawn.getBlock().setType(Material.AIR);
         player.teleport(spawn);
