@@ -405,15 +405,19 @@ public class PrivateMines extends JavaPlugin {
 
     results.forEach(result -> {
       String owner = result.getString(1);
-      String item = result.getString(2);
-      int quantity = result.get(3);
-      double price = result.get(4);
+      String seller = result.getString(2);
+      String item = result.getString(3);
+      int quantity = result.get(4);
+      double price = result.get(5);
+      double tax = result.get(6);
 
       privateMines.getLogger().info("result " + result);
       privateMines.getLogger().info("owner " + owner);
+      privateMines.getLogger().info("seller");
       privateMines.getLogger().info("item " + item);
       privateMines.getLogger().info("quantity " + quantity);
       privateMines.getLogger().info("price " + price);
+      privateMines.getLogger().info("tax " + tax);
     });
   }
 

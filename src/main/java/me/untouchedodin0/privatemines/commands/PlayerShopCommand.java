@@ -5,14 +5,13 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
-import com.google.common.util.concurrent.AtomicDouble;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import dev.triumphteam.gui.guis.PaginatedGui;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.utils.AudienceUtils;
@@ -23,6 +22,7 @@ import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import redempt.redlib.misc.Task;
@@ -56,11 +56,7 @@ public class PlayerShopCommand extends BaseCommand {
     Shop shop = mineData.getShop();
 
     // Initialize the GUI
-    PaginatedGui paginatedGui = Gui
-        .paginated()
-        .title(Component.text("test"))
-        .rows(5)
-        .pageSize(36)
+    PaginatedGui paginatedGui = Gui.paginated().title(Component.text("test")).rows(5).pageSize(36)
         .create();
 
     paginatedGui.setDefaultClickAction(event -> event.setCancelled(true));
@@ -68,9 +64,15 @@ public class PlayerShopCommand extends BaseCommand {
     // Previous item
     paginatedGui.setItem(5, 3, ItemBuilder.from(Material.PAPER).setName("Previous")
         .asGuiItem(event -> paginatedGui.previous()));
+    // Sell All Button
+    paginatedGui.setItem(5, 5, ItemBuilder.from(Material.CHEST).name(Component.text("Sell All"))
+        .lore(List.of(Component.text("Click to sell all your"),
+            Component.text("items in your shop!"))).asGuiItem(event -> {
+          player.sendMessage(ChatColor.GREEN + "Selling all items!");
+        }));
     // Next item
-    paginatedGui.setItem(5, 7, ItemBuilder.from(Material.PAPER).setName("Next")
-        .asGuiItem(event -> paginatedGui.next()));
+    paginatedGui.setItem(5, 7,
+        ItemBuilder.from(Material.PAPER).setName("Next").asGuiItem(event -> paginatedGui.next()));
 
     // Asynchronous task to fetch shop data
     Task.asyncDelayed(() -> {
@@ -99,29 +101,25 @@ public class PlayerShopCommand extends BaseCommand {
 
       // Use a synchronous task to update the shopItems map
       Bukkit.getScheduler().runTask(PrivateMines.getPrivateMines(), () -> {
-//        for (Material material : Material.values()) {
-//          if (material.isBlock()) {
-//            GuiItem guiItem = ItemBuilder.from(material)
-//                .name(Component.text("test"))
-//                .lore(Component.text("Quantity: " + shopItems.get(material)))
-//                .asGuiItem();
-//            paginatedGui.addItem(guiItem);
-//          }
-//        }
         shopItems.forEach((material, quantity) -> {
           GuiItem guiItem = ItemBuilder.from(material)
-              .name(Component.text("Item: " + material.name()))
-              .lore(Component.text("Quantity: " + quantity))
-              .asGuiItem();
+              .name(Component.text("Item: " + material.name())).lore(
+                  List.of(Component.text("Quantity: " + shopItems.get(material)),
+                      Component.text(" "), Component.text("Click to sell all!"))).asGuiItem();
           paginatedGui.addItem(guiItem);
         });
 
         // Open the GUI for the player
         paginatedGui.open(player);
       });
+      paginatedGui.setCloseGuiAction(event -> {
+        Bukkit.broadcastMessage("closed inventory " + paginatedGui);
+        Bukkit.broadcastMessage("using event " + event);
+        Bukkit.broadcastMessage("closing sql: " + sqlHelper);
+        sqlHelper.close();
+      });
     });
   }
-
 
 //  @Default
 //  @CommandPermission("privatemines.playershop")
@@ -320,15 +318,13 @@ public class PlayerShopCommand extends BaseCommand {
         int quantityBefore = sqlHelper.querySingleResult(
             "SELECT quantity FROM shops WHERE item=? AND owner=?;", "COBBLESTONE",
             player.getUniqueId().toString());
-        sqlHelper.execute("UPDATE shops SET price=? WHERE item=? AND owner=?;",
-            price, "COBBLESTONE", player.getUniqueId().toString());
-        sqlHelper.execute("UPDATE shops SET quantity=? WHERE item=? AND owner=?;",
-            quantity, "COBBLESTONE", player.getUniqueId().toString());
+        sqlHelper.execute("UPDATE shops SET price=? WHERE item=? AND owner=?;", price,
+            "COBBLESTONE", player.getUniqueId().toString());
+        sqlHelper.execute("UPDATE shops SET quantity=? WHERE item=? AND owner=?;", quantity,
+            "COBBLESTONE", player.getUniqueId().toString());
 
-        String[] messages = {
-            "Quantity before: " + quantityBefore,
-            "Set the prices of", "cobblestone to " + price,
-            "Set the quantity of", " cobblestone to " + quantity};
+        String[] messages = {"Quantity before: " + quantityBefore, "Set the prices of",
+            "cobblestone to " + price, "Set the quantity of", " cobblestone to " + quantity};
         player.sendMessage(messages);
       }
     }
