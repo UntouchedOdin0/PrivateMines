@@ -102,6 +102,7 @@ bukkit {
 }
 
 tasks.register('copyTo_DevServer', Copy) {
+    doNotTrackState("spigot-workaround")
     from shadowJar
     into "E:/Coding/Spigot Test Servers/1.19.2 Privates Mines (Paper)/plugins"
 }
