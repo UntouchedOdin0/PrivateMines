@@ -269,6 +269,7 @@ public class PrivateMinesCommand extends BaseCommand {
     } else {
       Mine mine = mineStorage.get(target.getUniqueId());
       if (mine != null) {
+        mine.reset();
         mine.handleReset();
       }
     }

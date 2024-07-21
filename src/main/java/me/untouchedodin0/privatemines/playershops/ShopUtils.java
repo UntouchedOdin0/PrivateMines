@@ -6,8 +6,10 @@ import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
+import net.royawesome.jlibnoise.module.combiner.Min;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
 import redempt.redlib.sql.SQLHelper.Results;
@@ -15,30 +17,38 @@ import redempt.redlib.sql.SQLHelper.Results;
 public class ShopUtils {
 
   private static final PrivateMines privateMines = PrivateMines.getPrivateMines();
-  private static final SQLHelper sqlHelper = privateMines.getSqlHelper();
+//  private SQLHelper sqlHelper = privateMines.getSqlHelper();
 
   public static void updatePrice(UUID uuid, Material material, double price) {
-    String insertQuery = String.format(
-        "INSERT INTO shops (owner, seller, item, quantity, price) " +
-            "VALUES ('%s', '%s', '%s', %d, %f) " +
-            "ON CONFLICT(owner, item) DO UPDATE SET price = excluded.price;",
-        uuid, uuid, material.name(), 0, price);
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
+    MineStorage mineStorage = privateMines.getMineStorage();
+    Mine mine = mineStorage.get(uuid);
+    if (mine != null) {
+      MineData mineData = mine.getMineData();
+
+      String insertQuery = String.format(
+          "INSERT INTO shops (owner, seller, item, quantity, price, tax) " +
+              "VALUES ('%s', '%s', '%s', %d, %f, %f) " +
+              "ON CONFLICT(owner, item) DO UPDATE SET price = excluded.price;",
+          uuid, uuid, material.name(), 0, price, mineData.getTax());
 
 //    String updateQuery = String.format(
 //        "UPDATE shops SET price = %f WHERE owner = '%s' AND item = '%s';", price, uuid,
 //        material.name());
 
-    // Log the query for debugging purposes
+      // Log the query for debugging purposes
 //    System.out.println("Executing query: " + updateQuery);
 
-    Bukkit.broadcastMessage(
-        String.format("updating item %s in %s's mine to %f", material.name(), uuid.toString(),
-            price));
+      Bukkit.broadcastMessage(
+          String.format("updating item %s in %s's mine to %f", material.name(), uuid.toString(),
+              price));
 
-    Task.asyncDelayed(() -> sqlHelper.execute(insertQuery));
+      Task.asyncDelayed(() -> sqlHelper.executeUpdate(insertQuery));
+    }
   }
 
   public static void setDefaultPrices(Mine mine) {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
     MineData mineData = mine.getMineData();
     String uuid = mineData.getMineOwner().toString();
 
@@ -46,12 +56,13 @@ public class ShopUtils {
     for (Material material : Objects.requireNonNull(mineData.getMineType().getMaterials()).keySet()) {
       double price = Objects.requireNonNull(mineData.getMineType().getPrices()).get(material);
       double finalPrice = mineData.getTax() / 100 * price;
+      double tax = mineData.getTax();
 
       String insertQuery = String.format(
-          "INSERT INTO shops (owner, seller, item, quantity, price) " +
-              "VALUES ('%s', '%s', '%s', %d, %f) " +
+          "INSERT INTO shops (owner, seller, item, quantity, price, tax) " +
+              "VALUES ('%s', '%s', '%s', %d, %f, %f) " +
               "ON CONFLICT(owner, item) DO UPDATE SET price = excluded.price;",
-          uuid, "", material.name(), 0, finalPrice);
+          uuid, "", material.name(), 0, finalPrice, tax);
 
       // Log the query being executed
       System.out.println("Executing query: " + insertQuery);
@@ -70,6 +81,7 @@ public class ShopUtils {
 
 
   public static void addItem(UUID uuid, Material material, int quantity, double price) {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
     MineStorage mineStorage = privateMines.getMineStorage();
     Mine mine = mineStorage.get(uuid);
 
@@ -96,7 +108,7 @@ public class ShopUtils {
           } else {
             // Item doesn't exist, insert a new row
             String insertQuery = "INSERT INTO shops (owner, seller, item, quantity, price, tax) VALUES (?, ?, ?, ?, ?, ?)";
-            sqlHelper.execute(insertQuery, ownerUUID, ownerUUID, materialName, quantity, finalPrice, taxRate);
+            sqlHelper.executeUpdate(insertQuery, ownerUUID, ownerUUID, materialName, quantity, finalPrice, taxRate);
 
             Bukkit.broadcastMessage("Inserted new item: " + materialName + " with quantity: " + quantity);
           }

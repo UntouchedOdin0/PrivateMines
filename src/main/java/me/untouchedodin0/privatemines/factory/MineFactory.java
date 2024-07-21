@@ -118,10 +118,10 @@ public class MineFactory {
 
       mine.setMineData(mineData);
       SQLUtils.insert(mine);
+      ShopUtils.setDefaultPrices(mine);
 
       mineStorage.addMine(uuid, mine);
       mine.handleReset();
-//      ShopUtils.setDefaultPrices(mine);
 
       Task.syncDelayed(() -> {
         spawn.getBlock().setType(Material.AIR);
