@@ -67,7 +67,7 @@ dependencies {
     implementation 'net.kyori:adventure-platform-bukkit:4.3.0'
     implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
-    implementation "dev.triumphteam:triumph-gui:3.1.2" // Replace version here
+    implementation "dev.triumphteam:triumph-gui:3.1.10" // Replace version here
     implementation 'io.papermc:paperlib:1.0.7'
     implementation 'com.convallyria.languagy:api:3.0.2'
 
