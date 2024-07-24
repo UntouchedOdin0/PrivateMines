@@ -18,6 +18,7 @@ import me.untouchedodin0.kotlin.utils.AudienceUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.mine.Mine;
+import me.untouchedodin0.privatemines.playershops.PlayerShopMenuUtils;
 import me.untouchedodin0.privatemines.playershops.Shop;
 import me.untouchedodin0.privatemines.playershops.ShopUtils;
 import net.kyori.adventure.text.Component;
@@ -40,6 +41,7 @@ public class PlayerShopCommand extends BaseCommand {
   @CommandPermission("privatemines.playershop")
   public synchronized void playerShop(Player player) {
     Map<Material, Integer> shopItems = new HashMap<>();
+    PlayerShopMenuUtils playerShopMenuUtils = new PlayerShopMenuUtils();
 
     if (!mineStorage.hasMine(player)) {
       audienceUtils.sendMessage(player, MessagesConfig.dontOwnMine);
@@ -55,8 +57,9 @@ public class PlayerShopCommand extends BaseCommand {
     MineData mineData = mine.getMineData();
     Shop shop = mineData.getShop();
 
+    playerShopMenuUtils.generateMenu(player);
     // Initialize the GUI
-    PaginatedGui paginatedGui = Gui.paginated().title(Component.text("test")).rows(5).pageSize(36)
+/*    PaginatedGui paginatedGui = Gui.paginated().title(Component.text("test")).rows(5).pageSize(36)
         .create();
 
     paginatedGui.setDefaultClickAction(event -> event.setCancelled(true));
@@ -72,10 +75,11 @@ public class PlayerShopCommand extends BaseCommand {
         }));
     // Next item
     paginatedGui.setItem(5, 7,
-        ItemBuilder.from(Material.PAPER).setName("Next").asGuiItem(event -> paginatedGui.next()));
+        ItemBuilder.from(Material.PAPER).setName("Next").asGuiItem(event -> paginatedGui.next()));*/
 
     // Asynchronous task to fetch shop data
-    Task.asyncDelayed(() -> {
+
+/*    Task.asyncDelayed(() -> {
       SQLHelper sqlHelper = privateMines.getSqlHelper();
       String ownerUUID = player.getUniqueId().toString();
       Results results = sqlHelper.queryResults("SELECT * FROM shops WHERE owner=?;", ownerUUID);
@@ -105,20 +109,24 @@ public class PlayerShopCommand extends BaseCommand {
           GuiItem guiItem = ItemBuilder.from(material)
               .name(Component.text("Item: " + material.name())).lore(
                   List.of(Component.text("Quantity: " + shopItems.get(material)),
-                      Component.text(" "), Component.text("Click to sell all!"))).asGuiItem();
+                      Component.text(" "), Component.text("Click to sell all!")))
+              .asGuiItem(event -> {
+              });
           paginatedGui.addItem(guiItem);
         });
 
         // Open the GUI for the player
         paginatedGui.open(player);
       });
-      paginatedGui.setCloseGuiAction(event -> {
-        Bukkit.broadcastMessage("closed inventory " + paginatedGui);
-        Bukkit.broadcastMessage("using event " + event);
-        Bukkit.broadcastMessage("closing sql: " + sqlHelper);
-        sqlHelper.close();
-      });
-    });
+    });*/
+
+//    paginatedGui.setCloseGuiAction(event -> {
+//      Bukkit.broadcastMessage("closed inventory " + paginatedGui);
+//      Bukkit.broadcastMessage("using event " + event);
+//      Bukkit.broadcastMessage("closing sql: " + sqlHelper);
+//      sqlHelper.flushAllCaches();
+//      sqlHelper.close();
+//    });
   }
 
 //  @Default
@@ -335,7 +343,18 @@ public class PlayerShopCommand extends BaseCommand {
     if (!mineStorage.hasMine(player)) {
       audienceUtils.sendMessage(player, MessagesConfig.dontOwnMine);
     } else {
-      ShopUtils.addItem(player.getUniqueId(), Material.COBBLESTONE, quantity, price);
+      Material material = player.getInventory().getItemInMainHand().getType();
+      ShopUtils.addItem(player.getUniqueId(), material, quantity, price);
+    }
+  }
+
+  @Subcommand("remove")
+  public void pricesDebugRemove(Player player, int quantity) {
+    if (!mineStorage.hasMine(player)) {
+      audienceUtils.sendMessage(player, MessagesConfig.dontOwnMine);
+    } else {
+      Material material = player.getInventory().getItemInMainHand().getType();
+      ShopUtils.removeItem(player.getUniqueId(), material, quantity);
     }
   }
 
