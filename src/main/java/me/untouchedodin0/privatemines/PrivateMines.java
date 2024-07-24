@@ -114,6 +114,18 @@ public class PrivateMines extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    System.out.println("                             ");
+    System.out.println("Hello, this a warning message");
+    System.out.println("to inform you that you're using");
+    System.out.println("a heavily in development version.");
+    System.out.println("I do not take any responsibility");
+    System.out.println("for this being used on production");
+    System.out.println("and breaking stuff.");
+    System.out.println("YOU HAVE BEEN WARNED.");
+    System.out.println("                             ");
+    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
     Instant start = Instant.now();
     getLogger().info("Loading Private Mines v" + getDescription().getVersion());
     saveDefaultConfig();
