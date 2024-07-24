@@ -265,7 +265,7 @@ public class PrivateMines extends JavaPlugin {
             owner VARCHAR(36) NOT NULL,
             seller VARCHAR(36) NOT NULL,
             item VARCHAR(50) NOT NULL,
-            quantity INT NOT NULL,
+            quantity LONG NOT NULL,
             price DOUBLE NOT NULL,
             tax DOUBLE NOT NULL,
             PRIMARY KEY (owner, item)
@@ -385,16 +385,6 @@ public class PrivateMines extends JavaPlugin {
   }
 
   public void loadShops() {
-    /*
-            sqlHelper.executeUpdate("""
-            CREATE TABLE IF NOT EXISTS shops (
-            owner VARCHAR(36) NOT NULL,
-            item VARCHAR(50) NOT NULL,
-            price DOUBLE NOT NULL,
-            PRIMARY KEY (owner, item)
-            );
-        """);
-     */
     SQLHelper sqlHelper = getSqlHelper();
     Results results = sqlHelper.queryResults("SELECT * FROM shops");
 

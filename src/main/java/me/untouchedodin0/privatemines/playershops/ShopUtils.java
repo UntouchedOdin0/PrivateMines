@@ -1,5 +1,9 @@
 package me.untouchedodin0.privatemines.playershops;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import me.untouchedodin0.kotlin.mine.data.MineData;
@@ -10,11 +14,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
+import redempt.redlib.sql.SQLHelper.Results;
 
 public class ShopUtils {
 
   private static final PrivateMines privateMines = PrivateMines.getPrivateMines();
-//  private SQLHelper sqlHelper = privateMines.getSqlHelper();
 
   public static void updatePrice(UUID uuid, Material material, double price) {
     SQLHelper sqlHelper = privateMines.getSqlHelper();
@@ -29,15 +33,8 @@ public class ShopUtils {
               "ON CONFLICT(owner, item) DO UPDATE SET price = excluded.price;",
           uuid, uuid, material.name(), 0, price, mineData.getTax());
 
-//    String updateQuery = String.format(
-//        "UPDATE shops SET price = %f WHERE owner = '%s' AND item = '%s';", price, uuid,
-//        material.name());
-
-      // Log the query for debugging purposes
-//    System.out.println("Executing query: " + updateQuery);
-
       Bukkit.broadcastMessage(
-          String.format("updating item %s in %s's mine to %f", material.name(), uuid.toString(),
+          String.format("updating item %s in %s's mine to %f", material.name(), uuid,
               price));
 
       Task.asyncDelayed(() -> sqlHelper.executeUpdate(insertQuery));
@@ -77,8 +74,7 @@ public class ShopUtils {
     }
   }
 
-
-  public static void addItem(UUID uuid, Material material, int quantity, double price) {
+  public static void addItem(UUID uuid, Material material, long quantity, double price) {
     SQLHelper sqlHelper = privateMines.getSqlHelper();
     MineStorage mineStorage = privateMines.getMineStorage();
     Mine mine = mineStorage.get(uuid);
@@ -90,39 +86,71 @@ public class ShopUtils {
       double taxRate = mineData.getTax() / 100.0;
       double finalPrice = price * (1 + taxRate);
 
+      Bukkit.broadcastMessage("material name " + materialName);
+
       Task.asyncDelayed(() -> {
         try {
           // Check if the item already exists
           String checkQuery = "SELECT quantity FROM shops WHERE owner = ? AND item = ?";
-          Integer currentQuantity = sqlHelper.querySingleResult(checkQuery, ownerUUID,
-              materialName);
+          long currentQuantity = 0L;
+          boolean itemExists = false;
 
-          if (currentQuantity != null) {
-            // Item exists, update the quantity and price
-            int newQuantity = currentQuantity + quantity;
-            String updateQuery = "UPDATE shops SET quantity = ?, price = ? WHERE owner = ? AND item = ?";
-            sqlHelper.executeUpdate(updateQuery, newQuantity, finalPrice, ownerUUID, materialName);
+          try (PreparedStatement statement = sqlHelper.getConnection()
+              .prepareStatement(checkQuery)) {
+            statement.setString(1, ownerUUID);
+            statement.setString(2, materialName);
 
-            Bukkit.broadcastMessage(
-                "Updated item: " + materialName + " with new quantity: " + newQuantity);
-          } else {
-            // Item doesn't exist, insert a new row
-            String insertQuery = "INSERT INTO shops (owner, seller, item, quantity, price, tax) VALUES (?, ?, ?, ?, ?, ?)";
-            sqlHelper.executeUpdate(insertQuery, ownerUUID, ownerUUID, materialName, quantity,
-                finalPrice, taxRate);
-
-            Bukkit.broadcastMessage(
-                "Inserted new item: " + materialName + " with quantity: " + quantity);
+            try (ResultSet resultSet = statement.executeQuery()) {
+              if (resultSet.next()) {
+                currentQuantity = resultSet.getLong("quantity"); // Retrieves BIGINT as long
+                itemExists = true;
+              }
+            }
           }
+
+          // Calculate the new quantity and check for overflow
+          long newQuantity;
+          if (quantity > 0 && (Long.MAX_VALUE - currentQuantity < quantity)) {
+            // Overflow detected
+            newQuantity = Long.MAX_VALUE; // Cap to max value
+            Bukkit.broadcastMessage("Overflow detected. Quantity capped to " + newQuantity);
+          } else {
+            newQuantity = currentQuantity + quantity;
+          }
+
+          // Update or insert the item in the database
+          String updateQuery;
+          if (itemExists) {
+            updateQuery = "UPDATE shops SET quantity = ?, price = ? WHERE owner = ? AND item = ?";
+          } else {
+            updateQuery = "INSERT INTO shops (owner, item, quantity, price) VALUES (?, ?, ?, ?)";
+          }
+
+          try (PreparedStatement statement = sqlHelper.getConnection()
+              .prepareStatement(updateQuery)) {
+            statement.setLong(1, newQuantity);
+            statement.setDouble(2, finalPrice);
+            statement.setString(3, ownerUUID);
+            statement.setString(4, materialName);
+
+            statement.executeUpdate();
+          }
+
+          Bukkit.broadcastMessage(
+              "Updated item: " + materialName + " with new quantity: " + newQuantity);
+
         } catch (Exception e) {
+          Bukkit.getLogger().severe("Error updating item: " + e.getMessage());
           e.printStackTrace();
-          Bukkit.broadcastMessage("Error handling item: " + materialName);
         }
       });
+    } else {
+      Bukkit.getLogger().warning("Mine not found for UUID: " + uuid.toString());
     }
   }
 
-  public static void removeItem(UUID uuid, Material material, int quantity) {
+
+  public static void removeItem(UUID uuid, Material material, long quantity) {
     SQLHelper sqlHelper = privateMines.getSqlHelper();
     MineStorage mineStorage = privateMines.getMineStorage();
     Mine mine = mineStorage.get(uuid);
@@ -132,34 +160,112 @@ public class ShopUtils {
       String materialName = material.name();
 
       Task.asyncDelayed(() -> {
-        try {
-          // Check if the item exists
-          String checkQuery = "SELECT quantity FROM shops WHERE owner = ? AND item = ?";
-          Integer currentQuantity = sqlHelper.querySingleResult(checkQuery, ownerUUID,
-              materialName);
+        int maxRetries = 5;
+        int retryDelay = 1000; // 1 second delay between retries
 
-          if (currentQuantity != null) {
-            // Item exists, update the quantity
-            int newQuantity = currentQuantity - quantity;
-            if (newQuantity > 0) {
-              String updateQuery = "UPDATE shops SET quantity = ? WHERE owner = ? AND item = ?";
-              sqlHelper.executeUpdate(updateQuery, newQuantity, ownerUUID, materialName);
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+          try {
+            // Check if the item exists and get the current quantity
+            String checkQuery = "SELECT quantity FROM shops WHERE owner = ? AND item = ?";
+            long currentQuantity = 0L;
 
-              Bukkit.broadcastMessage(
-                  "Updated item: " + materialName + " with new quantity: " + newQuantity);
-            } else {
-              String deleteQuery = "DELETE FROM shops WHERE owner = ? AND item = ?";
-              sqlHelper.executeUpdate(deleteQuery, ownerUUID, materialName);
+            try (PreparedStatement statement = sqlHelper.getConnection()
+                .prepareStatement(checkQuery)) {
+              statement.setString(1, ownerUUID);
+              statement.setString(2, materialName);
 
-              Bukkit.broadcastMessage("Removed item: " + materialName + " from the shop");
+              try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                  currentQuantity = resultSet.getLong("quantity"); // Retrieves BIGINT as long
+                }
+              }
             }
-          } else {
-            // Item does not exist
-            Bukkit.broadcastMessage("Item: " + materialName + " does not exist in the shop");
+
+            // Calculate the new quantity and check for underflow
+            long newQuantity = Math.max(currentQuantity - quantity, 0);
+
+            // Update the quantity in the database
+            String updateQuery = "UPDATE shops SET quantity = ? WHERE owner = ? AND item = ?";
+            sqlHelper.executeUpdate(updateQuery, newQuantity, ownerUUID, materialName);
+
+            Bukkit.broadcastMessage(
+                "Updated item: " + materialName + " with new quantity: " + newQuantity);
+            break; // Exit the retry loop on success
+
+          } catch (Exception e) {
+            // Log the exception and retry if needed
+            Bukkit.broadcastMessage("Error handling item removal: " + materialName);
+
+            if (attempt < maxRetries) {
+              try {
+                Thread.sleep(retryDelay); // Wait before retrying
+              } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt(); // Restore interrupted status
+              }
+            } else {
+              throw new RuntimeException("Failed to remove item after " + maxRetries + " attempts",
+                  e);
+            }
           }
-        } catch (Exception e) {
-          e.printStackTrace();
-          Bukkit.broadcastMessage("Error handling item removal: " + materialName);
+        }
+      });
+    }
+  }
+
+  public Map<Material, Long> getShopItems(UUID uuid) {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
+    String ownerUUID = uuid.toString();
+    Map<Material, Long> shopItems = new HashMap<>();
+
+    Results results = sqlHelper.queryResults("SELECT * FROM shops WHERE owner=?;", ownerUUID);
+
+    if (results == null) {
+      Bukkit.broadcastMessage("No results found.");
+      return null;
+    }
+
+    results.forEach(result -> {
+      String item = result.getString(3);
+      long quantity = result.getLong(4);
+
+      Material material = Material.getMaterial(item);
+      if (material != null) {
+        shopItems.put(material, quantity);
+      } else {
+        Bukkit.broadcastMessage("Invalid material: " + item);
+      }
+    });
+    return shopItems;
+  }
+
+  public void sellItems(UUID uuid, boolean includeTax) {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
+    String ownerUUID = uuid.toString();
+    Map<Material, Long> shopItems = new HashMap<>();
+
+    Results results = sqlHelper.queryResults("SELECT * FROM shops WHERE owner=?;", ownerUUID);
+
+    if (results == null) {
+      Bukkit.broadcastMessage("No results found.");
+    }
+
+    if (results != null) {
+      results.forEach(result -> {
+        String item = result.getString(3);
+        long price = result.getLong(5);
+        double tax = result.get(6);
+
+        if (!includeTax) {
+          shopItems.put(Material.getMaterial(item), price);
+        } else {
+          // This calculates the tax amount (how much is subtracted for tax purposes)
+          double taxAmount = price * tax / 100.0;
+
+          // This calculates the earner's amount (how much the seller receives after tax)
+          double earnerAmount = price - taxAmount;
+
+          Bukkit.getPlayer(uuid).sendMessage("You earnt $" + earnerAmount);
+          Bukkit.getPlayer(uuid).sendMessage("You paid $" + taxAmount + " in taxes..");
         }
       });
     }

@@ -1,5 +1,7 @@
 package me.untouchedodin0.privatemines.playershops;
 
+import static me.untouchedodin0.privatemines.utils.Utils.format;
+
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
@@ -8,29 +10,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 import me.untouchedodin0.privatemines.PrivateMines;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import redempt.redlib.sql.SQLHelper;
-import redempt.redlib.sql.SQLHelper.Results;
 
 public class PlayerShopMenuUtils {
 
   PrivateMines privateMines = PrivateMines.getPrivateMines();
-  private Map<Material, Integer> shopItems;
-  private Map<Material, Integer> quantitySold;
+  private Map<Material, Long> shopItems;
+  private Map<Material, Long> quantitySold;
 
   public void generateMenu(Player player) {
+    ShopUtils shopUtils = new ShopUtils();
+
     // Initialize the GUI
     PaginatedGui paginatedGui = Gui.paginated().title(Component.text("test")).rows(5).pageSize(36)
         .create();
     paginatedGui.setDefaultClickAction(event -> event.setCancelled(true));
 
-    shopItems = getShopItems(player.getUniqueId());
+    shopItems = shopUtils.getShopItems(player.getUniqueId());
     quantitySold = new HashMap<>();
 
     // Previous item
@@ -52,7 +53,7 @@ public class PlayerShopMenuUtils {
 
           for (GuiItem guiItem : items) {
             Material material = guiItem.getItemStack().getType();
-            int quantity = shopItems.get(material);
+            long quantity = shopItems.get(material);
 
             ShopUtils.removeItem(player.getUniqueId(), material, quantity);
             quantitySold.put(material, quantity); // Update quantitySold map
@@ -80,24 +81,28 @@ public class PlayerShopMenuUtils {
         .asGuiItem(event -> paginatedGui.next()));
 
     shopItems.forEach((material, quantity) -> {
-      GuiItem guiItem = ItemBuilder.from(material).name(Component.text("Item: " + material.name()))
-          .lore(List.of(Component.text("Quantity: " + shopItems.get(material)), Component.text(" "),
-              Component.text("Click to sell all!"))).asGuiItem(event -> {
-            quantitySold.put(material, quantity); // Update quantitySold map
+      if (quantity > 0) {
+        GuiItem guiItem = ItemBuilder.from(material)
+            .name(Component.text(format(material))).lore(
+                List.of(Component.text("Quantity: " + shopItems.get(material)).color(NamedTextColor.GRAY), Component.text(" "),
+                    Component.text("Click to sell all!").color(NamedTextColor.GREEN))).asGuiItem(event -> {
+              quantitySold.put(material, quantity); // Update quantitySold map
 
-            // Remove the item from shopItems
-            shopItems.remove(material);
+              // Remove the item from shopItems
+              shopItems.remove(material);
 
-            // Remove item from database
-            ShopUtils.removeItem(player.getUniqueId(), material, quantity);
+              // Remove item from database
+              ShopUtils.removeItem(player.getUniqueId(), material, quantity);
 
-            // Send a message about the sold item
-            player.sendMessage(ChatColor.GREEN + "Sold item: " + material.name() + " x" + quantity);
+              // Send a message about the sold item
+              player.sendMessage(
+                  ChatColor.GREEN + "Sold item: " + material.name() + " x" + quantity);
 
-            // Refresh the menu
-            refreshGui(player, paginatedGui);
-          });
-      paginatedGui.addItem(guiItem);
+              // Refresh the menu
+              refreshGui(player, paginatedGui);
+            });
+        paginatedGui.addItem(guiItem);
+      }
     });
 
     paginatedGui.open(player);
@@ -128,31 +133,29 @@ public class PlayerShopMenuUtils {
     });
   }
 
-  public Map<Material, Integer> getShopItems(UUID uuid) {
-    SQLHelper sqlHelper = privateMines.getSqlHelper();
-    String ownerUUID = uuid.toString();
-    Map<Material, Integer> shopItems = new HashMap<>();
-
-    Results results = sqlHelper.queryResults("SELECT * FROM shops WHERE owner=?;", ownerUUID);
-
-    if (results == null) {
-      Bukkit.broadcastMessage("No results found.");
-      return null;
-    }
-
-    results.forEach(result -> {
-      String owner = result.getString(1);
-      String seller = result.getString(2);
-      String item = result.getString(3);
-      int quantity = result.get(4);
-
-      Material material = Material.getMaterial(item);
-      if (material != null) {
-        shopItems.put(material, quantity);
-      } else {
-        Bukkit.broadcastMessage("Invalid material: " + item);
-      }
-    });
-    return shopItems;
-  }
+//  public Map<Material, Long> getShopItems(UUID uuid) {
+//    SQLHelper sqlHelper = privateMines.getSqlHelper();
+//    String ownerUUID = uuid.toString();
+//    Map<Material, Long> shopItems = new HashMap<>();
+//
+//    Results results = sqlHelper.queryResults("SELECT * FROM shops WHERE owner=?;", ownerUUID);
+//
+//    if (results == null) {
+//      Bukkit.broadcastMessage("No results found.");
+//      return null;
+//    }
+//
+//    results.forEach(result -> {
+//      String item = result.getString(3);
+//      long quantity = result.getLong(4);
+//
+//      Material material = Material.getMaterial(item);
+//      if (material != null) {
+//        shopItems.put(material, quantity);
+//      } else {
+//        Bukkit.broadcastMessage("Invalid material: " + item);
+//      }
+//    });
+//    return shopItems;
+//  }
 }

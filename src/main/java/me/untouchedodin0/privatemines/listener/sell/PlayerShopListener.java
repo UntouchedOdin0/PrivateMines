@@ -1,13 +1,16 @@
 package me.untouchedodin0.privatemines.listener.sell;
 
+import java.util.Map;
 import java.util.Objects;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.playershops.Shop;
+import me.untouchedodin0.privatemines.playershops.ShopUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,12 +30,11 @@ public class PlayerShopListener implements Listener {
     if (mine != null) {
       MineData mineData = mine.getMineData();
       Shop shop = mineData.getShop();
+      ShopUtils shopUtils = new ShopUtils();
 
-      Bukkit.broadcastMessage("Block break listener lol.");
-      Bukkit.broadcastMessage("nearest mine " + mine);
-      Bukkit.broadcastMessage("mine data " + mineData);
-      Bukkit.broadcastMessage("shop " + shop);
-      Bukkit.broadcastMessage("shop prices " + Objects.requireNonNull(shop).getPrices());
+      Map<Material, Long> shopItems =  shopUtils.getShopItems(mineData.getMineOwner());
+
+      shopUtils.sellItems(player.getUniqueId(), true);
     }
   }
 }
