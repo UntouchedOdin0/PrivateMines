@@ -1,9 +1,7 @@
 package me.untouchedodin0.privatemines.playershops;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -150,7 +148,7 @@ public class ShopUtils {
         }
       });
     } else {
-      Bukkit.getLogger().warning("Mine not found for UUID: " + uuid.toString());
+      Bukkit.getLogger().warning("Mine not found for UUID: " + uuid);
     }
   }
 

@@ -19,8 +19,6 @@ import org.bukkit.entity.Player;
 
 public class PlayerShopMenuUtils {
 
-  PrivateMines privateMines = PrivateMines.getPrivateMines();
-  // private Map<Material, Long> shopItems;
   private List<ShopItem> shopItems;
   private Map<Material, Long> quantitySold;
 
@@ -50,9 +48,7 @@ public class PlayerShopMenuUtils {
             ShopUtils.removeItem(player.getUniqueId(), shopItem.getItem(), shopItem.getQuantity());
           });
           shopItems.clear();
-          quantitySold.forEach((material, aLong) -> {
-            player.sendMessage("Sold " + aLong + "x " + material.name());
-          });
+          quantitySold.forEach((material, aLong) -> player.sendMessage("Sold " + aLong + "x " + material.name()));
 
           List<GuiItem> items = paginatedGui.getPageItems().stream().filter(item -> {
             String itemName = Objects.requireNonNull(ChatColor.stripColor(

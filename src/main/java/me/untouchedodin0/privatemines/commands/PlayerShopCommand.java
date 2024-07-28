@@ -29,7 +29,6 @@ public class PlayerShopCommand extends BaseCommand {
   @Default
   @CommandPermission("privatemines.playershop")
   public synchronized void playerShop(Player player) {
-    Map<Material, Integer> shopItems = new HashMap<>();
     PlayerShopMenuUtils playerShopMenuUtils = new PlayerShopMenuUtils();
 
     if (!mineStorage.hasMine(player)) {

@@ -1,6 +1,5 @@
 package me.untouchedodin0.privatemines.playershops;
 
-import java.util.UUID;
 import org.bukkit.Material;
 
 public class ShopItem {
