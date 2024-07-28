@@ -14,6 +14,7 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.playershops.PlayerShopMenuUtils;
+import me.untouchedodin0.privatemines.playershops.ShopItem;
 import me.untouchedodin0.privatemines.playershops.ShopUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -63,7 +64,9 @@ public class PlayerShopCommand extends BaseCommand {
     } else {
       Material material = player.getInventory().getItemInMainHand().getType();
       Bukkit.broadcastMessage("" + material);
-      ShopUtils.addItem(player.getUniqueId(), material, quantity, price);
+      ShopItem shopItem = new ShopItem(material, quantity, price, 0);
+      ShopUtils.addItem(player.getUniqueId(), shopItem);
+//      ShopUtils.addItem(player.getUniqueId(), material, quantity, price);
     }
   }
 

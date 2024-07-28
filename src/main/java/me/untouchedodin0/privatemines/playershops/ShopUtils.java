@@ -1,8 +1,12 @@
 package me.untouchedodin0.privatemines.playershops;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -74,7 +78,8 @@ public class ShopUtils {
     }
   }
 
-  public static void addItem(UUID uuid, Material material, long quantity, double price) {
+
+  public static void addItem(UUID uuid, ShopItem shopItem) {
     SQLHelper sqlHelper = privateMines.getSqlHelper();
     MineStorage mineStorage = privateMines.getMineStorage();
     Mine mine = mineStorage.get(uuid);
@@ -82,9 +87,9 @@ public class ShopUtils {
     if (mine != null) {
       MineData mineData = mine.getMineData();
       String ownerUUID = uuid.toString();
-      String materialName = material.name();
+      String materialName = shopItem.getItem().name();
       double taxRate = mineData.getTax() / 100.0;
-      double finalPrice = price * (1 + taxRate);
+      double finalPrice = shopItem.getPrice() * (1 + taxRate);
 
       Bukkit.broadcastMessage("material name " + materialName);
 
@@ -110,12 +115,12 @@ public class ShopUtils {
 
           // Calculate the new quantity and check for overflow
           long newQuantity;
-          if (quantity > 0 && (Long.MAX_VALUE - currentQuantity < quantity)) {
+          if (shopItem.getQuantity() > 0 && (Long.MAX_VALUE - currentQuantity < shopItem.getQuantity())) {
             // Overflow detected
             newQuantity = Long.MAX_VALUE; // Cap to max value
             Bukkit.broadcastMessage("Overflow detected. Quantity capped to " + newQuantity);
           } else {
-            newQuantity = currentQuantity + quantity;
+            newQuantity = currentQuantity + shopItem.getQuantity();
           }
 
           // Update or insert the item in the database
@@ -148,7 +153,6 @@ public class ShopUtils {
       Bukkit.getLogger().warning("Mine not found for UUID: " + uuid.toString());
     }
   }
-
 
   public static void removeItem(UUID uuid, Material material, long quantity) {
     SQLHelper sqlHelper = privateMines.getSqlHelper();
@@ -212,10 +216,10 @@ public class ShopUtils {
     }
   }
 
-  public Map<Material, Long> getShopItems(UUID uuid) {
+  public List<ShopItem> getShopItems(UUID uuid) {
     SQLHelper sqlHelper = privateMines.getSqlHelper();
     String ownerUUID = uuid.toString();
-    Map<Material, Long> shopItems = new HashMap<>();
+    List<ShopItem> shopItems = new ArrayList<>();
 
     Results results = sqlHelper.queryResults("SELECT * FROM shops WHERE owner=?;", ownerUUID);
 
@@ -227,10 +231,13 @@ public class ShopUtils {
     results.forEach(result -> {
       String item = result.getString(3);
       long quantity = result.getLong(4);
+      double price = result.get(5);
+      double tax = result.get(6);
 
       Material material = Material.getMaterial(item);
       if (material != null) {
-        shopItems.put(material, quantity);
+        ShopItem shopItem = new ShopItem(material, quantity, price, tax);
+        shopItems.add(shopItem);
       } else {
         Bukkit.broadcastMessage("Invalid material: " + item);
       }
@@ -266,6 +273,8 @@ public class ShopUtils {
 
           Bukkit.getPlayer(uuid).sendMessage("You earnt $" + earnerAmount);
           Bukkit.getPlayer(uuid).sendMessage("You paid $" + taxAmount + " in taxes..");
+
+          shopItems.put(Material.getMaterial(item), (long) taxAmount);
         }
       });
     }

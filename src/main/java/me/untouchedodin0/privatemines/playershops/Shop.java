@@ -74,4 +74,8 @@ public class Shop {
     public void setPrices(Map<Material, Double> prices) {
         this.prices = prices;
     }
+
+    public double getPrice(Material material) {
+        return prices.get(material);
+    }
 }
