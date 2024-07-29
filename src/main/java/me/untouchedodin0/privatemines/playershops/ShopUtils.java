@@ -89,8 +89,6 @@ public class ShopUtils {
       double taxRate = mineData.getTax() / 100.0;
       double finalPrice = shopItem.getPrice() * (1 + taxRate);
 
-      Bukkit.broadcastMessage("material name " + materialName);
-
       Task.asyncDelayed(() -> {
         try {
           // Check if the item already exists
@@ -116,7 +114,6 @@ public class ShopUtils {
           if (shopItem.getQuantity() > 0 && (Long.MAX_VALUE - currentQuantity < shopItem.getQuantity())) {
             // Overflow detected
             newQuantity = Long.MAX_VALUE; // Cap to max value
-            Bukkit.broadcastMessage("Overflow detected. Quantity capped to " + newQuantity);
           } else {
             newQuantity = currentQuantity + shopItem.getQuantity();
           }
@@ -138,10 +135,6 @@ public class ShopUtils {
 
             statement.executeUpdate();
           }
-
-          Bukkit.broadcastMessage(
-              "Updated item: " + materialName + " with new quantity: " + newQuantity);
-
         } catch (Exception e) {
           Bukkit.getLogger().severe("Error updating item: " + e.getMessage());
           e.printStackTrace();
@@ -189,15 +182,10 @@ public class ShopUtils {
             // Update the quantity in the database
             String updateQuery = "UPDATE shops SET quantity = ? WHERE owner = ? AND item = ?";
             sqlHelper.executeUpdate(updateQuery, newQuantity, ownerUUID, materialName);
-
-            Bukkit.broadcastMessage(
-                "Updated item: " + materialName + " with new quantity: " + newQuantity);
             break; // Exit the retry loop on success
 
           } catch (Exception e) {
             // Log the exception and retry if needed
-            Bukkit.broadcastMessage("Error handling item removal: " + materialName);
-
             if (attempt < maxRetries) {
               try {
                 Thread.sleep(retryDelay); // Wait before retrying
@@ -222,7 +210,6 @@ public class ShopUtils {
     Results results = sqlHelper.queryResults("SELECT * FROM shops WHERE owner=?;", ownerUUID);
 
     if (results == null) {
-      Bukkit.broadcastMessage("No results found.");
       return null;
     }
 
@@ -236,8 +223,6 @@ public class ShopUtils {
       if (material != null) {
         ShopItem shopItem = new ShopItem(material, quantity, price, tax);
         shopItems.add(shopItem);
-      } else {
-        Bukkit.broadcastMessage("Invalid material: " + item);
       }
     });
     return shopItems;

@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import me.untouchedodin0.privatemines.PrivateMines;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
@@ -51,26 +50,10 @@ public class PlayerShopMenuUtils {
           quantitySold.forEach((material, aLong) -> player.sendMessage("Sold " + aLong + "x " + material.name()));
 
           List<GuiItem> items = paginatedGui.getPageItems().stream().filter(item -> {
-            String itemName = Objects.requireNonNull(ChatColor.stripColor(
-                Objects.requireNonNull(item.getItemStack().getItemMeta()).getDisplayName()));
+            String itemName = Objects.requireNonNull(item.getItemStack().getItemMeta()).getDisplayName();
             return !(itemName.equals("Previous") || itemName.equals("Sell All") || itemName.equals(
                 "Next"));
           }).toList();
-
-          // Send a message with sold quantities
-//          if (!quantitySold.isEmpty()) {
-//            StringBuilder soldMessage = new StringBuilder(ChatColor.GREEN + "Sold items: ");
-//            quantitySold.forEach(
-//                (material, quantity) -> soldMessage.append(material.name()).append(" x")
-//                    .append(quantity).append(", "));
-//            // Remove trailing comma and space
-//            if (soldMessage.length() > 2) {
-//              soldMessage.setLength(soldMessage.length() - 2);
-//            }
-//
-//
-//            player.sendMessage(soldMessage.toString());
-//          }
 
           refreshGui(player, paginatedGui);
         }));

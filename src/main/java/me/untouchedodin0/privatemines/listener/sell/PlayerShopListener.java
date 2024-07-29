@@ -31,6 +31,7 @@ public class PlayerShopListener implements Listener {
       double price = shop != null ? shop.getPrice(material) : 0;
       ShopItem shopItem = new ShopItem(material, quantity, price, 0);
       ShopUtils.addItem(mineData.getMineOwner(), shopItem);
+      event.setDropItems(false);
     }
   }
 }
