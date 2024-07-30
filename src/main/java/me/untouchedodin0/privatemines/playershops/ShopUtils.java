@@ -122,18 +122,29 @@ public class ShopUtils {
           String updateQuery;
           if (itemExists) {
             updateQuery = "UPDATE shops SET quantity = ?, price = ? WHERE owner = ? AND item = ?";
+
+            try (PreparedStatement statement = sqlHelper.getConnection()
+                .prepareStatement(updateQuery)) {
+              statement.setLong(1, newQuantity);
+              statement.setDouble(2, finalPrice);
+              statement.setString(3, ownerUUID);
+              statement.setString(4, materialName);
+
+              statement.executeUpdate();
+            }
           } else {
-            updateQuery = "INSERT INTO shops (owner, item, quantity, price) VALUES (?, ?, ?, ?)";
-          }
+            updateQuery = "INSERT INTO shops (owner, seller, item, quantity, price, tax) VALUES (?, ?, ?, ?, ?, ?)";
 
-          try (PreparedStatement statement = sqlHelper.getConnection()
-              .prepareStatement(updateQuery)) {
-            statement.setLong(1, newQuantity);
-            statement.setDouble(2, finalPrice);
-            statement.setString(3, ownerUUID);
-            statement.setString(4, materialName);
-
-            statement.executeUpdate();
+            try (PreparedStatement statement = sqlHelper.getConnection()
+                .prepareStatement(updateQuery)) {
+              statement.setString(1, ownerUUID);
+              statement.setString(2, ownerUUID);
+              statement.setString(3, materialName);
+              statement.setLong(4, newQuantity);
+              statement.setDouble(5, finalPrice);
+              statement.setDouble(6, taxRate);
+              statement.executeUpdate();
+            }
           }
         } catch (Exception e) {
           Bukkit.getLogger().severe("Error updating item: " + e.getMessage());
@@ -226,6 +237,12 @@ public class ShopUtils {
       }
     });
     return shopItems;
+  }
+
+  public void clearShopItems(UUID uuid) {
+    SQLHelper sqlHelper = privateMines.getSqlHelper();
+    String ownerUUID = uuid.toString();
+    sqlHelper.executeUpdate("DELETE FROM shops WHERE owner=?;", ownerUUID);
   }
 
   public void sellItems(UUID uuid, boolean includeTax) {

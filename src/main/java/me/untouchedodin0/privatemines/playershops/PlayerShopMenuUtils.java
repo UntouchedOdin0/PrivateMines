@@ -15,6 +15,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class PlayerShopMenuUtils {
 
@@ -46,16 +47,18 @@ public class PlayerShopMenuUtils {
             quantitySold.put(shopItem.getItem(), shopItem.getQuantity());
             ShopUtils.removeItem(player.getUniqueId(), shopItem.getItem(), shopItem.getQuantity());
           });
-          shopItems.clear();
-          quantitySold.forEach((material, aLong) -> player.sendMessage("Sold " + aLong + "x " + material.name()));
+          quantitySold.forEach(
+              (material, aLong) -> player.sendMessage("Sold " + aLong + "x " + material.name()));
 
           List<GuiItem> items = paginatedGui.getPageItems().stream().filter(item -> {
-            String itemName = Objects.requireNonNull(item.getItemStack().getItemMeta()).getDisplayName();
+            String itemName = Objects.requireNonNull(item.getItemStack().getItemMeta())
+                .getDisplayName();
             return !(itemName.equals("Previous") || itemName.equals("Sell All") || itemName.equals(
                 "Next"));
           }).toList();
 
           refreshGui(player, paginatedGui);
+          shopUtils.clearShopItems(player.getUniqueId());
         }));
 
     // Next item
@@ -80,14 +83,13 @@ public class PlayerShopMenuUtils {
               shopItems.remove(material);
 
               // Remove item from database
-//              ShopUtils.removeItem(player.getUniqueId(), material, quantity);
+              ShopUtils.removeItem(player.getUniqueId(), material, quantity);
 
               // Send a message about the sold item
               player.sendMessage(
                   ChatColor.GREEN + "Sold item: " + material.name() + " x" + quantity);
 
-              // Refresh the menu
-              refreshGui(player, paginatedGui);
+              paginatedGui.updatePageItem(event.getSlot(), new ItemStack(Material.AIR));
             });
         paginatedGui.addItem(guiItem);
       }
@@ -125,23 +127,5 @@ public class PlayerShopMenuUtils {
     });
   }
 }
-//    shopItems.forEach((material, quantity) -> {
-//      GuiItem guiItem = ItemBuilder.from(material).name(Component.text("Item: " + material.name()))
-//          .lore(List.of(Component.text("Quantity: " + quantity), Component.text(" "),
-//              Component.text("Click to sell all!"))).asGuiItem(event -> {
-//            quantitySold.put(material, quantity); // Update quantitySold map
-//
-//            // Remove the item from shopItems
-//            shopItems.remove(material);
-//
-//            // Remove item from database
-//            ShopUtils.removeItem(player.getUniqueId(), material, quantity);
-//
-//            // Send a message about the sold item
-//            player.sendMessage(ChatColor.GREEN + "Sold item: " + material.name() + " x" + quantity);
-//
-//            // Refresh the menu
-//            refreshGui(player, paginatedGui);
-//          });
-//      paginatedGui.addItem(guiItem);
+
 
