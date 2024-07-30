@@ -19,39 +19,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package me.untouchedodin0.privatemines.listener;
+package me.untouchedodin0.privatemines.events;
 
-import me.untouchedodin0.kotlin.mine.storage.MineStorage;
-import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.config.Config;
+import java.util.UUID;
 import me.untouchedodin0.privatemines.mine.Mine;
-import me.untouchedodin0.privatemines.utils.QueueUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
-public class PlayerJoinListener implements Listener {
+public class PrivateMineBanEvent extends Event {
 
-  PrivateMines privateMines = PrivateMines.getPrivateMines();
-  MineStorage mineStorage = privateMines.getMineStorage();
+  public static final HandlerList handlers = new HandlerList();
 
-  @EventHandler(priority = EventPriority.HIGHEST)
-  public void onJoin(PlayerJoinEvent playerJoinEvent) {
-    if (Config.giveMineOnFirstJoin) {
-      Player player = playerJoinEvent.getPlayer();
+  public UUID mineOwner;
+  public UUID bannedPlayer;
+  public Mine mine;
+  public boolean cancelled;
 
-      Bukkit.broadcastMessage("checking user : " + player);
+  public PrivateMineBanEvent(UUID mineOwner, UUID bannedPlayer, Mine mine) {
+    this.mineOwner = mineOwner;
+    this.bannedPlayer = bannedPlayer;
+    this.mine = mine;
+  }
 
-      QueueUtils queueUtils = privateMines.getQueueUtils();
-      if (queueUtils.isInQueue(player.getUniqueId())) {
-        player.sendMessage(ChatColor.RED + "You're already in the queue!");
-        return;
-      }
-      queueUtils.claim(player);
-    }
+  public UUID getMineOwner() {
+    return mineOwner;
+  }
+
+  public UUID getBannedPlayer() {
+    return bannedPlayer;
+  }
+
+  public Mine getMine() {
+    return mine;
+  }
+
+  public boolean isCancelled() {
+    return cancelled;
+  }
+
+  public void setCancelled(boolean cancelled) {
+    this.cancelled = cancelled;
+  }
+
+  @NotNull
+  @Override
+  public HandlerList getHandlers() {
+    return handlers;
   }
 }

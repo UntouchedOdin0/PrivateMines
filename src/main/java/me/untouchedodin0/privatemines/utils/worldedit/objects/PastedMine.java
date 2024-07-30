@@ -3,7 +3,7 @@ package me.untouchedodin0.privatemines.utils.worldedit.objects;
 import com.sk89q.worldedit.math.BlockVector3;
 import java.io.File;
 import me.untouchedodin0.privatemines.PrivateMines;
-import me.untouchedodin0.privatemines.iterator.SchematicIterator.MineBlocks;
+import me.untouchedodin0.privatemines.iterator.SchematicIteratorOriginal.MineBlocks;
 import me.untouchedodin0.privatemines.storage.SchematicStorage;
 import org.bukkit.Location;
 

@@ -39,11 +39,7 @@ data class MineData(
     var isOpen: Boolean = false,
     var tax: Double = 5.0,
 ) {
-//    fun setMineType(mineType: MineType) {
-//        this.mineType = mineType;
-//    }
-
-    private var shop: Shop? = null
+    var shop: Shop? = null
 
     var bannedPlayers: MutableList<UUID> = mutableListOf()
     var friends: MutableList<UUID> = mutableListOf()

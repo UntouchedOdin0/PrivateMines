@@ -51,7 +51,6 @@ class AudienceUtils {
 
     fun sendMessage(player: Player, textComponent: TextComponent) {
         if (privateMines.adventure != null) {
-            val miniMessage = MiniMessage.miniMessage()
             val audiences = privateMines.adventure
             val audience = audiences.player(player)
             audience.sendMessage(textComponent)

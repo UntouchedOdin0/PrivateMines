@@ -35,6 +35,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -95,5 +96,10 @@ public class Utils {
       return stringBuilder.toString();
     }
     return "";
+  }
+
+  public static String getNMSVersion() {
+    final String version = Bukkit.getServer().getClass().getPackage().getName();
+    return version.substring(version.lastIndexOf('.') + 1);
   }
 }

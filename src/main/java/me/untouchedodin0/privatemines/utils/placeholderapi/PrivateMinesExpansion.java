@@ -64,11 +64,13 @@ public class PrivateMinesExpansion extends PlaceholderExpansion {
     Player player = offlinePlayer.getPlayer();
     MineStorage mineStorage = privateMines.getMineStorage();
     Mine mine;
+    Mine closest;
 
     if (player != null) {
-      mine = mineStorage.get(Objects.requireNonNull(player.getPlayer()).getUniqueId());
-
       Location location = player.getPlayer().getLocation();
+
+      mine = mineStorage.get(Objects.requireNonNull(player.getPlayer()).getUniqueId());
+      closest = mineStorage.getClosest(location);
 
       switch (params.toLowerCase()) {
         case "size":
@@ -81,26 +83,40 @@ public class PrivateMinesExpansion extends PlaceholderExpansion {
             return Integer.toString(distance);
           }
         case "owner":
-          Mine closest = mineStorage.getClosest(location);
           if (closest != null) {
             MineData mineData = closest.getMineData();
             return String.valueOf(mineData.getMineOwner());
           }
           break;
         case "location":
-          Mine mine1 = mineStorage.get(player);
-          if (mine1 != null) {
-            return String.valueOf(mine1.getLocation());
+          if (mine != null) {
+            return String.valueOf(mine.getLocation());
           }
         case "spawn":
-          Mine mine2 = mineStorage.get(player);
-          if (mine2 != null) {
-            return LocationUtils.toString(mine2.getSpawnLocation());
+          if (mine != null) {
+            return LocationUtils.toString(mine.getSpawnLocation());
           }
         case "inqueue":
           return String.valueOf(queueUtils.isInQueue(player.getUniqueId()));
         case "hasmine":
           return String.valueOf(mineStorage.hasMine(player));
+        case "tax":
+          if (mine != null) {
+            MineData mineData = mine.getMineData();
+            double tax = mineData.getTax();
+            return String.valueOf(tax);
+          }
+        case "current_mine_tax":
+          if (closest != null) {
+            MineData mineData = closest.getMineData();
+            double tax = mineData.getTax();
+            return String.valueOf(tax);
+          }
+        case "is_public":
+          if (mine != null) {
+            MineData mineData = mine.getMineData();
+            return String.valueOf(mineData.isOpen());
+          }
       }
     }
 

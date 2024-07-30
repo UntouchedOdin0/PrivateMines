@@ -19,26 +19,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package me.untouchedodin0.privatemines.storage;
+package me.untouchedodin0.privatemines.events;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import me.untouchedodin0.privatemines.iterator.SchematicIteratorOriginal.MineBlocks;
+import java.util.UUID;
+import me.untouchedodin0.privatemines.mine.Mine;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
-public class SchematicStorage {
+public class PrivateMineUnbanEvent extends Event {
 
-  private final Map<File, MineBlocks> mineBlocksMap = new HashMap<>();
+  public static final HandlerList handlers = new HandlerList();
 
-  public void addSchematic(File file, MineBlocks mineBlocks) {
-    mineBlocksMap.putIfAbsent(file, mineBlocks);
+  public UUID mineOwner;
+  public UUID bannedPlayer;
+  public Mine mine;
+  public boolean cancelled;
+
+  public PrivateMineUnbanEvent(UUID mineOwner, UUID bannedPlayer, Mine mine) {
+    this.mineOwner = mineOwner;
+    this.bannedPlayer = bannedPlayer;
+    this.mine = mine;
   }
 
-  public Map<File, MineBlocks> getMineBlocksMap() {
-    return mineBlocksMap;
+  public UUID getMineOwner() {
+    return mineOwner;
   }
 
-  public MineBlocks get(File file) {
-    return mineBlocksMap.get(file);
+  public UUID getBannedPlayer() {
+    return bannedPlayer;
+  }
+
+  public Mine getMine() {
+    return mine;
+  }
+
+  public boolean isCancelled() {
+    return cancelled;
+  }
+
+  public void setCancelled(boolean cancelled) {
+    this.cancelled = cancelled;
+  }
+
+  @NotNull
+  @Override
+  public HandlerList getHandlers() {
+    return handlers;
   }
 }

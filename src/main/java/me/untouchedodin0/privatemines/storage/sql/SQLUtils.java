@@ -1,5 +1,6 @@
 package me.untouchedodin0.privatemines.storage.sql;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +17,7 @@ import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
@@ -129,8 +131,10 @@ public class SQLUtils {
     MineData mineData = mine.getMineData();
     String owner = mineData.getMineOwner().toString();
     String dropQuery = String.format("DELETE FROM privatemines WHERE owner = '%s'", owner);
+    String dropShopQuery = String.format("DELETE FROM shops WHERE owner = '%s'", owner);
 
     Task.asyncDelayed(() -> sqlHelper.executeUpdate(dropQuery));
+    Task.asyncDelayed(() -> sqlHelper.executeUpdate(dropShopQuery));
   }
 
   public static void insertPregen(PregenMine pregenMine) {
@@ -228,3 +232,4 @@ public class SQLUtils {
 //    });
   }
 }
+

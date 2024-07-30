@@ -24,6 +24,7 @@ package me.untouchedodin0.kotlin.mine.pregen
 import me.untouchedodin0.privatemines.PrivateMines
 import me.untouchedodin0.privatemines.utils.Utils
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import redempt.redlib.misc.LocationUtils
@@ -42,6 +43,7 @@ class PregenMine {
 
 
     fun teleport(player: Player) {
+        spawnLocation?.block!!.type = Material.AIR
         spawnLocation?.let(player::teleport)
     }
 }
