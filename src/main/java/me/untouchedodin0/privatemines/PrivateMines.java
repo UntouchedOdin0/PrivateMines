@@ -22,6 +22,7 @@
 package me.untouchedodin0.privatemines;
 
 import co.aikar.commands.BukkitCommandManager;
+import co.aikar.commands.CommandManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -114,18 +115,6 @@ public class PrivateMines extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    System.out.println("                             ");
-    System.out.println("Hello, this a warning message");
-    System.out.println("to inform you that you're using");
-    System.out.println("a heavily in development version.");
-    System.out.println("I do not take any responsibility");
-    System.out.println("for this being used on production");
-    System.out.println("and breaking stuff.");
-    System.out.println("YOU HAVE BEEN WARNED.");
-    System.out.println("                             ");
-    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
     Instant start = Instant.now();
     getLogger().info("Loading Private Mines v" + getDescription().getVersion());
     saveDefaultConfig();
@@ -223,6 +212,7 @@ public class PrivateMines extends JavaPlugin {
     });
 
     BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
+    bukkitCommandManager.enableUnstableAPI("help");
 
     bukkitCommandManager.registerCommand(new PrivateMinesCommand());
     bukkitCommandManager.registerCommand(new PublicMinesCommand());
@@ -287,7 +277,7 @@ public class PrivateMines extends JavaPlugin {
     sqlHelper.setAutoCommit(true);
 
     Task.asyncDelayed(this::loadMines);
-    Task.asyncDelayed(this::loadShops);
+//    Task.asyncDelayed(this::loadShops);
     Task.asyncDelayed(SQLUtils::loadPregens);
     Task.asyncDelayed(this::loadAddons);
 
@@ -400,11 +390,6 @@ public class PrivateMines extends JavaPlugin {
     SQLHelper sqlHelper = getSqlHelper();
     Results results = sqlHelper.queryResults("SELECT * FROM shops");
 
-    privateMines.getLogger().info("------");
-    privateMines.getLogger().info("- load shops -");
-    privateMines.getLogger().info("sql helper " + sqlHelper);
-    privateMines.getLogger().info("results " + results);
-
     results.forEach(result -> {
       String owner = result.getString(1);
       String seller = result.getString(2);
@@ -412,14 +397,6 @@ public class PrivateMines extends JavaPlugin {
       int quantity = result.get(4);
       double price = result.get(5);
       double tax = result.get(6);
-
-      privateMines.getLogger().info("result " + result);
-      privateMines.getLogger().info("owner " + owner);
-      privateMines.getLogger().info("seller");
-      privateMines.getLogger().info("item " + item);
-      privateMines.getLogger().info("quantity " + quantity);
-      privateMines.getLogger().info("price " + price);
-      privateMines.getLogger().info("tax " + tax);
     });
   }
 

@@ -67,6 +67,8 @@ import me.untouchedodin0.privatemines.events.PrivateMineUpgradeEvent;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.regions.RegionUtils;
+import me.untouchedodin0.privatemines.utils.regions.RegionUtils.SplitMode;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import me.untouchedodin0.privatemines.utils.worldedit.PasteHelper;
 import me.untouchedodin0.privatemines.utils.worldedit.objects.PastedMine;
@@ -512,7 +514,7 @@ public class Mine {
       }
     }
 
-    if (percentageTask == null) {
+/*    if (percentageTask == null) {
       //Create a new Bukkit task async
       this.percentageTask = Task.syncRepeating(() -> {
         double percentage = getPercentage();
@@ -521,7 +523,7 @@ public class Mine {
           handleReset();
         }
       }, 0, 80);
-    }
+    }*/
     if (owner != null) {
       audienceUtils.sendMessage(owner, MessagesConfig.mineReset);
     }

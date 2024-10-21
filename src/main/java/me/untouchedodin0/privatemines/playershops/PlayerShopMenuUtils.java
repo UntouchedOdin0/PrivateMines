@@ -2,17 +2,21 @@ package me.untouchedodin0.privatemines.playershops;
 
 import static me.untouchedodin0.privatemines.utils.Utils.format;
 
+import de.rapha149.signgui.SignGUI;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import dev.triumphteam.gui.guis.PaginatedGui;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -74,10 +78,46 @@ public class PlayerShopMenuUtils {
         GuiItem guiItem = ItemBuilder.from(material).name(Component.text(format(material))).lore(
                 List.of(
                     Component.text("Quantity: " + shopItem.getQuantity()).color(NamedTextColor.GRAY),
-                    Component.text("Price: " + price), Component.text(" "),
+                    Component.text("Price: " + price),
+                    Component.text(" "),
+                    Component.text("Right-Click to set price"),
                     Component.text("Click to sell all!").color(NamedTextColor.GREEN)))
             .asGuiItem(event -> {
-              quantitySold.put(material, quantity); // Update quantitySold map
+
+              switch (event.getClick()) {
+                case LEFT -> {
+                  player.sendMessage("selling all items lol");
+                  quantitySold.put(material, quantity); // Update quantitySold map
+
+                  // Remove the item from shopItems
+                  shopItems.remove(material);
+
+                  // Remove item from database
+                  ShopUtils.removeItem(player.getUniqueId(), material, quantity);
+
+                  // Send a message about the sold item
+                  player.sendMessage(
+                      ChatColor.GREEN + "Sold item: " + material.name() + " x" + quantity);
+
+                  paginatedGui.updatePageItem(event.getSlot(), new ItemStack(Material.AIR));
+                }
+                case SHIFT_RIGHT -> {
+                  SignGUI gui = SignGUI.builder()
+                      .setLine(0, "Enter Price")
+                      .setType(Material.SIGN)
+                      .setColor(DyeColor.YELLOW)
+                      .setHandler(((player1, result) -> {
+
+                        String line0 = result.getLine(0);
+                        String[] lines = result.getLines();
+
+                        Bukkit.broadcastMessage("line0 " + line0);
+                        Bukkit.broadcastMessage("lines " + lines);
+                        return Collections.emptyList();
+                      })).build();
+                }
+              }
+/*              quantitySold.put(material, quantity); // Update quantitySold map
 
               // Remove the item from shopItems
               shopItems.remove(material);
@@ -89,7 +129,7 @@ public class PlayerShopMenuUtils {
               player.sendMessage(
                   ChatColor.GREEN + "Sold item: " + material.name() + " x" + quantity);
 
-              paginatedGui.updatePageItem(event.getSlot(), new ItemStack(Material.AIR));
+              paginatedGui.updatePageItem(event.getSlot(), new ItemStack(Material.AIR));*/
             });
         paginatedGui.addItem(guiItem);
       }

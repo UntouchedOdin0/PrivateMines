@@ -1,6 +1,5 @@
 package me.untouchedodin0.privatemines.storage.sql;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,7 +16,6 @@ import me.untouchedodin0.privatemines.utils.Utils;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
 import redempt.redlib.sql.SQLHelper;
@@ -32,16 +30,22 @@ public class SQLUtils {
   public static Location getCurrentLocation() {
     MineWorldManager mineWorldManager = PrivateMines.getPrivateMines().getMineWorldManager();
     SQLHelper sqlHelper = privateMines.getSqlHelper();
-    Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
-    var ref = new Object() {
-      Location location = null;
-    };
 
-    if (results.isEmpty()) {
+    if (sqlHelper == null) {
+      privateMines.getLogger().warning("sqlHelper is null in SQLUtils.");
       return mineWorldManager.getDefaultLocation();
     } else {
-      results.forEach(results1 -> ref.location = LocationUtils.fromString(results1.getString(3)));
-      return ref.location;
+      Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
+      var ref = new Object() {
+        Location location = null;
+      };
+
+      if (results.isEmpty()) {
+        return mineWorldManager.getDefaultLocation();
+      } else {
+        results.forEach(results1 -> ref.location = LocationUtils.fromString(results1.getString(3)));
+        return ref.location;
+      }
     }
   }
 
