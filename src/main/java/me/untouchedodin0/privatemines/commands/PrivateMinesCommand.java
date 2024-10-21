@@ -26,7 +26,6 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
-import co.aikar.commands.annotation.Split;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -47,6 +46,7 @@ import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.AudienceUtils;
+import me.untouchedodin0.kotlin.utils.FlagUtils;
 import me.untouchedodin0.kotlin.utils.Range;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
@@ -209,7 +209,8 @@ public class PrivateMinesCommand extends BaseCommand {
       if (mine != null) {
         mine.upgrade();
         mine.reset();
-        audienceUtils.sendMessage(Objects.requireNonNull(target.getPlayer()), MessagesConfig.mineUpgraded);
+        audienceUtils.sendMessage(Objects.requireNonNull(target.getPlayer()),
+            MessagesConfig.mineUpgraded);
 
         List<Player> players = new ArrayList<>();
 
@@ -268,11 +269,11 @@ public class PrivateMinesCommand extends BaseCommand {
     } else {
       Mine mine = mineStorage.get(target.getUniqueId());
       if (mine != null) {
+        mine.reset();
         mine.handleReset();
       }
     }
   }
-
 
   @Subcommand("reset")
   @CommandPermission("privatemines.reset")
@@ -330,6 +331,7 @@ public class PrivateMinesCommand extends BaseCommand {
   @CommandCompletion("@players")
   @CommandPermission("privatemines.go")
   @Syntax("<target>")
+  @CommandAlias("visit")
   public void go(Player player, OfflinePlayer target) {
     if (target.getPlayer() != null) {
       Player targetPlayer = target.getPlayer();
@@ -459,18 +461,24 @@ public class PrivateMinesCommand extends BaseCommand {
   @Subcommand("setblocks")
   @CommandCompletion("@players")
   @CommandPermission("privatemines.setblocks")
-  @Syntax("<target> <materials> e.g. DIRT, STONE")
-  public void setBlocks(CommandSender sender, OfflinePlayer target,
-      @Split(",") String[] materials) {
+  @Syntax("<target> <materials> STONE, DIRT")
+  public void setBlocks(CommandSender sender, OfflinePlayer target, String materials) {
     Map<Material, Double> map = new HashMap<>();
 
-    for (String s : materials) {
-      if (Material.getMaterial(s.toUpperCase()) == null) {
-        sender.sendMessage(ChatColor.RED + "Failed to find Material: " + s);
-        return;
+    // Split the materials string into an array
+    String[] materialArray = materials.split(",");
+
+    for (String string : materialArray) {
+      // Valid format, proceed with getting the material and percent values.
+      String[] parts = string.split(";");
+      if (parts.length == 1) {
+        Material material = Material.getMaterial(parts[0].toUpperCase());
+        map.put(material, 1.0);
+      } else if (parts.length == 2) {
+        Material material = Material.getMaterial(parts[0].toUpperCase());
+        double percentage = Double.parseDouble(parts[1]);
+        map.put(material, percentage);
       }
-      Material material = Material.valueOf(s.toUpperCase());
-      map.put(material, 1.0);
     }
 
     if (target != null) {
@@ -504,48 +512,57 @@ public class PrivateMinesCommand extends BaseCommand {
 
       PregenStorage pregenStorage = privateMines.getPregenStorage();
       if (pregenStorage.isAllRedeemed()) {
-//        player.sendMessage(ChatColor.RED + "All the mines have been claimed...");
         audienceUtils.sendMessage(player, MessagesConfig.allMinesClaimed);
       } else {
         PregenMine pregenMine = pregenStorage.getAndRemove();
         MineType mineType = mineTypeManager.getDefaultMineType();
-        Location location = pregenMine.getLocation();
-        Location spawn = pregenMine.getSpawnLocation();
-        Location corner1 = pregenMine.getLowerRails();
-        Location corner2 = pregenMine.getUpperRails();
-        Location minimum = pregenMine.getFullMin();
-        Location maximum = pregenMine.getFullMax();
-        BlockVector3 miningRegionMin = BukkitAdapter.asBlockVector(Objects.requireNonNull(corner1));
-        BlockVector3 miningRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(corner2));
-        BlockVector3 fullRegionMin = BukkitAdapter.asBlockVector(Objects.requireNonNull(minimum));
-        BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(maximum));
+        Location location;
+        if (pregenMine != null) {
+          location = pregenMine.getLocation();
+          Location spawn = pregenMine.getSpawnLocation();
+          Location corner1 = pregenMine.getLowerRails();
+          Location corner2 = pregenMine.getUpperRails();
+          Location minimum = pregenMine.getFullMin();
+          Location maximum = pregenMine.getFullMax();
+          BlockVector3 miningRegionMin = BukkitAdapter.asBlockVector(
+              Objects.requireNonNull(corner1));
+          BlockVector3 miningRegionMax = BukkitAdapter.asBlockVector(
+              Objects.requireNonNull(corner2));
+          BlockVector3 fullRegionMin = BukkitAdapter.asBlockVector(Objects.requireNonNull(minimum));
+          BlockVector3 fullRegionMax = BukkitAdapter.asBlockVector(Objects.requireNonNull(maximum));
+          FlagUtils flagUtils = new FlagUtils();
 
-        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionManager regionManager = container.get(
-            BukkitAdapter.adapt(Objects.requireNonNull(spawn).getWorld()));
+          RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+          RegionManager regionManager = container.get(
+              BukkitAdapter.adapt(Objects.requireNonNull(spawn).getWorld()));
 
-        ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName,
-            miningRegionMin, miningRegionMax);
-        ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName, fullRegionMin,
-            fullRegionMax);
+          ProtectedCuboidRegion miningRegion = new ProtectedCuboidRegion(mineRegionName,
+              miningRegionMin, miningRegionMax);
+          ProtectedCuboidRegion fullRegion = new ProtectedCuboidRegion(fullRegionName,
+              fullRegionMin, fullRegionMax);
 
-        if (regionManager != null) {
-          regionManager.addRegion(miningRegion);
-          regionManager.addRegion(fullRegion);
+          if (regionManager != null) {
+            regionManager.addRegion(miningRegion);
+            regionManager.addRegion(fullRegion);
+          }
+
+          Mine mine = new Mine(privateMines);
+          MineData mineData = new MineData(player.getUniqueId(), corner2, corner1, minimum, maximum,
+              Objects.requireNonNull(location), spawn, mineType, false, 5.0);
+          mine.setMineData(mineData);
+          SQLUtils.claim(location);
+          SQLUtils.insert(mine);
+
+          mineStorage.addMine(player.getUniqueId(), mine);
+
+          Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
+          Task.syncDelayed(() -> flagUtils.setFlags(mine));
+          pregenMine.teleport(player);
+          Task.syncDelayed(
+              () -> Objects.requireNonNull(pregenMine.getSpawnLocation()).subtract(0, 0, 1)
+                  .getBlock().setType(Material.AIR));
+          mine.handleReset();
         }
-
-        Mine mine = new Mine(privateMines);
-        MineData mineData = new MineData(player.getUniqueId(), corner2, corner1, minimum, maximum,
-            Objects.requireNonNull(location), spawn, mineType, false, 5.0);
-        mine.setMineData(mineData);
-        SQLUtils.claim(location);
-        SQLUtils.insert(mine);
-
-        mineStorage.addMine(player.getUniqueId(), mine);
-
-        Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
-        pregenMine.teleport(player);
-        mine.handleReset();
       }
     }
   }

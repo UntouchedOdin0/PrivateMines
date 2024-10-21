@@ -30,16 +30,22 @@ public class SQLUtils {
   public static Location getCurrentLocation() {
     MineWorldManager mineWorldManager = PrivateMines.getPrivateMines().getMineWorldManager();
     SQLHelper sqlHelper = privateMines.getSqlHelper();
-    Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
-    var ref = new Object() {
-      Location location = null;
-    };
 
-    if (results.isEmpty()) {
+    if (sqlHelper == null) {
+      privateMines.getLogger().warning("sqlHelper is null in SQLUtils.");
       return mineWorldManager.getDefaultLocation();
     } else {
-      results.forEach(results1 -> ref.location = LocationUtils.fromString(results1.getString(3)));
-      return ref.location;
+      Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
+      var ref = new Object() {
+        Location location = null;
+      };
+
+      if (results.isEmpty()) {
+        return mineWorldManager.getDefaultLocation();
+      } else {
+        results.forEach(results1 -> ref.location = LocationUtils.fromString(results1.getString(3)));
+        return ref.location;
+      }
     }
   }
 
@@ -129,8 +135,10 @@ public class SQLUtils {
     MineData mineData = mine.getMineData();
     String owner = mineData.getMineOwner().toString();
     String dropQuery = String.format("DELETE FROM privatemines WHERE owner = '%s'", owner);
+    String dropShopQuery = String.format("DELETE FROM shops WHERE owner = '%s'", owner);
 
     Task.asyncDelayed(() -> sqlHelper.executeUpdate(dropQuery));
+    Task.asyncDelayed(() -> sqlHelper.executeUpdate(dropShopQuery));
   }
 
   public static void insertPregen(PregenMine pregenMine) {
@@ -228,3 +236,4 @@ public class SQLUtils {
 //    });
   }
 }
+

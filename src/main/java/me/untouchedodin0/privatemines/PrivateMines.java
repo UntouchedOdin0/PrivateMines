@@ -21,7 +21,8 @@
 
 package me.untouchedodin0.privatemines;
 
-import co.aikar.commands.PaperCommandManager;
+import co.aikar.commands.BukkitCommandManager;
+import co.aikar.commands.CommandManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -34,26 +35,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.storage.MineStorage;
 import me.untouchedodin0.kotlin.mine.storage.PregenStorage;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.privatemines.commands.AddonsCommand;
+import me.untouchedodin0.privatemines.commands.PlayerShopCommand;
 import me.untouchedodin0.privatemines.commands.PrivateMinesCommand;
 import me.untouchedodin0.privatemines.commands.PublicMinesCommand;
+import me.untouchedodin0.privatemines.commands.UsePlayerShopCommand;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MenuConfig;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
 import me.untouchedodin0.privatemines.config.MineConfig;
 import me.untouchedodin0.privatemines.factory.MineFactory;
 import me.untouchedodin0.privatemines.iterator.SchematicIterator;
+import me.untouchedodin0.privatemines.iterator.SchematicIteratorOriginal;
+import me.untouchedodin0.privatemines.iterator.SchematicIteratorOriginal.MineBlocks;
 import me.untouchedodin0.privatemines.listener.MineResetListener;
 import me.untouchedodin0.privatemines.listener.PlayerJoinListener;
 import me.untouchedodin0.privatemines.listener.sell.AutoSellListener;
+import me.untouchedodin0.privatemines.listener.sell.PlayerShopListener;
 import me.untouchedodin0.privatemines.listener.sell.UPCSellListener;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
@@ -63,7 +67,6 @@ import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.storage.sql.SQLite;
 import me.untouchedodin0.privatemines.utils.QueueUtils;
 import me.untouchedodin0.privatemines.utils.UpdateChecker;
-import me.untouchedodin0.privatemines.utils.addon.Addon;
 import me.untouchedodin0.privatemines.utils.addon.AddonManager;
 import me.untouchedodin0.privatemines.utils.placeholderapi.PrivateMinesExpansion;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
@@ -77,11 +80,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.Task;
-import redempt.redlib.sql.SQLCache;
 import redempt.redlib.sql.SQLHelper;
 import redempt.redlib.sql.SQLHelper.Results;
 
@@ -94,6 +95,7 @@ public class PrivateMines extends JavaPlugin {
   private final Path schematicsDirectory = getDataFolder().toPath().resolve("schematics");
   private final Path addonsDirectory = getDataFolder().toPath().resolve("addons");
   private SchematicStorage schematicStorage;
+  private SchematicIteratorOriginal schematicIteratorOriginal;
   private SchematicIterator schematicIterator;
   private MineFactory mineFactory;
   private MineStorage mineStorage;
@@ -104,7 +106,6 @@ public class PrivateMines extends JavaPlugin {
   private static Economy econ = null;
   private SQLite sqlite;
   private SQLHelper sqlHelper;
-  private Map<String, SQLCache> caches;
   private BukkitAudiences adventure;
   private AddonManager addonManager;
 
@@ -118,7 +119,6 @@ public class PrivateMines extends JavaPlugin {
     getLogger().info("Loading Private Mines v" + getDescription().getVersion());
     saveDefaultConfig();
     saveResource("menus.yml", false);
-//    saveResource("messages_en.yml", false);
     saveLocales();
 
     privateMines = this;
@@ -202,16 +202,23 @@ public class PrivateMines extends JavaPlugin {
         return;
       }
 
-      SchematicIterator.MineBlocks mineBlocks = schematicIterator.findRelativePoints(schematicFile);
-      schematicStorage.addSchematic(schematicFile, mineBlocks);
+      if (Config.useNewSchematicLoader) {
+        MineBlocks mineBlocksRewrite = schematicIterator.findRelativePoints(schematicFile);
+        schematicStorage.addSchematic(schematicFile, mineBlocksRewrite);
+      } else {
+        MineBlocks mineBlocksOriginal = schematicIteratorOriginal.findRelativePoints(schematicFile);
+        schematicStorage.addSchematic(schematicFile, mineBlocksOriginal);
+      }
     });
 
-    PaperCommandManager paperCommandManager = new PaperCommandManager(this);
-    paperCommandManager.enableUnstableAPI("help");
+    BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
+    bukkitCommandManager.enableUnstableAPI("help");
 
-    paperCommandManager.registerCommand(new PrivateMinesCommand());
-    paperCommandManager.registerCommand(new PublicMinesCommand());
-    paperCommandManager.registerCommand(new AddonsCommand());
+    bukkitCommandManager.registerCommand(new PrivateMinesCommand());
+    bukkitCommandManager.registerCommand(new PublicMinesCommand());
+    bukkitCommandManager.registerCommand(new AddonsCommand());
+    bukkitCommandManager.registerCommand(new PlayerShopCommand());
+    bukkitCommandManager.registerCommand(new UsePlayerShopCommand());
 
     File dataFolder = new File(privateMines.getDataFolder(), "privatemines.db");
     if (!dataFolder.exists()) {
@@ -255,19 +262,22 @@ public class PrivateMines extends JavaPlugin {
         max_full VARCHAR(20)
         );
         """);
+    sqlHelper.executeUpdate("""
+            CREATE TABLE IF NOT EXISTS shops (
+            owner VARCHAR(36) NOT NULL,
+            seller VARCHAR(36) NOT NULL,
+            item VARCHAR(50) NOT NULL,
+            quantity LONG NOT NULL,
+            price DOUBLE NOT NULL,
+            tax DOUBLE NOT NULL,
+            PRIMARY KEY (owner, item)
+            );
+        """);
+
     sqlHelper.setAutoCommit(true);
 
-    this.caches = new HashMap<>();
-
-    String databaseName = "privatemines";
-    List<String> cacheNames = List.of("owner", "mineType", "mineLocation", "corner1", "corner2");
-
-    cacheNames.forEach(string -> {
-      SQLCache sqlCache = sqlHelper.createCache(databaseName, string);
-      caches.put(string, sqlCache);
-    });
-
-    Task.asyncDelayed(this::loadSQLMines);
+    Task.asyncDelayed(this::loadMines);
+//    Task.asyncDelayed(this::loadShops);
     Task.asyncDelayed(SQLUtils::loadPregens);
     Task.asyncDelayed(this::loadAddons);
 
@@ -305,9 +315,9 @@ public class PrivateMines extends JavaPlugin {
     sqlHelper.close();
   }
 
-
   public void setupSchematicUtils() {
     this.schematicStorage = new SchematicStorage();
+    this.schematicIteratorOriginal = new SchematicIteratorOriginal(getSchematicStorage());
     this.schematicIterator = new SchematicIterator(getSchematicStorage());
   }
 
@@ -324,7 +334,7 @@ public class PrivateMines extends JavaPlugin {
     return true;
   }
 
-  public void loadSQLMines() {
+  public void loadMines() {
     SQLHelper sqlHelper = getSqlHelper();
     Results results = sqlHelper.queryResults("SELECT * FROM privatemines;");
 
@@ -339,20 +349,22 @@ public class PrivateMines extends JavaPlugin {
       String spawn = result.getString(8);
       double tax = result.get(9);
       int isOpen = result.get(10);
-//      String resultsMaterial = result.getString(13);
-//      resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
-//
-//      Map<Material, Double> materials = new HashMap<>();
-//
-//      String[] pairs = resultsMaterial.split("\\s*,\\s*");
-//
-//      for (String string : pairs) {
-//        String[] parts = string.split("=");
-//        String matString = parts[0];
-//        double percent = Double.parseDouble(parts[1].substring(0, parts[1].length() - 1));
-//        Material material = Material.valueOf(matString);
-//        materials.put(material, percent);
-//      }
+      String resultsMaterial = result.getString(13);
+      Map<Material, Double> materials = new HashMap<>();
+
+      if (!resultsMaterial.isEmpty()) {
+        resultsMaterial = resultsMaterial.substring(1); // remove starting '{'
+
+        String[] pairs = resultsMaterial.split("\\s*,\\s*");
+
+        for (String string : pairs) {
+          String[] parts = string.split("=");
+          String matString = parts[0];
+          double percent = Double.parseDouble(parts[1].substring(0, parts[1].length() - 1));
+          Material material = Material.valueOf(matString);
+          materials.put(material, percent);
+        }
+      }
 
       Mine mine = new Mine(this);
       UUID uuid = UUID.fromString(owner);
@@ -367,10 +379,24 @@ public class PrivateMines extends JavaPlugin {
 
       MineData mineData = new MineData(uuid, minMining, maxMining, fullMin, fullMax, location,
           spawnLocation, type, open, tax);
-//      mineData.setMaterials(materials); - This breaks it for some reason
+      mineData.setMaterials(materials);
       mine.setMineData(mineData);
 
       mineStorage.addMine(uuid, mine);
+    });
+  }
+
+  public void loadShops() {
+    SQLHelper sqlHelper = getSqlHelper();
+    Results results = sqlHelper.queryResults("SELECT * FROM shops");
+
+    results.forEach(result -> {
+      String owner = result.getString(1);
+      String seller = result.getString(2);
+      String item = result.getString(3);
+      int quantity = result.get(4);
+      double price = result.get(5);
+      double tax = result.get(6);
     });
   }
 
@@ -456,6 +482,7 @@ public class PrivateMines extends JavaPlugin {
 
   private void registerListeners() {
     getServer().getPluginManager().registerEvents(new MineResetListener(), this);
+    getServer().getPluginManager().registerEvents(new PlayerShopListener(), this);
   }
 
   public SQLHelper getSqlHelper() {

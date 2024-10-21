@@ -22,6 +22,7 @@ import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.mine.Mine;
 import me.untouchedodin0.privatemines.mine.MineTypeManager;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -87,10 +88,6 @@ public class QueueUtils {
             }
           }
           int estimateSeconds = place.get() * 3;
-
-//          player.sendTitle(ChatColor.GREEN + "You're at slot #" + slot.get(),
-//              ChatColor.YELLOW + String.format(" Estimated wait time: %d seconds!",
-//                  estimateSeconds));
         }
       }
     }, 0L, 60L);
@@ -105,6 +102,12 @@ public class QueueUtils {
 
         PregenMine pregenMine = pregenStorage.getAndRemove();
         MineType mineType = mineTypeManager.getDefaultMineType();
+
+        if (pregenMine == null) {
+          privateMines.getLogger().info("No pregen mines are left.");
+          return;
+        }
+
         Location location = pregenMine.getLocation();
         Location spawn = pregenMine.getSpawnLocation();
         Location corner1 = pregenMine.getLowerRails();
@@ -139,7 +142,7 @@ public class QueueUtils {
 
         mineStorage.addMine(player.getUniqueId(), mine);
 
-        Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
+        spawn.getBlock().setType(Material.AIR);
         pregenMine.teleport(player);
         mine.handleReset();
       }

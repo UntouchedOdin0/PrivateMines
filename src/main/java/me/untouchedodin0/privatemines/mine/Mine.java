@@ -22,13 +22,16 @@
 package me.untouchedodin0.privatemines.mine;
 
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -42,10 +45,12 @@ import io.th0rgal.oraxen.api.OraxenBlocks;
 import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import me.untouchedodin0.kotlin.mine.data.MineData;
 import me.untouchedodin0.kotlin.mine.type.MineType;
 import me.untouchedodin0.kotlin.utils.AudienceUtils;
@@ -53,13 +58,17 @@ import me.untouchedodin0.kotlin.utils.FlagUtils;
 import me.untouchedodin0.privatemines.PrivateMines;
 import me.untouchedodin0.privatemines.config.Config;
 import me.untouchedodin0.privatemines.config.MessagesConfig;
+import me.untouchedodin0.privatemines.events.PrivateMineBanEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineDeleteEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineExpandEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineResetEvent;
+import me.untouchedodin0.privatemines.events.PrivateMineTeleportEvent;
 import me.untouchedodin0.privatemines.events.PrivateMineUpgradeEvent;
 import me.untouchedodin0.privatemines.storage.sql.SQLUtils;
 import me.untouchedodin0.privatemines.utils.ExpansionUtils;
 import me.untouchedodin0.privatemines.utils.Utils;
+import me.untouchedodin0.privatemines.utils.regions.RegionUtils;
+import me.untouchedodin0.privatemines.utils.regions.RegionUtils.SplitMode;
 import me.untouchedodin0.privatemines.utils.world.MineWorldManager;
 import me.untouchedodin0.privatemines.utils.worldedit.PasteHelper;
 import me.untouchedodin0.privatemines.utils.worldedit.objects.PastedMine;
@@ -80,7 +89,6 @@ public class Mine {
   private boolean canExpand = true;
   private Task task;
   private Task percentageTask = null;
-  private int airBlocks;
   AudienceUtils audienceUtils = new AudienceUtils();
 
   public Mine(PrivateMines privateMines) {
@@ -108,10 +116,15 @@ public class Mine {
   }
 
   public void teleport(Player player) {
-    if (getSpawnLocation().getBlock().getType().isBlock()) {
-      getSpawnLocation().getBlock().setType(Material.AIR, false);
-      player.teleport(getSpawnLocation());
-      audienceUtils.sendMessage(player, MessagesConfig.teleportedToOwnMine);
+    PrivateMineTeleportEvent privateMineTeleportEvent = new PrivateMineTeleportEvent(player, this);
+    Task.syncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineTeleportEvent));
+
+    if (!privateMineTeleportEvent.isCancelled()) {
+      if (getSpawnLocation().getBlock().getType().isBlock()) {
+        getSpawnLocation().getBlock().setType(Material.AIR, false);
+        player.teleport(getSpawnLocation());
+        audienceUtils.sendMessage(player, MessagesConfig.teleportedToOwnMine);
+      }
     }
   }
 
@@ -437,6 +450,7 @@ public class Mine {
         mineData.getMinimumMining().getBlockY(), mineData.getMinimumMining().getBlockZ()),
         BlockVector3.at(mineData.getMaximumMining().getBlockX(),
             mineData.getMaximumMining().getBlockY(), mineData.getMaximumMining().getBlockZ()));
+    World world = getSpawnLocation().getWorld();
 
     if (Config.addWallGap) {
       for (int i = 0; i < Config.wallsGap; i++) {
@@ -444,19 +458,20 @@ public class Mine {
       }
     }
 
-    long total = region.getVolume();
+    double percentage = 0.0;
 
-    // Calculate the percetage of the region called "region" to then compare with how many blocks have been mined.
-    airBlocks = 0;
-    for (BlockVector3 vector : region) {
-      Block block = Objects.requireNonNull(Bukkit.getWorld(
-              Objects.requireNonNull(Objects.requireNonNull(getSpawnLocation()).getWorld()).getName()))
-          .getBlockAt(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
-      if (block.getType().equals(Material.AIR)) {
-        this.airBlocks++;
-      }
+    try (EditSession editSession = WorldEdit.getInstance()
+        .newEditSession(BukkitAdapter.adapt(world))) {
+      BlockType air = BukkitAdapter.asBlockType(Material.AIR);
+      BlockTypeMask mask = new BlockTypeMask(editSession, air);
+
+      int airBlocks = editSession.countBlocks(region, mask);
+      int totalBlocks = region.size();
+      percentage = ((double) airBlocks / totalBlocks) * 100;
+    } catch (MaxChangedBlocksException e) {
+      privateMines.getLogger().log(Level.WARNING, "An error occurred during the edit session", e);
     }
-    return (float) airBlocks * 100L / total;
+    return percentage;
   }
 
   public void handleReset() {
@@ -499,17 +514,16 @@ public class Mine {
       }
     }
 
-    if (percentageTask == null) {
+/*    if (percentageTask == null) {
       //Create a new Bukkit task async
       this.percentageTask = Task.syncRepeating(() -> {
         double percentage = getPercentage();
         double resetPercentage = mineType.getResetPercentage();
         if (percentage > resetPercentage) {
           handleReset();
-          airBlocks = 0;
         }
       }, 0, 80);
-    }
+    }*/
     if (owner != null) {
       audienceUtils.sendMessage(owner, MessagesConfig.mineReset);
     }
@@ -519,7 +533,7 @@ public class Mine {
     MineType mineType = mineData.getMineType();
 
     if (task == null) {
-      this.task = Task.syncRepeating(this::handleReset, 0L, mineType.getResetTime() * 20L);
+      this.task = Task.syncRepeating(this::handleReset, 0L, mineType.getResetTime() * 60 * 20L);
     }
   }
 
@@ -533,32 +547,51 @@ public class Mine {
     privateMines.getLogger().info("Stopped tasks for mine " + mineData.getMineOwner());
   }
 
-
   public void ban(Player player) {
-    if (mineData.getBannedPlayers().contains(player.getUniqueId())) {
-      return;
-    }
-    Player owner = Bukkit.getPlayer(mineData.getMineOwner());
-    if (player.equals(owner)) {
-      return;
+    UUID uuid = player.getUniqueId();
+    UUID mineOwner = mineData.getMineOwner();
+
+    PrivateMineBanEvent privateMineBanEvent = new PrivateMineBanEvent(mineOwner, uuid, this);
+    Task.asyncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineBanEvent));
+
+    if (privateMineBanEvent.isCancelled()) return;
+
+    List<UUID> bannedPlayers = mineData.getBannedPlayers();
+    if (bannedPlayers.contains(uuid) || uuid.equals(mineOwner)) {
+      return; // Player is already banned or is the mine owner, nothing to do.
     }
 
-    audienceUtils.sendMessage(player, Objects.requireNonNull(owner),
-        MessagesConfig.successfullyBannedPlayer);
-    audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.bannedFromMine);
+    Player owner = Bukkit.getPlayer(mineOwner);
+    if (owner == null) {
+      return; // The mine owner is not online, so we can't proceed.
+    }
+    audienceUtils.sendMessage(player, owner, MessagesConfig.successfullyBannedPlayer);
+    audienceUtils.sendMessage(player, owner, MessagesConfig.bannedFromMine);
 
-    mineData.getBannedPlayers().add(player.getUniqueId());
+    bannedPlayers.add(uuid);
     setMineData(mineData);
     SQLUtils.update(this);
   }
 
   public void unban(Player player) {
     Player owner = Bukkit.getPlayer(mineData.getMineOwner());
-    audienceUtils.sendMessage(player, Objects.requireNonNull(owner), MessagesConfig.unbannedPlayer);
-    audienceUtils.sendMessage(player, Objects.requireNonNull(owner),
-        MessagesConfig.unbannedFromMine);
 
-    mineData.getBannedPlayers().remove(player.getUniqueId());
+    if (owner == null) {
+      return; // The mine owner is not online, so we can't proceed.
+    }
+
+    UUID playerUniqueId = player.getUniqueId();
+    UUID ownerUUID = owner.getUniqueId();
+
+    PrivateMineBanEvent privateMineBanEvent = new PrivateMineBanEvent(ownerUUID, playerUniqueId, this);
+    Task.asyncDelayed(() -> Bukkit.getPluginManager().callEvent(privateMineBanEvent));
+
+    if (privateMineBanEvent.isCancelled()) return;
+
+    audienceUtils.sendMessage(player, owner, MessagesConfig.unbannedPlayer);
+    audienceUtils.sendMessage(player, owner, MessagesConfig.unbannedFromMine);
+
+    mineData.getBannedPlayers().remove(playerUniqueId);
     setMineData(mineData);
     SQLUtils.update(this);
   }
@@ -746,9 +779,7 @@ public class Mine {
           mineData.setMaximumFullRegion(maximum);
           setMineData(mineData);
           handleReset();
-          Task.asyncDelayed(() -> {
-            SQLUtils.update(this);
-          });
+          Task.asyncDelayed(() -> SQLUtils.update(this));
           Task.syncDelayed(() -> spawn.getBlock().setType(Material.AIR, false));
 
           if (Bukkit.getPluginManager().isPluginEnabled("XPrison")) {

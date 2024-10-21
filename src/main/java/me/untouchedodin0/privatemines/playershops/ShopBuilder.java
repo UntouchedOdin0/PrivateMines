@@ -25,6 +25,7 @@
 package me.untouchedodin0.privatemines.playershops;
 
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Material;
 
 import java.util.Map;
@@ -32,7 +33,7 @@ import java.util.UUID;
 
 public class ShopBuilder {
     UUID owner;
-    Region region;
+    ProtectedRegion region;
     Map<Material, Double> prices;
 
     public ShopBuilder setOwner(UUID owner) {
@@ -40,7 +41,7 @@ public class ShopBuilder {
         return this;
     }
 
-    public ShopBuilder setRegion(Region region) {
+    public ShopBuilder setRegion(ProtectedRegion region) {
         this.region = region;
         return this;
     }

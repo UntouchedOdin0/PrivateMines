@@ -102,4 +102,8 @@ public class MineWorldManager {
   public Location getDefaultLocation() {
     return defaultLocation;
   }
+
+  public int getBorderDistance() {
+    return borderDistance;
+  }
 }

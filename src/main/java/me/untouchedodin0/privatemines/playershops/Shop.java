@@ -24,15 +24,14 @@
 
 package me.untouchedodin0.privatemines.playershops;
 
-import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class Shop {
 
@@ -44,7 +43,7 @@ public class Shop {
 
     UUID owner;
     Map<Material, Double> prices = new HashMap<>();
-    Region region;
+    ProtectedRegion region;
 
     public UUID getOwner() {
         return owner;
@@ -68,11 +67,15 @@ public class Shop {
         }
     }
 
-    public void setRegion(Region region) {
+    public void setRegion(ProtectedRegion region) {
         this.region = region;
     }
 
     public void setPrices(Map<Material, Double> prices) {
         this.prices = prices;
+    }
+
+    public double getPrice(Material material) {
+        return prices.get(material);
     }
 }
